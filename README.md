@@ -1,9 +1,9 @@
 gstreamer1.x-java
 =================
 
-This is a version of gstreamer-java mostly compatible with gstreamer 1.0/1.2 including some code produced by CafeX Communications.
+This is a version of gstreamer-java mostly compatible with gstreamer 1.0/1.2 including some changes donated by CafeX Communications.
 
-Originally based on the code from https://code.google.com/p/gstreamer-java/.
+Originally this code was taken from https://code.google.com/p/gstreamer-java/.
 
 Current Status
 ==============
