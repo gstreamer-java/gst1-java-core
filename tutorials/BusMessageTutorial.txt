@@ -1,0 +1,96 @@
+None of the other tutorials so far handle error conditions, nor do they exit 
+once the media file has finished playing.
+
+This tutorial will show you how to listen for messages on the pipeline Bus to
+detect these conditions.
+
+public class BusMessages {
+    public static void main(String[] args) {
+        args = Gst.init("BusMessages", args);
+        final PlayBin playbin = new PlayBin("BusMessages");
+        playbin.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+        playbin.setInputFile(new File(args[0]));
+        playbin.getBus().connect(new Bus.EOS() {
+            public void endOfStream(GstObject source) {
+                System.out.println("Finished playing file");
+                Gst.quit();
+            }
+        });
+        playbin.getBus().connect(new Bus.ERROR() {
+            public void errorMessage(GstObject source, int code, String message) {
+                System.out.println("Error occurred: " + message);
+                Gst.quit();
+            }
+        });
+        playbin.getBus().connect(new Bus.STATE_CHANGED() {
+            public void stateChanged(GstObject source, State old, State current, State pending) {
+                if (source == playbin) {
+                    System.out.println("Pipeline state changed from " + old + " to " + current);
+                }
+            }
+        });
+        playbin.setState(State.PLAYING);
+        Gst.main();
+        playbin.setState(State.NULL);
+        Gst.deinit();
+    }
+}
+
+The first few lines should be familiar by now from AudioPlayerTutorial.
+
+After we set the input file to use, the code gets interesting - we register
+listeners for Bus events.
+
+First we connect a listener for EOS - end-of-stream events which are sent when
+the media file has finished playing.
+
+        playbin.getBus().connect(new Bus.EOS() {
+            public void endOfStream(GstObject source) {
+                System.out.println("Finished playing file");
+                Gst.quit();
+            }
+        });
+
+You can put whatever you want inside the endOfStream() method, but here we just
+print out an informative message and call Gst.quit(), which will make 
+the call to Gst.main() at the end of the program, return.
+
+
+
+Next up, we connect a listener for ERROR events - these will get posted if 
+gstreamer cannot play the file for any reason, or errors are discovered in the
+stream.
+
+        playbin.getBus().connect(new Bus.ERROR() {
+            public void errorMessage(GstObject source, int code, String message) {
+                System.out.println("Error occurred: " + message);
+                Gst.quit();
+            }
+        });
+
+Lastly, we connect a listener for state-changed events.  This is instructive to
+see how gstreamer changes the pipeline state in response to a 
+Pipeline.setState() method call.
+
+        playbin.getBus().connect(new Bus.STATE_CHANGED() {
+            public void stateChanged(GstObject source, State old, State current, State pending) {
+                if (source == playbin) {
+                    System.out.println("Pipeline state changed from " + old + " to " + current);
+                }
+            }
+        });
+
+Since any element in the pipeline can post messages on the Bus, we need to check 
+that the message source is the pipeline - i.e. the state change is a top level 
+pipeline state change, and not some internal element changing state.
+
+
+Finally, we have the standard gstreamer boilerplate to keep the main thread 
+alive whilst the media file is playing, and clean up at its completion.
+
+        playbin.setState(State.PLAYING);
+        Gst.main();
+        playbin.setState(State.NULL);
+        Gst.deinit();
+
+

@@ -1,0 +1,50 @@
+This is a port of the gstreamer tutorial from http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/chapter-init.html
+
+It demonstrates how to initialize the gstreamer framework before using it.
+
+public class InitTest {
+    public static void main(String[] args) {
+        args = Gst.init("InitTest", args);
+        Version version = Gst.getVersion();
+        String nanoStr = "";
+        if (version.getNano() == 1) {
+            nanoStr = " (CVS)";
+        } else if (version.getNano() >= 2) {
+            nanoStr = " (Pre-release)";
+        }
+        System.out.printf("Gstreamer version %d.%d.%d%s initialized!",
+                version.getMajor(), version.getMinor(), version.getMicro(),
+                nanoStr);
+
+        Gst.deinit();
+    }
+}
+
+The first line simply initializes gstreamer itself:
+
+       args = Gst.init("InitTest", args);
+
+The first argument is the program name.  You can supply any string here, as it
+is only used by gstreamer for debugging and error messages, but supplying the
+name of your main class would be a good idea.
+
+If gstreamer fails to initialize, Gst.init() will throw a GstException which you
+might want to catch if you want to report the error in a GUI.
+
+
+After initializing gstreamer, we get the version information of the currently
+loaded version of gstreamer.
+
+        Version version = Gst.getVersion();
+
+Each gstreamer version has a major, minor, micro and nano component.  The major 
+is always '0', the minor will always be '10', and the micro is incremented for
+each release.  The nano component is used between releases to signify a 
+non-release version (either compiled from CVS, or a pre-release).
+
+To get the version as a string as shown above, simply use Version.toString().
+
+After we've finished with gstreamer, shut it down via;
+
+        Gst.deinit();
+

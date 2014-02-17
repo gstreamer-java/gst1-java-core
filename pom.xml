@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.googlecode.gstreamer-java</groupId>
+  <artifactId>gstreamer-java</artifactId>
+  <packaging>jar</packaging>
+  <name>Gstreamer Java</name>
+  <version>1.6-SNAPSHOT</version>
+  <description>Java binding for the Gstreamer framework</description>
+  <url>http://code.google.com/p/gstreamer-java</url>
+  <developers>
+    <developer>
+      <id>wmeissner</id>
+      <name>Wayne Meissner</name>
+      <email>wmeissner[at]gmail[dot]com</email>
+      <roles>
+        <role>founder</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>lfarkas</id>
+      <name>Levante Farkas</name>
+      <email>lfarkas[at]gmail[dot]com</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>andres.colubri</id>
+      <name>Andres Colubri</name>
+      <email>andres.colubri[at]gmail[dot]com</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>tshalif</id>
+      <name>Tal Shalif</name>
+      <email>tal[at]shalif[dot]com</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>dhoyt</id>
+      <name>David Hoyt</name>
+      <email>david.g.hoyt[at]gmail[dot]com</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>http://code.google.com/p/gstreamer-java/source/browse</url>
+    <connection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</connection>
+    <developerConnection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</developerConnection>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>${jna.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>platform</artifactId>
+      <version>${jna.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.apple</groupId>
+      <artifactId>AppleJavaExtensions</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testSourceDirectory>test</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>test</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.2.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.13</version>
+        <configuration>
+          <forkMode>pertest</forkMode>
+          <argLine>${maven.test.jvmargs}</argLine>
+          <excludes>
+            <exclude>**/Test*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <distributionManagement>
+
+    <!-- maintainer note: Run following to stage on sonatype (replace xxx): 
+         Have the following in your ~/.m2/settings.xml: ===================================== 
+         <servers> <server> <id>sonatype-nexus-staging</id> <username>my-sonatype-nexus-username</username> 
+         <password>my-sonatype-nexus-passwd</password> </server> </servers> ===================================== 
+         Then from a shell in the gstreamer-java subdir: ============================================================================================ 
+         tanaka> LANG=en_GB.UTF-8 mvn -Dgpg.Dkeyname=xxx@example.com \ -Dgpg.passphrase=xxxx 
+         \ -Darguments="-Dgpg.passphrase=xxxx" \ -DconnectionUrl=scm:svn:https://gstreamer-java.googlecode.com/svn/branches/maven-release-1.x 
+         \ release:perform ============================================================================================ -->
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Nexus Release Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Nexus Snapshot Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.test.jvmargs></maven.test.jvmargs>
+    <jna.version>3.5.1</jna.version>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.swt.carbon</groupId>
+          <artifactId>macosx</artifactId>
+          <version>3.3.0-v3346</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.swt.win32.win32</groupId>
+          <artifactId>x86</artifactId>
+          <version>3.3.0-v3346</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>linux-x64</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <name>Linux</name>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.swt.gtk.linux</groupId>
+          <artifactId>x86_64</artifactId>
+          <version>3.3.0-v3346</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <name>Linux</name>
+          <arch>i386</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.swt.gtk.linux</groupId>
+          <artifactId>x86</artifactId>
+          <version>3.3.0-v3346</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

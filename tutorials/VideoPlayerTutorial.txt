@@ -1,0 +1,81 @@
+
+Like the audio player, gstreamer can be used to build a simple video player:
+
+public class VideoPlayer {
+    public static void main(String[] args) {
+        args = Gst.init("VideoPlayer", args);
+        final PlayBin playbin = new PlayBin("VideoPlayer");
+        playbin.setInputFile(new File(args[0]));
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                VideoComponent videoComponent = new VideoComponent();
+                playbin.setVideoSink(videoComponent.getElement());
+
+                JFrame frame = new JFrame("VideoPlayer");
+                frame.getContentPane().add(videoComponent, BorderLayout.CENTER);
+                frame.setPreferredSize(new Dimension(640, 480));
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                playbin.setState(State.PLAYING);
+            }
+        });
+        Gst.main();
+        playbin.setState(State.NULL);
+    }
+}
+
+The first few lines once again, just initialize gstreamer and set up the 
+PlayBin to play a file:
+
+        args = Gst.init("VideoPlayer", args);
+        final PlayBin playbin = new PlayBin("VideoPlayer");
+        playbin.setInputFile(new File(args[0]));
+
+Now we have to create somewhere for the video to be displayed.  All these 
+operations must be executed on the Swing event dispatch thread, as swing 
+components are being created, and swing is not thread-safe, so wrap it all
+using SwingUtilities.
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // Do video setup here ...
+            }
+        });
+
+First we create the VideoComponent - this is a lightweight swing component that
+will display video sent to it.
+
+                VideoComponent videoComponent = new VideoComponent();
+
+
+Second, we have to hook it into the playbin as the video output.  In 
+AudioPlayerTutorial we disabled video output via playbin.setVideoSink(), here
+we will use it to enable video output.
+
+                playbin.setVideoSink(videoComponent.getElement());
+
+Now we add the videocomponent to a JFrame for display, and do some basic JFrame 
+setup to get the window into a sane state.
+
+                JFrame frame = new JFrame("VideoPlayer");
+                frame.getContentPane().add(videoComponent, BorderLayout.CENTER);
+                frame.setPreferredSize(new Dimension(640, 480));
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+
+Lastly, we set the pipeline playing.
+
+                playbin.setState(State.PLAYING);
+
+At the end of the main method we have the usual gstreamer boilerplate:
+
+        Gst.main();
+        playbin.setState(State.NULL);
+
+Whilst that isn't strictly neccessary for GUI gstreamer applications, it keeps
+the same pattern as used in the other tutorials for familiarity.
+

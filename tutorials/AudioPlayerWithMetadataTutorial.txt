@@ -1,0 +1,59 @@
+Audio and video files commonly contain meta-data such as the artist(s), the 
+album, what encoder was used to build the file, etc.
+
+That information can be extracted from the pipeline by adding a listener to
+the pipeline to listen for tag events.
+
+public class AudioPlayerMetadata {
+    public static void main(String[] args) {
+        args = Gst.init("AudioPlayerMetadata", args);
+        PlayBin playbin = new PlayBin("AudioPlayer");
+        playbin.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+        playbin.setInputFile(new File(args[0]));
+
+        playbin.getBus().connect(new Bus.TAG() {
+
+            public void tagsFound(GstObject source, TagList tagList) {
+                for (String tagName : tagList.getTagNames()) {
+                    for (Object tagData : tagList.getValues(tagName)) {
+                        System.out.printf("[%s]=%s\n", tagName, tagData);
+                    }
+                }
+            }
+        });
+        
+        playbin.setState(State.PLAYING);
+        Gst.main();
+        playbin.setState(State.NULL);
+    }
+}
+
+The first part of the above program comes from AudioPlayerTutorial and just 
+sets up the pipeline to play the file.
+
+Now comes the interesting part where we listen for tag messages.  Every pipeline
+has a 'Bus' that elements in the pipeline use when they wish to tell your
+application that something has happened - such as new meta-data being found.
+
+So, we connect a listener to the bus to listen for those messages - in this case
+we want to listen for 'tag' messages:
+
+        playbin.getBus().connect(new Bus.TAG() {
+            public void tagsFound(GstObject source, TagList tagList) {
+                // Add code here to print out the tags
+            }
+        });
+
+As each tag can have multiple values (e.g. multiple artists), we need to 
+retrieve all the values for a particular tag and process/print them.
+
+In the 'tagsFound' method above, we add the following code:
+
+                for (Object tagData : tagList.getValues(tagName)) {
+                    System.out.printf("[%s]=%s\n", tagName, tagData);
+                }
+
+You can do any thing you want in that listener, such as storing the tags for 
+later, displaying them in a GUI, etc.
+                
+
