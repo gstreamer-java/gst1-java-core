@@ -39,11 +39,12 @@ public class GstInterface extends NativeValue {
     protected final Pointer handle;
     protected final Element element;
     protected GstInterface(Element element, GType type) {
-        if (!GSTINTERFACES_API.gst_element_implements_interface(element, type)) {
-            throw new IllegalArgumentException("Element does not implement interface");
-        }
+//        if (!GSTINTERFACES_API.gst_element_implements_interface(element, type)) {
+//            throw new IllegalArgumentException("Element does not implement interface");
+//        }
         this.element = element;
-        handle = GSTINTERFACES_API.gst_implements_interface_cast(element, type);
+//        handle = GSTINTERFACES_API.gst_implements_interface_cast(element, type);
+        handle = element.getNativeAddress();
     }
     protected Object nativeValue() {
         return handle;
