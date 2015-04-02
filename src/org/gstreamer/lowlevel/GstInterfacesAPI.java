@@ -20,7 +20,6 @@
 
 package org.gstreamer.lowlevel;
 
-import org.gstreamer.Element;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 
@@ -30,5 +29,4 @@ public interface GstInterfacesAPI extends Library {
     GType  gst_implements_interface_get_type();
     Pointer gst_implements_interface_cast(NativeObject from, GType type);
     Pointer gst_implements_interface_check(NativeObject from, GType type);
-    boolean gst_element_implements_interface(Element element, GType iface_type);
 }
