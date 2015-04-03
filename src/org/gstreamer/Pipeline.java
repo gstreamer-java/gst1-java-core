@@ -330,9 +330,8 @@ public class Pipeline extends Bin {
      * @return The current position or -1 if the query failed. 
      */
     public long queryPosition(Format format) {
-        Format[] fmt = { format };
         long[] pos = { 0 };
-        return gst.gst_element_query_position(this, fmt, pos) ? pos[0] : -1L;
+        return gst.gst_element_query_position(this, format, pos) ? pos[0] : -1L;
     }
     
     /**
