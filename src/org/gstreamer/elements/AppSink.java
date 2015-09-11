@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Wayne Meissner
  * Copyright (c) 2008 Wayne Meissner
@@ -42,7 +43,7 @@ public class AppSink extends BaseSink {
         super(init);
     }
     
-    protected AppSink(String name) {
+    public AppSink(String name) {
     	this(makeRawElement(GST_NAME, name));
     }
 
