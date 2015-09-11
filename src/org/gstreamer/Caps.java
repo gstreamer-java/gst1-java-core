@@ -1,4 +1,5 @@
-/* 
+/*
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) <2003> David A. Schleef <ds@schleef.org>
@@ -58,7 +59,7 @@ import com.sun.jna.Pointer;
  *
  * @see Structure
  */
-public class Caps extends RefCountedObject {
+public class Caps extends MiniObject {
     public static final String GTYPE_NAME = "GstCaps";
     
     private static final GstCapsAPI gst = GstNative.load(GstCapsAPI.class);
@@ -211,7 +212,7 @@ public class Caps extends RefCountedObject {
      * @return true if the caps could be simplified
      */
     public boolean simplify() {
-        return gst.gst_caps_do_simplify(this);
+        return gst.gst_caps_simplify(this);
     }
     
     /**
@@ -262,8 +263,8 @@ public class Caps extends RefCountedObject {
      * is no longer valid.</b>
      * @param other The other {@link Caps} to merge.
      */
-    public void merge(Caps other) {
-        gst.gst_caps_merge(this, other);
+    public Caps merge(Caps other) {
+        return gst.gst_caps_merge(this, other);
     }
     
     /**
@@ -417,15 +418,15 @@ public class Caps extends RefCountedObject {
         }
         return other == this || isEqual((Caps) other);
     }
-    protected void ref() {
-        gst.gst_caps_ref(this);
-    }
-    protected void unref() {
-        gst.gst_caps_unref(this);
-    }
-    protected void disposeNativeHandle(Pointer ptr) {
-        gst.gst_caps_unref(ptr);
-    }
+//    protected void ref() {
+//        gst.gst_caps_ref(this);
+//    }
+//    protected void unref() {
+//        gst.gst_caps_unref(this);
+//    }
+//    protected void disposeNativeHandle(Pointer ptr) {
+//        gst.gst_caps_unref(ptr);
+//    }
 
     
 }

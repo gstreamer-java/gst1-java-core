@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith 
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -57,7 +58,7 @@ public interface GstCapsAPI extends com.sun.jna.Library {
     
     /* manipulation */
     void gst_caps_append(Caps caps1, @Invalidate Caps caps2);
-    void gst_caps_merge(Caps caps1, @Invalidate Caps caps2);
+    @CallerOwnsReturn Caps gst_caps_merge(Caps caps1, @Invalidate Caps caps2);
     void gst_caps_append_structure(Caps caps, @Invalidate Structure structure);
     void gst_caps_remove_structure(Caps caps, int idx);
     void gst_caps_merge_structure(Caps caps, @Invalidate Structure structure);
@@ -72,7 +73,7 @@ public interface GstCapsAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Caps gst_caps_subtract( Caps minuend,  Caps subtrahend);
     @CallerOwnsReturn Caps gst_caps_union( Caps caps1,  Caps caps2);
     @CallerOwnsReturn Caps gst_caps_normalize( Caps caps);
-    boolean gst_caps_do_simplify(Caps caps);
+    boolean gst_caps_simplify(Caps caps);
     @FreeReturnValue String gst_caps_to_string(Caps caps);
     /* tests */
 

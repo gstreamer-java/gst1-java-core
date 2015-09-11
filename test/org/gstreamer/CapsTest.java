@@ -69,7 +69,7 @@ public class CapsTest {
     public void capsMerge() {
         Caps caps1 = new Caps("video/x-raw, format=RGB, bpp=32, depth=24");
         Caps caps2 = new Caps("video/x-raw, format=RGB, width=640, height=480");
-        caps1.merge(caps2);
+        caps1 = caps1.merge(caps2);
         // Verify that the victim caps were invalidated and cannot be used.
         try {
             caps2.toString();
@@ -85,8 +85,8 @@ public class CapsTest {
                 heightFound = true;
             }
         }
-        assertFalse("width not appended", widthFound);
-        assertFalse("height not appended", heightFound);
+        assertTrue("width not appended", widthFound);
+        assertTrue("height not appended", heightFound);
     }
     
     @Test
