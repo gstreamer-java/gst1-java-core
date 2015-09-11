@@ -21,16 +21,15 @@
 
 package org.gstreamer;
 
-import java.nio.ByteBuffer;
 
 import org.gstreamer.lowlevel.GstBufferAPI;
-import org.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 import org.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.gstreamer.lowlevel.GstNative;
 import org.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
+import java.nio.ByteBuffer;
 
 /**
  * Data-passing buffer type, supporting sub-buffers.
@@ -97,9 +96,12 @@ public class Buffer extends MiniObject {
         @CallerOwnsReturn Pointer ptr_gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
     }
     private static final API gst = GstNative.load(API.class);
+    
+    private final MapInfoStruct mapInfo;
+    
     public Buffer(Initializer init) {
         super(init);
-	struct = new BufferStruct(handle());
+        mapInfo = new MapInfoStruct();
     }
     
     /**
@@ -130,14 +132,14 @@ public class Buffer extends MiniObject {
         return ptr;
     }
     
-    /**
-     * Gets the size of the buffer data
-     * 
-     * @return the size of the buffer data in bytes.
-     */
-    public int getSize() {
-    	return gst.gst_buffer_get_size(this).intValue();
-    }
+//    /**
+//     * Gets the size of the buffer data
+//     * 
+//     * @return the size of the buffer data in bytes.
+//     */
+//    public int getSize() {
+//    	return gst.gst_buffer_get_size(this).intValue();
+//    }
     
     /**
      * Gets a {@link java.nio.ByteBuffer} that can access the native memory
@@ -145,82 +147,18 @@ public class Buffer extends MiniObject {
      * 
      * @return A {@link java.nio.ByteBuffer} that can access this Buffer's data.
      */
-    public synchronized byte[] readData() {
-        byte[] byteData;
-        
-        final MapInfoStruct mapinfo = new MapInfoStruct();
-        	
-        int flags = GstBufferAPI.GST_MAP_READ;
-		boolean ok = gst.gst_buffer_map(this, mapinfo, flags);
-		if (ok)
-		{
-		    try
-		    {
-                long size = mapinfo.size.longValue();
-                Pointer data = mapinfo.data;
-                if (data != null && size > 0) {
-                    byteData = data.getByteArray(0, (int) size);
-                } else {
-                    byteData = null;
-                }
-		    }
-		    finally
-		    {
-		        gst.gst_buffer_unmap(this, mapinfo);
-		    }
-		}
-		else
-		{
-		    byteData = null;
-		}
-        return byteData;
-    }
-    
-    
-    @Override
-    public String toString() {
-    	return super.toString();
-    }
-
-    /**
-     * Sets the timestamp in time of the buffer data, can be {@link ClockTime#NONE}
-     * when the timestamp is not known or relevant.
-     */
-    public void setTimestamp(ClockTime timestamp) {
-        struct.pts = timestamp;
-        struct.writeField("pts");
-    }
- 
-    public void writeData(byte[] data, int i, int length)
-    {
-        final MapInfoStruct mapinfo = new MapInfoStruct();
-        
-        int flags = GstBufferAPI.GST_MAP_WRITE;
-        boolean ok = gst.gst_buffer_map(this, mapinfo, flags);
-        if (ok)
-        {
-            try
-            {
-                final long sizeOfDestination = mapinfo.size.longValue();
-                if (sizeOfDestination < length)
-                {
-                    throw new IllegalArgumentException("Not enough room to write data");
-                }
-                final int bytesToWrite = Math.min((int)sizeOfDestination, length);
-                final Pointer dest = mapinfo.data;
-                if (dest != null && sizeOfDestination > 0) {
-                    dest.write(0, data, 0, bytesToWrite);
-                }
-            }
-            finally
-            {
-                gst.gst_buffer_unmap(this, mapinfo);
-            }
-        }
-        else
-        {
-            throw new IllegalStateException("Cannot map buffer");
+    public ByteBuffer map(boolean writeable) {
+        boolean ok = gst.gst_buffer_map(this, mapInfo,
+                writeable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
+        if (ok) {
+            return mapInfo.data.getByteBuffer(0, mapInfo.size.intValue());
+        } else {
+            return null;
         }
     }
-    private final BufferStruct struct;
+    
+    public void unmap() {
+        gst.gst_buffer_unmap(this, mapInfo);
+    }
+    
 }
