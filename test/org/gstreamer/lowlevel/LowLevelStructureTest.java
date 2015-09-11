@@ -185,8 +185,6 @@ public class LowLevelStructureTest {
 
         structs.add(GstMiniObjectAPI.MiniObjectStruct.class);
 
-        structs.add(GstMixerAPI.MixerTrackStruct.class);
-
         structs.add(GstObjectAPI.GstObjectStruct.class);
         structs.add(GstObjectAPI.GstObjectClass.class);
 
@@ -196,8 +194,6 @@ public class LowLevelStructureTest {
 
         structs.add(GstQueryAPI.QueryStruct.class);
 
-        structs.add(GstTunerAPI.TunerChannelStruct.class);
-        structs.add(GstTunerAPI.TunerNormStruct.class);
 
 
     }
