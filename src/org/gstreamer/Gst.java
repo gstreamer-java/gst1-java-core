@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -32,40 +33,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gstreamer.elements.AppSink;
 import org.gstreamer.elements.AppSrc;
 import org.gstreamer.elements.BaseSink;
 import org.gstreamer.elements.BaseSrc;
-import org.gstreamer.elements.BaseTransform;
-import org.gstreamer.elements.DecodeBin;
-import org.gstreamer.elements.FakeSink;
-import org.gstreamer.elements.FakeSrc;
-import org.gstreamer.elements.FileSink;
-import org.gstreamer.elements.FileSrc;
-import org.gstreamer.elements.Identity;
-import org.gstreamer.elements.InputSelector;
-import org.gstreamer.elements.MultiFdSink;
-import org.gstreamer.elements.MultiQueue;
-import org.gstreamer.elements.OSXVideoSink;
 import org.gstreamer.elements.PlayBin;
-import org.gstreamer.elements.Queue;
-import org.gstreamer.elements.Queue2;
-import org.gstreamer.elements.ShmSink;
-import org.gstreamer.elements.ShmSrc;
-import org.gstreamer.elements.TCPServerSink;
-import org.gstreamer.elements.Tee;
-import org.gstreamer.elements.TypeFind;
-import org.gstreamer.elements.good.RTPBin;
-import org.gstreamer.elements.good.RTSPSrc;
 import org.gstreamer.glib.GDate;
 import org.gstreamer.glib.MainContextExecutorService;
 import org.gstreamer.interfaces.ColorBalanceChannel;
-import org.gstreamer.interfaces.MixerTrack;
-import org.gstreamer.interfaces.TunerChannel;
-import org.gstreamer.interfaces.TunerNorm;
 import org.gstreamer.lowlevel.GMainContext;
 import org.gstreamer.lowlevel.GValueAPI.GValue;
 import org.gstreamer.lowlevel.GValueAPI.GValueArray;
@@ -81,6 +58,7 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.gstreamer.elements.BaseTransform;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -474,11 +452,6 @@ public final class Gst {
 		TimedValue.class,
 		ValueArray.class,
 		ValueList.class,
-		// ----------- Interfaces -------------
-		ColorBalanceChannel.class,
-		MixerTrack.class,
-		TunerChannel.class,
-		TunerNorm.class,
 		// ----------- Base -------------
 		Buffer.class,
 		Bus.class,
@@ -504,31 +477,7 @@ public final class Gst {
 		BaseSink.class,
 		BaseTransform.class,
 		Bin.class,
-		// CapsFilter.class;
-		DecodeBin.class,
-		FakeSink.class,
-		FakeSrc.class,
-		// FdSink.class,
-		// FdSrc.class,
-		FileSink.class,
-		FileSrc.class,
-		// Funnel.class,
-		Identity.class,
-		InputSelector.class,
-		MultiFdSink.class,
-		MultiQueue.class,
-		OSXVideoSink.class,
-		// OutputSelector.class,
 		Pipeline.class,
-		PlayBin.class,
-		Queue.class,
-		Queue2.class,
-		ShmSink.class,
-		ShmSrc.class,
-		TCPServerSink.class,
-		Tee.class,
-		TypeFind.class,
-		RTPBin.class,
-		RTSPSrc.class,
+		PlayBin.class
 	};
 }
