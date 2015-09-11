@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2007, 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -20,14 +21,9 @@
 
 package org.gstreamer;
 
-import org.gstreamer.lowlevel.GstMessageAPI;
 import org.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.gstreamer.lowlevel.GstNative;
 import org.gstreamer.lowlevel.GstSampleAPI;
-import org.gstreamer.lowlevel.ReferenceManager;
-import org.gstreamer.lowlevel.annotations.HasSubtype;
-
-import com.sun.jna.Pointer;
 
 /**
  * Lightweight objects to signal the occurrence of pipeline events.
@@ -52,13 +48,11 @@ import com.sun.jna.Pointer;
  * An {@link Element} usually posts messages on the bus provided by the parent
  * container using {@link Element#postMessage postMessage()}.
  */
-@HasSubtype
 public class Sample extends MiniObject {
     public static final String GTYPE_NAME = "GstSample";
 
     static interface API extends GstSampleAPI, GstMiniObjectAPI {}
     static final API gst = GstNative.load(API.class);
-    protected GstSampleAPI.SampleStruct sampleStruct;
     
     /**
      * Creates a new instance of Message.
@@ -67,7 +61,10 @@ public class Sample extends MiniObject {
      */
     public Sample(Initializer init) {
         super(init);
-        sampleStruct = new GstSampleAPI.SampleStruct(handle());
+    }
+    
+    public Caps getCaps() {
+        return gst.gst_sample_get_caps(this);
     }
     
     /**
@@ -76,11 +73,12 @@ public class Sample extends MiniObject {
      * @return the buffer
      */
     public Buffer getBuffer() {
-         Pointer ptr = gst.gst_sample_get_buffer(this);
-         
-         // Buffer is owned alongside sample - freeing sample
-         // will unref the buffer so add another ref
-         return new Buffer(new Initializer(ptr, true, true));
+//         Pointer ptr = gst.gst_sample_get_buffer(this);
+//         
+//         // Buffer is owned alongside sample - freeing sample
+//         // will unref the buffer so add another ref
+//         return new Buffer(new Initializer(ptr, true, true));
+        return gst.gst_sample_get_buffer(this);
     }
     
 }

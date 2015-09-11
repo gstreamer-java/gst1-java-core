@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
@@ -20,28 +21,15 @@
 
 package org.gstreamer.lowlevel;
 
-import org.gstreamer.Buffer;
-import org.gstreamer.Caps;
-import org.gstreamer.Clock;
-import org.gstreamer.Format;
-import org.gstreamer.GstObject;
-import org.gstreamer.Message;
-import org.gstreamer.MessageType;
 import org.gstreamer.Sample;
-import org.gstreamer.Segment;
-import org.gstreamer.State;
-import org.gstreamer.Structure;
-import org.gstreamer.TagList;
-import org.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
-import org.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.gstreamer.lowlevel.annotations.ConstReturn;
-import org.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
 import java.util.List;
+import org.gstreamer.Buffer;
+import org.gstreamer.Caps;
+import org.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
  * GstSample functions
@@ -73,6 +61,7 @@ public interface GstSampleAPI extends com.sun.jna.Library {
         }
     }
     
-    Pointer gst_sample_get_buffer(Sample sample);
+    /*@CallerOwnsReturn*/ Caps gst_sample_get_caps(Sample sample);
+    /*@CallerOwnsReturn*/ Buffer gst_sample_get_buffer(Sample sample);
     
 }
