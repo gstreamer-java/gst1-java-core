@@ -245,14 +245,14 @@ public class EventTest {
         }
     }
     @Test public void Seek_getStartType() {
-        for (SeekType TYPE : new SeekType[] { SeekType.CUR, SeekType.SET, SeekType.END }) {
+        for (SeekType TYPE : new SeekType[] { SeekType.SET, SeekType.END }) {
             SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
                     TYPE, 0, SeekType.NONE, 0);
             assertEquals("Wrong startType in SeekEvent", TYPE, ev.getStartType());
         }
     }
     @Test public void Seek_getStopType() {
-        for (SeekType TYPE : new SeekType[] { SeekType.CUR, SeekType.SET, SeekType.END }) {
+        for (SeekType TYPE : new SeekType[] { SeekType.SET, SeekType.END }) {
             SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
                     SeekType.NONE, 0, TYPE, 0);
             assertEquals("Wrong stopType in SeekEvent", TYPE, ev.getStopType());

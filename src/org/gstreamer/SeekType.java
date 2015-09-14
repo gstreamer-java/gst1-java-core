@@ -29,8 +29,6 @@ package org.gstreamer;
 public enum SeekType {
     /** No change in position is required. */
     NONE,
-    /** Change relative to current position. */
-    CUR,
     /** Absolute position is requested. */
     SET,
     /** Relative position to duration is requested. */
