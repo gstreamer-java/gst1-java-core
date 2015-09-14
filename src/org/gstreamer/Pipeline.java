@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2007,2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2004,2005 Wim Taymans <wim@fluendo.com>

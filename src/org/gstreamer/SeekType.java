@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.

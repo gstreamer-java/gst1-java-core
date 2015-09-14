@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2009 Levente Farkas
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>

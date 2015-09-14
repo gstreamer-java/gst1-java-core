@@ -1,4 +1,5 @@
-/* 
+/*
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
