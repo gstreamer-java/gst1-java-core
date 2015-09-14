@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2015 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -39,6 +40,8 @@ import org.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.gstreamer.lowlevel.GstNative;
 
 import com.sun.jna.Callback;
+import com.sun.jna.CallbackThreadInitializer;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -688,27 +691,33 @@ public class Bus extends GstObject {
         syncHandler = handler;
     }
     private static org.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
+        
+        {
+            Native.setCallbackThreadInitializer(this,
+                new CallbackThreadInitializer(true, false, "GstBus"));
+            
+        }
 		
-		public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
-			if (bus.syncHandler != null) {
-	            BusSyncReply reply = bus.syncHandler.syncMessage(msg);
+	public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
+            if (bus.syncHandler != null) {
+	        BusSyncReply reply = bus.syncHandler.syncMessage(msg);
 	            
-	            if (reply != BusSyncReply.DROP) {
-	                Gst.getExecutor().execute(new Runnable() {
-	                    public void run() {
-	                        bus.dispatchMessage(msg);
-	                    }
-	                });
-	            }
-        	}
+	        if (reply != BusSyncReply.DROP) {
+	            Gst.getExecutor().execute(new Runnable() {
+	                public void run() {
+	                    bus.dispatchMessage(msg);
+	                }
+	            });
+	        }
+            }
             //
             // Unref the message, since we are dropping it.
             // (the normal GC will drop other refs to it)
             //
             gst.gst_mini_object_unref(msg);
             return BusSyncReply.DROP;
-		}
-	};
+	}
+    };
     
     /**
      * Connects to a signal.
@@ -806,18 +815,9 @@ public class Bus extends GstObject {
             this.callback = callback;
         }
         public void busMessage(final Bus bus, final Message msg) {
-        	final MessageType messageType;
-        	try {
-        		messageType = msg.getType();
-        		if ((type.intValue() & msg.getType().intValue()) != 0) {
-                    callback.callback(bus, msg, null);
-                }
-        	} catch (Throwable e) {
-        		e.printStackTrace();
-        		System.out.println("ERROR getting type from message");
-        		System.exit(1);
-        	}
-            
+            if ((type.intValue() & msg.getType().intValue()) != 0) {
+                callback.callback(bus, msg, null);
+            }
         }
     }
     
