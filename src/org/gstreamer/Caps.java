@@ -23,7 +23,6 @@ package org.gstreamer;
 
 import org.gstreamer.lowlevel.GstCapsAPI;
 import org.gstreamer.lowlevel.GstNative;
-import org.gstreamer.lowlevel.RefCountedObject;
 
 import com.sun.jna.Pointer;
 
@@ -141,161 +140,161 @@ public class Caps extends MiniObject {
     public int size() {
         return gst.gst_caps_get_size(this);
     }
-    
-    /**
-     * Create a new Caps as a copy of the this caps.
-     * 
-     * The new Caps will be a copy of this caps, with all the internal structures 
-     * copied as well.
-     *
-     * @return The new Caps.
-     */
-    public Caps copy() {
-        return gst.gst_caps_copy(this);
-    }
-    
-    /**
-     * Creates a new {@link Caps} that contains all the formats that are in
-     * either this Caps or the other Caps.
-     * 
-     * @param other The {@link Caps} to union with this one.
-     * @return The new {@link Caps}
-     */
-    public Caps union(Caps other) {
-        return gst.gst_caps_union(this, other);
-    }
-    
-    /**
-     * Creates a new {@link Caps} that contains all the formats that are common
-     * to both this Caps and the other Caps.
-     * 
-     * @param other The {@link Caps} to intersect with this one.
-     *
-     * @return The new {@link Caps}
-     */
-    public Caps intersect(Caps other) {
-        return gst.gst_caps_intersect(this, other);
-    }
-    
-    /**
-     * Subtracts the subtrahend Caps from this Caps.
-     * 
-     * <note>This function does not work reliably if optional properties for caps
-     * are included on one caps and omitted on the other.</note>
-     * @param subtrahend The {@link Caps} to subtract.
-     * @return The resulting caps.
-     */
-    public Caps subtract(Caps subtrahend) {
-        return gst.gst_caps_subtract(this, subtrahend);
-    }
-
-    /**
-     * Normalize the Caps.
-     * 
-     * Creates a new {@link Caps} that represents the same set of formats as
-     * this Caps, but contains no lists.  Each list is expanded into separate
-     * {@link Structure}s
-     * 
-     * @return The new {@link Caps}
-     * @see Structure
-     */
-    public Caps normalize() {
-        return gst.gst_caps_normalize(this);
-    }
-    
-    /**
-     * Modifies this caps inplace into a representation that represents the
-     * same set of formats, but in a simpler form.  Component structures that are
-     * identical are merged.  Component structures that have values that can be
-     * merged are also merged.
-     *
-     * @return true if the caps could be simplified
-     */
-    public boolean simplify() {
-        return gst.gst_caps_simplify(this);
-    }
-    
-    /**
-     * Append the structures contained in caps to this caps object. 
-     * The structures in caps are not copied -- they are transferred to this caps.
-     * <p>
-     * If either caps is ANY, the resulting caps will be ANY.
-     * 
-     * @param caps The Caps to append
-     */
-    public void append(Caps caps) {
-        gst.gst_caps_append(this, caps);
-    }
-    
-    /**
-     * Append structure to this caps.
-     * The structure is not copied; this caps takes ownership, so do not use struct
-     * after calling this method.
-     * 
-     * @param struct The structure to append.
-     */
-    public void append(Structure struct) {
-        gst.gst_caps_append_structure(this, struct);
-    }
-    
-    /**
-     * Remove a struture from the caps.
-     * Removes the stucture with the given index from the list of structures
-     * contained in this caps.
-     * 
-     * @param index Index of the structure to remove.
-     */
-    public void removeStructure(int index) {
-        gst.gst_caps_remove_structure(this, index);
-    }
-    
-    /**
-     * Merge another {@link Caps} with this one.
-     * <p>
-     * Appends the structures contained in the other Caps to this one, if they 
-     * are not yet expressed by this Caps. 
-     * <p>
-     * The structures in other are not copied, they are transferred to this Caps,
-     * and then other is freed.
-     * <p>
-     * If either caps is ANY, the resulting caps will be ANY.
-     * <p><b>Do not use the argument after calling this method, as the native peer
-     * is no longer valid.</b>
-     * @param other The other {@link Caps} to merge.
-     */
-    public Caps merge(Caps other) {
-        return gst.gst_caps_merge(this, other);
-    }
-    
-    /**
-     * Append a structure to this caps. 
-     * Appends structure to this caps if its not already expressed.  
-     * The structure is not copied; caps becomes the owner of structure and structure 
-     * must not be used after calling this method.
-     *
-     * @param structure The structure to merge.
-     */
-    public void merge(Structure structure) {
-        gst.gst_caps_merge_structure(this, structure);
-    }
-    
-    /**
-     *
-     * Returns a writable copy of this caps.
-     * <p>
-     * This method will invalidate the native side of this caps object, so it should
-     * not be used after calling this method, and only the returned Caps object should be used.
-     * <p>
-     * 
-     * @return A writable version of this caps object.
-     */
-    public Caps makeWritable() {
-        return gst.gst_caps_make_writable(this);
-    }
-    
-    public void setInteger(String field, Integer value) {
-        gst.gst_caps_set_simple(this, field, value, null);
-    }
+//    
+//    /**
+//     * Create a new Caps as a copy of the this caps.
+//     * 
+//     * The new Caps will be a copy of this caps, with all the internal structures 
+//     * copied as well.
+//     *
+//     * @return The new Caps.
+//     */
+//    public Caps copy() {
+//        return gst.gst_caps_copy(this);
+//    }
+//    
+//    /**
+//     * Creates a new {@link Caps} that contains all the formats that are in
+//     * either this Caps or the other Caps.
+//     * 
+//     * @param other The {@link Caps} to union with this one.
+//     * @return The new {@link Caps}
+//     */
+//    public Caps union(Caps other) {
+//        return gst.gst_caps_union(this, other);
+//    }
+//    
+//    /**
+//     * Creates a new {@link Caps} that contains all the formats that are common
+//     * to both this Caps and the other Caps.
+//     * 
+//     * @param other The {@link Caps} to intersect with this one.
+//     *
+//     * @return The new {@link Caps}
+//     */
+//    public Caps intersect(Caps other) {
+//        return gst.gst_caps_intersect(this, other);
+//    }
+//    
+//    /**
+//     * Subtracts the subtrahend Caps from this Caps.
+//     * 
+//     * <note>This function does not work reliably if optional properties for caps
+//     * are included on one caps and omitted on the other.</note>
+//     * @param subtrahend The {@link Caps} to subtract.
+//     * @return The resulting caps.
+//     */
+//    public Caps subtract(Caps subtrahend) {
+//        return gst.gst_caps_subtract(this, subtrahend);
+//    }
+//
+//    /**
+//     * Normalize the Caps.
+//     * 
+//     * Creates a new {@link Caps} that represents the same set of formats as
+//     * this Caps, but contains no lists.  Each list is expanded into separate
+//     * {@link Structure}s
+//     * 
+//     * @return The new {@link Caps}
+//     * @see Structure
+//     */
+//    public Caps normalize() {
+//        return gst.gst_caps_normalize(this);
+//    }
+//    
+//    /**
+//     * Modifies this caps inplace into a representation that represents the
+//     * same set of formats, but in a simpler form.  Component structures that are
+//     * identical are merged.  Component structures that have values that can be
+//     * merged are also merged.
+//     *
+//     * @return true if the caps could be simplified
+//     */
+//    public boolean simplify() {
+//        return gst.gst_caps_simplify(this);
+//    }
+//    
+//    /**
+//     * Append the structures contained in caps to this caps object. 
+//     * The structures in caps are not copied -- they are transferred to this caps.
+//     * <p>
+//     * If either caps is ANY, the resulting caps will be ANY.
+//     * 
+//     * @param caps The Caps to append
+//     */
+//    public void append(Caps caps) {
+//        gst.gst_caps_append(this, caps);
+//    }
+//    
+//    /**
+//     * Append structure to this caps.
+//     * The structure is not copied; this caps takes ownership, so do not use struct
+//     * after calling this method.
+//     * 
+//     * @param struct The structure to append.
+//     */
+//    public void append(Structure struct) {
+//        gst.gst_caps_append_structure(this, struct);
+//    }
+//    
+//    /**
+//     * Remove a struture from the caps.
+//     * Removes the stucture with the given index from the list of structures
+//     * contained in this caps.
+//     * 
+//     * @param index Index of the structure to remove.
+//     */
+//    public void removeStructure(int index) {
+//        gst.gst_caps_remove_structure(this, index);
+//    }
+//    
+//    /**
+//     * Merge another {@link Caps} with this one.
+//     * <p>
+//     * Appends the structures contained in the other Caps to this one, if they 
+//     * are not yet expressed by this Caps. 
+//     * <p>
+//     * The structures in other are not copied, they are transferred to this Caps,
+//     * and then other is freed.
+//     * <p>
+//     * If either caps is ANY, the resulting caps will be ANY.
+//     * <p><b>Do not use the argument after calling this method, as the native peer
+//     * is no longer valid.</b>
+//     * @param other The other {@link Caps} to merge.
+//     */
+//    public Caps merge(Caps other) {
+//        return gst.gst_caps_merge(this, other);
+//    }
+//    
+//    /**
+//     * Append a structure to this caps. 
+//     * Appends structure to this caps if its not already expressed.  
+//     * The structure is not copied; caps becomes the owner of structure and structure 
+//     * must not be used after calling this method.
+//     *
+//     * @param structure The structure to merge.
+//     */
+//    public void merge(Structure structure) {
+//        gst.gst_caps_merge_structure(this, structure);
+//    }
+//    
+//    /**
+//     *
+//     * Returns a writable copy of this caps.
+//     * <p>
+//     * This method will invalidate the native side of this caps object, so it should
+//     * not be used after calling this method, and only the returned Caps object should be used.
+//     * <p>
+//     * 
+//     * @return A writable version of this caps object.
+//     */
+//    public Caps makeWritable() {
+//        return gst.gst_caps_make_writable(this);
+//    }
+//    
+//    public void setInteger(String field, Integer value) {
+//        gst.gst_caps_set_simple(this, field, value, null);
+//    }
     
     /**
      * Get a {@link Structure} contained in this caps.
@@ -317,14 +316,14 @@ public class Caps extends MiniObject {
         // gst_caps_get_structure is not marked as CallerOwnsReturn, so it should work
         return gst.gst_caps_get_structure(this, index);
     }
-    /**
-     * Destructively discard all but the first structure from this caps.
-     * 
-     * Useful when fixating. This caps must be writable.
-     */
-    public void truncate() {
-        gst.gst_caps_truncate(this);
-    }
+//    /**
+//     * Destructively discard all but the first structure from this caps.
+//     * 
+//     * Useful when fixating. This caps must be writable.
+//     */
+//    public void truncate() {
+//        gst.gst_caps_truncate(this);
+//    }
     
     @Override
     public String toString() {
