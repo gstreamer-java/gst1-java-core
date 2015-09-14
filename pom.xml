@@ -5,7 +5,7 @@
     <groupId>com.github.gstreamer-java</groupId>
     <artifactId>gstreamer1-java-core</artifactId>
     <packaging>jar</packaging>
-    <name>Gstreamer Java 1.x  Core</name>
+    <name>GStreamer 1.x Java Core</name>
     <version>0.9-SNAPSHOT</version>
     <description>Java binding for the Gstreamer framework</description>
     <url>http://code.google.com/p/gstreamer-java</url>
