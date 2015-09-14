@@ -340,7 +340,7 @@ public class Pipeline extends Bin {
      * @return The total duration of the current media stream.
      */
     public ClockTime queryDuration() {
-        return ClockTime.valueOf(queryDuration(TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+        return ClockTime.valueOf(queryDuration(Format.TIME), TimeUnit.NANOSECONDS);
     }
     
     /**
@@ -350,10 +350,7 @@ public class Pipeline extends Bin {
      * @return The total duration of the current media stream.
      */
     public long queryDuration(TimeUnit unit) {
-        Format[] fmt = { Format.TIME };
-        long[] duration = { 0 };
-        gst.gst_element_query_duration(this, fmt, duration);
-        return unit.convert(duration[0], TimeUnit.NANOSECONDS);
+        return unit.convert(queryDuration(Format.TIME), TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -363,10 +360,8 @@ public class Pipeline extends Bin {
      * @return The total duration of the current media stream.
      */
     public long queryDuration(Format format) {
-        Format[] fmt = { format };
-        long[] duration = { 0 };
-        gst.gst_element_query_duration(this, fmt, duration);
-        return duration[0];
+        long[] dur = { 0 };
+        return gst.gst_element_query_duration(this, format, dur) ? dur[0] : -1L;
     }
 
     /**

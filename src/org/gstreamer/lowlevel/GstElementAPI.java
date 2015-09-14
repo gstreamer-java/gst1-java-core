@@ -58,7 +58,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
     boolean gst_element_set_locked_state(Element element, boolean locked_state);
     boolean gst_element_sync_state_with_parent(Element elem);
     boolean gst_element_query_position(Element elem, Format fmt, long[] pos);
-    boolean gst_element_query_duration(Element elem, Format[] fmt, long[] pos);
+    boolean gst_element_query_duration(Element elem, Format fmt, long[] pos);
     boolean gst_element_query(Element elem, Query query);
     boolean gst_element_seek(Element elem, double rate, Format format, int flags,
             SeekType cur_type, long cur, SeekType stop_type, long stop);
