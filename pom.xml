@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.gstreamer-java</groupId>
-    <artifactId>gstreamer1-java-core</artifactId>
+    <groupId>org.freedesktop.gstreamer</groupId>
+    <artifactId>gst1-java-core</artifactId>
     <packaging>jar</packaging>
     <name>GStreamer 1.x Java Core</name>
     <version>0.9-SNAPSHOT</version>
-    <description>Java binding for the Gstreamer framework</description>
-    <url>http://code.google.com/p/gstreamer-java</url>
+    <description>Unofficial Java binding for the Gstreamer framework</description>
+    <url>http://www.github.com/gstreamer-java</url>
     <developers>
         <developer>
             <id>wmeissner</id>
@@ -51,6 +51,14 @@
                 <role>developer</role>
             </roles>
         </developer>
+        <developer>
+            <id>neilcsmith-net</id>
+            <name>Neil C Smith</name>
+            <email>neilcsmith.net[at]googlemail[dot]com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
     </developers>
     <licenses>
         <license>
@@ -59,11 +67,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
+<!--    <scm>
         <url>http://code.google.com/p/gstreamer-java/source/browse</url>
         <connection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</connection>
         <developerConnection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</developerConnection>
-    </scm>
+    </scm>-->
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -101,7 +109,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.3</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -136,7 +144,7 @@
             </plugin>
         </plugins>
     </build>
-    <distributionManagement>
+    <!--<distributionManagement>-->
 
         <!-- maintainer note: Run following to stage on sonatype (replace xxx): 
         Have the following in your ~/.m2/settings.xml: ===================================== 
@@ -146,7 +154,7 @@
         tanaka> LANG=en_GB.UTF-8 mvn -Dgpg.Dkeyname=xxx@example.com \ -Dgpg.passphrase=xxxx 
         \ -Darguments="-Dgpg.passphrase=xxxx" \ -DconnectionUrl=scm:svn:https://gstreamer-java.googlecode.com/svn/branches/maven-release-1.x 
         \ release:perform ============================================================================================ -->
-        <repository>
+<!--        <repository>
             <id>sonatype-nexus-staging</id>
             <name>Nexus Release Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
@@ -156,7 +164,7 @@
             <name>Nexus Snapshot Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-    </distributionManagement>
+    </distributionManagement>-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -165,65 +173,6 @@
     </properties>
 
     <profiles>
-        <profile>
-            <id>mac</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.swt.carbon</groupId>
-                    <artifactId>macosx</artifactId>
-                    <version>3.3.0-v3346</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.swt.win32.win32</groupId>
-                    <artifactId>x86</artifactId>
-                    <version>3.3.0-v3346</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>linux-x64</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <name>Linux</name>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-        </profile>
-        <profile>
-            <id>linux</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <name>Linux</name>
-                    <arch>i386</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.swt.gtk.linux</groupId>
-                    <artifactId>x86</artifactId>
-                    <version>3.3.0-v3346</version>
-                </dependency>
-            </dependencies>
-        </profile>
         <profile>
             <id>release-sign-artifacts</id>
             <activation>
