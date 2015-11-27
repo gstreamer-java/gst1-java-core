@@ -1,4 +1,4 @@
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.Structure;

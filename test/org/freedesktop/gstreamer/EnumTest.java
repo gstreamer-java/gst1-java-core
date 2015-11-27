@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007 Wayne Meissner
+ * Copyright (c) 2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
  *
@@ -17,11 +17,13 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.Gst;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
+import org.freedesktop.gstreamer.lowlevel.EnumMapper;
+import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,32 +32,42 @@ import org.junit.Test;
 
 /**
  *
+ * @author wayne
  */
-public class InitTest {
-    
-    public InitTest() {
-        
-    }
-    @Test
-    public void testInit() {
-        String[] args = Gst.init("InitTest", new String[] { "--gst-plugin-spew" });
-        assertTrue(args.length == 0);
-        Gst.deinit();
-    }
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+public class EnumTest {
+
+    public EnumTest() {
     }
 
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        Gst.init("EnumTest", new String[] {});
+    }
+    
     @AfterClass
     public static void tearDownClass() throws Exception {
+        Gst.deinit();
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
-    
+    private static enum TestEnum {
+        FOO,
+        @DefaultEnumValue
+        BAR;
+    }
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    // @Test
+    // public void hello() {}
+    @Test public void valueOfInt() {
+        TestEnum e = EnumMapper.getInstance().valueOf(0xdeadbeef, TestEnum.class);
+        assertEquals("Wrong value returned for the default", TestEnum.BAR, e);
+    }
 }

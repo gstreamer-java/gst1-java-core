@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2008 Wayne Meissner
+ * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
  *
@@ -17,13 +17,12 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.Gst;
-import static org.junit.Assert.assertEquals;
-
-import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
+import org.freedesktop.gstreamer.ElementFactory;
+import org.freedesktop.gstreamer.GhostPad;
+import org.freedesktop.gstreamer.Element;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -34,14 +33,14 @@ import org.junit.Test;
  *
  * @author wayne
  */
-public class EnumTest {
+public class GhostPadTest {
 
-    public EnumTest() {
+    public GhostPadTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("EnumTest", new String[] {});
+        Gst.init("GhostPadTest", new String[] {});
     }
     
     @AfterClass
@@ -56,18 +55,16 @@ public class EnumTest {
     @After
     public void tearDown() {
     }
-    private static enum TestEnum {
-        FOO,
-        @DefaultEnumValue
-        BAR;
-    }
+
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
     // @Test
     // public void hello() {}
-    @Test public void valueOfInt() {
-        TestEnum e = EnumMapper.getInstance().valueOf(0xdeadbeef, TestEnum.class);
-        assertEquals("Wrong value returned for the default", TestEnum.BAR, e);
+    @Test
+    public void newGhostPad() {
+        Element fakesink = ElementFactory.make("fakesink", "fs");
+        @SuppressWarnings("unused")
+        GhostPad gpad = new GhostPad("ghostsink", fakesink.getStaticPad("sink"));
     }
 }

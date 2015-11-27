@@ -17,12 +17,11 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.GhostPad;
-import org.freedesktop.gstreamer.Element;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,40 +30,32 @@ import org.junit.Test;
 
 /**
  *
- * @author wayne
  */
-public class GhostPadTest {
-
-    public GhostPadTest() {
+public class InitTest {
+    
+    public InitTest() {
+        
     }
-
+    @Test
+    public void testInit() {
+        String[] args = Gst.init("InitTest", new String[] { "--gst-plugin-spew" });
+        assertTrue(args.length == 0);
+        Gst.deinit();
+    }
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("GhostPadTest", new String[] {});
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
-        Gst.deinit();
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
     }
-
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
-    @Test
-    public void newGhostPad() {
-        Element fakesink = ElementFactory.make("fakesink", "fs");
-        @SuppressWarnings("unused")
-        GhostPad gpad = new GhostPad("ghostsink", fakesink.getStaticPad("sink"));
-    }
+    
 }
