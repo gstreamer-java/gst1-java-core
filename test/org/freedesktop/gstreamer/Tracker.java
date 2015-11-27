@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.GObject;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 

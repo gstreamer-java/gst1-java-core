@@ -20,14 +20,6 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.elements.PlayBin;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Pipeline;
-import org.freedesktop.gstreamer.PadDirection;
-import org.freedesktop.gstreamer.StaticPadTemplate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

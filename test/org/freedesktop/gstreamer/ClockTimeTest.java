@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.ClockTime;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;

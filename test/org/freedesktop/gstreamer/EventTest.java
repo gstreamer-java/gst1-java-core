@@ -19,14 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.EventType;
-import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.Structure;
-import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.SeekType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

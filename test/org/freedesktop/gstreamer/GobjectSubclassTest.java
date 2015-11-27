@@ -19,10 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.PadTemplate;
-import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.lowlevel.BaseSrcAPI;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;

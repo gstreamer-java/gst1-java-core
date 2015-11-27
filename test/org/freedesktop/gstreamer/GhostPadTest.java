@@ -19,10 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.GhostPad;
-import org.freedesktop.gstreamer.Element;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

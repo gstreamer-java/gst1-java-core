@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;

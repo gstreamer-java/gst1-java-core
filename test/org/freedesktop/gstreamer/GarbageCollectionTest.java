@@ -19,13 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Bus;
-import org.freedesktop.gstreamer.Pipeline;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
