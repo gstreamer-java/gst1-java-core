@@ -17,15 +17,8 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Bus;
-import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.State;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

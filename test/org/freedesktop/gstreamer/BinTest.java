@@ -17,15 +17,8 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.PadLinkReturn;
-import org.freedesktop.gstreamer.Pipeline;
-import org.freedesktop.gstreamer.Pad;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

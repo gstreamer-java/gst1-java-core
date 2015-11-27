@@ -17,12 +17,8 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Bus;
-import org.freedesktop.gstreamer.Pipeline;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 

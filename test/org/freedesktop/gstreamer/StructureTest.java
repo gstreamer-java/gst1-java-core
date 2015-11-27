@@ -1,7 +1,5 @@
-package org.freedekstop.gstreamer;
+package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Structure;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
