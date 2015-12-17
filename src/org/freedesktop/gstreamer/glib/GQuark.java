@@ -1,6 +1,7 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -26,13 +27,13 @@ public class GQuark {
         this.value = value;
     }
     public int intValue() {
-        return value;
+        return this.value;
     }
-    
-    public GQuark valueOf(String quark) {
+
+    public static GQuark valueOf(String quark) {
         return GObjectAPI.GOBJECT_API.g_quark_from_string(quark);
     }
-    
+
     @Override
     public String toString() {
         return GObjectAPI.GOBJECT_API.g_quark_to_string(this);
