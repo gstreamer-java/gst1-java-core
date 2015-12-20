@@ -4,16 +4,16 @@
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -23,14 +23,17 @@
 package org.freedesktop.gstreamer;
 
 
+import java.nio.ByteBuffer;
+
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
-import java.nio.ByteBuffer;
 
 /**
  * Data-passing buffer type, supporting sub-buffers.
@@ -46,7 +49,7 @@ import java.nio.ByteBuffer;
  * using new {@link #Buffer(int)} to create a buffer with preallocated data of a given size.
  * <p>
  * The data pointed to by the buffer can be accessed with the {@link #getByteBuffer}
- * method.  For buffers of size 0, the data pointer is undefined (usually NULL) 
+ * method.  For buffers of size 0, the data pointer is undefined (usually NULL)
  * and should never be used.
  * <p>
  * If an element knows what pad you will push the buffer out on, it should use
@@ -97,21 +100,24 @@ public class Buffer extends MiniObject {
         @CallerOwnsReturn Pointer ptr_gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
     }
     private static final API gst = GstNative.load(API.class);
-    
+
     private final MapInfoStruct mapInfo;
-    
+    private final BufferStruct struct;
+
+
     public Buffer(Initializer init) {
         super(init);
-        mapInfo = new MapInfoStruct();
+        this.mapInfo = new MapInfoStruct();
+        this.struct = new BufferStruct(this.handle());
     }
-    
+
     /**
      * Creates a newly allocated buffer without any data.
      */
     public Buffer() {
-        this(initializer(gst.ptr_gst_buffer_new()));
+        this(NativeObject.initializer(Buffer.gst.ptr_gst_buffer_new()));
     }
-    
+
     /**
      * Creates a newly allocated buffer with data of the given size.
      * The buffer memory is not cleared. If the requested amount of
@@ -122,44 +128,69 @@ public class Buffer extends MiniObject {
      * @param size
      */
     public Buffer(int size) {
-        this(initializer(allocBuffer(size)));
+        this(NativeObject.initializer(Buffer.allocBuffer(size)));
     }
-    
+
     private static Pointer allocBuffer(int size) {
-        Pointer ptr = gst.ptr_gst_buffer_new_allocate(null, size, null);
+        Pointer ptr = Buffer.gst.ptr_gst_buffer_new_allocate(null, size, null);
         if (ptr == null) {
             throw new OutOfMemoryError("Could not allocate Buffer of size "+ size);
         }
         return ptr;
     }
-    
+
 //    /**
 //     * Gets the size of the buffer data
-//     * 
+//     *
 //     * @return the size of the buffer data in bytes.
 //     */
 //    public int getSize() {
 //    	return gst.gst_buffer_get_size(this).intValue();
 //    }
-    
+
     /**
      * Gets a {@link java.nio.ByteBuffer} that can access the native memory
      * associated with this Buffer.
-     * 
+     *
      * @return A {@link java.nio.ByteBuffer} that can access this Buffer's data.
      */
     public ByteBuffer map(boolean writeable) {
-        boolean ok = gst.gst_buffer_map(this, mapInfo,
+        boolean ok = Buffer.gst.gst_buffer_map(this, this.mapInfo,
                 writeable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
         if (ok) {
-            return mapInfo.data.getByteBuffer(0, mapInfo.size.intValue());
+            return this.mapInfo.data.getByteBuffer(0, this.mapInfo.size.intValue());
         } else {
             return null;
         }
     }
-    
+
     public void unmap() {
-        gst.gst_buffer_unmap(this, mapInfo);
+        Buffer.gst.gst_buffer_unmap(this, this.mapInfo);
     }
-    
+
+    /**
+     * Gets the timestamps of this buffer.
+     * The buffer DTS refers to the timestamp when the buffer should be decoded and is usually monotonically increasing.
+     * The buffer PTS refers to the timestamp when the buffer content should be presented to the user and is not always monotonically increasing.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getTimestamp(TimestampTypes type) {
+    	switch(type) {
+    	case DTS:
+    		return (ClockTime) this.struct.readField("dts");
+    	case PTS:
+    		return (ClockTime) this.struct.readField("pts");
+    	default:
+    		throw new UnsupportedOperationException(type + " not implemented yet");
+    	}
+
+    }
+
+
+    public enum TimestampTypes {
+    	DTS,
+    	PTS
+    }
+
 }
