@@ -39,7 +39,7 @@ public class AppSink extends BaseSink {
     public static final String GST_NAME = "appsink";
     public static final String GTYPE_NAME = "GstAppSink";
 
-    private static final AppAPI gst() { return AppAPI.APP_API; }
+    private static final AppAPI gst = AppAPI.APP_API;
 
     public AppSink(Initializer init) {
         super(init);
@@ -60,7 +60,7 @@ public class AppSink extends BaseSink {
      */
     @Override
     public void setCaps(Caps caps) {
-        AppSink.gst().gst_app_sink_set_caps(this, caps);
+        AppSink.gst.gst_app_sink_set_caps(this, caps);
     }
 
     /**
@@ -69,7 +69,7 @@ public class AppSink extends BaseSink {
      * @return The caps configured on this <tt>AppSink</tt>
      */
     public Caps getCaps() {
-        return AppSink.gst().gst_app_sink_get_caps(this);
+        return AppSink.gst.gst_app_sink_get_caps(this);
     }
 
     /**
@@ -81,7 +81,7 @@ public class AppSink extends BaseSink {
      * <tt>AppSink</tt> is EOS.
      */
     public boolean isEOS() {
-        return AppSink.gst().gst_app_sink_is_eos(this);
+        return AppSink.gst.gst_app_sink_is_eos(this);
     }
 
     /**
@@ -107,7 +107,7 @@ public class AppSink extends BaseSink {
      * @return A {@link Buffer} or <tt>null</tt> when the appsink is stopped or EOS.
      */
     public Sample pullPreroll() {
-        return AppSink.gst().gst_app_sink_pull_preroll(this);
+        return AppSink.gst.gst_app_sink_pull_preroll(this);
     }
 
     /**
@@ -130,7 +130,7 @@ public class AppSink extends BaseSink {
      * @return A {@link org.freedesktop.gstreamer.Buffer} or NULL when the appsink is stopped or EOS.
      */
     public Sample pullSample() {
-        return AppSink.gst().gst_app_sink_pull_sample(this);
+        return AppSink.gst.gst_app_sink_pull_sample(this);
     }
 
     /**
