@@ -1,8 +1,9 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,12 +21,18 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.Clock;
+import org.freedesktop.gstreamer.ClockTime;
+import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.MessageType;
 import org.freedesktop.gstreamer.State;
+import org.freedesktop.gstreamer.StreamStatus;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
@@ -36,8 +43,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.List;
 
 /*
  * GstMessage functions
@@ -47,34 +52,37 @@ public interface GstMessageAPI extends com.sun.jna.Library {
 
     public static final class MessageStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
-//        public volatile Pointer lock;
-//        public volatile Pointer cond;
         public volatile MessageType type;
         public volatile long timestamp;
         public volatile GstObject src;
         public volatile int seqnum;
-        
+
+        // private
+        public volatile Pointer lock;
+        public volatile Pointer cond;
+
         /**
          * Creates a new instance of MessageStruct
          */
         public MessageStruct() {
         }
         public MessageStruct(Pointer ptr) {
-            useMemory(ptr);
+            this.useMemory(ptr);
         }
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", // "lock", "cond",
+                "mini_object",
                 "type", "timestamp", "src",
-                "seqnum"
+                "seqnum", "lock", "cond",
             });
         }
     }
-    
+
     GType gst_message_get_type();
     String gst_message_type_get_name(MessageType type);
+    void gst_message_parse_async_done(Message msg, ClockTime[] clockTime);
     void gst_message_parse_state_changed(Message msg, State[] old, State[] current, State[] pending);
     void gst_message_parse_tag(Message msg, PointerByReference tagList);
     void gst_message_parse_clock_provide(Message msg, PointerByReference clock, int[] reader);
@@ -85,12 +93,17 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     void gst_message_parse_warning(Message msg, GErrorStruct[] err, Pointer[] debug);
     void gst_message_parse_info(Message msg, PointerByReference err, PointerByReference debug);
     void gst_message_parse_info(Message msg, GErrorStruct[] err, Pointer[] debug);
+    void gst_message_parse_new_clock(Message message, Clock[] clock);
     void gst_message_parse_buffering(Message msg, int[] percent);
-    void gst_message_parse_segment_start(Message message, Format[] format, long[] position); 
+    void gst_message_parse_segment_start(Message message, Format[] format, long[] position);
     void gst_message_parse_segment_done(Message message, Format[] format, long[] position);
-    void gst_message_parse_duration(Message message, Format[] format, long[] position);
+    void gst_message_parse_stream_status(Message message, StreamStatus[] type, Element[] owner);
+    void gst_message_parse_qos(Message message, boolean[] live, long[] running_time, long[] stream_time, long[] timestamp, long[] duration);
+    boolean gst_message_parse_context_type(Message message, String[] context_type);
+
+//    void gst_message_parse_duration(Message message, Format[] format, long[] position);
     void gst_message_parse_async_start(Message message, boolean[] new_base_time);
-    
+
     @CallerOwnsReturn Message gst_message_new_eos(GstObject src);
     @CallerOwnsReturn Message gst_message_new_error(GstObject src, GErrorStruct error, String debug);
     @CallerOwnsReturn Message gst_message_new_warning(GstObject src, GErrorStruct error, String debug);
@@ -106,7 +119,7 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Message gst_message_new_element(GstObject src, Structure structure);
     @CallerOwnsReturn Message gst_message_new_segment_start(GstObject src, Format format, long position);
     @CallerOwnsReturn Message gst_message_new_segment_done(GstObject src, Format format, long position);
-    @CallerOwnsReturn Message gst_message_new_duration(GstObject src, Format format, long duration);
+    @CallerOwnsReturn Message gst_message_new_duration_changed(GstObject src);
     @CallerOwnsReturn Message gst_message_new_async_start(GstObject src, boolean new_base_time);
     @CallerOwnsReturn Message gst_message_new_async_done(GstObject src);
     @CallerOwnsReturn Message gst_message_new_latency(GstObject src);

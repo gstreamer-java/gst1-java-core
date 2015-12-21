@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
@@ -24,6 +24,8 @@ package org.freedesktop.gstreamer.query;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Pointer;
 
@@ -31,13 +33,9 @@ import com.sun.jna.Pointer;
  * Used to discover information about the currently configured segment for playback.
  */
 public class SegmentQuery extends Query {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_query_new_segment(Format format);
-        void gst_query_set_segment(SegmentQuery query, double rate, Format format,
-         /* gint64 */ long start_value, /* gint64 */ long stop_value);
-        void gst_query_parse_segment(SegmentQuery query, double[] rate, /*GstFormat **/ int[] format,
-         /* gint64 * */ long[] start_value, /* gint64 * */ long[] stop_value);
 
+    private static interface API extends GstQueryAPI {
+        Pointer ptr_gst_query_new_segment(Format format);
     }
     private static final API gst = GstNative.load(API.class);
     public SegmentQuery(Initializer init) {
@@ -49,73 +47,73 @@ public class SegmentQuery extends Query {
      * @param format the {@link Format} for the new query.
      */
     public SegmentQuery(Format format) {
-        this(initializer(gst.ptr_gst_query_new_segment(format)));
+        this(NativeObject.initializer(SegmentQuery.gst.ptr_gst_query_new_segment(format)));
     }
-    
+
     /**
-     * Answers a segment query by setting the requested values. 
+     * Answers a segment query by setting the requested values.
      * <p>
      * The normal playback segment of a pipeline is 0 to duration at the default rate of
      * 1.0. If a seek was performed on the pipeline to play a different
      * segment, this query will return the range specified in the last seek.
      *
-     * {@code startValue} and {@code stopValue} will respectively contain the configured 
-     * playback range start and stop values expressed in format. 
-     * The values are always between 0 and the duration of the media and 
+     * {@code startValue} and {@code stopValue} will respectively contain the configured
+     * playback range start and stop values expressed in format.
+     * The values are always between 0 and the duration of the media and
      * {@code startValue <= stopValue}. {@code rate} will contain the playback rate. For
      * negative rates, playback will actually happen from {@code stopValue} to
      * {@code startValue}.
-     * 
+     *
      * @param rate the rate of the segment.
      * @param format the {@link Format} of the segment values.
      * @param startValue the start value.
      * @param stopValue the stop value.
      */
     public void setSegment(double rate, Format format, long startValue, long stopValue) {
-        gst.gst_query_set_segment(this, rate, format, startValue, stopValue);
+        SegmentQuery.gst.gst_query_set_segment(this, rate, format, startValue, stopValue);
     }
-    
+
     /**
      * Gets the rate of the segment Query.
-     * 
+     *
      * @return the rate of the segment.
      */
     public double getRate() {
         double[] rate = new double[1];
-        gst.gst_query_parse_segment(this, rate, null, null, null);
+        SegmentQuery.gst.gst_query_parse_segment(this, rate, null, null, null);
         return rate[0];
     }
-    
+
     /**
      * Gets the format of the start and stop values in the segment query.
-     * 
+     *
      * @return The format for the start and stop values.
      */
     public Format getFormat() {
-        int[] fmt = new int[1];
-        gst.gst_query_parse_segment(this, null, fmt, null, null);
-        return Format.valueOf(fmt[0]);
+    	Format[] fmt = { Format.UNDEFINED };
+        SegmentQuery.gst.gst_query_parse_segment(this, null, fmt, null, null);
+        return fmt[0];
     }
-    
+
     /**
      * Gets the start of the playback range.
-     * 
+     *
      * @return the start of the playback range.
      */
     public long getStart() {
         long[] value = new long[1];
-        gst.gst_query_parse_segment(this, null, null, value, null);
+        SegmentQuery.gst.gst_query_parse_segment(this, null, null, value, null);
         return value[0];
     }
-    
+
     /**
      * Gets the end of the playback range.
-     * 
+     *
      * @return the end of the playback range.
      */
     public long getEnd() {
         long[] value = new long[1];
-        gst.gst_query_parse_segment(this, null, null, null, value);
+        SegmentQuery.gst.gst_query_parse_segment(this, null, null, null, value);
         return value[0];
     }
 }

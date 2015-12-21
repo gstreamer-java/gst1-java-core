@@ -1,7 +1,8 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,6 +20,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
@@ -29,8 +33,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstQuery functions
@@ -38,13 +40,10 @@ import java.util.List;
 public interface GstQueryAPI extends com.sun.jna.Library {
     GstQueryAPI GSTQUERY_API = GstNative.load(GstQueryAPI.class);
 
+    GType gst_query_get_type();
+
     String gst_query_type_get_name(QueryType query);
     GQuark gst_query_type_to_quark(QueryType query);
-    /* register a new query */
-    QueryType gst_query_type_register(String nick, String description);
-    QueryType gst_query_type_get_by_nick(String nick);
-    
-    GType gst_query_get_type();
 
     /* position query */
     @CallerOwnsReturn Query gst_query_new_position(Format format);
@@ -58,10 +57,8 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 
     /* latency query */
     @CallerOwnsReturn Query gst_query_new_latency();
-    void gst_query_set_latency(Query query, boolean live, ClockTime min_latency,
-         ClockTime max_latency);
-    void gst_query_parse_latency(Query query, boolean[] live, ClockTime[] min_latency, 
-		                                 ClockTime[] max_latency);
+    void gst_query_set_latency(Query query, boolean live, ClockTime min_latency, ClockTime max_latency);
+    void gst_query_parse_latency(Query query, boolean[] live, ClockTime[] min_latency, ClockTime[] max_latency);
 
     /* convert query */
     @CallerOwnsReturn Query gst_query_new_convert(Format src_format, /* gint64 */ long value, Format dest_format);
@@ -69,6 +66,7 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 						 Format dest_format, /* gint64 */ long dest_value);
     void gst_query_parse_convert(Query query, Format[] src_format, /*gint64 **/ long[] src_value,
 						 Format[] dest_format, /*gint64 **/ long[] dest_value);
+
     /* segment query */
     @CallerOwnsReturn Query gst_query_new_segment(Format format);
     void gst_query_set_segment(Query query, double rate, Format format,
@@ -76,8 +74,8 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     void gst_query_parse_segment(Query query, double[] rate, Format[] format,
          /* gint64 * */ long[] start_value, /* gint64 * */ long[] stop_value);
 
-    /* application specific query */
-    @CallerOwnsReturn Query gst_query_new_application(QueryType type, @Invalidate Structure structure);
+    /* custom specific query */
+    @CallerOwnsReturn Query gst_query_new_custom(QueryType type, @Invalidate Structure structure);
     Structure gst_query_get_structure(Query query);
 
     /* seeking query */
@@ -86,20 +84,26 @@ public interface GstQueryAPI extends com.sun.jna.Library {
         boolean seekable, /* gint64 */ long segment_start, /* gint64 */ long segment_end);
     void gst_query_parse_seeking(Query query, Format[] format,
         boolean[] seekable, /* gint64 * */ long[] segment_start, /* gint64 * */ long[] segment_end);
+
     /* formats query */
     @CallerOwnsReturn Query gst_query_new_formats();
     void gst_query_set_formats(Query query, int n_formats, Format... formats);
     void gst_query_set_formatsv(Query query, int n_formats, Format[] formats);
-    void gst_query_parse_formats_length(Query query, int[] n_formats);
-    void gst_query_parse_formats_nth(Query query, int nth, Format[] format);
-    
+    void gst_query_parse_n_formats(Query query, int[] n_formats);
+    void gst_query_parse_nth_format(Query query, int nth, /*GstFormat * */ Format[] format);
+
+    /* context query */
+    @CallerOwnsReturn Query gst_query_new_context(String context_type);
+    boolean gst_query_parse_context_type(Query query, String[] context_type);
+
+
     public static final class QueryStruct extends com.sun.jna.Structure {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;
         public volatile int type;
         public volatile Pointer structure;
         public volatile Pointer _gst_reserved;
         public QueryStruct(Pointer ptr) {
-            useMemory(ptr);
+            this.useMemory(ptr);
         }
 
         @Override

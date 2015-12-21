@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -28,26 +28,39 @@ import org.freedesktop.gstreamer.MessageType;
 import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.QueryType;
 import org.freedesktop.gstreamer.event.BufferSizeEvent;
+import org.freedesktop.gstreamer.event.CapsEvent;
 import org.freedesktop.gstreamer.event.EOSEvent;
 import org.freedesktop.gstreamer.event.FlushStartEvent;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.LatencyEvent;
 import org.freedesktop.gstreamer.event.NavigationEvent;
-import org.freedesktop.gstreamer.event.NewSegmentEvent;
 import org.freedesktop.gstreamer.event.QOSEvent;
+import org.freedesktop.gstreamer.event.ReconfigureEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
+import org.freedesktop.gstreamer.event.StepEvent;
+import org.freedesktop.gstreamer.event.StreamStartEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
+import org.freedesktop.gstreamer.message.AsyncDoneMessage;
+import org.freedesktop.gstreamer.message.AsyncStartMessage;
 import org.freedesktop.gstreamer.message.BufferingMessage;
-import org.freedesktop.gstreamer.message.DurationMessage;
+import org.freedesktop.gstreamer.message.DurationChangedMessage;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.ErrorMessage;
 import org.freedesktop.gstreamer.message.InfoMessage;
 import org.freedesktop.gstreamer.message.LatencyMessage;
+import org.freedesktop.gstreamer.message.NeedContextMessage;
+import org.freedesktop.gstreamer.message.NewClockMessage;
+import org.freedesktop.gstreamer.message.QosMessage;
 import org.freedesktop.gstreamer.message.SegmentDoneMessage;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
+import org.freedesktop.gstreamer.message.StreamStartMessage;
+import org.freedesktop.gstreamer.message.StreamStatusMessage;
 import org.freedesktop.gstreamer.message.TagMessage;
 import org.freedesktop.gstreamer.message.WarningMessage;
+import org.freedesktop.gstreamer.query.ContextQuery;
 import org.freedesktop.gstreamer.query.ConvertQuery;
+import org.freedesktop.gstreamer.query.CustomQuery;
 import org.freedesktop.gstreamer.query.DurationQuery;
 import org.freedesktop.gstreamer.query.FormatsQuery;
 import org.freedesktop.gstreamer.query.LatencyQuery;
@@ -72,9 +85,9 @@ class SubtypeMapper {
     }
     private static final class MapHolder {
         public static final Map<Class<?>, Mapper> mappers = new HashMap<Class<?>, Mapper>() {{
-           put(Event.class, new EventMapper());
-           put(Message.class, new MessageMapper());
-           put(Query.class, new QueryMapper());
+           this.put(Event.class, new EventMapper());
+           this.put(Message.class, new MessageMapper());
+           this.put(Query.class, new QueryMapper());
         }};
     }
     private static interface Mapper {
@@ -84,16 +97,20 @@ class SubtypeMapper {
         static class MapHolder {
             private static final Map<EventType, Class<? extends Event>> typeMap
                 = new HashMap<EventType, Class<? extends Event>>() {{
-                put(EventType.BUFFERSIZE, BufferSizeEvent.class);
-                put(EventType.EOS, EOSEvent.class);
-                put(EventType.LATENCY, LatencyEvent.class);
-                put(EventType.FLUSH_START, FlushStartEvent.class);
-                put(EventType.FLUSH_STOP, FlushStopEvent.class);
-                put(EventType.NAVIGATION, NavigationEvent.class);
-                put(EventType.NEWSEGMENT, NewSegmentEvent.class);
-                put(EventType.SEEK, SeekEvent.class);
-                put(EventType.TAG, TagEvent.class);
-                put(EventType.QOS, QOSEvent.class);
+                    this.put(EventType.BUFFERSIZE, BufferSizeEvent.class);
+                    this.put(EventType.EOS, EOSEvent.class);
+                    this.put(EventType.CAPS, CapsEvent.class);
+                    this.put(EventType.RECONFIGURE, ReconfigureEvent.class);
+                    this.put(EventType.STREAM_START, StreamStartEvent.class);
+                    this.put(EventType.LATENCY, LatencyEvent.class);
+                    this.put(EventType.FLUSH_START, FlushStartEvent.class);
+                    this.put(EventType.FLUSH_STOP, FlushStopEvent.class);
+                    this.put(EventType.NAVIGATION, NavigationEvent.class);
+                    this.put(EventType.SEGMENT, SegmentEvent.class);
+                    this.put(EventType.SEEK, SeekEvent.class);
+                    this.put(EventType.TAG, TagEvent.class);
+                    this.put(EventType.QOS, QOSEvent.class);
+                    this.put(EventType.STEP, StepEvent.class);
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstEventAPI.EventStruct struct = new GstEventAPI.EventStruct(ptr);
@@ -102,7 +119,8 @@ class SubtypeMapper {
                 return eventClass != null ? eventClass : Event.class;
             }
         }
-        public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
+        @Override
+		public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
             return MapHolder.subtypeFor(ptr);
         }
     }
@@ -110,16 +128,23 @@ class SubtypeMapper {
         static class MapHolder {
             private static final Map<MessageType, Class<? extends Message>> typeMap
                     = new HashMap<MessageType, Class<? extends Message>>() {{
-                put(MessageType.EOS, EOSMessage.class);
-                put(MessageType.ERROR, ErrorMessage.class);
-                put(MessageType.BUFFERING, BufferingMessage.class);
-                put(MessageType.DURATION, DurationMessage.class);
-                put(MessageType.INFO, InfoMessage.class);
-                put(MessageType.LATENCY, LatencyMessage.class);
-                put(MessageType.SEGMENT_DONE, SegmentDoneMessage.class);
-                put(MessageType.STATE_CHANGED, StateChangedMessage.class);
-                put(MessageType.TAG, TagMessage.class);
-                put(MessageType.WARNING, WarningMessage.class);
+                        this.put(MessageType.ASYNC_DONE, AsyncDoneMessage.class);
+                        this.put(MessageType.ASYNC_START, AsyncStartMessage.class);
+                        this.put(MessageType.EOS, EOSMessage.class);
+                        this.put(MessageType.ERROR, ErrorMessage.class);
+                        this.put(MessageType.BUFFERING, BufferingMessage.class);
+                        this.put(MessageType.DURATION_CHANGED, DurationChangedMessage.class);
+                        this.put(MessageType.INFO, InfoMessage.class);
+                        this.put(MessageType.LATENCY, LatencyMessage.class);
+                        this.put(MessageType.NEW_CLOCK, NewClockMessage.class);
+                        this.put(MessageType.QOS, QosMessage.class);
+                        this.put(MessageType.SEGMENT_DONE, SegmentDoneMessage.class);
+                        this.put(MessageType.STREAM_STATUS, StreamStatusMessage.class);
+                        this.put(MessageType.STREAM_START, StreamStartMessage.class);
+                        this.put(MessageType.STATE_CHANGED, StateChangedMessage.class);
+                        this.put(MessageType.TAG, TagMessage.class);
+                        this.put(MessageType.WARNING, WarningMessage.class);
+                        this.put(MessageType.NEED_CONTEXT, NeedContextMessage.class);
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstMessageAPI.MessageStruct struct = new GstMessageAPI.MessageStruct(ptr);
@@ -128,7 +153,8 @@ class SubtypeMapper {
                 return messageClass != null ? messageClass : Message.class;
             }
         }
-        public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
+        @Override
+		public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
             return MapHolder.subtypeFor(ptr);
         }
     }
@@ -136,22 +162,25 @@ class SubtypeMapper {
         static class MapHolder {
             private static final Map<QueryType, Class<? extends Query>> typeMap
                 = new HashMap<QueryType, Class<? extends Query>>() {{
-                put(QueryType.CONVERT, ConvertQuery.class);
-                put(QueryType.DURATION, DurationQuery.class);
-                put(QueryType.FORMATS, FormatsQuery.class);
-                put(QueryType.LATENCY, LatencyQuery.class);
-                put(QueryType.POSITION, PositionQuery.class);
-                put(QueryType.SEEKING, SeekingQuery.class);
-                put(QueryType.SEGMENT, SegmentQuery.class);
+                    this.put(QueryType.CONVERT, ConvertQuery.class);
+                    this.put(QueryType.DURATION, DurationQuery.class);
+                    this.put(QueryType.CUSTOM, CustomQuery.class);
+                    this.put(QueryType.FORMATS, FormatsQuery.class);
+                    this.put(QueryType.LATENCY, LatencyQuery.class);
+                    this.put(QueryType.POSITION, PositionQuery.class);
+                    this.put(QueryType.SEEKING, SeekingQuery.class);
+                    this.put(QueryType.SEGMENT, SegmentQuery.class);
+                    this.put(QueryType.CONTEXT, ContextQuery.class);
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstQueryAPI.QueryStruct struct = new GstQueryAPI.QueryStruct(ptr);
                 QueryType type = QueryType.valueOf((Integer) struct.readField("type"));
-                Class<? extends Query> queryClass = typeMap.get(type);
+                Class<? extends Query> queryClass = MapHolder.typeMap.get(type);
                 return queryClass != null ? queryClass : Query.class;
             }
         }
-        public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
+        @Override
+		public Class<? extends NativeObject> subtypeFor(Pointer ptr) {
             return MapHolder.subtypeFor(ptr);
         }
     }

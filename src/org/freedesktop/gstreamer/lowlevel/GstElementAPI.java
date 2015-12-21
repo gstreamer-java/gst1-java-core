@@ -1,7 +1,8 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,10 +21,14 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Clock;
 import org.freedesktop.gstreamer.ClockTime;
+import org.freedesktop.gstreamer.Context;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.ElementFactory;
 import org.freedesktop.gstreamer.Event;
@@ -42,8 +47,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstElement methods
@@ -58,7 +61,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
     boolean gst_element_set_locked_state(Element element, boolean locked_state);
     boolean gst_element_sync_state_with_parent(Element elem);
     boolean gst_element_query_position(Element elem, Format fmt, long[] pos);
-    boolean gst_element_query_duration(Element elem, Format fmt, long[] pos);
+    boolean gst_element_query_duration(Element elem, Format fmt, long[] duration);
     boolean gst_element_query(Element elem, Query query);
     boolean gst_element_seek(Element elem, double rate, Format format, int flags,
             SeekType cur_type, long cur, SeekType stop_type, long stop);
@@ -78,10 +81,11 @@ public interface GstElementAPI extends com.sun.jna.Library {
     void gst_element_unlink_pads(Element src, String srcpadname, Element dest, String destpadname);
     boolean gst_element_link_pads_filtered(Element src, String srcpadname, Element dest, String destpadname,
             Caps filter);
-    
+
     Pointer gst_element_iterate_pads(Element element);
     Pointer gst_element_iterate_src_pads(Element element);
     Pointer gst_element_iterate_sink_pads(Element element);
+
     /* factory management */
     ElementFactory gst_element_get_factory(Element element);
     @CallerOwnsReturn Bus gst_element_get_bus(Element element);
@@ -96,7 +100,9 @@ public interface GstElementAPI extends com.sun.jna.Library {
     ClockTime gst_element_get_base_time(Element element);
     void gst_element_set_start_time(Element element, ClockTime time);
     ClockTime gst_element_get_start_time(Element element);
-    
+    /* context */
+    void gst_element_set_context(Element element, Context context);
+
     public static final class GstElementDetails extends com.sun.jna.Structure {
          /*< public > */
         public volatile String longname;
@@ -104,7 +110,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public volatile String description;
         public volatile String author;
         /*< private > */
-        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];        
+        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];
 
         @Override
         protected List<String> getFieldOrder() {
@@ -119,9 +125,10 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public volatile Pointer state_lock;
         public volatile Pointer state_cond;
         public volatile int state_cookie;
+        public volatile State target_state;
         public volatile State current_state;
-        public volatile State next_state; 
-        public volatile State pending_state;         
+        public volatile State next_state;
+        public volatile State pending_state;
         public volatile StateChangeReturn last_return;
         public volatile Pointer bus;
         public volatile Pointer clock;
@@ -140,7 +147,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "object", "state_lock", "state_cond",
-                "state_cookie", "current_state", "next_state",
+                "state_cookie", "target_state", "current_state", "next_state",
                 "pending_state", "last_return", "bus",
                 "clock", "base_time", "numpads",
                 "pads", "numsrcpads", "srcpads",
@@ -160,7 +167,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
             public void callback(Element element, Pad pad);
         }
         public static interface GetState extends GstCallback {
-            public StateChangeReturn callback(Element element, Pointer p_state, 
+            public StateChangeReturn callback(Element element, Pointer p_state,
                     Pointer p_pending, long timeout);
         }
         public static interface SetState extends GstCallback {
@@ -169,12 +176,22 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public static interface ChangeState extends GstCallback {
             public StateChangeReturn callback(Element element, int transition);
         }
+        public static interface StateChanged extends GstCallback {
+            public StateChangeReturn callback(Element element, State oldState, State newState, State pending);
+        }
+        public static interface SetContext extends GstCallback {
+            public void callback(Element element, Context context);
+        }
+
         //
         // Actual data members
         //
         public GstObjectClass parent_class;
-        public volatile GstElementDetails details;
+        /* the element metadata */
+        public volatile Pointer metadata;
+        /* factory that the element was created from */
         public volatile ElementFactory elementfactory;
+        /* templates for our pads */
         public volatile Pointer padtemplates;
         public volatile int numpadtemplates;
         public volatile int pad_templ_cookie;
@@ -190,37 +207,38 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public GetState get_state;
         public SetState set_state;
         public ChangeState change_state;
+        public StateChanged state_changed;
         /* bus */
         public volatile Pointer set_bus;
         /* set/get clocks */
         public volatile Pointer provide_clock;
         public volatile Pointer set_clock;
-        
-        /* index */
-        public volatile Pointer get_index;
-        public volatile Pointer set_index;
-        public volatile Pointer send_event;
+
         /* query functions */
-        public volatile Pointer get_query_types;
+        public volatile Pointer send_event;
         public volatile Pointer query;
-      
-        /*< private >*/  
+        public volatile Pointer post_message;
+
+        public volatile SetContext set_context;
+
+        /*< private >*/
         // Use an array of byte if arrays of Pointer don't work
         public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "parent_class", "details", "elementfactory",
+                "parent_class", "metadata", "elementfactory",
                 "padtemplates", "numpadtemplates", "pad_templ_cookie",
                 "pad_added", "pad_removed", "no_more_pads",
                 "request_new_pad", "release_pad", "get_state",
-                "set_state", "change_state", "set_bus",
-                "provide_clock", "set_clock", "get_index",
-                "set_index", "send_event", "get_query_types",
-                "query", "_gst_reserved"
-            });       
+                "set_state", "change_state", "state_changed", "set_bus",
+                "provide_clock", "set_clock",
+                "send_event", "query", "post_message",
+                "set_context",
+                "_gst_reserved"
+            });
         }
-        
+
     }
 }

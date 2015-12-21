@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2015 Christophe Lafolet
- * Copyright (C) 2008 Wayne Meissner
  *
  * This file is part of gstreamer-java.
  *
@@ -16,39 +15,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.freedesktop.gstreamer.query;
 
-package org.freedesktop.gstreamer;
+import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
-import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-/**
- * Base query type
- */
-@HasSubtype
-public class Query extends MiniObject {
-    public static final String GTYPE_NAME = "GstQuery";
+import com.sun.jna.Pointer;
 
-    private static interface API extends GstQueryAPI {}
+public class ContextQuery extends Query {
+    private static interface API extends GstQueryAPI {
+        Pointer ptr_gst_query_new_context(String context_type);
+    }
     private static final API gst = GstNative.load(API.class);
 
-    /**
-     * Internally used constructor.  Do not use.
-     *
-     * @param init internal initialization data.
-     */
-    public Query(Initializer init) {
+    public ContextQuery(Initializer init) {
         super(init);
     }
 
-    /**
-     * Get the structure of this query.
-     *
-     * @return The structure of this Query.
-     */
-    public Structure getStructure() {
-        return ReferenceManager.addKeepAliveReference(Query.gst.gst_query_get_structure(this), this);
+    public ContextQuery(String context_type) {
+        this(NativeObject.initializer(ContextQuery.gst.ptr_gst_query_new_context(context_type)));
+    }
+
+    public String getContextType() {
+    	String[] context_type = new String[1];
+    	boolean isOk = ContextQuery.gst.gst_query_parse_context_type(this, context_type);
+    	return isOk ? context_type[0] : null;
     }
 
 }

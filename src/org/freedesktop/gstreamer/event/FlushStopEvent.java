@@ -1,9 +1,10 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
  *                    2005 Wim Taymans <wim@fluendo.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -23,13 +24,14 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Pointer;
 
 /**
  * Stop a flush operation.
  * <p>
- * The flush stop event can be sent upstream and downstream and travels 
+ * The flush stop event can be sent upstream and downstream and travels
  * out-of-bounds with the dataflow.
  * <p>
  * It is typically sent after sending a {@link FlushStartEvent} event to make the
@@ -43,10 +45,10 @@ import com.sun.jna.Pointer;
  */
 public class FlushStopEvent extends Event {
     private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_flush_stop();
+        Pointer ptr_gst_event_new_flush_stop(boolean reset_time);
     }
     private static final API gst = GstNative.load(API.class);
-    
+
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
@@ -54,11 +56,13 @@ public class FlushStopEvent extends Event {
     public FlushStopEvent(Initializer init) {
         super(init);
     }
-    
+
     /**
-     * Creates a new flush stop event. 
+     * Creates a new flush stop event.
+     * @param reset_time if time should be reset
      */
-    public FlushStopEvent() {
-        super(initializer(gst.ptr_gst_event_new_flush_stop()));
+    public FlushStopEvent(boolean reset_time) {
+        super(NativeObject.initializer(FlushStopEvent.gst.ptr_gst_event_new_flush_stop(reset_time)));
     }
 }
+

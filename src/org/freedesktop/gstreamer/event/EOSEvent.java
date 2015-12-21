@@ -1,9 +1,9 @@
-/* 
+/*
  * Copyright (c) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
  *                    2005 Wim Taymans <wim@fluendo.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -23,15 +23,16 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Pointer;
 
 /**
- * End-Of-Stream. No more data is to be expected to follow without a {@link NewSegmentEvent}.
+ * End-Of-Stream. No more data is to be expected to follow without a {@link SegmentEvent}.
  * <p>
  * The eos event can only travel downstream
  * synchronized with the buffer flow. Elements that receive the EOS
- * event on a pad can return {@link org.gstreamer.FlowReturn#UNEXPECTED} when data after 
+ * event on a pad can return {@link org.gstreamer.FlowReturn#UNEXPECTED} when data after
  * the EOS event arrives.
  * <p>
  * The EOS event will travel down to the sink elements in the pipeline
@@ -46,7 +47,7 @@ public class EOSEvent extends Event {
         Pointer ptr_gst_event_new_eos();
     }
     private static final API gst = GstNative.load(API.class);
-    
+
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
@@ -54,11 +55,11 @@ public class EOSEvent extends Event {
     public EOSEvent(Initializer init) {
         super(init);
     }
-    
+
     /**
-     * Creates a new EOS event. 
+     * Creates a new EOS event.
      */
     public EOSEvent() {
-        super(initializer(gst.ptr_gst_event_new_eos()));
+        super(NativeObject.initializer(EOSEvent.gst.ptr_gst_event_new_eos()));
     }
 }

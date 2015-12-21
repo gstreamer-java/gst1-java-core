@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2015 Christophe Lafolet
- * Copyright (C) 2008 Wayne Meissner
  *
  * This file is part of gstreamer-java.
  *
@@ -17,38 +16,36 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.message;
+
+
+import org.freedesktop.gstreamer.GstObject;
+import org.freedesktop.gstreamer.Message;
+import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
-import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
-/**
- * Base query type
- */
-@HasSubtype
-public class Query extends MiniObject {
-    public static final String GTYPE_NAME = "GstQuery";
+import com.sun.jna.Pointer;
 
-    private static interface API extends GstQueryAPI {}
+public class QosMessage extends Message {
+    private static interface API extends GstMessageAPI {
+    	@CallerOwnsReturn Pointer ptr_gst_message_new_qos(GstObject src, boolean live, long running_time, long stream_time, long timestamp, long duration);
+    }
     private static final API gst = GstNative.load(API.class);
 
     /**
-     * Internally used constructor.  Do not use.
+     * Creates a new Qos message.
      *
      * @param init internal initialization data.
      */
-    public Query(Initializer init) {
+    public QosMessage(Initializer init) {
         super(init);
     }
 
-    /**
-     * Get the structure of this query.
-     *
-     * @return The structure of this Query.
-     */
-    public Structure getStructure() {
-        return ReferenceManager.addKeepAliveReference(Query.gst.gst_query_get_structure(this), this);
+    public boolean isLive() {
+    	boolean[] isLive = new boolean[1];
+        QosMessage.gst.gst_message_parse_qos(this, isLive, null, null, null, null);
+        return isLive[0];
     }
 
 }

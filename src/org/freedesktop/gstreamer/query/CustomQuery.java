@@ -1,4 +1,6 @@
-/* 
+
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
@@ -18,13 +20,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.QueryType;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
@@ -32,21 +35,22 @@ import com.sun.jna.Pointer;
 /**
  * A Custom application query.
  */
-public class ApplicationQuery extends Query {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_query_new_application(QueryType type, @Invalidate Structure structure);
+public class CustomQuery extends Query {
+    private static interface API extends GstQueryAPI {
+        Pointer ptr_gst_query_new_custom(QueryType type, @Invalidate Structure structure);
     }
     private static final API gst = GstNative.load(API.class);
-    public ApplicationQuery(Initializer init) {
+    public CustomQuery(Initializer init) {
         super(init);
     }
+
     /**
      * Constructs a new custom application query object.
-     * 
+     *
      * @param type the query type
      * @param structure a structure for the query
      */
-    public ApplicationQuery(QueryType type, Structure structure) {
-        this(initializer(gst.ptr_gst_query_new_application(type, structure)));
+    public CustomQuery(QueryType type, Structure structure) {
+        this(NativeObject.initializer(CustomQuery.gst.ptr_gst_query_new_custom(type, structure)));
     }
 }

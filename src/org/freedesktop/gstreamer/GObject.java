@@ -810,8 +810,11 @@ public abstract class GObject extends RefCountedObject {
             if (o == null) {
                 return;
             }
-            GObject.logger.log(GObject.LIFECYCLE, "toggle_ref " + o.getClass().getSimpleName() +
-                    " (" +  ptr + ")" + " last_ref=" + is_last_ref);
+        	if (GObject.logger.isLoggable(GObject.LIFECYCLE)) {
+                GObject.logger.log(GObject.LIFECYCLE, "toggle_ref " + o.getClass().getSimpleName() +
+                        " (" +  ptr + ")" + " last_ref=" + is_last_ref);
+        	}
+
             if (is_last_ref) {
                 GObject.strongReferences.remove(o);
             } else {

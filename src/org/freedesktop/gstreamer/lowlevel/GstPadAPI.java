@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -25,11 +25,13 @@ import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.FlowReturn;
+import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.PadLinkReturn;
 import org.freedesktop.gstreamer.PadProbeReturn;
 import org.freedesktop.gstreamer.PadTemplate;
+import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
@@ -45,32 +47,32 @@ import com.sun.jna.Pointer;
 public interface GstPadAPI extends com.sun.jna.Library {
 	public static final int GST_PAD_PROBE_TYPE_INVALID		 	= 0;
 	/* flags to control blocking */
-	public static final int GST_PAD_PROBE_TYPE_IDLE 			= (1 << 0);
-	public static final int GST_PAD_PROBE_TYPE_BLOCK 			= (1 << 1);
+	public static final int GST_PAD_PROBE_TYPE_IDLE 			= 1 << 0;
+	public static final int GST_PAD_PROBE_TYPE_BLOCK 			= 1 << 1;
 	/* flags to select datatypes */
-	public static final int GST_PAD_PROBE_TYPE_BUFFER 			= (1 << 4);
-	public static final int GST_PAD_PROBE_TYPE_BUFFER_LIST      = (1 << 5);
-	public static final int GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM = (1 << 6);
-	public static final int GST_PAD_PROBE_TYPE_EVENT_UPSTREAM   = (1 << 7);
-	public static final int GST_PAD_PROBE_TYPE_EVENT_FLUSH      = (1 << 8);
-	public static final int GST_PAD_PROBE_TYPE_QUERY_DOWNSTREAM = (1 << 9);
-	public static final int GST_PAD_PROBE_TYPE_QUERY_UPSTREAM   = (1 << 10);
+	public static final int GST_PAD_PROBE_TYPE_BUFFER 			= 1 << 4;
+	public static final int GST_PAD_PROBE_TYPE_BUFFER_LIST      = 1 << 5;
+	public static final int GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM = 1 << 6;
+	public static final int GST_PAD_PROBE_TYPE_EVENT_UPSTREAM   = 1 << 7;
+	public static final int GST_PAD_PROBE_TYPE_EVENT_FLUSH      = 1 << 8;
+	public static final int GST_PAD_PROBE_TYPE_QUERY_DOWNSTREAM = 1 << 9;
+	public static final int GST_PAD_PROBE_TYPE_QUERY_UPSTREAM   = 1 << 10;
 	/* flags to select scheduling mode */
-	public static final int GST_PAD_PROBE_TYPE_PUSH             = (1 << 12);
-	public static final int GST_PAD_PROBE_TYPE_PULL             = (1 << 13);
-	public static final int GST_PAD_PROBE_TYPE_BLOCKING         = GST_PAD_PROBE_TYPE_IDLE | GST_PAD_PROBE_TYPE_BLOCK;
-	public static final int GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM  = GST_PAD_PROBE_TYPE_BUFFER | GST_PAD_PROBE_TYPE_BUFFER_LIST | GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_DATA_UPSTREAM    = GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_DATA_BOTH        = GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM | GST_PAD_PROBE_TYPE_DATA_UPSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM = GST_PAD_PROBE_TYPE_BLOCK | GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_BLOCK_UPSTREAM   = GST_PAD_PROBE_TYPE_BLOCK | GST_PAD_PROBE_TYPE_DATA_UPSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_EVENT_BOTH       = GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;		  
-	public static final int GST_PAD_PROBE_TYPE_QUERY_BOTH       = GST_PAD_PROBE_TYPE_QUERY_DOWNSTREAM | GST_PAD_PROBE_TYPE_QUERY_UPSTREAM;
-	public static final int GST_PAD_PROBE_TYPE_ALL_BOTH         = GST_PAD_PROBE_TYPE_DATA_BOTH | GST_PAD_PROBE_TYPE_QUERY_BOTH;
-	public static final int GST_PAD_PROBE_TYPE_SCHEDULING       = GST_PAD_PROBE_TYPE_PUSH | GST_PAD_PROBE_TYPE_PULL;
-	
+	public static final int GST_PAD_PROBE_TYPE_PUSH             = 1 << 12;
+	public static final int GST_PAD_PROBE_TYPE_PULL             = 1 << 13;
+	public static final int GST_PAD_PROBE_TYPE_BLOCKING         = GstPadAPI.GST_PAD_PROBE_TYPE_IDLE | GstPadAPI.GST_PAD_PROBE_TYPE_BLOCK;
+	public static final int GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM  = GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER | GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER_LIST | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_DATA_UPSTREAM    = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_DATA_BOTH        = GstPadAPI.GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_DATA_UPSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM = GstPadAPI.GST_PAD_PROBE_TYPE_BLOCK | GstPadAPI.GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_BLOCK_UPSTREAM   = GstPadAPI.GST_PAD_PROBE_TYPE_BLOCK | GstPadAPI.GST_PAD_PROBE_TYPE_DATA_UPSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_EVENT_BOTH       = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_QUERY_BOTH       = GstPadAPI.GST_PAD_PROBE_TYPE_QUERY_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_QUERY_UPSTREAM;
+	public static final int GST_PAD_PROBE_TYPE_ALL_BOTH         = GstPadAPI.GST_PAD_PROBE_TYPE_DATA_BOTH | GstPadAPI.GST_PAD_PROBE_TYPE_QUERY_BOTH;
+	public static final int GST_PAD_PROBE_TYPE_SCHEDULING       = GstPadAPI.GST_PAD_PROBE_TYPE_PUSH | GstPadAPI.GST_PAD_PROBE_TYPE_PULL;
+
     static GstPadAPI GSTPAD_API = GstNative.load(GstPadAPI.class);
-    
+
     GType gst_pad_get_type();
     GType gst_ghost_pad_get_type();
     @CallerOwnsReturn Pad gst_pad_new(String name, PadDirection direction);
@@ -89,7 +91,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Caps gst_pad_proxy_getcaps(Pad pad);
     boolean gst_pad_proxy_setcaps(Pad pad, Caps caps);
     @CallerOwnsReturn Element gst_pad_get_parent_element(Pad pad);
-    
+
 
     boolean gst_pad_set_active(Pad pad, boolean active);
     boolean gst_pad_is_active(Pad pad);
@@ -99,7 +101,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
     boolean gst_pad_is_blocking(Pad pad);
     /* get_pad_template returns a non-refcounted PadTemplate */
     PadTemplate gst_pad_get_pad_template(Pad pad);
-    
+
     /* capsnego function for connected/unconnected pads */
     @CallerOwnsReturn Caps gst_pad_get_caps(Pad  pad);
     void gst_pad_fixate_caps(Pad pad, Caps caps);
@@ -107,7 +109,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
     boolean gst_pad_set_caps(Pad pad, Caps caps);
     @CallerOwnsReturn Caps gst_pad_peer_get_caps(Pad pad);
     boolean gst_pad_peer_accept_caps(Pad pad, Caps caps);
-    
+
     /* capsnego for connected pads */
     @CallerOwnsReturn Caps gst_pad_get_allowed_caps(Pad pad);
     @CallerOwnsReturn Caps gst_pad_get_negotiated_caps(Pad pad);
@@ -119,6 +121,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
             Buffer[] buffer);
     boolean gst_pad_push_event(Pad pad, @IncRef Event event);
     boolean gst_pad_event_default(Pad pad, Event event);
+
     /* data passing functions on pad */
     FlowReturn gst_pad_chain(Pad pad, @IncRef Buffer buffer);
     FlowReturn gst_pad_get_range(Pad pad, /* guint64 */ long offset, /* guint */ int size,
@@ -128,7 +131,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
         void callback(Pad pad, Caps caps);
     }
     void gst_pad_set_fixatecaps_function(Pad pad, PadFixateCaps fixate);
-    
+
     /* probes */
 //    public static interface PadDataProbe extends GstCallback {
 //        void callback(Pad pad, Buffer buffer, Pointer user_data);
@@ -136,13 +139,13 @@ public interface GstPadAPI extends com.sun.jna.Library {
 //    public static interface PadEventProbe extends GstCallback {
 //        boolean callback(Pad pad, Event ev, Pointer user_data);
 //    }
-    
+
     public static interface PadProbeCallback extends GstCallback {
         public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data);
     }
-    
+
     /**
-     * 
+     *
      * @param pad
      * @param mask The type comes from the constants in GstPadProbeType
      * @param callback
@@ -150,10 +153,10 @@ public interface GstPadAPI extends com.sun.jna.Library {
      * @param destroy_data
      * @return
      */
-    NativeLong gst_pad_add_probe(Pad pad, int mask, PadProbeCallback callback, 
+    NativeLong gst_pad_add_probe(Pad pad, int mask, PadProbeCallback callback,
     		Pointer user_data, GDestroyNotify destroy_data);
     void gst_pad_remove_probe(Pad pad, NativeLong id);
-    
+
     Event gst_pad_probe_info_get_event(GstPadProbeInfo probeInfo);
 
 //    NativeLong /* gulong */ gst_pad_add_data_probe(Pad pad, PadDataProbe handler, Pointer data);
@@ -167,4 +170,12 @@ public interface GstPadAPI extends com.sun.jna.Library {
 //    NativeLong /* gulong */ gst_pad_add_buffer_probe(Pad pad, GstCallback handler, Pointer data);
 //
 //    void gst_pad_remove_buffer_probe(Pad pad, NativeLong handler_id);
+
+    public static interface PadQueryCallback extends GstCallback {
+        public boolean callback(Pad pad, GstObject parent, Query query);
+    }
+    void gst_pad_set_query_function_full(Pad pad, PadQueryCallback callback, Pointer data, GDestroyNotify notify);
+
+    Caps gst_pad_query_caps(Pad pad, Caps filter);
+
 }

@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2015 Christophe Lafolet
- * Copyright (C) 2008 Wayne Meissner
  *
  * This file is part of gstreamer-java.
  *
@@ -17,38 +16,35 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
+
+
+import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
-import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-/**
- * Base query type
- */
-@HasSubtype
-public class Query extends MiniObject {
-    public static final String GTYPE_NAME = "GstQuery";
+import com.sun.jna.Pointer;
 
-    private static interface API extends GstQueryAPI {}
+
+public class CapsEvent extends Event {
+    private static interface API extends com.sun.jna.Library {
+        Pointer ptr_gst_event_new_caps(Caps caps);
+    }
     private static final API gst = GstNative.load(API.class);
 
     /**
-     * Internally used constructor.  Do not use.
-     *
-     * @param init internal initialization data.
+     * This constructor is for internal use only.
+     * @param init initialization data.
      */
-    public Query(Initializer init) {
+    public CapsEvent(Initializer init) {
         super(init);
     }
 
     /**
-     * Get the structure of this query.
-     *
-     * @return The structure of this Query.
+     * Creates a new caps event.
      */
-    public Structure getStructure() {
-        return ReferenceManager.addKeepAliveReference(Query.gst.gst_query_get_structure(this), this);
+    public CapsEvent(final Caps caps) {
+        super(NativeObject.initializer(CapsEvent.gst.ptr_gst_event_new_caps(caps)));
     }
-
 }

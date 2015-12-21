@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008 Wayne Meissner
- * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
+ * Copyright (c) 2015 Christophe Lafolet
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,7 +19,7 @@
 package org.freedesktop.gstreamer.message;
 
 
-import org.freedesktop.gstreamer.Bin;
+import org.freedesktop.gstreamer.Clock;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
@@ -29,30 +29,39 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
 
-/**
- * This message is generated and posted in the sink elements of a {@link Bin}.
- * The bin will only forward the EOS message to the application if all sinks
- * have posted an EOS message.
- */
-public class EOSMessage extends Message {
+public class NewClockMessage extends Message {
     private static interface API extends GstMessageAPI {
-    	@CallerOwnsReturn Pointer ptr_gst_message_new_eos(GstObject src);
+    	@CallerOwnsReturn Pointer ptr_gst_message_new_new_clock(GstObject src, Clock clock);
     }
     private static final API gst = GstNative.load(API.class);
 
     /**
-     * Creates a new eos message.
+     * Creates a new new clock message.
+     *
      * @param init internal initialization data.
      */
-    public EOSMessage(Initializer init) {
+    public NewClockMessage(Initializer init) {
         super(init);
     }
 
     /**
-     * Creates a new eos message.
-     * @param src The object originating the message.
+     * Creates a new clock message.
+     * @param src the object originating the message.
+     *
      */
-    public EOSMessage(GstObject src) {
-        this(NativeObject.initializer(EOSMessage.gst.ptr_gst_message_new_eos(src)));
+    public NewClockMessage(GstObject src, Clock clock) {
+        this(NativeObject.initializer(NewClockMessage.gst.ptr_gst_message_new_new_clock(src, clock)));
     }
+
+    /**
+     * Gets the clock of this message.
+     *
+     * @return the clock
+     */
+    public Clock getClock() {
+    	Clock[] clock = new Clock[1];
+        NewClockMessage.gst.gst_message_parse_new_clock(this, clock);
+        return clock[0];
+    }
+
 }
