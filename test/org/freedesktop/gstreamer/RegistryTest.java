@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * gstreamer-java is free software: you can redistribute it and/or modify
@@ -19,15 +19,12 @@
 
 package org.freedesktop.gstreamer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 
+import org.freedesktop.gstreamer.PluginFeature.Rank;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,7 +44,7 @@ public class RegistryTest {
     public static void setUpClass() throws Exception {
         Gst.init("RegistryTest", new String[] {});
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
@@ -69,7 +66,7 @@ public class RegistryTest {
     @Test
     public void getDefault() {
         Registry registry = Registry.getInstance();
-        assertNotNull("Registry.getDefault() returned null", registry);
+        Assert.assertNotNull("Registry.getDefault() returned null", registry);
     }
     @Test
     public void listPlugins() {
@@ -80,7 +77,7 @@ public class RegistryTest {
         ElementFactory.make("vorbisdec", "vorbis");
         ElementFactory.make("decodebin", "decoder");
         List<Plugin> plugins = registry.getPluginList();
-        assertFalse("No plugins found", plugins.isEmpty());
+        Assert.assertFalse("No plugins found", plugins.isEmpty());
         boolean pluginFound = false;
         for (Plugin p : plugins) {
 //            System.out.println("Found plugin: " + p.getName());
@@ -88,7 +85,7 @@ public class RegistryTest {
                 pluginFound = true;
             }
         }
-        assertTrue(PLUGIN + " plugin not found", pluginFound);
+        Assert.assertTrue(PLUGIN + " plugin not found", pluginFound);
     }
     @Test
     public void filterPlugins() {
@@ -104,15 +101,16 @@ public class RegistryTest {
         final boolean[] filterCalled = { false };
         List<Plugin> plugins = registry.getPluginList(new Registry.PluginFilter() {
 
-            public boolean accept(Plugin plugin) {
+            @Override
+			public boolean accept(Plugin plugin) {
                 filterCalled[0] = true;
                 return plugin.getName().equals(PLUGIN);
             }
         }, true);
-        assertFalse("No plugins found", plugins.isEmpty());
-        assertTrue("PluginFilter not called", filterCalled[0]);
-        assertEquals("Plugin list should contain 1 item", 1, plugins.size());
-        assertEquals(PLUGIN + " plugin not found", PLUGIN, plugins.get(0).getName());
+        Assert.assertFalse("No plugins found", plugins.isEmpty());
+        Assert.assertTrue("PluginFilter not called", filterCalled[0]);
+        Assert.assertEquals("Plugin list should contain 1 item", 1, plugins.size());
+        Assert.assertEquals(PLUGIN + " plugin not found", PLUGIN, plugins.get(0).getName());
     }
     @Test
     public void listPluginFeatures() {
@@ -124,7 +122,7 @@ public class RegistryTest {
         ElementFactory.make("vorbisdec", "vorbis");
         ElementFactory.make("decodebin", "decoder");
         List<PluginFeature> features = registry.getPluginFeatureListByPlugin(PLUGIN);
-        assertFalse("No plugin features found", features.isEmpty());
+        Assert.assertFalse("No plugin features found", features.isEmpty());
         boolean pluginFound = false;
         for (PluginFeature p : features) {
 //            System.out.println("Found plugin feature " + p.getName());
@@ -132,11 +130,15 @@ public class RegistryTest {
                 pluginFound = true;
             }
         }
-        assertTrue(PLUGIN + " plugin not found", pluginFound);
+        Assert.assertTrue(PLUGIN + " plugin not found", pluginFound);
     }
     @Test
     public void lookupFeature() {
         @SuppressWarnings("unused")
         PluginFeature f = Registry.getInstance().findPluginFeature("decodebin");
+        f.setRank(Rank.GST_RANK_PRIMARY);
+        Assert.assertSame("Can't modify rank", Rank.GST_RANK_PRIMARY, f.getRank());
+        f.setRank(Rank.GST_RANK_NONE);
+        Assert.assertSame("Can't modify rank", Rank.GST_RANK_NONE, f.getRank());
     }
 }
