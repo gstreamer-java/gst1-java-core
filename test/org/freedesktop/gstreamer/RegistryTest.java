@@ -68,13 +68,13 @@ public class RegistryTest {
     // public void hello() {}
     @Test
     public void getDefault() {
-        Registry registry = Registry.getDefault();
+        Registry registry = Registry.getInstance();
         assertNotNull("Registry.getDefault() returned null", registry);
     }
     @Test
     public void listPlugins() {
         final String PLUGIN = "vorbis"; // Use something that is likely to be there
-        Registry registry = Registry.getDefault();
+        Registry registry = Registry.getInstance();
         // Ensure some plugins are loaded
         ElementFactory.make("playbin", "test");
         ElementFactory.make("vorbisdec", "vorbis");
@@ -96,7 +96,7 @@ public class RegistryTest {
             return; // gst_registry_plugin_filter doesn't exist on windows
         }
         final String PLUGIN = "vorbis"; // Use something that is likely to be there
-        Registry registry = Registry.getDefault();
+        Registry registry = Registry.getInstance();
         // Ensure some plugins are loaded
         ElementFactory.make("playbin", "test");
         ElementFactory.make("vorbisdec", "vorbis");
@@ -118,7 +118,7 @@ public class RegistryTest {
     public void listPluginFeatures() {
         final String PLUGIN = "vorbis"; // Use something that is likely to be there
         final String FEATURE = "vorbisdec";
-        Registry registry = Registry.getDefault();
+        Registry registry = Registry.getInstance();
         // Ensure some plugins are loaded
         ElementFactory.make("playbin", "test");
         ElementFactory.make("vorbisdec", "vorbis");
@@ -137,6 +137,6 @@ public class RegistryTest {
     @Test
     public void lookupFeature() {
         @SuppressWarnings("unused")
-        PluginFeature f = Registry.getDefault().findPluginFeature("decodebin");
+        PluginFeature f = Registry.getInstance().findPluginFeature("decodebin");
     }
 }
