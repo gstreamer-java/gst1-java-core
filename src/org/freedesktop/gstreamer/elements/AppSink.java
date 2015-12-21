@@ -25,6 +25,8 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -37,28 +39,28 @@ public class AppSink extends BaseSink {
     public static final String GST_NAME = "appsink";
     public static final String GTYPE_NAME = "GstAppSink";
 
-    private static final AppAPI gst() { return AppAPI.APP_API; }
+    private static final AppAPI gst = AppAPI.APP_API;
 
     public AppSink(Initializer init) {
         super(init);
     }
-    
+
     public AppSink(String name) {
-    	this(makeRawElement(GST_NAME, name));
+    	this(Element.makeRawElement(AppSink.GST_NAME, name));
     }
 
     /**
      * Sets the capabilities on the appsink element.
      * <p>
      * After calling this method, the sink will only accept caps that match <tt>caps</tt>.
-     * If <tt>caps</tt> is non-fixed, you must check the caps on the buffers to 
-     * get the actual used caps. 
-     * 
+     * If <tt>caps</tt> is non-fixed, you must check the caps on the buffers to
+     * get the actual used caps.
+     *
      * @param caps The <tt>Caps</tt> to set.
      */
     @Override
     public void setCaps(Caps caps) {
-        gst().gst_app_sink_set_caps(this, caps);
+        AppSink.gst.gst_app_sink_set_caps(this, caps);
     }
 
     /**
@@ -67,26 +69,26 @@ public class AppSink extends BaseSink {
      * @return The caps configured on this <tt>AppSink</tt>
      */
     public Caps getCaps() {
-        return gst().gst_app_sink_get_caps(this);
+        return AppSink.gst.gst_app_sink_get_caps(this);
     }
 
     /**
      * Checks if this <tt>AppSink</tt> is end-of-stream.
      * <p>
      * If an EOS event has been received, no more buffers can be pulled.
-     * 
-     * @return <tt>true</tt> if no more buffers can be pulled and this 
+     *
+     * @return <tt>true</tt> if no more buffers can be pulled and this
      * <tt>AppSink</tt> is EOS.
      */
     public boolean isEOS() {
-        return gst().gst_app_sink_is_eos(this);
+        return AppSink.gst.gst_app_sink_is_eos(this);
     }
 
     /**
      * Get the last preroll buffer in this <tt>AppSink</tt>.
      * <p>
      * This was the buffer that caused the appsink to preroll in the PAUSED state.
-     * This buffer can be pulled many times and remains available to the application 
+     * This buffer can be pulled many times and remains available to the application
      * even after EOS.
      * <p>
      * This function is typically used when dealing with a pipeline in the PAUSED
@@ -100,12 +102,12 @@ public class AppSink extends BaseSink {
      * <tt>null</tt>. Use {@link #isEOS} to check for the EOS condition.
      * <p>
      * This function blocks until a preroll buffer or EOS is received or the appsink
-     * element is set to the READY/NULL state. 
+     * element is set to the READY/NULL state.
      *
      * @return A {@link Buffer} or <tt>null</tt> when the appsink is stopped or EOS.
      */
     public Sample pullPreroll() {
-        return gst().gst_app_sink_pull_preroll(this);
+        return AppSink.gst.gst_app_sink_pull_preroll(this);
     }
 
     /**
@@ -113,7 +115,7 @@ public class AppSink extends BaseSink {
      * Pulls a {@link org.freedesktop.gstreamer.Buffer} from the <tt>AppSink</tt>.
      * <p>
      * This function blocks until a buffer or EOS becomes available or the appsink
-     * element is set to the READY/NULL state. 
+     * element is set to the READY/NULL state.
      * <p>
       * This function will only return buffers when the appsink is in the PLAYING
      * state. All rendered buffers will be put in a queue so that the application
@@ -122,13 +124,13 @@ public class AppSink extends BaseSink {
      * especially when dealing with raw video frames.
      * <p>
      * If an EOS event was received before any buffers, this function returns
-     * <tt>null</tt>. Use {@link #isEOS} to check for the EOS condition. 
+     * <tt>null</tt>. Use {@link #isEOS} to check for the EOS condition.
      *
      * Returns: a #GstBuffer or NULL when the appsink is stopped or EOS.
-     * @return A {@link org.freedesktop.gstreamer.Buffer} or NULL when the appsink is stopped or EOS. 
+     * @return A {@link org.freedesktop.gstreamer.Buffer} or NULL when the appsink is stopped or EOS.
      */
     public Sample pullSample() {
-        return gst().gst_app_sink_pull_sample(this);
+        return AppSink.gst.gst_app_sink_pull_sample(this);
     }
 
     /**
@@ -146,7 +148,7 @@ public class AppSink extends BaseSink {
      * @param listener
      */
     public void connect(final EOS listener) {
-        connect(EOS.class, listener, new GstCallback() {
+        this.connect(EOS.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(AppSink elem) {
                 listener.eos(elem);
@@ -159,9 +161,9 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(EOS listener) {
-        disconnect(EOS.class, listener);
+        this.disconnect(EOS.class, listener);
     }
-    
+
     /**
      * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
@@ -170,7 +172,7 @@ public class AppSink extends BaseSink {
          *
          * @param elem
          */
-        public void newBuffer(AppSink elem);
+        public FlowReturn newSample(AppSink elem);
     }
     /**
      * Adds a listener for the <code>new-buffer</code> signal. If a blocking
@@ -181,10 +183,10 @@ public class AppSink extends BaseSink {
      * @param listener
      */
     public void connect(final NEW_SAMPLE listener) {
-        connect(NEW_SAMPLE.class, listener, new GstCallback() {
+        this.connect(NEW_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public void callback(AppSink elem) {
-                listener.newBuffer(elem);
+            public FlowReturn callback(AppSink elem) {
+                return listener.newSample(elem);
             }
         });
     }
@@ -194,9 +196,9 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(NEW_SAMPLE listener) {
-        disconnect(NEW_SAMPLE.class, listener);
+        this.disconnect(NEW_SAMPLE.class, listener);
     }
-    
+
     /**
      * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
@@ -216,7 +218,7 @@ public class AppSink extends BaseSink {
      * @param listener
      */
     public void connect(final NEW_PREROLL listener) {
-        connect(NEW_PREROLL.class, listener, new GstCallback() {
+        this.connect(NEW_PREROLL.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(AppSink elem) {
                 listener.newPreroll(elem);
@@ -229,11 +231,11 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(NEW_PREROLL listener) {
-        disconnect(NEW_PREROLL.class, listener);
+        this.disconnect(NEW_PREROLL.class, listener);
     }
 
     /**
-     * This function blocks until a buffer or EOS becomes available or this 
+     * This function blocks until a buffer or EOS becomes available or this
      * {@link AppSink} element is set to the READY/NULL state.
      */
     public static interface PULL_BUFFER {
@@ -244,16 +246,16 @@ public class AppSink extends BaseSink {
         public Buffer pullBuffer(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>pull-buffer</code> signal. 
-     * Note that when the application does not pull buffers fast enough, the 
-     * queued buffers could consume a lot of memory, especially when dealing 
-     * with raw video frames. It's possible to control the behaviour of the 
+     * Adds a listener for the <code>pull-buffer</code> signal.
+     * Note that when the application does not pull buffers fast enough, the
+     * queued buffers could consume a lot of memory, especially when dealing
+     * with raw video frames. It's possible to control the behaviour of the
      * queue with the "drop" and "max-buffers" properties.
      *
      * @param listener
      */
     public void connect(final PULL_BUFFER listener) {
-        connect(PULL_BUFFER.class, listener, new GstCallback() {
+        this.connect(PULL_BUFFER.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public Buffer callback(AppSink elem) {
                 return listener.pullBuffer(elem);
@@ -266,11 +268,11 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(PULL_BUFFER listener) {
-        disconnect(PULL_BUFFER.class, listener);
+        this.disconnect(PULL_BUFFER.class, listener);
     }
 
     /**
-     * Get the last preroll buffer in this {@link AppSink} element.  
+     * Get the last preroll buffer in this {@link AppSink} element.
      */
     public static interface PULL_PREROLL {
         /**
@@ -280,12 +282,12 @@ public class AppSink extends BaseSink {
         public Buffer pullPreroll(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>pull-preroll</code> signal. 
+     * Adds a listener for the <code>pull-preroll</code> signal.
      *
      * @param listener
      */
     public void connect(final PULL_PREROLL listener) {
-        connect(PULL_PREROLL.class, listener, new GstCallback() {
+        this.connect(PULL_PREROLL.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public Buffer callback(AppSink elem) {
                 return listener.pullPreroll(elem);
@@ -298,7 +300,7 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(PULL_PREROLL listener) {
-        disconnect(PULL_PREROLL.class, listener);
+        this.disconnect(PULL_PREROLL.class, listener);
     }
 
     /**
@@ -317,7 +319,7 @@ public class AppSink extends BaseSink {
      * @param listener
      */
     public void connect(final NEW_BUFFER_LIST listener) {
-        connect(NEW_BUFFER_LIST.class, listener, new GstCallback() {
+        this.connect(NEW_BUFFER_LIST.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(AppSink elem) {
                 listener.newBufferList(elem);
@@ -330,11 +332,11 @@ public class AppSink extends BaseSink {
      * @param listener The listener that was previously added.
      */
     public void disconnect(NEW_BUFFER_LIST listener) {
-        disconnect(NEW_BUFFER_LIST.class, listener);
+        this.disconnect(NEW_BUFFER_LIST.class, listener);
     }
 
 //    /**
-//     * This function blocks until a buffer list or EOS becomes available or 
+//     * This function blocks until a buffer list or EOS becomes available or
 //     * this {@link AppSink} element is set to the READY/NULL state.
 //     */
 //    public static interface PULL_BUFFER_LIST {
@@ -345,7 +347,7 @@ public class AppSink extends BaseSink {
 //        public BufferList pullBufferList(AppSink elem);
 //    }
 //    /**
-//     * Adds a listener for the <code>pull-buffer-list</code> signal. 
+//     * Adds a listener for the <code>pull-buffer-list</code> signal.
 //     *
 //     * @param listener
 //     */

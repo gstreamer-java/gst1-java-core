@@ -1,30 +1,5 @@
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.lowlevel.GSignalAPI;
-import org.freedesktop.gstreamer.lowlevel.GValueStruct;
-import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI;
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
-import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GstLFOControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GstCapsAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseTransformAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseSrcAPI;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.GstAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI;
-import org.freedesktop.gstreamer.lowlevel.GstObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.GstInterpolationControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -35,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,7 +32,7 @@ public class LowLevelStructureTest {
 
     @BeforeClass
     public static void setUpClass() {
-        initStructList();
+        LowLevelStructureTest.initStructList();
     }
 
     @AfterClass
@@ -65,8 +41,8 @@ public class LowLevelStructureTest {
 
     @Before
     public void setUp() {
-        if (untestable == null) {
-            untestable = new ArrayList<Class<? extends Structure>>();
+        if (LowLevelStructureTest.untestable == null) {
+            LowLevelStructureTest.untestable = new ArrayList<Class<? extends Structure>>();
         }
     }
 
@@ -77,24 +53,24 @@ public class LowLevelStructureTest {
     @Test
     public void runTest() {
 
-        for (Class<? extends Structure> struct : structs) {
-            testStruct(struct);
+        for (Class<? extends Structure> struct : LowLevelStructureTest.structs) {
+            this.testStruct(struct);
         }
 
-        if (!untestable.isEmpty()) {
+        if (!LowLevelStructureTest.untestable.isEmpty()) {
             StringBuilder builder = new StringBuilder("UNTESTABLE:\n");
-            for (Class<? extends Structure> struct : untestable) {
+            for (Class<? extends Structure> struct : LowLevelStructureTest.untestable) {
                 builder.append(struct.getName());
                 builder.append("\n");
             }
-            LOG.log(Level.WARNING, builder.toString());
+            LowLevelStructureTest.LOG.log(Level.WARNING, builder.toString());
         }
 
     }
 
     @SuppressWarnings("unchecked")
     private void testStruct(Class<? extends Structure> struct) {
-        LOG.log(Level.INFO, "Testing {0}", struct.getName());
+        LowLevelStructureTest.LOG.log(Level.INFO, "Testing {0}", struct.getName());
         Structure inst = null;
         List<String> fields = null;
         try {
@@ -104,7 +80,7 @@ public class LowLevelStructureTest {
 //                Constructor<? extends Structure> con = struct.getConstructor(Pointer.class);
 //                inst = con.newInstance(Pointer.NULL);
 //            } catch (Exception ex1) {
-            untestable.add(struct);
+            LowLevelStructureTest.untestable.add(struct);
 //                assertTrue(false);
             return;
 
@@ -114,10 +90,10 @@ public class LowLevelStructureTest {
             getFieldOrder.setAccessible(true);
             fields = (List<String>) getFieldOrder.invoke(inst);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Can't find getFieldOrder() method", ex);
-            assertTrue(false);
+            LowLevelStructureTest.LOG.log(Level.SEVERE, "Can't find getFieldOrder() method", ex);
+            Assert.assertTrue(false);
         }
-        testFields(inst, fields);
+        this.testFields(inst, fields);
     }
 
     private void testFields(Structure inst, List<String> expectedFields) {
@@ -128,94 +104,94 @@ public class LowLevelStructureTest {
                 fieldNames.add(field.getName());
             }
         }
-        assertTrue(expectedFields.equals(fieldNames));
+        Assert.assertTrue(expectedFields.equals(fieldNames));
     }
 
     private static void initStructList() {
-        structs = new ArrayList<Class<? extends Structure>>();
+        LowLevelStructureTest.structs = new ArrayList<Class<? extends Structure>>();
 
-        structs.add(BaseSinkAPI.GstBaseSinkStruct.class);
-        structs.add(BaseSinkAPI.GstBaseSinkAbi.class);
-        structs.add(BaseSinkAPI.GstBaseSinkClass.class);
+        LowLevelStructureTest.structs.add(BaseSinkAPI.GstBaseSinkStruct.class);
+        LowLevelStructureTest.structs.add(BaseSinkAPI.GstBaseSinkAbi.class);
+        LowLevelStructureTest.structs.add(BaseSinkAPI.GstBaseSinkClass.class);
 
-        structs.add(BaseSrcAPI.GstBaseSrcStruct.class);
-        structs.add(BaseSrcAPI.GstBaseSrcAbi.class);
-        structs.add(BaseSrcAPI.GstBaseSrcClass.class);
+        LowLevelStructureTest.structs.add(BaseSrcAPI.GstBaseSrcStruct.class);
+        LowLevelStructureTest.structs.add(BaseSrcAPI.GstBaseSrcAbi.class);
+        LowLevelStructureTest.structs.add(BaseSrcAPI.GstBaseSrcClass.class);
 
-        structs.add(BaseTransformAPI.GstBaseTransformStruct.class);
-        structs.add(BaseTransformAPI.GstBaseTransformClass.class);
+        LowLevelStructureTest.structs.add(BaseTransformAPI.GstBaseTransformStruct.class);
+        LowLevelStructureTest.structs.add(BaseTransformAPI.GstBaseTransformClass.class);
 
-        structs.add(GObjectAPI.GTypeClass.class);
-        structs.add(GObjectAPI.GTypeInstance.class);
-        structs.add(GObjectAPI.GObjectStruct.class);
-        structs.add(GObjectAPI.GObjectClass.class);
-        structs.add(GObjectAPI.GTypeInfo.class);
-        structs.add(GObjectAPI.GParamSpec.class);
-        structs.add(GObjectAPI.GParamSpecBoolean.class);
-        structs.add(GObjectAPI.GParamSpecChar.class);
-        structs.add(GObjectAPI.GParamSpecDouble.class);
-        structs.add(GObjectAPI.GParamSpecFloat.class);
-        structs.add(GObjectAPI.GParamSpecInt.class);
-        structs.add(GObjectAPI.GParamSpecInt64.class);
-        structs.add(GObjectAPI.GParamSpecLong.class);
-        structs.add(GObjectAPI.GParamSpecString.class);
-        structs.add(GObjectAPI.GParamSpecUChar.class);
-        structs.add(GObjectAPI.GParamSpecUInt.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GTypeClass.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GTypeInstance.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GObjectStruct.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GObjectClass.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GTypeInfo.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpec.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecBoolean.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecChar.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecDouble.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecFloat.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecInt.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecInt64.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecLong.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecString.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecUChar.class);
+        LowLevelStructureTest.structs.add(GObjectAPI.GParamSpecUInt.class);
 
-        structs.add(GSignalAPI.GSignalQuery.class);
+        LowLevelStructureTest.structs.add(GSignalAPI.GSignalQuery.class);
 
-        structs.add(GValueAPI.GValue.class);
-        structs.add(GValueAPI.GValueArray.class);
+        LowLevelStructureTest.structs.add(GValueAPI.GValue.class);
+        LowLevelStructureTest.structs.add(GValueAPI.GValueArray.class);
 
-        structs.add(GValueStruct.class);
+        LowLevelStructureTest.structs.add(GValueStruct.class);
 
-        structs.add(GlibAPI.GList.class);
-        structs.add(GlibAPI.GSList.class);
+        LowLevelStructureTest.structs.add(GlibAPI.GList.class);
+        LowLevelStructureTest.structs.add(GlibAPI.GSList.class);
 
-        structs.add(GstAPI.GstSegmentStruct.class);
-        structs.add(GstAPI.GErrorStruct.class);
+        LowLevelStructureTest.structs.add(GstSegmentAPI.GstSegmentStruct.class);
+        LowLevelStructureTest.structs.add(GstAPI.GErrorStruct.class);
 
-        structs.add(GstBufferAPI.BufferStruct.class);
+        LowLevelStructureTest.structs.add(GstBufferAPI.BufferStruct.class);
 
-        structs.add(GstCapsAPI.GPtrArray.class);
-        structs.add(GstCapsAPI.GstCapsStruct.class);
-        structs.add(GstCapsAPI.GstStaticCapsStruct.class);
+        LowLevelStructureTest.structs.add(GstCapsAPI.GPtrArray.class);
+        LowLevelStructureTest.structs.add(GstCapsAPI.GstCapsStruct.class);
+        LowLevelStructureTest.structs.add(GstCapsAPI.GstStaticCapsStruct.class);
 
-        structs.add(GstColorBalanceAPI.ColorBalanceChannelStruct.class);
+        LowLevelStructureTest.structs.add(GstColorBalanceAPI.ColorBalanceChannelStruct.class);
 
-        structs.add(GstControlSourceAPI.TimedValue.class);
-        structs.add(GstControlSourceAPI.ValueArray.class);
-        structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
-        structs.add(GstControlSourceAPI.GstControlSourceClass.class);
+        LowLevelStructureTest.structs.add(GstControlSourceAPI.TimedValue.class);
+        LowLevelStructureTest.structs.add(GstControlSourceAPI.ValueArray.class);
+        LowLevelStructureTest.structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
+        LowLevelStructureTest.structs.add(GstControlSourceAPI.GstControlSourceClass.class);
 
         // error loading native lib?
         //structs.add(GstControllerAPI.GstControllerStruct.class);
         //structs.add(GstControllerAPI.GstControllerClass.class);
 
-        structs.add(GstElementAPI.GstElementDetails.class);
-        structs.add(GstElementAPI.GstElementStruct.class);
-        structs.add(GstElementAPI.GstElementClass.class);
+        LowLevelStructureTest.structs.add(GstElementAPI.GstElementDetails.class);
+        LowLevelStructureTest.structs.add(GstElementAPI.GstElementStruct.class);
+        LowLevelStructureTest.structs.add(GstElementAPI.GstElementClass.class);
 
-        structs.add(GstEventAPI.EventStruct.class);
+        LowLevelStructureTest.structs.add(GstEventAPI.EventStruct.class);
 
-        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
-        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);
+        LowLevelStructureTest.structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
+        LowLevelStructureTest.structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);
 
-        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceStruct.class);
-        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceClass.class);
+        LowLevelStructureTest.structs.add(GstLFOControlSourceAPI.GstLFOControlSourceStruct.class);
+        LowLevelStructureTest.structs.add(GstLFOControlSourceAPI.GstLFOControlSourceClass.class);
 
-        structs.add(GstMessageAPI.MessageStruct.class);
+        LowLevelStructureTest.structs.add(GstMessageAPI.MessageStruct.class);
 
-        structs.add(GstMiniObjectAPI.MiniObjectStruct.class);
+        LowLevelStructureTest.structs.add(GstMiniObjectAPI.MiniObjectStruct.class);
 
-        structs.add(GstObjectAPI.GstObjectStruct.class);
-        structs.add(GstObjectAPI.GstObjectClass.class);
+        LowLevelStructureTest.structs.add(GstObjectAPI.GstObjectStruct.class);
+        LowLevelStructureTest.structs.add(GstObjectAPI.GstObjectClass.class);
 
-        structs.add(GstPadTemplateAPI.GstStaticPadTemplate.class);
+        LowLevelStructureTest.structs.add(GstPadTemplateAPI.GstStaticPadTemplate.class);
 
-        structs.add(GstPluginFeatureAPI.TypeNameData.class);
+        LowLevelStructureTest.structs.add(GstPluginFeatureAPI.TypeNameData.class);
 
-        structs.add(GstQueryAPI.QueryStruct.class);
+        LowLevelStructureTest.structs.add(GstQueryAPI.QueryStruct.class);
 
 
 

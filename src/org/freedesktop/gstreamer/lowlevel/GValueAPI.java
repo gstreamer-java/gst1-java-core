@@ -20,7 +20,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
@@ -29,8 +31,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -51,7 +51,7 @@ public interface GValueAPI extends Library {
 
     GValueAPI GVALUE_API = GNative.loadLibrary("gobject-2.0", GValueAPI.class,
     		new HashMap<String, Object>() {{
-    			put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
+    			this.put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
     		}});
 
     public static final class GValue extends com.sun.jna.Structure {
@@ -80,146 +80,148 @@ public interface GValueAPI extends Library {
 
         public GValue(GType type) {
             this();
-            GVALUE_API.g_value_init(this, type);
+            GValueAPI.GVALUE_API.g_value_init(this, type);
         }
-        
+
         public GValue(GType type, Object val) {
-            this(type);            
-            setValue(val);
+            this(type);
+            this.setValue(val);
         }
-        
+
         public GValue() {}
         public GValue(Pointer ptr) {
-            useMemory(ptr);
-            read();
+            this.useMemory(ptr);
+            this.read();
         }
-        
+
         private <T> T validateVal(Object val, Class<T> clazz) {
-            return validateVal(val, clazz, false);
+            return this.validateVal(val, clazz, false);
         }
-        
+
         private <T> T validateVal(Object val, Class<T> clazz, boolean allowNull) {
-            
+
             if (val == null) {
                 if (allowNull) {
                     return null;
                 } else {
-                    throw new IllegalArgumentException("null value not allowed for GType." + g_type);
+                    throw new IllegalArgumentException("null value not allowed for GType." + this.g_type);
                 }
             }
-            
+
             return clazz.cast(val);
 
         }
-        
+
         public void setValue(Object val) {
-            
-            if (g_type.equals(GType.INT)) { GVALUE_API.g_value_set_int(this, validateVal(val, Integer.class));
-            } else if (g_type.equals(GType.UINT)) { GVALUE_API.g_value_set_uint(this, validateVal(val, Integer.class));
-            } else if (g_type.equals(GType.CHAR)) { GVALUE_API.g_value_set_char(this, validateVal(val, Byte.class));
-            } else if (g_type.equals(GType.UCHAR)) { GVALUE_API.g_value_set_uchar(this, validateVal(val, Byte.class));
-            } else if (g_type.equals(GType.LONG)) { GVALUE_API.g_value_set_long(this, validateVal(val, NativeLong.class));
-            } else if (g_type.equals(GType.ULONG)) { GVALUE_API.g_value_set_ulong(this, validateVal(val, NativeLong.class));
-            } else if (g_type.equals(GType.INT64)) { GVALUE_API.g_value_set_int64(this, validateVal(val, Long.class));
-            } else if (g_type.equals(GType.UINT64)) { GVALUE_API.g_value_set_uint64(this, validateVal(val, Long.class));
-            } else if (g_type.equals(GType.BOOLEAN)) { GVALUE_API.g_value_set_boolean(this, validateVal(val, Boolean.class));
-            } else if (g_type.equals(GType.FLOAT)) { GVALUE_API.g_value_set_float(this, validateVal(val, Float.class));
-            } else if (g_type.equals(GType.DOUBLE)) { GVALUE_API.g_value_set_double(this, validateVal(val, Double.class));
-            } else if (g_type.equals(GType.STRING)) { GVALUE_API.g_value_set_string(this, validateVal(val, String.class));
-            } else if (g_type.equals(GType.OBJECT)) { GVALUE_API.g_value_set_object(this, validateVal(val, GObject.class, true));
-            } else if (g_type.equals(GType.POINTER)) { GVALUE_API.g_value_set_pointer(this, validateVal(val, Pointer.class));            
+
+            if (this.g_type.equals(GType.INT)) { GValueAPI.GVALUE_API.g_value_set_int(this, this.validateVal(val, Integer.class));
+            } else if (this.g_type.equals(GType.UINT)) { GValueAPI.GVALUE_API.g_value_set_uint(this, this.validateVal(val, Integer.class));
+            } else if (this.g_type.equals(GType.CHAR)) { GValueAPI.GVALUE_API.g_value_set_char(this, this.validateVal(val, Byte.class));
+            } else if (this.g_type.equals(GType.UCHAR)) { GValueAPI.GVALUE_API.g_value_set_uchar(this, this.validateVal(val, Byte.class));
+            } else if (this.g_type.equals(GType.LONG)) { GValueAPI.GVALUE_API.g_value_set_long(this, this.validateVal(val, NativeLong.class));
+            } else if (this.g_type.equals(GType.ULONG)) { GValueAPI.GVALUE_API.g_value_set_ulong(this, this.validateVal(val, NativeLong.class));
+            } else if (this.g_type.equals(GType.INT64)) { GValueAPI.GVALUE_API.g_value_set_int64(this, this.validateVal(val, Long.class));
+            } else if (this.g_type.equals(GType.UINT64)) { GValueAPI.GVALUE_API.g_value_set_uint64(this, this.validateVal(val, Long.class));
+            } else if (this.g_type.equals(GType.BOOLEAN)) { GValueAPI.GVALUE_API.g_value_set_boolean(this, this.validateVal(val, Boolean.class));
+            } else if (this.g_type.equals(GType.FLOAT)) { GValueAPI.GVALUE_API.g_value_set_float(this, this.validateVal(val, Float.class));
+            } else if (this.g_type.equals(GType.DOUBLE)) { GValueAPI.GVALUE_API.g_value_set_double(this, this.validateVal(val, Double.class));
+            } else if (this.g_type.equals(GType.STRING)) { GValueAPI.GVALUE_API.g_value_set_string(this, this.validateVal(val, String.class));
+            } else if (this.g_type.equals(GType.OBJECT)) { GValueAPI.GVALUE_API.g_value_set_object(this, this.validateVal(val, GObject.class, true));
+            } else if (this.g_type.equals(GType.POINTER)) { GValueAPI.GVALUE_API.g_value_set_pointer(this, this.validateVal(val, Pointer.class));
             } else {
-                throw new IllegalStateException("setValue() not supported yet for GType." + g_type);
-            }            
-        }
-        
-        public boolean checkHolds(GType type) {
-        	return GVALUE_API.g_type_check_value_holds(this, type);
-        }
-        
-        public GType getType() {
-        	return g_type;
-        }
-        
-        public Object getValue() {
-            if (g_type.equals(GType.INT)) { return toInt();
-            } else if (g_type.equals(GType.UINT)) { return toUInt();
-            } else if (g_type.equals(GType.CHAR)) { return toChar();
-            } else if (g_type.equals(GType.UCHAR)) { return toUChar();
-            } else if (g_type.equals(GType.LONG)) { return toLong();
-            } else if (g_type.equals(GType.ULONG)) { return toULong();
-            } else if (g_type.equals(GType.INT64)) { return toInt64();
-            } else if (g_type.equals(GType.UINT64)) { return toUInt64();
-            } else if (g_type.equals(GType.BOOLEAN)) { return toBoolean();
-            } else if (g_type.equals(GType.FLOAT)) { return toFloat();
-            } else if (g_type.equals(GType.DOUBLE)) { return toDouble();
-            } else if (g_type.equals(GType.STRING)) { return toJavaString();
-            } else if (g_type.equals(GType.OBJECT)) { return toObject();
-            } else if (g_type.equals(GType.POINTER)) { return toPointer();
-            } else {
-            	// object type not supported!
+                throw new IllegalStateException("setValue() not supported yet for GType." + this.g_type);
             }
-            return null;
         }
-        
+
+        public boolean checkHolds(GType type) {
+        	return GValueAPI.GVALUE_API.g_type_check_value_holds(this, type);
+        }
+
+        public GType getType() {
+        	return this.g_type;
+        }
+
+        public Object getValue() {
+            if (this.g_type.equals(GType.INT)) { return this.toInt();
+            } else if (this.g_type.equals(GType.UINT)) { return this.toUInt();
+            } else if (this.g_type.equals(GType.CHAR)) { return this.toChar();
+            } else if (this.g_type.equals(GType.UCHAR)) { return this.toUChar();
+            } else if (this.g_type.equals(GType.LONG)) { return this.toLong();
+            } else if (this.g_type.equals(GType.ULONG)) { return this.toULong();
+            } else if (this.g_type.equals(GType.INT64)) { return this.toInt64();
+            } else if (this.g_type.equals(GType.UINT64)) { return this.toUInt64();
+            } else if (this.g_type.equals(GType.BOOLEAN)) { return this.toBoolean();
+            } else if (this.g_type.equals(GType.FLOAT)) { return this.toFloat();
+            } else if (this.g_type.equals(GType.DOUBLE)) { return this.toDouble();
+            } else if (this.g_type.equals(GType.STRING)) { return this.toJavaString();
+            } else if (this.g_type.equals(GType.POINTER)) { return this.toPointer();
+//          } else if (this.g_type.equals(GType.OBJECT)) { return this.toObject();
+            } else {
+            	// others are derived from object
+            	return GValueAPI.GVALUE_API.g_value_get_object(this);
+            }
+//            return null;
+        }
+
         public Integer toInt() {
-        	return g_type.equals(GType.INT) ? new Integer(GVALUE_API.g_value_get_int(this)) : null; 
+        	return this.g_type.equals(GType.INT) ? new Integer(GValueAPI.GVALUE_API.g_value_get_int(this)) : null;
         }
-        
+
         public Integer toUInt() {
-        	return g_type.equals(GType.UINT) ? new Integer(GVALUE_API.g_value_get_uint(this)) : null; 
+        	return this.g_type.equals(GType.UINT) ? new Integer(GValueAPI.GVALUE_API.g_value_get_uint(this)) : null;
         }
-        
+
         public Byte toChar() {
-        	return g_type.equals(GType.CHAR) ? new Byte(GVALUE_API.g_value_get_char(this)) : null; 
+        	return this.g_type.equals(GType.CHAR) ? new Byte(GValueAPI.GVALUE_API.g_value_get_char(this)) : null;
         }
-        
+
         public Byte toUChar() {
-        	return g_type.equals(GType.UCHAR) ? new Byte(GVALUE_API.g_value_get_uchar(this)) : null;
+        	return this.g_type.equals(GType.UCHAR) ? new Byte(GValueAPI.GVALUE_API.g_value_get_uchar(this)) : null;
         }
-        
+
         public Long toLong() {
-        	return g_type.equals(GType.LONG) ? new Long(GVALUE_API.g_value_get_long(this).longValue()) : null;
+        	return this.g_type.equals(GType.LONG) ? new Long(GValueAPI.GVALUE_API.g_value_get_long(this).longValue()) : null;
         }
-        
+
         public Long toULong() {
-        	return g_type.equals(GType.ULONG) ? new Long(GVALUE_API.g_value_get_ulong(this).longValue()) : null; 
+        	return this.g_type.equals(GType.ULONG) ? new Long(GValueAPI.GVALUE_API.g_value_get_ulong(this).longValue()) : null;
         }
-        
+
         public Long toInt64() {
-        	return g_type.equals(GType.INT64)? new Long(GVALUE_API.g_value_get_int64(this)) : null; 
+        	return this.g_type.equals(GType.INT64)? new Long(GValueAPI.GVALUE_API.g_value_get_int64(this)) : null;
         }
-        
+
         public Long toUInt64() {
-        	return g_type.equals(GType.UINT64) ? new Long(GVALUE_API.g_value_get_uint64(this)) : null;
+        	return this.g_type.equals(GType.UINT64) ? new Long(GValueAPI.GVALUE_API.g_value_get_uint64(this)) : null;
         }
-        
+
         public Boolean toBoolean() {
-        	return g_type.equals(GType.BOOLEAN) ? new Boolean(GVALUE_API.g_value_get_boolean(this)) : null;
+        	return this.g_type.equals(GType.BOOLEAN) ? new Boolean(GValueAPI.GVALUE_API.g_value_get_boolean(this)) : null;
         }
-        
+
         public Float toFloat() {
-        	return g_type.equals(GType.FLOAT) ? new Float(GVALUE_API.g_value_get_float(this)) : null;
+        	return this.g_type.equals(GType.FLOAT) ? new Float(GValueAPI.GVALUE_API.g_value_get_float(this)) : null;
         }
-        
+
         public Double toDouble() {
-        	return g_type.equals(GType.DOUBLE) ? new Double(GVALUE_API.g_value_get_double(this)) : null;
+        	return this.g_type.equals(GType.DOUBLE) ? new Double(GValueAPI.GVALUE_API.g_value_get_double(this)) : null;
         }
-        
+
         public String toJavaString() {
-        	return g_type.equals(GType.STRING) ? GVALUE_API.g_value_get_string(this) : null;
+        	return this.g_type.equals(GType.STRING) ? GValueAPI.GVALUE_API.g_value_get_string(this) : null;
         }
-        
+
         public Object toObject() {
-        	return g_type.equals(GType.OBJECT) ? GVALUE_API.g_value_get_object(this) : null;
+        	return this.g_type.equals(GType.OBJECT) ? GValueAPI.GVALUE_API.g_value_get_object(this) : null;
         }
-        
+
         public Pointer toPointer() {
-        	return g_type.equals(GType.POINTER) ? GVALUE_API.g_value_get_pointer(this) : null;
+        	return this.g_type.equals(GType.POINTER) ? GValueAPI.GVALUE_API.g_value_get_pointer(this) : null;
         }
-        
-        public String toString() {
-        	return GVALUE_API.g_strdup_value_contents(this);
+
+        @Override
+		public String toString() {
+        	return GValueAPI.GVALUE_API.g_strdup_value_contents(this);
         }
     }
 
@@ -236,64 +238,64 @@ public interface GValueAPI extends Library {
         public GValueArray() {
             this(0);
         }
-        
+
         public GValueArray(int n_prealloced) {
-            this(GVALUE_API.g_value_array_new(n_prealloced));
-            ownsMemory = true;
+            this(GValueAPI.GVALUE_API.g_value_array_new(n_prealloced));
+            this.ownsMemory = true;
         }
-        
+
         public GValueArray(Pointer pointer) {
             super(pointer);
-            n_values = pointer.getInt(0);
+            this.n_values = pointer.getInt(0);
         }
-        
+
         @SuppressWarnings("unused")
         private static GValueArray valueOf(Pointer ptr) {
             return ptr != null ? new GValueArray(ptr) : null;
         }
 
         public int getNValues() {
-            return n_values;
+            return this.n_values;
         }
 
-        public GValueArray prepend(GValue value) {            
-            GVALUE_API.g_value_array_prepend(this, value);
+        public GValueArray prepend(GValue value) {
+            GValueAPI.GVALUE_API.g_value_array_prepend(this, value);
             return this;
         }
-        
-        public GValueArray append(GValue value) {            
-            GVALUE_API.g_value_array_append(this, value);
+
+        public GValueArray append(GValue value) {
+            GValueAPI.GVALUE_API.g_value_array_append(this, value);
             return this;
         }
-        
-        public GValueArray insert(int index, GValue value) {            
-            GVALUE_API.g_value_array_insert(this, index, value);
+
+        public GValueArray insert(int index, GValue value) {
+            GValueAPI.GVALUE_API.g_value_array_insert(this, index, value);
             return this;
         }
-        
-        public GValueArray remove(int index) {            
-            GVALUE_API.g_value_array_remove(this, index);
+
+        public GValueArray remove(int index) {
+            GValueAPI.GVALUE_API.g_value_array_remove(this, index);
             return this;
         }
-        
+
         public GValue nth(int i) {
-            return GVALUE_API.g_value_array_get_nth(this, i);
+            return GValueAPI.GVALUE_API.g_value_array_get_nth(this, i);
         }
-        
-        public Object getValue(int i) {            
-            GValue v = nth(i);            
+
+        public Object getValue(int i) {
+            GValue v = this.nth(i);
             return v == null ? null : v.getValue();
         }
-        
+
         @Override
         protected void finalize() throws Throwable {
-            free();
+            this.free();
         }
 
         public void free() {
-            if (ownsMemory) {
-                GVALUE_API.g_value_array_free(this);  
-                ownsMemory = false;
+            if (this.ownsMemory) {
+                GValueAPI.GVALUE_API.g_value_array_free(this);
+                this.ownsMemory = false;
             }
         }
 
@@ -304,7 +306,7 @@ public interface GValueAPI extends Library {
             });
         }
     }
-    
+
     GValue g_value_init(GValue value, GType g_type);
     GValue g_value_reset(GValue value);
     void g_value_unset(GValue value);
@@ -340,14 +342,14 @@ public interface GValueAPI extends Library {
     boolean g_value_type_compatible(GType src_type, GType dest_type);
     boolean g_value_type_transformable(GType src_type, GType dest_type);
     boolean g_value_transform(GValue src_value, GValue dest_value);
-    
+
     @CallerOwnsReturn String g_strdup_value_contents(GValue value);
-    
+
     void g_value_set_object(GValue value, GObject v_object);
     void g_value_take_object(GValue value, @Invalidate GObject v_object);
     GObject g_value_get_object(GValue value);
     @CallerOwnsReturn GObject g_value_dup_object(GValue value);
-   
+
     Pointer g_value_get_boxed(GValue value);
 
     GValue g_value_array_get_nth(GValueArray value_array, int index);
@@ -359,7 +361,7 @@ public interface GValueAPI extends Library {
     Pointer g_value_array_append(GValueArray value_array, GValue value);
     Pointer g_value_array_insert(GValueArray value_array, int index_, GValue value);
     Pointer g_value_array_remove(GValueArray value_array, int index);
-    
+
     boolean g_type_check_value_holds(GValue value, GType type);
 
 /*

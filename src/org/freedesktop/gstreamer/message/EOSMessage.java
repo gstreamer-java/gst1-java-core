@@ -1,7 +1,6 @@
-/* 
+/*
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
- *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,24 +18,28 @@
 
 package org.freedesktop.gstreamer.message;
 
+
+import org.freedesktop.gstreamer.Bin;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
 
 /**
- * This message is generated and posted in the sink elements of a {@link org.freedesktop.gstreamer.Bin}.
- * The bin will only forward the EOS message to the application if all sinks 
+ * This message is generated and posted in the sink elements of a {@link Bin}.
+ * The bin will only forward the EOS message to the application if all sinks
  * have posted an EOS message.
  */
 public class EOSMessage extends Message {
     private static interface API extends GstMessageAPI {
-        Pointer ptr_gst_message_new_eos(GstObject src);
+    	@CallerOwnsReturn Pointer ptr_gst_message_new_eos(GstObject src);
     }
     private static final API gst = GstNative.load(API.class);
-    
+
     /**
      * Creates a new eos message.
      * @param init internal initialization data.
@@ -44,12 +47,12 @@ public class EOSMessage extends Message {
     public EOSMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new eos message.
      * @param src The object originating the message.
      */
     public EOSMessage(GstObject src) {
-        this(initializer(gst.ptr_gst_message_new_eos(src)));
+        this(NativeObject.initializer(EOSMessage.gst.ptr_gst_message_new_eos(src)));
     }
 }

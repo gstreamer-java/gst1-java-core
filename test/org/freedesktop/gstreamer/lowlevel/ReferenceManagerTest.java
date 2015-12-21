@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * gstreamer-java is free software: you can redistribute it and/or modify
@@ -19,10 +19,6 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
@@ -30,6 +26,7 @@ import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Gst;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +43,7 @@ public class ReferenceManagerTest {
     public static void setUpClass() throws Exception {
         Gst.init("ReferenceManagerTest", new String[] {});
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
@@ -70,26 +67,26 @@ public class ReferenceManagerTest {
 
     @Test public void testReference() throws Exception {
         Object ref = new Object();
-        Caps target = new Caps("video/x-raw-rgb");
+        Caps target = new Caps("video/x-raw");
         ReferenceManager.addKeepAliveReference(ref, target);
         WeakReference<Object> targetRef = new WeakReference<Object>(target);
         target = null;
-        assertFalse("target collected prematurely", waitGC(targetRef));
+        Assert.assertFalse("target collected prematurely", this.waitGC(targetRef));
         ref = null;
-        assertTrue("target not collected when ref is collected", waitGC(targetRef));
+        Assert.assertTrue("target not collected when ref is collected", this.waitGC(targetRef));
     }
     @Test public void testMultipleReferences() throws Exception {
         Object ref1 = new Object();
         Object ref2 = new Object();
-        Caps target = new Caps("video/x-raw-rgb");
+        Caps target = new Caps("video/x-raw");
         ReferenceManager.addKeepAliveReference(ref1, target);
         ReferenceManager.addKeepAliveReference(ref2, target);
         WeakReference<Object> targetRef = new WeakReference<Object>(target);
         target = null;
-        assertFalse("target collected prematurely", waitGC(targetRef));
+        Assert.assertFalse("target collected prematurely", this.waitGC(targetRef));
         ref1 = null;
-        assertFalse("target collected after only one ref disposed", waitGC(targetRef));
+        Assert.assertFalse("target collected after only one ref disposed", this.waitGC(targetRef));
         ref2 = null;
-        assertTrue("target not collected when ref is dispose", waitGC(targetRef));
+        Assert.assertTrue("target not collected when ref is dispose", this.waitGC(targetRef));
     }
 }

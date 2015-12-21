@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -35,7 +35,7 @@ public interface GstBinAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Pointer ptr_gst_pipeline_new(String name);
     @CallerOwnsReturn Bin gst_bin_new(String name);
     GType gst_bin_get_type();
-    
+
     boolean gst_bin_add(Bin bin, Element element);
     void gst_bin_add_many(Bin bin, Element... elements);
     boolean gst_bin_remove(Bin bin, Element element);
@@ -53,5 +53,5 @@ public interface GstBinAPI extends com.sun.jna.Library {
     //Debugging
     void gst_debug_bin_to_dot_file (Bin bin, int details, String file_name);
     void _gst_debug_bin_to_dot_file_with_ts (Bin bin, int details, String file_name);
-    
+
 }

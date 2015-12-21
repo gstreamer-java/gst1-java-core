@@ -1,6 +1,7 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -40,7 +41,7 @@ import com.sun.jna.Pointer;
 public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Handle {
     private static final Logger logger = Logger.getLogger(NativeObject.class.getName());
     private static final Level LIFECYCLE = Level.FINE;
-    
+
     // Use this to propagate low level pointer arguments up the constructor chain
     protected static class Initializer {
         public final Pointer ptr;
@@ -57,13 +58,13 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
         }
     }
     protected static final Initializer defaultInit = new Initializer();
-    
+
     /*
      * The default for new objects is to not need a refcount increase, and that
      * they own the native object.  Special cases can use the other constructor.
      */
     protected static Initializer initializer(Pointer ptr) {
-        Initializer initializer = initializer(ptr, false, true);
+        Initializer initializer = NativeObject.initializer(ptr, false, true);
         return initializer;
     }
     protected static Initializer initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
@@ -74,100 +75,114 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     }
     /** Creates a new instance of NativeObject */
     protected NativeObject(final Initializer init) {
-        logger.entering("NativeObject", "<init>", new Object[] { init });
+    	if (NativeObject.logger.isLoggable(Level.FINER)) {
+            NativeObject.logger.entering("NativeObject", "<init>", new Object[] { init });
+    	}
+
         if (init == null) {
             throw new IllegalArgumentException("Initializer cannot be null");
         }
-        logger.log(LIFECYCLE, "Creating " + getClass().getSimpleName() + " (" + init.ptr + ")");
-        nativeRef = new NativeRef(this);
+    	if (NativeObject.logger.isLoggable(NativeObject.LIFECYCLE)) {
+            NativeObject.logger.log(NativeObject.LIFECYCLE, "Creating " + this.getClass().getSimpleName() + " (" + init.ptr + ")");
+    	}
+
+        this.nativeRef = new NativeRef(this);
         this.handle = init.ptr;
         this.ownsHandle.set(init.ownsHandle);
-        
+
         //
-        // Only store this object in the map if we can tell when it has been disposed 
+        // Only store this object in the map if we can tell when it has been disposed
         // (i.e. must be at least a GObject - MiniObject and other NativeObject subclasses
-        // don't signal destruction, so it is impossible to know if the instance 
+        // don't signal destruction, so it is impossible to know if the instance
         // is stale or not
         //
-        if (GObject.class.isAssignableFrom(getClass())) {
-            getInstanceMap().put(init.ptr, nativeRef);
+        if (GObject.class.isAssignableFrom(this.getClass())) {
+            NativeObject.getInstanceMap().put(init.ptr, this.nativeRef);
         }
-        
+
     }
-    
+
     abstract protected void disposeNativeHandle(Pointer ptr);
-    
+
     public void dispose() {
-        logger.log(LIFECYCLE, "Disposing object " + getClass().getName() + " = " + handle);
-//        System.out.println("Disposing " + handle);
-        if (!disposed.getAndSet(true)) {
-            getInstanceMap().remove(handle, nativeRef);
-            if (ownsHandle.get()) {
-                disposeNativeHandle(handle);
+
+    	if (NativeObject.logger.isLoggable(NativeObject.LIFECYCLE)) {
+            NativeObject.logger.log(NativeObject.LIFECYCLE, "Disposing object " + this.getClass().getName() + " = " + this.handle);
+    	}
+
+        if (!this.disposed.getAndSet(true)) {
+            NativeObject.getInstanceMap().remove(this.handle, this.nativeRef);
+            if (this.ownsHandle.get()) {
+                this.disposeNativeHandle(this.handle);
             }
-            valid.set(false);
+            this.valid.set(false);
         }
     }
-    
+
     @Override
     protected void invalidate() {
-        logger.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
-        getInstanceMap().remove(handle(), nativeRef);
-        disposed.set(true);
-        ownsHandle.set(false);
-        valid.set(false);
+    	if (NativeObject.logger.isLoggable(NativeObject.LIFECYCLE)) {
+            NativeObject.logger.log(NativeObject.LIFECYCLE, "Invalidating object " + this + " = " + this.handle());
+    	}
+        NativeObject.getInstanceMap().remove(this.handle(), this.nativeRef);
+        this.disposed.set(true);
+        this.ownsHandle.set(false);
+        this.valid.set(false);
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         try {
-            logger.log(LIFECYCLE, "Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
-//            System.out.println("Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
-            dispose();
+        	if (NativeObject.logger.isLoggable(NativeObject.LIFECYCLE)) {
+                NativeObject.logger.log(NativeObject.LIFECYCLE, "Finalizing " + this.getClass().getSimpleName() + " (" + this.handle + ")");
+        	}
+            this.dispose();
         } finally {
             super.finalize();
         }
     }
     @Override
     protected Object nativeValue() {
-        return handle();
+        return this.handle();
     }
     protected Pointer handle() {
-        if (!valid.get() || disposed.get()) {
+        if (!this.valid.get() || this.disposed.get()) {
             throw new IllegalStateException("Native object has been disposed");
         }
-        return handle;
+        return this.handle;
     }
     public Pointer getNativeAddress() {
-        return handle;
+        return this.handle;
     }
     protected boolean isDisposed() {
-        return disposed.get();
+        return this.disposed.get();
     }
     protected static NativeObject instanceFor(Pointer ptr) {
-        WeakReference<NativeObject> ref = getInstanceMap().get(ptr);
-        
+        WeakReference<NativeObject> ref = NativeObject.getInstanceMap().get(ptr);
+
         //
         // If the reference was there, but the object it pointed to had been collected, remove it from the map
         //
         if (ref != null && ref.get() == null) {
-            getInstanceMap().remove(ptr);
+            NativeObject.getInstanceMap().remove(ptr);
         }
         return ref != null ? ref.get() : null;
     }
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls) {
-    	return objectFor(ptr, cls, true);
+    	return NativeObject.objectFor(ptr, cls, true);
     }
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef) {
-        return objectFor(ptr, cls, needRef, true);
+        return NativeObject.objectFor(ptr, cls, needRef, true);
     }
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
-        return objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
+        return NativeObject.objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
     }
-        
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
-        logger.entering("NativeObject", "instanceFor", new Object[] { ptr, refAdjust, ownsHandle });
-        
+    	if (NativeObject.logger.isLoggable(Level.FINER)) {
+            NativeObject.logger.entering("NativeObject", "instanceFor", new Object[] { ptr, refAdjust, ownsHandle });
+    	}
+
         // Ignore null pointers
         if (ptr == null) {
             return null;
@@ -179,17 +194,17 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
             }
             return cls.cast(obj);
         }
-        
+
         //
-        // If it is a GObject or MiniObject, read the g_class field to find
+        // If it is a GObject or MiniObject, read the GType field to find
         // the most exact class match
         //
         if (GObject.class.isAssignableFrom(cls) || MiniObject.class.isAssignableFrom(cls)) {
-            cls = classFor(ptr, cls);
+            cls = NativeObject.classFor(ptr, cls);
         }
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
-            T retVal = constructor.newInstance(initializer(ptr, refAdjust > 0, ownsHandle));
+            T retVal = constructor.newInstance(NativeObject.initializer(ptr, refAdjust > 0, ownsHandle));
             //retVal.initNativeHandle(ptr, refAdjust > 0, ownsHandle);
             return retVal;
         } catch (SecurityException ex) {
@@ -203,54 +218,57 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex);
         }
-
     }
-    
+
     @SuppressWarnings("unchecked")
     protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, Class<T> defaultClass) {
-        Class<? extends NativeObject> cls = GstTypes.classFor(ptr);
-        if (cls != null && cls.isAnnotationPresent(HasSubtype.class)) {
-            cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
-        }
-        return (cls != null && defaultClass.isAssignableFrom(cls)) ? (Class<T>) cls : defaultClass; 
+        Class<? extends NativeObject> cls = GstTypes.classFor(ptr, defaultClass);
+
+    	if (cls.isAnnotationPresent(HasSubtype.class)) {
+    		cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
+    	}
+        return cls != null && defaultClass.isAssignableFrom(cls) ? (Class<T>) cls : defaultClass;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        return o instanceof NativeObject && ((NativeObject) o).handle.equals(handle);
+        return o instanceof NativeObject && ((NativeObject) o).handle.equals(this.handle);
     }
-    
+
     @Override
     public int hashCode() {
-        return handle.hashCode();
+        return this.handle.hashCode();
     }
-    
+
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + handle() + ")";
+        return this.getClass().getSimpleName() + "(" + this.handle() + ")";
     }
-    
+
     //
     // No longer want to garbage collect this object
     //
     public void disown() {
-        logger.log(LIFECYCLE, "Disowning " + handle());
-        ownsHandle.set(false);
+    	if (NativeObject.logger.isLoggable(NativeObject.LIFECYCLE)) {
+            NativeObject.logger.log(NativeObject.LIFECYCLE, "Disowning " + this.handle());
+    	}
+        this.ownsHandle.set(false);
     }
-    
+
     static {
         //
-        // Add a shutdown task to cleanup any dangling object references, so 
+        // Add a shutdown task to cleanup any dangling object references, so
         // Gst.deinit() can shutdown cleanly.  Unreffing objects after gst_deinit()
         // has been called could be asking for trouble.
         //
         Gst.addStaticShutdownTask(new Runnable() {
 
-            public void run() {
-                System.gc(); 
+            @Override
+			public void run() {
+                System.gc();
                 int gcCount = 20;
                 // Give the GC a chance to cleanup nicely
-                while (!getInstanceMap().isEmpty() && gcCount-- > 0) {
+                while (!NativeObject.getInstanceMap().isEmpty() && gcCount-- > 0) {
                     try {
                         Thread.sleep(10);
                         System.gc();
@@ -258,10 +276,9 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
                         break;
                     }
                 }
-                for (Object o : getInstanceMap().values().toArray()) {
+                for (Object o : NativeObject.getInstanceMap().values().toArray()) {
                     NativeObject obj = ((NativeRef) o).get();
                     if (obj != null && !obj.disposed.get()) {
-//                        System.out.println("Disposing " + obj);
                         obj.dispose();
                     }
                 }
@@ -285,17 +302,18 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
         private static final ConcurrentMap<Pointer, NativeRef> instanceMap = new ConcurrentHashMap<Pointer, NativeRef>();
         static {
             //
-            // Add a shutdown task to cleanup any dangling object references, so 
+            // Add a shutdown task to cleanup any dangling object references, so
             // Gst.deinit() can shutdown cleanly.  Unreffing objects after gst_deinit()
             // has been called could be asking for trouble.
             //
             Gst.addStaticShutdownTask(new Runnable() {
 
-                public void run() {
-                    System.gc(); 
+                @Override
+				public void run() {
+                    System.gc();
                     int gcCount = 20;
                     // Give the GC a chance to cleanup nicely
-                    while (!getInstanceMap().isEmpty() && gcCount-- > 0) {
+                    while (!NativeObject.getInstanceMap().isEmpty() && gcCount-- > 0) {
                         try {
                             Thread.sleep(10);
                             System.gc();
@@ -303,10 +321,9 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
                             break;
                         }
                     }
-                    for (Object o : getInstanceMap().values().toArray()) {
+                    for (Object o : NativeObject.getInstanceMap().values().toArray()) {
                         NativeObject obj = ((NativeRef) o).get();
                         if (obj != null && !obj.disposed.get()) {
-    //                        System.out.println("Disposing " + obj);
                             obj.dispose();
                         }
                     }

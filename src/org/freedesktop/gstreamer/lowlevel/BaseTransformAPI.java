@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,6 +19,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
@@ -27,22 +30,20 @@ import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.elements.BaseTransform;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementClass;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
+import org.freedesktop.gstreamer.lowlevel.GstSegmentAPI.GstSegmentStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
-import java.util.Arrays;
-import java.util.List;
 
 public interface BaseTransformAPI extends Library {
 	BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
-    
+
     public static final class GstBaseTransformStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
 
@@ -74,7 +75,7 @@ public interface BaseTransformAPI extends Library {
         /*< private >*/
         public volatile /* GstBaseTransformPrivate */ Pointer priv;
 
-        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE - 1];
+        public volatile Pointer[] _gst_reserved = new Pointer[BaseTransformAPI.GST_PADDING_LARGE - 1];
 
         @Override
         protected List<String> getFieldOrder() {
@@ -87,12 +88,12 @@ public interface BaseTransformAPI extends Library {
                 "transform_lock", "priv", "_gst_reserved"
             });
         }
-    
-        
-    
+
+
+
     }
 
-    
+
     public static interface TransformCaps extends Callback {
         public Caps callback(BaseTransform trans, PadDirection direction, Caps caps);
     }
@@ -100,7 +101,7 @@ public interface BaseTransformAPI extends Library {
         public void callback(BaseTransform trans, PadDirection direction, Caps caps, Caps othercaps);
     }
     public static interface TransformSize extends Callback {
-        public boolean callback(BaseTransform trans, PadDirection direction, Caps caps, 
+        public boolean callback(BaseTransform trans, PadDirection direction, Caps caps,
         						int size, Caps othercaps, IntByReference othersize);
     }
     public static interface GetUnitSize extends Callback {
@@ -122,7 +123,7 @@ public interface BaseTransformAPI extends Library {
         public FlowReturn callback(BaseTransform trans, Buffer inbuf);
     }
     public static interface PrepareOutput extends Callback {
-        public FlowReturn callback(BaseTransform trans, Buffer input, int size, Caps caps, 
+        public FlowReturn callback(BaseTransform trans, Buffer input, int size, Caps caps,
         						/*GstBuffer ** */ Pointer buf);
     }
     public static interface BeforeTransform extends Callback {
@@ -131,37 +132,37 @@ public interface BaseTransformAPI extends Library {
     public static interface AcceptCaps extends Callback {
         public boolean callback(BaseTransform trans, PadDirection direction, Caps caps);
     }
-    
+
     public static final class GstBaseTransformClass extends com.sun.jna.Structure {
         public GstBaseTransformClass() {}
         public GstBaseTransformClass(Pointer ptr) {
-            useMemory(ptr);
-            read();
+            this.useMemory(ptr);
+            this.read();
         }
-        
+
         //
         // Actual data members
         //
         public GstElementClass parent_class;
-        
+
         /*< public >*/
         public TransformCaps transform_caps;
 
         public FixateCaps fixate_caps;
-        
+
         public TransformSize transform_size;
-        
+
         public GetUnitSize get_unit_size;
 
         public SetCaps set_caps;
 
         public BooleanFunc1 start;
         public BooleanFunc1 stop;
-        
+
         public EventNotify event;
-        
+
         public Transform transform;
-        
+
         public TransformIp transform_ip;
 
         public volatile boolean passthrough_on_same_caps;
@@ -169,13 +170,13 @@ public interface BaseTransformAPI extends Library {
         public PrepareOutput prepare_output_buffer;
 
         public EventNotify src_event;
-        
+
         public BeforeTransform before_transform;
-        
+
         public AcceptCaps accept_caps;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * (GST_PADDING_LARGE - 3)];
+        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * (BaseTransformAPI.GST_PADDING_LARGE - 3)];
 
         @Override
         protected List<String> getFieldOrder() {
@@ -186,10 +187,10 @@ public interface BaseTransformAPI extends Library {
                 "transform", "transform_ip", "passthrough_on_same_caps",
                 "prepare_output_buffer", "src_event", "before_transform",
                 "accept_caps", "_gst_reserved"
-            });            
+            });
         }
     }
-    
+
     GType gst_base_transform_get_type();
 
     void gst_base_transform_set_passthrough(BaseTransform trans, boolean passthrough);

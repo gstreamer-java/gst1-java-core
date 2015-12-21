@@ -1,8 +1,9 @@
-/* 
+/*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Andres Colubri
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,12 +21,13 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.MiniObject;
 
 import com.sun.jna.Pointer;
 
@@ -34,76 +36,110 @@ import com.sun.jna.Pointer;
  */
 public class GstTypes {
     private static final Logger logger = Logger.getLogger(GstTypes.class.getName());
-    
+
     private static final Map<String, Class<? extends NativeObject>> gTypeNameMap
-        = new HashMap<String, Class<? extends NativeObject>>();
-    private static final Map<Pointer, Class<? extends NativeObject>> gTypeInstanceMap
-        = new ConcurrentHashMap<Pointer, Class<? extends NativeObject>>();
-    
+        = new ConcurrentHashMap<String, Class<? extends NativeObject>>();
+
+    // will be fill in lazy because some GType values are unknown at start-up
+    private static final Map<GType, Class<? extends NativeObject>> gTypeMap
+    	= new ConcurrentHashMap<GType, Class<? extends NativeObject>>();
+
+    private static final GObjectAPI gst = GObjectAPI.GOBJECT_API;
+
     private GstTypes() {}
     /**
      * Register a new class into the gTypeNameMap.
      */
     public static void registerType(Class<? extends NativeObject> cls, String gTypeName) {
-   		gTypeNameMap.put(gTypeName, cls);
+   		GstTypes.gTypeNameMap.put(gTypeName, cls);
     }
     /**
      * Retrieve the class of a GType
-     * 
+     *
      * @param gType The type of Class
      * @return The Class of the desired type.
      */
-    public static Class<? extends NativeObject> find(GType gType) {
-        logger.entering("GstTypes", "find", gType);
-        return gTypeNameMap.get(GOBJECT_API.g_type_name(gType));
+    public static Class<? extends NativeObject> classFor(GType gType) {
+    	if (GstTypes.logger.isLoggable(Level.FINER)) {
+            GstTypes.logger.entering("GstTypes", "classFor", gType);
+    	}
+        return GstTypes.gTypeNameMap.get(GstTypes.gst.g_type_name(gType));
     }
+
     /**
      * Retrieve the class of a GType Name
-     * 
+     *
      * @param gTypeName The type name of Class
      * @return The Class of the desired type.
      */
-    public static Class<? extends NativeObject> find(String gTypeName) {
-        logger.entering("GstTypes", "find", gTypeName);
-        return gTypeNameMap.get(gTypeName);
+    public static Class<? extends NativeObject> classFor(String gTypeName) {
+    	if (GstTypes.logger.isLoggable(Level.FINER)) {
+            GstTypes.logger.entering("GstTypes", "classFor", gTypeName);
+    	}
+        return GstTypes.gTypeNameMap.get(gTypeName);
     }
 
-    public static final boolean isGType(Pointer p, long type) {
-        return getGType(p).longValue() == type;
-    }
-    public static final GType getGType(Pointer ptr) {        
-        // Retrieve ptr->g_class
-        Pointer g_class = ptr.getPointer(0);
-        // Now return g_class->gtype
-        return GType.valueOf(g_class.getNativeLong(0).longValue());
-    }
-    public static final Class<? extends NativeObject> classFor(Pointer ptr) {
-        Pointer g_class = ptr.getPointer(0);
-        Class<? extends NativeObject> cls = gTypeInstanceMap.get(g_class);
-        if (cls != null) {
-            return cls;
+    /**
+     * Retrieve the class from a pointer
+     *
+     * @param defaultClass A parent Class
+     * @return The Class of the desired type.
+     */
+    public static final Class<? extends NativeObject> classFor(Pointer ptr, Class<? extends NativeObject> defaultClass) {
+    	String gTypeName = null;
+    	GType gType =
+    			GObject.class.isAssignableFrom(defaultClass) ? GObject.getType(ptr) :
+    			MiniObject.class.isAssignableFrom(defaultClass) ? MiniObject.getType(ptr) :
+    				null; // shall never appears
+
+    	if (GstTypes.logger.isLoggable(Level.FINER)) {
+    		GstTypes.logger.finer("Type of " + ptr + " = " + gType);
+    	}
+
+    	Class<? extends NativeObject> cls = GstTypes.gTypeMap.get(gType);
+        if (cls == null) {
+        	gTypeName = GstTypes.gst.g_type_name(gType);
+        	cls = GstTypes.gTypeNameMap.get(GstTypes.gst.g_type_name(gType));
+        	if (cls != null) GstTypes.gTypeMap.put(gType, cls);
         }
 
-        GType type = GType.valueOf(g_class.getNativeLong(0).longValue());
-        logger.finer("Type of " + ptr + " = " + type);
-        while (cls == null && !type.equals(GType.OBJECT) && !type.equals(GType.INVALID)) {
-            cls = find(type);
-            if (cls != null) {
-                logger.finer("Found type of " + ptr + " = " + cls);
-                gTypeInstanceMap.put(g_class, cls);
-                break;
+        if (cls == null) {
+
+            GType type = gType;
+
+            if (GstTypes.logger.isLoggable(Level.FINER)) {
+                GstTypes.logger.finer("search for " + gType);
             }
-            type = GOBJECT_API.g_type_parent(type);
+
+            // Search if a parent class is registered
+            do {
+                type = GstTypes.gst.g_type_parent(type);
+
+                cls = GstTypes.gTypeMap.get(type);
+                if (cls == null) cls = GstTypes.gTypeNameMap.get(GstTypes.gst.g_type_name(type));
+                if (cls != null) {
+                    if (GstTypes.logger.isLoggable(Level.FINER)) {
+                        GstTypes.logger.finer("Found type of " + gType + " = " + cls);
+                    }
+                    GstTypes.gTypeMap.put(gType, cls);
+                    GstTypes.gTypeNameMap.put(gTypeName, cls);
+                    return cls;
+                }
+
+            } while (!type.equals(GType.OBJECT) && !type.equals(GType.BOXED) && !type.equals(GType.INVALID));
+
+            GstTypes.gTypeMap.put(gType, defaultClass);
+            GstTypes.gTypeNameMap.put(gTypeName, defaultClass);
+
+            return defaultClass;
         }
         return cls;
     }
-    public static final Class<? extends NativeObject> classFor(GType type) {
-        return find(type);
-    }
+
     public static final GType typeFor(Class<? extends NativeObject> cls) {
-        for (Map.Entry<String, Class<? extends NativeObject>> e : gTypeNameMap.entrySet()) {
+        for (Map.Entry<String, Class<? extends NativeObject>> e : GstTypes.gTypeNameMap.entrySet()) {
             if (e.getValue().equals(cls)) {
-                return GOBJECT_API.g_type_from_name(e.getKey());
+                return GstTypes.gst.g_type_from_name(e.getKey());
             }
         }
         return GType.INVALID;

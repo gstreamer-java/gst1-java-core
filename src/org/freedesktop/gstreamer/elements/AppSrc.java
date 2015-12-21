@@ -23,6 +23,7 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -35,69 +36,69 @@ import com.sun.jna.ptr.LongByReference;
 public class AppSrc extends BaseSrc {
     public static final String GST_NAME = "appsrc";
     public static final String GTYPE_NAME = "GstAppSrc";
-    
-    private static final AppAPI gst() { return AppAPI.APP_API; }
+
+    private static final AppAPI gst = AppAPI.APP_API;
 
     public enum Type {
         STREAM,
         SEEKABLE,
         RANDOM_ACCESS;
     }
-     
+
     public AppSrc(Initializer init) {
         super(init);
     }
-   
+
     protected AppSrc(String name) {
-    	this(makeRawElement(GST_NAME, name));
+    	this(Element.makeRawElement(AppSrc.GST_NAME, name));
     }
-    
+
     @Override
     public void setCaps(Caps caps) {
-        gst().gst_app_src_set_caps(this, caps);
+        AppSrc.gst.gst_app_src_set_caps(this, caps);
     }
     public Caps getCaps() {
-        return gst().gst_app_src_get_caps(this);
+        return AppSrc.gst.gst_app_src_get_caps(this);
     }
 
     public void setSize(long size) {
-        gst().gst_app_src_set_size(this, size);
+        AppSrc.gst.gst_app_src_set_size(this, size);
     }
     public long getSize() {
-        return gst().gst_app_src_get_size(this);
+        return AppSrc.gst.gst_app_src_get_size(this);
     }
 
     public void setStreamType(AppSrc.Type type) {
-        gst().gst_app_src_set_stream_type(this, type);
+        AppSrc.gst.gst_app_src_set_stream_type(this, type);
     }
     AppSrc.Type getStreamType(AppSrc.Type type) {
-        return gst().gst_app_src_get_stream_type(this);
+        return AppSrc.gst.gst_app_src_get_stream_type(this);
     }
 
     public void setMaxBytes(long max) {
-        gst().gst_app_src_set_max_bytes(this, max);
+        AppSrc.gst.gst_app_src_set_max_bytes(this, max);
     }
     public long getMaxBytes() {
-        return gst().gst_app_src_get_max_bytes(this);
+        return AppSrc.gst.gst_app_src_get_max_bytes(this);
     }
 
     public void setLatency(long min, long max) {
-        gst().gst_app_src_set_latency(this, min, max);
+        AppSrc.gst.gst_app_src_set_latency(this, min, max);
     }
     public void getLatency(long[] minmax) {
         LongByReference minRef = new LongByReference();
         LongByReference maxRef = new LongByReference();
-        gst().gst_app_src_get_latency(this, minRef, minRef);
-        if ((minmax == null) || (minmax.length != 2)) minmax = new long[2];
+        AppSrc.gst.gst_app_src_get_latency(this, minRef, minRef);
+        if (minmax == null || minmax.length != 2) minmax = new long[2];
         minmax[0] = minRef.getValue();
         minmax[1] = maxRef.getValue();
     }
 
     public void pushBuffer(Buffer buffer) {
-    	gst().gst_app_src_push_buffer(this, buffer);
+    	AppSrc.gst.gst_app_src_push_buffer(this, buffer);
     }
     public void endOfStream() {
-        gst().gst_app_src_end_of_stream(this);
+        AppSrc.gst.gst_app_src_end_of_stream(this);
     }
 
     /**
@@ -116,7 +117,7 @@ public class AppSrc extends BaseSrc {
      * @param listener Listener to be called this when appsrc has no more buffer are available.
      */
     public void connect(final END_OF_STREAM listener) {
-        connect(END_OF_STREAM.class, listener, new GstCallback() {
+        this.connect(END_OF_STREAM.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public FlowReturn callback(AppSrc elem) {
                 return listener.endOfStream(elem);
@@ -129,7 +130,7 @@ public class AppSrc extends BaseSrc {
      * @param listener The listener that was previously added.
      */
     public void disconnect(END_OF_STREAM listener) {
-        disconnect(END_OF_STREAM.class, listener);
+        this.disconnect(END_OF_STREAM.class, listener);
     }
 
     /**
@@ -148,7 +149,7 @@ public class AppSrc extends BaseSrc {
      * @param listener Listener to be called this when appsrc fills its queue.
      */
     public void connect(final ENOUGH_DATA listener) {
-        connect(ENOUGH_DATA.class, listener, new GstCallback() {
+        this.connect(ENOUGH_DATA.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(AppSrc elem) {
                 listener.enoughData(elem);
@@ -161,7 +162,7 @@ public class AppSrc extends BaseSrc {
      * @param listener The listener that was previously added.
      */
     public void disconnect(ENOUGH_DATA listener) {
-        disconnect(ENOUGH_DATA.class, listener);
+        this.disconnect(ENOUGH_DATA.class, listener);
     }
 
     /**
@@ -181,7 +182,7 @@ public class AppSrc extends BaseSrc {
      * @param listener Listener to be called when appsrc needs data.
      */
     public void connect(final NEED_DATA listener) {
-        connect(NEED_DATA.class, listener, new GstCallback() {
+        this.connect(NEED_DATA.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(AppSrc elem, int size) {
                 listener.needData(elem, size);
@@ -194,11 +195,11 @@ public class AppSrc extends BaseSrc {
      * @param listener The listener that was previously added.
      */
     public void disconnect(NEED_DATA listener) {
-        disconnect(NEED_DATA.class, listener);
+        this.disconnect(NEED_DATA.class, listener);
     }
 
     /**
-     * Signal emitted when adds a buffer to the queue of buffers that 
+     * Signal emitted when adds a buffer to the queue of buffers that
      * this {@link AppSrc} element will push to its source pad.
      */
     public static interface PUSH_BUFFER {
@@ -215,7 +216,7 @@ public class AppSrc extends BaseSrc {
      * @param listener Listener to be called when appsrc push buffer.
      */
     public void connect(final PUSH_BUFFER listener) {
-        connect(PUSH_BUFFER.class, listener, new GstCallback() {
+        this.connect(PUSH_BUFFER.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public FlowReturn callback(AppSrc elem, Buffer buffer) {
                 return listener.pushBuffer(elem, buffer);
@@ -228,7 +229,7 @@ public class AppSrc extends BaseSrc {
      * @param listener The listener that was previously added.
      */
     public void disconnect(PUSH_BUFFER listener) {
-        disconnect(PUSH_BUFFER.class, listener);
+        this.disconnect(PUSH_BUFFER.class, listener);
     }
 
     /**
@@ -253,7 +254,7 @@ public class AppSrc extends BaseSrc {
      * the application should push-buffers from the new position.
      */
     public void connect(final SEEK_DATA listener) {
-        connect(SEEK_DATA.class, listener, new GstCallback() {
+        this.connect(SEEK_DATA.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public boolean callback(AppSrc elem, long position) {
                 return listener.seekData(elem, position);
@@ -266,6 +267,6 @@ public class AppSrc extends BaseSrc {
      * @param listener The listener that was previously added.
      */
     public void disconnect(SEEK_DATA listener) {
-        disconnect(SEEK_DATA.class, listener);
+        this.disconnect(SEEK_DATA.class, listener);
     }
 }
