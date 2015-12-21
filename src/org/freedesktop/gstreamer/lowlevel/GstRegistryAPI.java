@@ -60,7 +60,7 @@ public interface GstRegistryAPI extends com.sun.jna.Library {
     /* normal GObject stuff */
     GType gst_registry_get_type();
     /* registry_get_default returns a non-refcounted object */
-    Pointer gst_registry_get_default();
+    Pointer gst_registry_get();
     boolean gst_registry_scan_path(Registry registry, String path);
 
 

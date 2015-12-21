@@ -128,7 +128,7 @@ public class Registry extends GstObject {
     public static Registry getDefault() {
         // Need to handle the return value here, as it is a persistent object
         // i.e. the java proxy should not dispose of the underlying object when finalized
-        return GstObject.objectFor(gst.gst_registry_get_default(), Registry.class,
+        return GstObject.objectFor(gst.gst_registry_get(), Registry.class,
                 false, false);
     }
     /** Creates a new instance of Registry */
