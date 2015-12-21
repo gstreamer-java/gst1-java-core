@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Christophe Lafolet
  * Copyright (c) 2010 David Hoyt <dhoyt@hoytsoft.org>
  *
  * This file is part of gstreamer-java.
@@ -18,67 +19,85 @@
 
 package org.freedesktop.gstreamer;
 
-/**
- * A representation of the values used in querying the pipeline using
- * gst_query_new_segment() and subsequently gst_query_parse_segment().
- */
-public final class Segment {
-    //--------------------------------------------------------------------------
-    // Instance variables
-    //
-    private final double rate;
-    private final Format format;
-    private final long startValue;
-    private final long stopValue;
+import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.GstSegmentAPI;
 
-   /**
-    * Creates a new instance of {@link Segment}.
-    *
-    * @param rate the rate of the segment.
-    * @param format the {@link Format} of the segment values.
-    * @param startValue the start value.
-    * @param stopValue the stop value.
-    */
-    Segment(double rate, Format format, long startValue, long stopValue) {
-        this.rate = rate;
-        this.format = format;
-        this.stopValue = stopValue;
-        this.startValue = startValue;
+public final class Segment extends GstObject {
+
+    static interface API extends GstSegmentAPI {}
+    private static final GstSegmentAPI gst = GstNative.load(API.class);
+
+    /**
+     * Creates a new instance of {@link Segment}.
+     */
+    public Segment(Initializer init) {
+        super(init);
     }
 
     /**
-     * Gets the rate of the segment.
-     *
-     * @return The rate of the segment.
+     * Creates a new instance of {@link Segment}.
      */
-    public double getRate() {
-        return rate;
+    public Segment(Format format) {
+        super(GstObject.initializer(Segment.gst.ptr_gst_segment_new()));
+        Segment.gst.gst_segment_init(this, format);
     }
 
-    /**
-     * Gets the {@link Format} of the segment values.
-     *
-     * @return The {@link Format} of the segment values.
-     */
-    public Format getFormat() {
-        return format;
+    public boolean seek(double rate, Format format, int flags,
+            SeekType startType, long start, SeekType stopType, long stop) {
+    	boolean[] update = new boolean[1];
+        Segment.gst.gst_segment_do_seek(this, rate, format, flags, startType, start, stopType, stop, update);
+        return update[0];
     }
 
-    /**
-     * Gets the start value.
-     * 
-     * @return The start value.
-     */
-    public long getStartValue() {
-        return startValue;
-    }
-
-    /**
-     * Gets the stop value.
-     * 
-     * @return The stop value.
-     */
-    public long getStopValue() {
-        return stopValue;
-    }
+    // TODO
+//   /**
+//    * Creates a new instance of {@link Segment}.
+//    *
+//    * @param rate the rate of the segment.
+//    * @param format the {@link Format} of the segment values.
+//    * @param startValue the start value.
+//    * @param stopValue the stop value.
+//    */
+//    Segment(double rate, Format format, long startValue, long stopValue) {
+//        this.rate = rate;
+//        this.format = format;
+//        this.stopValue = stopValue;
+//        this.startValue = startValue;
+//    }
+//
+//    /**
+//     * Gets the rate of the segment.
+//     *
+//     * @return The rate of the segment.
+//     */
+//    public double getRate() {
+//        return this.rate;
+//    }
+//
+//    /**
+//     * Gets the {@link Format} of the segment values.
+//     *
+//     * @return The {@link Format} of the segment values.
+//     */
+//    public Format getFormat() {
+//        return this.format;
+//    }
+//
+//    /**
+//     * Gets the start value.
+//     *
+//     * @return The start value.
+//     */
+//    public long getStartValue() {
+//        return this.startValue;
+//    }
+//
+//    /**
+//     * Gets the stop value.
+//     *
+//     * @return The stop value.
+//     */
+//    public long getStopValue() {
+//        return this.stopValue;
+//    }
 }
