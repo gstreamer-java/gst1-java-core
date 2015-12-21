@@ -45,6 +45,22 @@ import org.freedesktop.gstreamer.elements.FakeSink;
 import org.freedesktop.gstreamer.elements.FakeSrc;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
+import org.freedesktop.gstreamer.event.BufferSizeEvent;
+import org.freedesktop.gstreamer.event.BusSyncHandler;
+import org.freedesktop.gstreamer.event.CapsEvent;
+import org.freedesktop.gstreamer.event.EOSEvent;
+import org.freedesktop.gstreamer.event.FlushStartEvent;
+import org.freedesktop.gstreamer.event.FlushStopEvent;
+import org.freedesktop.gstreamer.event.ForceKeyUnit;
+import org.freedesktop.gstreamer.event.LatencyEvent;
+import org.freedesktop.gstreamer.event.NavigationEvent;
+import org.freedesktop.gstreamer.event.QOSEvent;
+import org.freedesktop.gstreamer.event.ReconfigureEvent;
+import org.freedesktop.gstreamer.event.SeekEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
+import org.freedesktop.gstreamer.event.StepEvent;
+import org.freedesktop.gstreamer.event.StreamStartEvent;
+import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
@@ -57,7 +73,35 @@ import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.message.AsyncDoneMessage;
+import org.freedesktop.gstreamer.message.AsyncStartMessage;
+import org.freedesktop.gstreamer.message.BufferingMessage;
+import org.freedesktop.gstreamer.message.DurationChangedMessage;
+import org.freedesktop.gstreamer.message.EOSMessage;
+import org.freedesktop.gstreamer.message.ErrorMessage;
+import org.freedesktop.gstreamer.message.GErrorMessage;
+import org.freedesktop.gstreamer.message.InfoMessage;
+import org.freedesktop.gstreamer.message.LatencyMessage;
+import org.freedesktop.gstreamer.message.NeedContextMessage;
+import org.freedesktop.gstreamer.message.NewClockMessage;
+import org.freedesktop.gstreamer.message.QosMessage;
+import org.freedesktop.gstreamer.message.SegmentDoneMessage;
+import org.freedesktop.gstreamer.message.StateChangedMessage;
+import org.freedesktop.gstreamer.message.StreamStartMessage;
+import org.freedesktop.gstreamer.message.StreamStatusMessage;
+import org.freedesktop.gstreamer.message.TagMessage;
+import org.freedesktop.gstreamer.message.WarningMessage;
+import org.freedesktop.gstreamer.query.ContextQuery;
+import org.freedesktop.gstreamer.query.ConvertQuery;
+import org.freedesktop.gstreamer.query.CustomQuery;
+import org.freedesktop.gstreamer.query.DurationQuery;
+import org.freedesktop.gstreamer.query.FormatsQuery;
+import org.freedesktop.gstreamer.query.LatencyQuery;
+import org.freedesktop.gstreamer.query.PositionQuery;
+import org.freedesktop.gstreamer.query.SeekingQuery;
+import org.freedesktop.gstreamer.query.SegmentQuery;
 
+import com.sun.jna.Library;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -413,16 +457,33 @@ public final class Gst {
         }
     };
 
-    private static String getField(Class<? extends NativeObject> cls, String name)
+    private static String getField(Class<? extends NativeObject> cls, String fieldName)
             throws SecurityException, IllegalArgumentException {
         try {
-            Field f = cls.getDeclaredField(name);
+            Field f = cls.getDeclaredField(fieldName);
             int mod = f.getModifiers();
             if (Modifier.isStatic(mod) && Modifier.isFinal(mod) && f.getType().equals(String.class)) {
                 f.setAccessible(true);
                 return (String)f.get(null);
             }
         } catch (NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Library getLibraryField(Class<? extends NativeObject> cls)
+            throws SecurityException, IllegalArgumentException {
+        try {
+            for (Field field : cls.getDeclaredFields()) {
+                int mod = field.getModifiers();
+                if (Modifier.isStatic(mod) && Modifier.isFinal(mod) && Library.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+                    return (Library)field.get(null);
+                }
+
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -436,26 +497,35 @@ public final class Gst {
         if (value != null)
             GstTypes.registerType(cls, value);
         value = Gst.getField(cls, "GST_NAME");
+
         if (Element.class.isAssignableFrom(cls) && value != null)
             ElementFactory.registerElement((Class<? extends Element>)cls, value);
+
     }
 
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
-        for(Class<?> cls : Gst.nativeClasses)
+        for(Class<?> cls : Gst.nativeClasses) {
             Gst.registerClass((Class<? extends NativeObject>)cls);
+
+            // Force load of libraries at start-up to prevent deadlock
+            Library lib = Gst.getLibraryField((Class<? extends NativeObject>)cls);
+            if (lib != null) lib.toString();
+        }
     }
     // to generate the list we use:
     // egrep -rl "GST_NAME|GTYPE_NAME" src 2>/dev/null | egrep -v ".svn|Gst.java" | sort
     // even though the best would be all subclasses of NativeObject
     @SuppressWarnings("rawtypes")
 	private static Class[] nativeClasses = {
+		Context.class,
 		GDate.class,
 		GValue.class,
 		GValueArray.class,
 		TimedValue.class,
 		ValueArray.class,
 		ValueList.class,
+		TagList.class,
 		// ----------- Base -------------
 		Buffer.class,
 		Bus.class,
@@ -488,6 +558,51 @@ public final class Gst {
 		Pipeline.class,
 		PlayBin.class,
 		URIDecodeBin.class,
-
+		// ----------- Messages -------------
+		AsyncDoneMessage.class,
+		AsyncStartMessage.class,
+		BufferingMessage.class,
+		DurationChangedMessage.class,
+		EOSMessage.class,
+		ErrorMessage.class,
+		GErrorMessage.class,
+		InfoMessage.class,
+		LatencyMessage.class,
+		NeedContextMessage.class,
+		NewClockMessage.class,
+		QosMessage.class,
+		SegmentDoneMessage.class,
+		StateChangedMessage.class,
+		StreamStartMessage.class,
+		StreamStatusMessage.class,
+		TagMessage.class,
+		WarningMessage.class,
+		// ----------- Queries -------------
+		ContextQuery.class,
+		ConvertQuery.class,
+		CustomQuery.class,
+		DurationQuery.class,
+		FormatsQuery.class,
+		LatencyQuery.class,
+		PositionQuery.class,
+		SeekingQuery.class,
+		SegmentQuery.class,
+		// ----------- Events -------------
+		BufferSizeEvent.class,
+		BusSyncHandler.class,
+		CapsEvent.class,
+		EOSEvent.class,
+		FlushStartEvent.class,
+		FlushStopEvent.class,
+		ForceKeyUnit.class,
+		LatencyEvent.class,
+		NavigationEvent.class,
+		QOSEvent.class,
+		ReconfigureEvent.class,
+		SeekEvent.class,
+		SegmentEvent.class,
+		StepEvent.class,
+		StreamStartEvent.class,
+		TagEvent.class,
 	};
 }
