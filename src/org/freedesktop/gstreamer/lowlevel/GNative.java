@@ -36,7 +36,9 @@ import com.sun.jna.Platform;
  */
 public final class GNative {
     // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
-    private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
+    // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
+    private final static String[] windowsNameFormats =
+            System.getProperty("gstreamer.GNative.windowsNameFormats", "%s|lib%s|lib%s-0").split("\\|");
 
     private GNative() {}
 
