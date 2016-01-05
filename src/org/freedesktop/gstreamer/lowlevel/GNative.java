@@ -36,13 +36,13 @@ import com.sun.jna.Platform;
  */
 public final class GNative {
     // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
-    private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
+    // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
+    private final static String[] windowsNameFormats =
+            System.getProperty("gstreamer.GNative.windowsNameFormats", "%s.0|%s-0|%s").split("\\|");
 
     private GNative() {}
 
     public static synchronized <T extends Library> T loadLibrary(String name, Class<T> interfaceClass, Map<String, ?> options) {
-        if (!Platform.isWindows())
-            return loadNativeLibrary(name, interfaceClass, options);
         for (String format : windowsNameFormats)
             try {
                 return interfaceClass.cast(loadNativeLibrary(String.format(format, name), interfaceClass, options));
