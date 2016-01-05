@@ -30,10 +30,6 @@ import com.sun.jna.Library;
  */
 @SuppressWarnings("serial")
 public final class GstNative {
-    // gstreamer library names the files one of libfoo-0.10 and libfoo-1.0
-    // private static String[] nameFormats = { /*"%s-0.10",*/ "%s-1.0" };
-    private final static String[] nameFormats =
-            System.getProperty("gstreamer.GstNative.nameFormats", "%s-1.0|%s-1.0.0").split("\\|");
 
     private GstNative() {}
     
@@ -42,17 +38,17 @@ public final class GstNative {
         put(Library.OPTION_FUNCTION_MAPPER, new GFunctionMapper());
     }};
 
+    // gstreamer library name is gstreamer-1.0.0. The extra .0 will be appended in GNative.loadLibrary().
     public static <T extends Library> T load(Class<T> interfaceClass) {
-        return load("gstreamer", interfaceClass);
+        return load("gstreamer-1.0", interfaceClass);
     }
 
     public static <T extends Library> T load(String libraryName, Class<T> interfaceClass) {
-        for (String format : nameFormats)
-            try {
-                return GNative.loadLibrary(String.format(format, libraryName), interfaceClass, options);
-            } catch (UnsatisfiedLinkError ex) {
-                continue;
-            }
-        throw new UnsatisfiedLinkError("Could not load library: " + libraryName);
+    	try {
+            return GNative.loadLibrary(libraryName, interfaceClass, options);
+        } catch (UnsatisfiedLinkError ex) {
+        	throw ex;
+        }
+    	
     }
 }
