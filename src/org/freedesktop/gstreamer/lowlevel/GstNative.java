@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -30,7 +31,9 @@ import com.sun.jna.Library;
 @SuppressWarnings("serial")
 public final class GstNative {
     // gstreamer library names the files one of libfoo-0.10 and libfoo-1.0
-    private static String[] nameFormats = { /*"%s-0.10",*/ "%s-1.0" };
+    // private static String[] nameFormats = { /*"%s-0.10",*/ "%s-1.0" };
+    private final static String[] nameFormats =
+            System.getProperty("gstreamer.GstNative.nameFormats", "%s-1.0").split("\\|");
 
     private GstNative() {}
     
