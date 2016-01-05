@@ -37,17 +37,25 @@ import com.sun.jna.Platform;
 public final class GNative {
     // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
     // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
-    private final static String[] windowsNameFormats =
-            System.getProperty("gstreamer.GNative.windowsNameFormats", "%s|lib%s|lib%s-0").split("\\|");
+            
+    private final static String[] nameFormats;
+    
+    static {
+        String defFormats = "%s";
+        if (Platform.isWindows()) {
+            defFormats = "%s|lib%s|lib%s-0";
+        } else if (Platform.isMac()) {
+            defFormats = "%s.0|%s";
+        }
+        nameFormats = System.getProperty("gstreamer.GNative.nameFormats", defFormats).split("\\|");
+    }
 
     private GNative() {}
 
     public static synchronized <T extends Library> T loadLibrary(String name, Class<T> interfaceClass, Map<String, ?> options) {
-        if (!Platform.isWindows())
-            return loadNativeLibrary(name, interfaceClass, options);
-        for (String format : windowsNameFormats)
+        for (String format : nameFormats)
             try {
-                return interfaceClass.cast(loadNativeLibrary(String.format(format, name), interfaceClass, options));
+                return loadNativeLibrary(String.format(format, name), interfaceClass, options);
             } catch (UnsatisfiedLinkError ex) {
                 continue;
             }
@@ -74,9 +82,7 @@ public final class GNative {
     }
 
     public static synchronized NativeLibrary getNativeLibrary(String name) {
-        if (!Platform.isWindows())
-            return NativeLibrary.getInstance(name);
-        for (String format : windowsNameFormats)
+        for (String format : nameFormats)
             try {
                 return NativeLibrary.getInstance(String.format(format, name));
             } catch (UnsatisfiedLinkError ex) {
