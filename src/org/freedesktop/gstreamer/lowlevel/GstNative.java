@@ -38,7 +38,8 @@ public final class GstNative {
         put(Library.OPTION_FUNCTION_MAPPER, new GFunctionMapper());
     }};
 
-    // gstreamer library name is gstreamer-1.0.0. The extra .0 will be appended in GNative.loadLibrary().
+    // gstreamer runtime library name is gstreamer-1.0.0. The extra .0 will be appended in GNative.loadLibrary().
+    // development versions may be gstreamer-1.0, which will be checked if gstreamer-1.0.0 is not found.
     public static <T extends Library> T load(Class<T> interfaceClass) {
         return load("gstreamer-1.0", interfaceClass);
     }
