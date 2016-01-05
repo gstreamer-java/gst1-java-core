@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -29,8 +30,6 @@ import com.sun.jna.Library;
  */
 @SuppressWarnings("serial")
 public final class GstNative {
-    // gstreamer library names the files one of libfoo-0.10 and libfoo-1.0
-    private static String[] nameFormats = { /*"%s-0.10",*/ "%s-1.0" };
 
     private GstNative() {}
     
@@ -39,17 +38,18 @@ public final class GstNative {
         put(Library.OPTION_FUNCTION_MAPPER, new GFunctionMapper());
     }};
 
+    // gstreamer runtime library name is gstreamer-1.0.0. The extra .0 will be appended in GNative.loadLibrary().
+    // development versions may be gstreamer-1.0, which will be checked if gstreamer-1.0.0 is not found.
     public static <T extends Library> T load(Class<T> interfaceClass) {
-        return load("gstreamer", interfaceClass);
+        return load("gstreamer-1.0", interfaceClass);
     }
 
     public static <T extends Library> T load(String libraryName, Class<T> interfaceClass) {
-        for (String format : nameFormats)
-            try {
-                return GNative.loadLibrary(String.format(format, libraryName), interfaceClass, options);
-            } catch (UnsatisfiedLinkError ex) {
-                continue;
-            }
-        throw new UnsatisfiedLinkError("Could not load library: " + libraryName);
+    	try {
+            return GNative.loadLibrary(libraryName, interfaceClass, options);
+        } catch (UnsatisfiedLinkError ex) {
+        	throw ex;
+        }
+    	
     }
 }
