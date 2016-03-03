@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
  * 
@@ -29,7 +30,9 @@ import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.GstIteratorAPI;
 
 import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
+import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
 /**
  *
@@ -37,49 +40,66 @@ import com.sun.jna.ptr.PointerByReference;
 class GstIterator<T extends NativeObject> extends NativeObject implements java.lang.Iterable<T> {
     private static final GstIteratorAPI gst = GstNative.load(GstIteratorAPI.class);
 
-    private Class<T> objectType;
+    private final GType gtype;
+    
     GstIterator(Pointer ptr, Class<T> cls) {
         super(initializer(ptr));
-        objectType = cls;
+        gtype = GstTypes.typeFor(cls);
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new IteratorImpl();
     }
     
+    @Override
     protected void disposeNativeHandle(Pointer ptr) {
         gst.gst_iterator_free(ptr);
     }
+    
     public List<T> asList() {
         List<T> list = new LinkedList<T>();
-        for (java.util.Iterator<T> it = iterator(); it.hasNext(); ) {
-            list.add(it.next());
+        for (T t : this) {
+            list.add(t);
         }
         return Collections.unmodifiableList(list);
     }
     
     class IteratorImpl implements java.util.Iterator<T> {
-        T next;        
+      
+        final GValueAPI.GValue gValue;
+        
+        T next;
+        
         IteratorImpl() {
+            gValue = new GValueAPI.GValue(gtype);
             next = getNext();
         }
+        
         private T getNext() {
-            PointerByReference nextRef = new PointerByReference();
-            if (gst.gst_iterator_next(handle(), nextRef) == 1) {                
-            	return NativeObject.objectFor(nextRef.getValue(), objectType, -1, true);
+            if (gst.gst_iterator_next(handle(), gValue) == 1) {
+                next = (T) gValue.getValue();
+                // reset cached structure or we get a memory leak
+                GValueAPI.GVALUE_API.g_value_reset(gValue);
+                return next;
+            } else {
+                return null;
             }
-            return null;
         }
+        
+        @Override
         public boolean hasNext() {
             return next != null;
         }
         
+        @Override
         public T next() {
             T result = next;
             next = getNext();
             return result;
         }
         
+        @Override
         public void remove() {
             throw new UnsupportedOperationException("Items cannot be removed.");
         }

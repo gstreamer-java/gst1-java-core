@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2016 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Andres Colubri
  * Copyright (c) 2008 Wayne Meissner
@@ -154,12 +155,10 @@ public interface GValueAPI extends Library {
             } else if (g_type.equals(GType.FLOAT)) { return toFloat();
             } else if (g_type.equals(GType.DOUBLE)) { return toDouble();
             } else if (g_type.equals(GType.STRING)) { return toJavaString();
-            } else if (g_type.equals(GType.OBJECT)) { return toObject();
+//            } else if (g_type.equals(GType.OBJECT)) { return toObject();
             } else if (g_type.equals(GType.POINTER)) { return toPointer();
-            } else {
-            	// object type not supported!
             }
-            return null;
+            return GVALUE_API.g_value_get_object(this);
         }
         
         public Integer toInt() {
