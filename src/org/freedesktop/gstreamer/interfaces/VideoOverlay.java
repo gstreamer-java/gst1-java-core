@@ -23,6 +23,7 @@
 package org.freedesktop.gstreamer.interfaces;
 
 import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.Message;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
@@ -43,7 +44,18 @@ public class VideoOverlay extends GstInterface {
     public static VideoOverlay wrap(Element element) {
         return new VideoOverlay(element);
     }
-    
+
+    /**
+     * Convenience function to check if the given message is a "prepare-window-handle".
+     * This usefull for setup native window handles with {@link BusSyncReply}.
+     * 
+     * @param message
+     * @return
+     */
+    public static boolean isVideoOverlayPrepareWindowHandleMessage(Message message) {
+        return GSTVIDEOOVERLAY_API.gst_is_video_overlay_prepare_window_handle_message(message);
+    }
+
     /**
      * Creates a new <tt>XOverlay</tt> instance
      * 

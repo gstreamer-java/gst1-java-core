@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.interfaces.VideoOverlay;
 
 import com.sun.jna.Library;
@@ -44,4 +45,6 @@ public interface GstVideoOverlayAPI extends Library {
 	void gst_video_overlay_handle_events(VideoOverlay overlay, boolean handle_events);
 	
 	boolean	gst_video_overlay_set_render_rectangle(VideoOverlay overlay, int x, int y, int width, int height);
+
+	boolean gst_is_video_overlay_prepare_window_handle_message(Message message);
 }
