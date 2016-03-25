@@ -119,7 +119,7 @@ public class Pad extends GstObject {
      * @return a newly allocated copy of the {@link Caps} of this pad.
      */
     public Caps getCaps() {
-        return gst.gst_pad_get_caps(this);
+        return gst.gst_pad_query_caps(this, null);
     }
     
     /**
@@ -166,7 +166,7 @@ public class Pad extends GstObject {
      * 
      */
     public Caps getNegotiatedCaps() {
-        return gst.gst_pad_get_negotiated_caps(this);
+        return gst.gst_pad_get_current_caps(this);
     }
     
     /**
@@ -194,7 +194,7 @@ public class Pad extends GstObject {
      * @return true if the pad can accept the caps.
      */
     public boolean acceptCaps(Caps caps) {
-        return gst.gst_pad_accept_caps(this, caps);
+        return gst.gst_pad_query_accept_caps(this, caps);
     }
     
     /**

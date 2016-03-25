@@ -101,16 +101,16 @@ public interface GstPadAPI extends com.sun.jna.Library {
     PadTemplate gst_pad_get_pad_template(Pad pad);
     
     /* capsnego function for connected/unconnected pads */
-    @CallerOwnsReturn Caps gst_pad_get_caps(Pad  pad);
+    @CallerOwnsReturn Caps gst_pad_query_caps(Pad pad, Caps caps);
     void gst_pad_fixate_caps(Pad pad, Caps caps);
-    boolean gst_pad_accept_caps(Pad pad, Caps caps);
+    boolean gst_pad_query_accept_caps(Pad pad, Caps caps);
     boolean gst_pad_set_caps(Pad pad, Caps caps);
     @CallerOwnsReturn Caps gst_pad_peer_get_caps(Pad pad);
     boolean gst_pad_peer_accept_caps(Pad pad, Caps caps);
     
     /* capsnego for connected pads */
     @CallerOwnsReturn Caps gst_pad_get_allowed_caps(Pad pad);
-    @CallerOwnsReturn Caps gst_pad_get_negotiated_caps(Pad pad);
+    @CallerOwnsReturn Caps gst_pad_get_current_caps(Pad pad);
 
     /* data passing functions to peer */
     FlowReturn gst_pad_push(Pad pad, @IncRef Buffer buffer);
