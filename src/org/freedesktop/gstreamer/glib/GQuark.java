@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -29,7 +30,7 @@ public class GQuark {
         return value;
     }
     
-    public GQuark valueOf(String quark) {
+    public static GQuark valueOf(String quark) {
         return GObjectAPI.GOBJECT_API.g_quark_from_string(quark);
     }
     
