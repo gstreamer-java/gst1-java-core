@@ -25,7 +25,6 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -171,7 +170,7 @@ public class AppSink extends BaseSink {
          *
          * @param elem
          */
-        public FlowReturn newBuffer(AppSink elem);
+        public void newBuffer(AppSink elem);
     }
     /**
      * Adds a listener for the <code>new-buffer</code> signal. If a blocking
@@ -184,8 +183,8 @@ public class AppSink extends BaseSink {
     public void connect(final NEW_SAMPLE listener) {
         connect(NEW_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public FlowReturn callback(AppSink elem) {
-                return listener.newBuffer(elem);
+            public void callback(AppSink elem) {
+                listener.newBuffer(elem);
             }
         });
     }
@@ -206,7 +205,7 @@ public class AppSink extends BaseSink {
          *
          * @param elem
          */
-        public FlowReturn newPreroll(AppSink elem);
+        public void newPreroll(AppSink elem);
     }
     /**
      * Adds a listener for the <code>new-preroll</code> signal. If a blocking
@@ -219,8 +218,8 @@ public class AppSink extends BaseSink {
     public void connect(final NEW_PREROLL listener) {
         connect(NEW_PREROLL.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public FlowReturn callback(AppSink elem) {
-                return listener.newPreroll(elem);
+            public void callback(AppSink elem) {
+                listener.newPreroll(elem);
             }
         });
     }
