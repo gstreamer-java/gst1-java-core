@@ -45,6 +45,9 @@ import com.sun.jna.ptr.PointerByReference;
  */
 @SuppressWarnings("serial")
 public class TagList extends MiniObject {
+    
+    public static final String GTYPE_NAME = "GstTagList";
+    
     private static interface API extends GstTagListAPI, GstTagAPI, GstMiniObjectAPI {
         @CallerOwnsReturn Pointer ptr_gst_tag_list_copy(TagList list);
         @CallerOwnsReturn Pointer ptr_gst_tag_list_merge(TagList list1, TagList list2, TagMergeMode mode);
