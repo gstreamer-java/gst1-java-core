@@ -39,7 +39,7 @@ public interface GstPluginAPI extends com.sun.jna.Library {
     String gst_plugin_get_source(Plugin plugin);
     String gst_plugin_get_package(Plugin plugin);
     String gst_plugin_get_origin(Plugin plugin);
-    //GModule *		gst_plugin_get_module		(Plugin plugin);
+    String gst_plugin_get_release_date_string(Plugin plugin);
     boolean gst_plugin_is_loaded(Plugin plugin);
     boolean gst_plugin_name_filter(Plugin plugin, String name);
 

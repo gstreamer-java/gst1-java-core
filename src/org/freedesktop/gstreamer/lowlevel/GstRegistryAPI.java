@@ -26,6 +26,7 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 /**
  * GstRegistry functions
@@ -41,9 +42,10 @@ public interface GstRegistryAPI extends com.sun.jna.Library {
          * to get a list of plugins that match certain criteria.
          *
          * @param plugin the plugin to check
+         * @param user_data the user_data that has been passed on e.g. {@link GstRegistryAPI#gst_registry_feature_filter}
          * @return true for a positive match, false otherwise
          */
-        boolean callback(Plugin plugin);
+        boolean callback(Plugin plugin, Pointer user_data);
     }
 
     
@@ -52,31 +54,34 @@ public interface GstRegistryAPI extends com.sun.jna.Library {
          * A function that can be used with e.g. gst_registry_feature_filter()
          * to get a list of pluginfeature that match certain criteria.
          * @param feature the pluginfeature to check
+         * @param user_data the user_data that has been passed on e.g. {@link GstRegistryAPI#gst_registry_feature_filter}
          * @return true if this plugin feature is accepted.
          */
-        boolean callback(PluginFeature feature);
+        boolean callback(PluginFeature feature, Pointer user_data);
     }
 
     /* normal GObject stuff */
     GType gst_registry_get_type();
     /* registry_get_default returns a non-refcounted object */
-    Pointer gst_registry_get_default();
-    boolean gst_registry_scan_path(Registry registry, String path);
-
-
+    Pointer gst_registry_get();
+    
+    GList gst_registry_get_feature_list(Registry registry, GType type);
+    int gst_registry_get_feature_list_cookie (Registry registry);
+    GList gst_registry_get_feature_list_by_plugin(Registry registry, String name);
+    GList gst_registry_get_plugin_list(Registry registry);
     boolean gst_registry_add_plugin(Registry registry, Plugin plugin);
     void gst_registry_remove_plugin(Registry registry, Plugin plugin);
-    boolean gst_registry_add_feature(Registry  registry, PluginFeature feature);
-    void gst_registry_remove_feature(Registry  registry, PluginFeature feature);
-    
+    GList gst_registry_plugin_filter(Registry registry, PluginFilter filter, boolean first, Pointer user_data);
+    GList gst_registry_feature_filter(Registry registry, PluginFeatureFilter filter, boolean first, Pointer user_data);
     @CallerOwnsReturn Plugin gst_registry_find_plugin(Registry registry, String name);
     @CallerOwnsReturn PluginFeature gst_registry_find_feature(Registry registry, String name, GType type);
-
-    @CallerOwnsReturn Plugin gst_registry_lookup(Registry registry, String filename);
     @CallerOwnsReturn PluginFeature gst_registry_lookup_feature(Registry registry, String name);
-
-
-    boolean gst_registry_binary_read_cache(Registry registry, String location);
-    boolean gst_registry_binary_write_cache(Registry registry, String location);
+    void gst_registry_add_path(Registry registry, String path);
+    GList gst_registry_get_path_list(Registry registry);
+    boolean gst_registry_scan_path(Registry registry, String path);
+    @CallerOwnsReturn Plugin gst_registry_lookup(Registry registry, String filename);
+    void gst_registry_remove_feature(Registry  registry, PluginFeature feature);
+    boolean gst_registry_add_feature(Registry  registry, PluginFeature feature);
+    boolean gst_registry_check_feature_version (Registry registry, String feature_name, int min_major, int min_minor, int min_micro);
 
 }
