@@ -73,7 +73,7 @@ public class Plugin extends GstObject {
      * @param pluginName
      * @return A new Plugin reference if the plugin was loaded, else null.
      */
-    public Plugin load(String pluginName) {
+    public static Plugin load(String pluginName) {
         return gst.gst_plugin_load_by_name(pluginName);
     }
     
@@ -148,6 +148,19 @@ public class Plugin extends GstObject {
      */
     public String getOrigin() {
         return gst.gst_plugin_get_origin(this);
+    }
+    
+    /**
+     * Get the release date (and possibly time) in form of a string, if
+     * available.
+     *
+     * For normal GStreamer plugin releases this will usually just be a date in
+     * the form of "YYYY-MM-DD", while pre-releases and builds from git may
+     * contain a time component after the date as well, in which case the string
+     * will be formatted like "YYYY-MM-DDTHH:MMZ" (e.g. "2012-04-30T09:30Z").Test
+     */
+    public String getReleaseDateString() {
+        return gst.gst_plugin_get_release_date_string(this);
     }
     
     /**

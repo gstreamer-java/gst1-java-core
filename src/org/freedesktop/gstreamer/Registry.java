@@ -30,8 +30,7 @@ import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstPluginAPI;
 import org.freedesktop.gstreamer.lowlevel.GstRegistryAPI;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
 
 /**
  * Abstract base class for management of {@link Plugin} objects.
@@ -99,15 +98,7 @@ import com.sun.jna.Pointer;
 public class Registry extends GstObject {
     public static final String GTYPE_NAME = "GstRegistry";
 
-    private static interface API extends GstPluginAPI, GstRegistryAPI {
-        void gst_plugin_feature_list_free(GList list);
-        GList gst_registry_get_plugin_list(Registry registry);
-        GList gst_registry_plugin_filter(Registry registry, PluginFilter filter, boolean first, Pointer user_data);
-        GList gst_registry_feature_filter(Registry registry, PluginFeatureFilter filter, boolean first, Pointer user_data);
-        GList gst_registry_get_feature_list(Registry registry, GType type);
-        GList gst_registry_get_feature_list_by_plugin(Registry registry, String name);
-        GList gst_registry_get_path_list(Registry registry);
-        void gst_plugin_list_free(GList list);
+    private static interface API extends GstPluginAPI, GstRegistryAPI, GstPluginFeatureAPI {
     }
     
     private static final API gst = GstNative.load(API.class);
@@ -125,10 +116,10 @@ public class Registry extends GstObject {
      * 
      * @return The default Registry.
      */
-    public static Registry getDefault() {
+    public static Registry get() {
         // Need to handle the return value here, as it is a persistent object
         // i.e. the java proxy should not dispose of the underlying object when finalized
-        return GstObject.objectFor(gst.gst_registry_get_default(), Registry.class,
+        return GstObject.objectFor(gst.gst_registry_get(), Registry.class,
                 false, false);
     }
     /** Creates a new instance of Registry */

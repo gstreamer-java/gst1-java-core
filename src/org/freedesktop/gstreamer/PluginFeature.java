@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.GstObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
 
 /**
@@ -32,8 +32,11 @@ import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
 public class PluginFeature extends GstObject {
     public static final String GTYPE_NAME = "GstPluginFeature";
 
-    private static final GstPluginFeatureAPI gst = GstNative.load(GstPluginFeatureAPI.class);
-    
+    private static interface API extends GstObjectAPI, GstPluginFeatureAPI {
+    }
+
+    private static final API gst = GstNative.load(API.class);
+
     public enum Rank {
         GST_RANK_NONE(0),
         GST_RANK_MARGINAL(64),
@@ -52,15 +55,15 @@ public class PluginFeature extends GstObject {
     }
 
     /** Creates a new instance of PluginFeature */
-    public PluginFeature(Initializer init) { 
-        super(init); 
+    public PluginFeature(Initializer init) {
+        super(init);
     }
-    
+
     @Override
     public String toString() {
         return getName();
     }
-    
+
     /**
      *  Gets the name of a plugin feature.
      *
@@ -68,9 +71,9 @@ public class PluginFeature extends GstObject {
      */
     @Override
     public String getName() {
-        return gst.gst_plugin_feature_get_name(this);
+        return gst.gst_object_get_name(this);
     }
-    
+
     /**
      * Sets the name of a plugin feature. The name uniquely identifies a feature
      * within all features of the same type. Renaming a plugin feature is not
@@ -79,10 +82,10 @@ public class PluginFeature extends GstObject {
      */
     @Override
     public boolean setName(String name) {
-        gst.gst_plugin_feature_set_name(this, name);
+        gst.gst_object_set_name(this, name);
         return true;
     }
-    
+
     /**
      * Set the rank for the plugin feature.
      * Specifies a rank for a plugin feature, so that autoplugging uses
@@ -93,9 +96,9 @@ public class PluginFeature extends GstObject {
         gst.gst_plugin_feature_set_rank(this, rank);
     }
     public void setRank(Rank rank) {
-    	setRank(rank.getValue());
+        setRank(rank.getValue());
     }
-    
+
     /**
      * Gets the rank of a plugin feature.
      *
@@ -104,7 +107,7 @@ public class PluginFeature extends GstObject {
     public int getRank() {
         return gst.gst_plugin_feature_get_rank(this);
     }
-    
+
     /**
      * Checks whether the given plugin feature is at least the required version.
      *
@@ -115,5 +118,24 @@ public class PluginFeature extends GstObject {
      */
     public boolean checkVersion(int major, int minor, int micro) {
         return gst.gst_plugin_feature_check_version(this, minor, minor, micro);
+    }
+    
+    /**
+     * Get the name of the plugin that provides this feature.
+     *
+     * @return the name of the plugin that provides this feature, or NULL if the
+     *         feature is not associated with a plugin.
+     */
+    public String getPluginName() {
+        return gst.gst_plugin_feature_get_plugin_name(this);
+    }
+    
+    /**
+     * Get the plugin that provides this feature.
+     * 
+     * @return the plugin that provides this feature, or NULL.
+     */
+    public Plugin getPlugin() {
+        return gst.gst_plugin_feature_get_plugin(this);
     }
 }

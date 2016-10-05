@@ -213,8 +213,6 @@ public class LowLevelStructureTest {
 
         structs.add(GstPadTemplateAPI.GstStaticPadTemplate.class);
 
-        structs.add(GstPluginFeatureAPI.TypeNameData.class);
-
         structs.add(GstQueryAPI.QueryStruct.class);
 
 

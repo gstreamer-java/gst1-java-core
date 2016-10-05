@@ -19,9 +19,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.List;
+import org.freedesktop.gstreamer.Plugin;
 import org.freedesktop.gstreamer.PluginFeature;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
@@ -34,25 +34,14 @@ public interface GstPluginFeatureAPI extends com.sun.jna.Library {
     GType gst_plugin_feature_get_type();
 
     @CallerOwnsReturn PluginFeature gst_plugin_feature_load(PluginFeature feature);
-    public static final class TypeNameData extends com.sun.jna.Structure {
-        public String name;
-        public GType type;
-
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{
-                "name", "type"
-            });
-        }
-    }
-    boolean gst_plugin_feature_type_name_filter(PluginFeature feature, TypeNameData data);
 
     void gst_plugin_feature_set_rank(PluginFeature feature, int rank);
-    void gst_plugin_feature_set_name(PluginFeature feature, String name);
     int gst_plugin_feature_get_rank(PluginFeature feature);
-    String gst_plugin_feature_get_name(PluginFeature feature);
+    String gst_plugin_feature_get_plugin_name(PluginFeature feature);
+    @CallerOwnsReturn Plugin gst_plugin_feature_get_plugin(PluginFeature feature);
 
     boolean gst_plugin_feature_check_version(PluginFeature feature,
             int min_major, int min_minor, int min_micro);
 
+    void gst_plugin_feature_list_free (GList list);
 }
