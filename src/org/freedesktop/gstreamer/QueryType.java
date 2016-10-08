@@ -21,50 +21,66 @@
 
 package org.freedesktop.gstreamer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GstQueryTypeFlags;
 
 /**
  * Standard predefined Query types
  */
 public final class QueryType implements Comparable<QueryType> {
-    private static int queryMax = 0;
-    private static final List<QueryType> cache = new ArrayList<QueryType>();
-    private static interface API extends com.sun.jna.Library {
-        String gst_query_type_get_name(QueryType query);
-        QueryType gst_query_type_get_by_nick(String nick);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final Map<Integer,String> nameCache = new HashMap<Integer,String>();
+
+    private static final GstQueryAPI gst = GstNative.load(GstQueryAPI.class);
     
     /** invalid query type */
-    public static final QueryType NONE = init();
+    public static final QueryType UNKNOWN = makeType(0, 0);
     /** current position in stream */
-    public static final QueryType POSITION = init();
+    public static final QueryType POSITION = makeType(10, GstQueryTypeFlags.BOTH);
     /** total duration of the stream */
-    public static final QueryType DURATION = init();
+    public static final QueryType DURATION = makeType(20, GstQueryTypeFlags.BOTH);
     /** latency of stream */
-    public static final QueryType LATENCY = init();
+    public static final QueryType LATENCY = makeType(30, GstQueryTypeFlags.BOTH);
     /** current jitter of stream */
-    public static final QueryType JITTER = init();
+    public static final QueryType JITTER = makeType(40, GstQueryTypeFlags.BOTH);
     /** current rate of the stream */
-    public static final QueryType RATE = init();
+    public static final QueryType RATE = makeType(50, GstQueryTypeFlags.BOTH);
     /** seeking capabilities */
-    public static final QueryType SEEKING = init();
+    public static final QueryType SEEKING = makeType(60, GstQueryTypeFlags.BOTH);
     /** segment start/stop positions */
-    public static final QueryType SEGMENT = init();
+    public static final QueryType SEGMENT = makeType(70, GstQueryTypeFlags.BOTH);
     /** convert values between formats */
-    public static final QueryType CONVERT = init();
+    public static final QueryType CONVERT = makeType(80, GstQueryTypeFlags.BOTH);
     /** query supported formats for convert */
-    public static final QueryType FORMATS = init();
-    
+    public static final QueryType FORMATS = makeType(90, GstQueryTypeFlags.BOTH);
+    /** query available media for efficient seeking */
+    public static final QueryType BUFFERING = makeType(110, GstQueryTypeFlags.BOTH);
+    /** a custom application or element defined query */
+    public static final QueryType CUSTOM = makeType(120, GstQueryTypeFlags.BOTH);
+    /** query the URI of the source or sink */
+    public static final QueryType URI = makeType(130, GstQueryTypeFlags.BOTH);
+    /** the buffer allocation properties */
+    public static final QueryType ALLOCATION = makeType(140, GstQueryTypeFlags.DOWNSTREAM | GstQueryTypeFlags.SERIALIZED);
+    /** the scheduling properties */
+    public static final QueryType SCHEDULING = makeType(150, GstQueryTypeFlags.UPSTREAM);
+    /** the accept caps query */
+    public static final QueryType ACCEPT_CAPS = makeType(160, GstQueryTypeFlags.BOTH);
+    /** the caps query */
+    public static final QueryType CAPS = makeType(170, GstQueryTypeFlags.BOTH);
+    /** wait till all serialized data is consumed downstream */
+    public static final QueryType DRAIN = makeType(180, GstQueryTypeFlags.DOWNSTREAM | GstQueryTypeFlags.SERIALIZED);
+    /** query the pipeline-local context from downstream or upstream (since 1.2) */
+    public static final QueryType CONTEXT = makeType(190, GstQueryTypeFlags.BOTH);
    
     private final Integer value;
 
-    private static final QueryType init() {
-        QueryType type = new QueryType(queryMax++);
-        cache.add(type.value, type);
+    private static QueryType makeType(int num, int flags) {
+        int value = (num << GstQueryAPI.GST_QUERY_NUM_SHIFT) | flags;
+        QueryType type = new QueryType(value);
         return type; 
     }
     
@@ -76,21 +92,9 @@ public final class QueryType implements Comparable<QueryType> {
      * with the specified value.
      */
     public static QueryType valueOf(int value) {
-        if (value >= 0 && value < cache.size()) {
-            return cache.get(value);
-        }
         return new QueryType(value);
     }
     
-    /**
-     * Looks up a query type by its gstreamer nick.
-     * 
-     * @param nick the gstreamer nick.
-     * @return the query type.
-     */
-    public static QueryType fromNick(String nick) {
-        return gst.gst_query_type_get_by_nick(nick);
-    }
     private QueryType(int value) {
         this.value = value;
     }
@@ -110,7 +114,12 @@ public final class QueryType implements Comparable<QueryType> {
      * @return the gstreamer name for this type.
      */
     public String getName() {
-        return gst.gst_query_type_get_name(this);
+        String cachedName = nameCache.get(value);
+        if(cachedName == null) {
+            cachedName = gst.gst_query_type_get_name(this);
+            nameCache.put(value, cachedName);
+        }
+        return cachedName;
     }
 
     /**
