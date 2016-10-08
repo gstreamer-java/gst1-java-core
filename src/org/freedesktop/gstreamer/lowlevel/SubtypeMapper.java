@@ -146,7 +146,7 @@ class SubtypeMapper {
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstQueryAPI.QueryStruct struct = new GstQueryAPI.QueryStruct(ptr);
-                QueryType type = QueryType.valueOf((Integer) struct.readField("type"));
+                QueryType type = QueryType.values()[((Integer) struct.readField("type"))];
                 Class<? extends Query> queryClass = typeMap.get(type);
                 return queryClass != null ? queryClass : Query.class;
             }
