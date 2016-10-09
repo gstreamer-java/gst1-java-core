@@ -236,11 +236,11 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
     private TypeConverter querytypeConverter = new TypeConverter() {
         
         public Object toNative(Object arg, ToNativeContext context) {
-            return ((QueryType)arg).intValue();
+            return ((QueryType)arg).ordinal();
         }
 
         public Object fromNative(Object arg0, FromNativeContext arg1) {
-            return QueryType.valueOf(((Number) arg0).intValue());            
+            return QueryType.values()[((Number) arg0).intValue()];
         }
 
         public Class<?> nativeType() {

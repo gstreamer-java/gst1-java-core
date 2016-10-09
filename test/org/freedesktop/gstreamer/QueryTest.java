@@ -31,16 +31,13 @@ import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.query.ApplicationQuery;
 import org.freedesktop.gstreamer.query.DurationQuery;
 import org.freedesktop.gstreamer.query.FormatsQuery;
 import org.freedesktop.gstreamer.query.LatencyQuery;
 import org.freedesktop.gstreamer.query.PositionQuery;
 import org.freedesktop.gstreamer.query.SeekingQuery;
 import org.freedesktop.gstreamer.query.SegmentQuery;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,9 +46,6 @@ import org.junit.Test;
  * @author wayne
  */
 public class QueryTest {
-    
-    public QueryTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -63,14 +57,6 @@ public class QueryTest {
         Gst.deinit();
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-    
     @Test
     public void gst_query_new_position() {
         Query query = GstQueryAPI.GSTQUERY_API.gst_query_new_position(Format.TIME);
@@ -174,13 +160,7 @@ public class QueryTest {
         assertTrue("toString() did not return minLatency", s.contains("min=" + minLatency));
         assertTrue("toString() did not return minLatency", s.contains("max=" + maxLatency));
     }
-    @Test public void applicationQuery() {
-        QueryType type = GstQueryAPI.GSTQUERY_API.gst_query_type_register("application_test", "An application query");
-        Structure s = new Structure("test");
-        ApplicationQuery query = new ApplicationQuery(type, s);
-        s = query.getStructure();
-        query.dispose();
-    }
+    
     @Test public void segmentQuery() {
         SegmentQuery query = new SegmentQuery(Format.TIME);
         ClockTime end = ClockTime.fromMillis(1000);
@@ -217,14 +197,7 @@ public class QueryTest {
         assertEquals("First format incorrect", Format.TIME, formats.get(0));
         assertEquals("Second format incorrect", Format.PERCENT, formats.get(1));
     }
-    @Test public void queryTypeNick() {
-        QueryType qt = QueryType.POSITION;
-        assertEquals("nick mismatch", qt, QueryType.fromNick(qt.getName()));
-    }
-    @Test public void customQueryType() {
-        QueryType qt = GstQueryAPI.GSTQUERY_API.gst_query_type_register("test", "A test query type");
-        assertEquals("nick mismatch", qt, QueryType.fromNick("test"));
-    }
+
     @Test public void makeWriteable() {
         Query query = new SegmentQuery(Format.TIME);
         assertTrue("New query is not writable", query.isWritable());

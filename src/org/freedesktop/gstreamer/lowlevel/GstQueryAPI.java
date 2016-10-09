@@ -26,11 +26,14 @@ import org.freedesktop.gstreamer.QueryType;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 import java.util.List;
+import org.freedesktop.gstreamer.query.DurationQuery;
+import org.freedesktop.gstreamer.query.FormatsQuery;
+import org.freedesktop.gstreamer.query.LatencyQuery;
+import org.freedesktop.gstreamer.query.PositionQuery;
 
 /**
  * GstQuery functions
@@ -40,24 +43,19 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 
     String gst_query_type_get_name(QueryType query);
     GQuark gst_query_type_to_quark(QueryType query);
-    /* register a new query */
-    QueryType gst_query_type_register(String nick, String description);
-    QueryType gst_query_type_get_by_nick(String nick);
-    
-    GType gst_query_get_type();
 
     /* position query */
-    @CallerOwnsReturn Query gst_query_new_position(Format format);
+    @CallerOwnsReturn PositionQuery gst_query_new_position(Format format);
     void gst_query_set_position(Query query, Format format, /* gint64 */ long cur);
     void gst_query_parse_position(Query query, Format[] format, /* gint64 * */ long[] cur);
 
     /* duration query */
-    @CallerOwnsReturn Query gst_query_new_duration(Format format);
+    @CallerOwnsReturn DurationQuery gst_query_new_duration(Format format);
     void gst_query_set_duration(Query query, Format format, /* gint64 */ long duration);
     void gst_query_parse_duration(Query query, /* Format **/ Format[] format, /* gint64 * */ long[] duration);
 
     /* latency query */
-    @CallerOwnsReturn Query gst_query_new_latency();
+    @CallerOwnsReturn LatencyQuery gst_query_new_latency();
     void gst_query_set_latency(Query query, boolean live, ClockTime min_latency,
          ClockTime max_latency);
     void gst_query_parse_latency(Query query, boolean[] live, ClockTime[] min_latency, 
@@ -76,8 +74,6 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     void gst_query_parse_segment(Query query, double[] rate, Format[] format,
          /* gint64 * */ long[] start_value, /* gint64 * */ long[] stop_value);
 
-    /* application specific query */
-    @CallerOwnsReturn Query gst_query_new_application(QueryType type, @Invalidate Structure structure);
     Structure gst_query_get_structure(Query query);
 
     /* seeking query */
@@ -87,11 +83,12 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     void gst_query_parse_seeking(Query query, Format[] format,
         boolean[] seekable, /* gint64 * */ long[] segment_start, /* gint64 * */ long[] segment_end);
     /* formats query */
-    @CallerOwnsReturn Query gst_query_new_formats();
+    @CallerOwnsReturn FormatsQuery gst_query_new_formats();
+    Pointer ptr_gst_query_new_formats();
     void gst_query_set_formats(Query query, int n_formats, Format... formats);
     void gst_query_set_formatsv(Query query, int n_formats, Format[] formats);
-    void gst_query_parse_formats_length(Query query, int[] n_formats);
-    void gst_query_parse_formats_nth(Query query, int nth, Format[] format);
+    void gst_query_parse_n_formats(Query query, int[] n_formats);
+    void gst_query_parse_nth_format(Query query, int nth, Format[] format);
     
     public static final class QueryStruct extends com.sun.jna.Structure {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;

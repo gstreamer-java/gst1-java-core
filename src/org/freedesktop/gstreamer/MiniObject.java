@@ -25,8 +25,11 @@ import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
 
-import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
+import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static org.freedesktop.gstreamer.GstObject.initializer;
 
 /**
  * Lightweight base class for the GStreamer object hierarchy
@@ -65,12 +68,26 @@ public class MiniObject extends RefCountedObject {
      * @return a writable version of this MiniObject.
      */
     protected <T extends MiniObject> T makeWritable(Class<T> subclass) {
-        MiniObject result = gst.gst_mini_object_make_writable(this);
+        Pointer result = gst.ptr_gst_mini_object_make_writable(this);
         if (result == null) {
             throw new NullPointerException("Could not make " + subclass.getSimpleName() 
                     + " writable");
         }
-        return subclass.cast(result);
+        try {
+            return subclass.getConstructor(Initializer.class).newInstance(new Initializer(result, false, true));
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        } catch (SecurityException ex) {
+            throw new RuntimeException(ex);
+        } catch (InstantiationException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     /*
      * FIXME: this one returns a new MiniObject, so we need to replace the Pointer

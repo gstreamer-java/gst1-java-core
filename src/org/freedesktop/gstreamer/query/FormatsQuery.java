@@ -29,25 +29,19 @@ import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  * Used for querying formats of the stream. 
  */
 public class FormatsQuery extends Query {
-    private static interface API extends com.sun.jna.Library {
-        Pointer gst_query_new_formats();
-        void gst_query_set_formats(Query query, int n_formats, Format... formats);
-        void gst_query_set_formatsv(Query query, int n_formats, /* GstFormat * */ int[] formats);
-        void gst_query_parse_formats_length(Query query, int[] n_formats);
-        void gst_query_parse_formats_nth(Query query, int nth, /*GstFormat * */ int[] format);
-    }
-    private static final API gst = GstNative.load(API.class);
+    private static final GstQueryAPI gst = GstNative.load(GstQueryAPI.class);
     
     /**
      * Constructs a new query object for querying formats of the stream. 
      */
     public FormatsQuery() {
-        this(initializer(gst.gst_query_new_formats()));
+        this(initializer(gst.ptr_gst_query_new_formats()));
     }
     public FormatsQuery(Initializer init) {
         super(init);
@@ -69,7 +63,7 @@ public class FormatsQuery extends Query {
      */
     public int getCount() {
         int[] count = { 0 };
-        gst.gst_query_parse_formats_length(this, count);
+        gst.gst_query_parse_n_formats(this, count);
         return count[0];
     }
     
@@ -79,9 +73,9 @@ public class FormatsQuery extends Query {
      * @return the format.
      */
     public Format getFormat(int index) {
-        int[] fmt = { 0 };
-        gst.gst_query_parse_formats_nth(this, index, fmt);
-        return Format.valueOf(fmt[0]);
+        Format[] fmt = new Format[1];
+        gst.gst_query_parse_nth_format(this, index, fmt);
+        return fmt[0];
     }
     
     /**

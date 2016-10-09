@@ -42,7 +42,7 @@ public interface GstMiniObjectAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Pointer ptr_gst_mini_object_copy(MiniObject mini_object);
     @CallerOwnsReturn MiniObject gst_mini_object_copy(MiniObject mini_object);
     boolean gst_mini_object_is_writable(MiniObject mini_object);
-    /* FIXME - invalidate the argument, and return a MiniObject */
+
     @CallerOwnsReturn Pointer ptr_gst_mini_object_make_writable(@Invalidate MiniObject mini_object);
     @CallerOwnsReturn MiniObject gst_mini_object_make_writable(@Invalidate MiniObject mini_object);
     
