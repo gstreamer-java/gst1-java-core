@@ -26,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 
+import org.freedesktop.gstreamer.elements.FakeSink;
+import org.freedesktop.gstreamer.elements.FakeSrc;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GObjectStruct;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -132,11 +134,13 @@ public class PipelineTest {
     public void testLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
+        assertEquals("First element not a fakesrc", FakeSrc.class, pipeline.getSources().get(0).getClass());
     }
     @Test
     public void testLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
-        assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", FakeSink.class, pipeline.getSinks().get(0).getClass());
     }
     @Test
     public void testVarargLaunch() {
@@ -152,10 +156,12 @@ public class PipelineTest {
     public void testVarargLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
+        assertEquals("First element not a fakesrc", FakeSrc.class, pipeline.getSources().get(0).getClass());
     }
     @Test
     public void testVarargLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
-        assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", FakeSink.class, pipeline.getSinks().get(0).getClass());
     }
 }
