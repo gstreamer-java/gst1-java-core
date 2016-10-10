@@ -475,6 +475,7 @@ public final class Gst {
 		Query.class,
 		Range.class,
 		Registry.class,
+		Sample.class,
 		// ----------- Elements -------------
 		AppSink.class,
 		AppSrc.class,
