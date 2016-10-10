@@ -26,12 +26,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 
+import org.freedesktop.gstreamer.elements.FakeSink;
+import org.freedesktop.gstreamer.elements.FakeSrc;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GObjectStruct;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -119,52 +120,48 @@ public class PipelineTest {
 //        assertTrue("ref_count not decremented", waitRefCnt(struct, 0));
     } /* Test of getBus method, of class Pipeline. */
     
-    @Ignore
     @Test
     public void testLaunch() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertNotNull("Pipeline not created", pipeline);
     }
-    @Ignore
     @Test
     public void testLaunchElementCount() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
     }
-    @Ignore
     @Test
     public void testLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
+        assertEquals("First element not a fakesrc", FakeSrc.class, pipeline.getSources().get(0).getClass());
     }
-    @Ignore
     @Test
     public void testLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
-        assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", FakeSink.class, pipeline.getSinks().get(0).getClass());
     }
-    @Ignore
     @Test
     public void testVarargLaunch() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertNotNull("Pipeline not created", pipeline);
     } 
-    @Ignore
     @Test
     public void testVarargLaunchElementCount() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
     }
-    @Ignore
     @Test
     public void testVarargLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
+        assertEquals("First element not a fakesrc", FakeSrc.class, pipeline.getSources().get(0).getClass());
     }
-    @Ignore
     @Test
     public void testVarargLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
-        assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
+        assertEquals("Second element not a fakesink", FakeSink.class, pipeline.getSinks().get(0).getClass());
     }
 }
