@@ -20,7 +20,10 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.glib.GQuark;
@@ -30,10 +33,8 @@ import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure.ByReference;
 import com.sun.jna.ptr.IntByReference;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *
@@ -114,7 +115,7 @@ public interface GObjectAPI extends Library {
     /* 
      * Basic Type Structures
      */
-    public static final class GTypeClass extends com.sun.jna.Structure {
+    public static class GTypeClass extends com.sun.jna.Structure {
 
         /*< private >*/
         public volatile GType g_type;
@@ -124,11 +125,16 @@ public interface GObjectAPI extends Library {
             return Collections.singletonList("g_type");
         }
     }
+    
+    public static final class GTypeClassByReference extends GTypeClass implements ByReference {
+    	//
+    }
+
 
     public static final class GTypeInstance extends com.sun.jna.Structure {
 
         /*< private >*/
-        public volatile Pointer g_class;
+    	public volatile GTypeClassByReference g_class; 
         
         @Override
         protected List<String> getFieldOrder() {
@@ -144,8 +150,8 @@ public interface GObjectAPI extends Library {
         public GObjectStruct(GObject obj) {
             this(obj.handle());
         }
-        public GObjectStruct(Pointer handle) {
-            useMemory(handle);
+        public GObjectStruct(Pointer ptr) {
+            super(ptr);
             read();
         }
         
@@ -196,7 +202,7 @@ public interface GObjectAPI extends Library {
 
         public GObjectClass() {}
         public GObjectClass(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -236,7 +242,7 @@ public interface GObjectAPI extends Library {
             clear();
         }
         public GTypeInfo(Pointer ptr) { 
-            useMemory(ptr); 
+            super(ptr); 
             read();
         }
         /* interface types, classed types, instantiated types */
@@ -272,7 +278,12 @@ public interface GObjectAPI extends Library {
     	public abstract Object getMaximum();
     	public abstract Object getDefault();
     	
-        public GParamSpecTypeSpecific() { clear(); }
+        public GParamSpecTypeSpecific() { 
+        	clear(); 
+        }
+        public GParamSpecTypeSpecific(Pointer ptr) {
+        	super(ptr);
+        }
     }
     public static final class GParamSpecBoolean extends GParamSpecTypeSpecific {
     	public volatile GParamSpec parent_instance;
@@ -283,7 +294,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecBoolean(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -305,7 +316,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecInt(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -329,7 +340,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return ((long)default_value)&0xffffff; }
     	
         public GParamSpecUInt(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -352,7 +363,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecChar(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -375,7 +386,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return ((short)default_value)&0xff; }
     	
         public GParamSpecUChar(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -398,7 +409,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecLong(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -421,7 +432,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecInt64(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -445,7 +456,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecFloat(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -469,7 +480,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecDouble(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -495,7 +506,7 @@ public interface GObjectAPI extends Library {
     	public Object getDefault() { return default_value; }
     	
         public GParamSpecString(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         
@@ -525,7 +536,7 @@ public interface GObjectAPI extends Library {
             clear();
         }
         public GParamSpec(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
             read();
         }
         

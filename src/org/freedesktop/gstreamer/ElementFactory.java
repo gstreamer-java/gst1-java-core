@@ -224,9 +224,11 @@ public class ElementFactory extends PluginFeature {
     
     @SuppressWarnings("unchecked")
     private static Element elementFor(Pointer ptr, String factoryName) {
-        Class<? extends Element> cls = typeMap.get(factoryName);
-        cls = (cls == null) ? (Class<Element>)GstTypes.classFor(ptr) : cls;
-        cls = (cls == null || !Element.class.isAssignableFrom(cls)) ? Element.class : cls;
+        Class<? extends Element> cls = ElementFactory.typeMap.get(factoryName);
+        if (cls == null) {
+            cls = (Class<Element>)GstTypes.classFor(Element.getType(ptr));
+            ElementFactory.typeMap.put(factoryName, cls);
+        }
         return NativeObject.objectFor(ptr, cls);
     }
 

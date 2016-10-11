@@ -52,21 +52,4 @@ public class Query extends MiniObject {
         return ReferenceManager.addKeepAliveReference(gst.gst_query_get_structure(this), this);
     }
     
-    /**
-     * Makes a writable query from this query.
-     * <p>
-     * <b>Note:</b> After calling this method, this Query instance is invalidated
-     * and should no longer be used.
-     * <p>
-     * This should be used like this:
-     * <p>
-     * <code>
-     *  query = query.makeWritable();
-     * </code>
-     * 
-     * @return A new Query that is writable.
-     */
-    public Query makeWritable() {
-        return makeWritable(getClass());
-    }
 }

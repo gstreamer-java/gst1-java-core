@@ -180,13 +180,19 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
             return cls.cast(obj);
         }
         
-        //
-        // If it is a GObject or MiniObject, read the g_class field to find
-        // the most exact class match
-        //
-        if (GObject.class.isAssignableFrom(cls) || MiniObject.class.isAssignableFrom(cls)) {
-            cls = classFor(ptr, cls);
+    	final GType gType =
+    			GObject.class.isAssignableFrom(cls) ? GObject.getType(ptr) :
+    			MiniObject.class.isAssignableFrom(cls) ? MiniObject.getType(ptr) :
+    			null; // shall never appears
+        
+		//
+		// For a GObject, MiniObject, ..., use the GType field to find the most
+		// exact class match
+		//
+        if (gType != null) {
+            cls = NativeObject.classFor(ptr, gType);
         }
+
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
             T retVal = constructor.newInstance(initializer(ptr, refAdjust > 0, ownsHandle));
@@ -207,12 +213,13 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     }
     
     @SuppressWarnings("unchecked")
-    protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, Class<T> defaultClass) {
-        Class<? extends NativeObject> cls = GstTypes.classFor(ptr);
-        if (cls != null && cls.isAnnotationPresent(HasSubtype.class)) {
-            cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
-        }
-        return (cls != null && defaultClass.isAssignableFrom(cls)) ? (Class<T>) cls : defaultClass; 
+    protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType) {
+        Class<? extends NativeObject> cls = GstTypes.classFor(gType);
+
+    	if (cls.isAnnotationPresent(HasSubtype.class)) {
+    		cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
+    	}
+    	return (Class<T>)cls;
     }
     
     @Override
