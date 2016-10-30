@@ -47,13 +47,14 @@ public interface GstMessageAPI extends com.sun.jna.Library {
 
     public static final class MessageStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
-//        public volatile Pointer lock;
-//        public volatile Pointer cond;
         public volatile MessageType type;
         public volatile long timestamp;
         public volatile GstObject src;
         public volatile int seqnum;
-        
+
+        public volatile Pointer lock;
+        public volatile Pointer cond;
+
         /**
          * Creates a new instance of MessageStruct
          */
@@ -66,9 +67,10 @@ public interface GstMessageAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", // "lock", "cond",
+                "mini_object", 
                 "type", "timestamp", "src",
-                "seqnum"
+                "seqnum",
+                "lock", "cond"
             });
         }
     }
