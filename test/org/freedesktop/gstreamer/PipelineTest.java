@@ -119,49 +119,49 @@ public class PipelineTest {
 //        assertTrue("ref_count not decremented", waitRefCnt(struct, 0));
     } /* Test of getBus method, of class Pipeline. */
     
-    @Ignore
+    
     @Test
     public void testLaunch() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertNotNull("Pipeline not created", pipeline);
     }
-    @Ignore
+    
     @Test
     public void testLaunchElementCount() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
     }
-    @Ignore
+    
     @Test
     public void testLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
     }
-    @Ignore
+    
     @Test
     public void testLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc ! fakesink");
         assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
     }
-    @Ignore
+    
     @Test
     public void testVarargLaunch() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertNotNull("Pipeline not created", pipeline);
     } 
-    @Ignore
+    
     @Test
     public void testVarargLaunchElementCount() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
     }
-    @Ignore
+    
     @Test
     public void testVarargLaunchSrcElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
     }
-    @Ignore
+    
     @Test
     public void testVarargLaunchSinkElement() {
         Pipeline pipeline = Pipeline.launch("fakesrc", "fakesink");
