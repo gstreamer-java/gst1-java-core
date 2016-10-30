@@ -19,25 +19,13 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
 
 /**
  * Force key unit event that forces out key frames
  */
-public class ForceKeyUnit extends Event
-{
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_video_event_new_downstream_force_key_unit(
-                ClockTime timestamp, ClockTime stream_time, ClockTime running_time,
-                boolean all_headers, int count);
-        Pointer ptr_gst_video_event_new_upstream_force_key_unit(
-                ClockTime running_time, boolean all_headers, int count);
-        Pointer ptr_gst_event_new_eos();
-    }
-    private static final API gst = GstNative.load("gstvideo", API.class);
+public class ForceKeyUnit extends Event {
+    private static final GstVideoAPI gst = GstVideoAPI.GSTVIDEO_API;
     
     /**
      * Constructor - used internally!

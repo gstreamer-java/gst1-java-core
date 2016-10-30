@@ -23,21 +23,17 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * A new set of metadata tags has been found in the stream.
  */
 public class TagEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_tag(@Invalidate TagList taglist);
-        void gst_event_parse_tag(Event event, Pointer[] taglist);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

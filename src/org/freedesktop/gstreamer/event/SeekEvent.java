@@ -24,9 +24,7 @@ package org.freedesktop.gstreamer.event;
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.SeekType;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * A request for a new playback position and rate.
@@ -63,14 +61,7 @@ import com.sun.jna.Pointer;
  * current position with a {@link SeekType#SET} to the desired position.
  */
 public class SeekEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_seek(double rate, Format format, int flags,
-            SeekType start_type, long start, SeekType stop_type, long stop);
-        void gst_event_parse_seek(Event event, double[] rate, Format[] format,
-            int[] flags, SeekType[] start_type, long[] start,
-                         SeekType[] stop_type, long[] stop);
-    }
-    private static final API gst = GstNative.load(API.class);
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

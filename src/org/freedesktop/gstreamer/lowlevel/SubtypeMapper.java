@@ -33,7 +33,7 @@ import org.freedesktop.gstreamer.event.FlushStartEvent;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.LatencyEvent;
 import org.freedesktop.gstreamer.event.NavigationEvent;
-import org.freedesktop.gstreamer.event.NewSegmentEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
 import org.freedesktop.gstreamer.event.QOSEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
@@ -90,7 +90,7 @@ class SubtypeMapper {
                 put(EventType.FLUSH_START, FlushStartEvent.class);
                 put(EventType.FLUSH_STOP, FlushStopEvent.class);
                 put(EventType.NAVIGATION, NavigationEvent.class);
-                put(EventType.NEWSEGMENT, NewSegmentEvent.class);
+                put(EventType.SEGMENT, SegmentEvent.class);
                 put(EventType.SEEK, SeekEvent.class);
                 put(EventType.TAG, TagEvent.class);
                 put(EventType.QOS, QOSEvent.class);
