@@ -19,35 +19,34 @@
 
 package org.freedesktop.gstreamer.message;
 
+import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.GstObject;
+import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+
+import com.sun.jna.Pointer;
 
 /**
- * This message is posted by element to provide information to the application.
+ * The duration of a pipeline has changed. The application can get the new 
+ * duration with a duration query.
  */
-public class InfoMessage extends GErrorMessage {
+public class DurationChangedMessage extends Message {
 
     private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
-     * Creates a new info message.
-     * 
+     * Creates a new DurationChanged message.
      * @param init internal initialization data.
      */
-    public InfoMessage(Initializer init) {
+    public DurationChangedMessage(Initializer init) {
         super(init);
     }
     
     /**
-     * Retrieves the GError structure contained in this message.
-     * 
-     * @return the GError contained in this message.
+     * Creates a new DurationChanged Message
      */
-    @Override
-    GErrorStruct parseMessage() {
-        GErrorStruct[] err = { null };
-        gst.gst_message_parse_info(this, err, null);
-        return err[0];
+    public DurationChangedMessage(GstObject src) {
+        this(initializer(gst.ptr_gst_message_new_duration_changed(src)));
     }
 }

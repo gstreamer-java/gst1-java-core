@@ -478,6 +478,8 @@ public final class Gst {
 		BaseTransform.class,
 		Bin.class,
 		Pipeline.class,
-		PlayBin.class
+		PlayBin.class,
+                //
+                TagList.class
 	};
 }

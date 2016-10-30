@@ -38,7 +38,7 @@ import org.freedesktop.gstreamer.event.QOSEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.message.BufferingMessage;
-import org.freedesktop.gstreamer.message.DurationMessage;
+import org.freedesktop.gstreamer.message.DurationChangedMessage;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.ErrorMessage;
 import org.freedesktop.gstreamer.message.InfoMessage;
@@ -113,7 +113,7 @@ class SubtypeMapper {
                 put(MessageType.EOS, EOSMessage.class);
                 put(MessageType.ERROR, ErrorMessage.class);
                 put(MessageType.BUFFERING, BufferingMessage.class);
-                put(MessageType.DURATION, DurationMessage.class);
+                put(MessageType.DURATION_CHANGED, DurationChangedMessage.class);
                 put(MessageType.INFO, InfoMessage.class);
                 put(MessageType.LATENCY, LatencyMessage.class);
                 put(MessageType.SEGMENT_DONE, SegmentDoneMessage.class);
