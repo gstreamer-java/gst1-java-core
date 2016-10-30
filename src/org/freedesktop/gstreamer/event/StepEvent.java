@@ -21,11 +21,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Structure;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * StepEvent. The purpose of the step event is to instruct a sink to skip amount (expressed in format) of media. 
@@ -36,11 +32,8 @@ import com.sun.jna.Pointer;
  * The intermediate flag instructs the pipeline that this step operation is part of a larger step operation.
  */
 public class StepEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-    	Pointer gst_event_new_custom(int type, @Invalidate Structure structure);
-    	Pointer ptr_gst_event_new_step(Format format, long amount, double rate, boolean flush, boolean intermediate);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

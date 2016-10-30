@@ -22,9 +22,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * End-Of-Stream. No more data is to be expected to follow without a {@link NewSegmentEvent}.
@@ -42,10 +40,8 @@ import com.sun.jna.Pointer;
  * forwarded to the application.
  */
 public class EOSEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_eos();
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

@@ -22,9 +22,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * Stop a flush operation.
@@ -42,10 +40,8 @@ import com.sun.jna.Pointer;
  * dataflow.
  */
 public class FlushStopEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_flush_stop();
-    }
-    private static final API gst = GstNative.load(API.class);
+    
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

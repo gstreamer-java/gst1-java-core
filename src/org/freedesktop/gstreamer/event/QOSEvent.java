@@ -23,9 +23,8 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.QOSType;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * A quality message. Used to indicate to upstream elements that the downstream 
@@ -38,11 +37,7 @@ import com.sun.jna.Pointer;
  *
  */
 public class QOSEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_qos(double proportion, long diff, ClockTime timestamp);
-        void gst_event_parse_qos(Event event, double[] proportion, long[] diff, ClockTime[] timestamp);
-    }
-    private static final API gst = GstNative.load(API.class);
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.
@@ -87,8 +82,17 @@ public class QOSEvent extends Event {
      * @param difference the time difference of the last Clock sync
      * @param timestamp the timestamp of the buffer
      */
-    public QOSEvent(double proportion, long difference, ClockTime timestamp) {
-        super(initializer(gst.ptr_gst_event_new_qos(proportion, difference, timestamp)));
+    public QOSEvent(QOSType type, double proportion, long difference, ClockTime timestamp) {
+        super(initializer(gst.ptr_gst_event_new_qos(type, proportion, difference, timestamp)));
+    }
+    
+    /**
+     * @return the proportion.
+     */
+    public QOSType getType() {
+        QOSType[] type = { null };
+        gst.gst_event_parse_qos(this, type, null, null, (ClockTime[]) null);
+        return type[0];
     }
     
     /**
@@ -103,7 +107,7 @@ public class QOSEvent extends Event {
      */
     public double getProportion() {
         double[] p = { 0d };
-        gst.gst_event_parse_qos(this, p, null, null);
+        gst.gst_event_parse_qos(this, null, p, null, (ClockTime[]) null);
         return p[0];
     }
     
@@ -119,7 +123,7 @@ public class QOSEvent extends Event {
      */
     public long getDifference() {
         long[] diff = { 0 };
-        gst.gst_event_parse_qos(this, null, diff, null);
+        gst.gst_event_parse_qos(this, null, null, diff, (ClockTime[]) null);
         return diff[0];
     }
     
@@ -133,7 +137,7 @@ public class QOSEvent extends Event {
      */
     public ClockTime getTimestamp() {
         ClockTime[] timestamp = new ClockTime[1];
-        gst.gst_event_parse_qos(this, null, null, timestamp);
+        gst.gst_event_parse_qos(this, null, null, null, timestamp);
         return timestamp[0];
     }
 }   
