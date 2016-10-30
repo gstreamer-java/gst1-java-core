@@ -177,10 +177,6 @@ public class LowLevelStructureTest {
 
         structs.add(GstBufferAPI.BufferStruct.class);
 
-        structs.add(GstCapsAPI.GPtrArray.class);
-        structs.add(GstCapsAPI.GstCapsStruct.class);
-        structs.add(GstCapsAPI.GstStaticCapsStruct.class);
-
         structs.add(GstColorBalanceAPI.ColorBalanceChannelStruct.class);
 
         structs.add(GstControlSourceAPI.TimedValue.class);
@@ -210,8 +206,6 @@ public class LowLevelStructureTest {
 
         structs.add(GstObjectAPI.GstObjectStruct.class);
         structs.add(GstObjectAPI.GstObjectClass.class);
-
-        structs.add(GstPadTemplateAPI.GstStaticPadTemplate.class);
 
         structs.add(GstQueryAPI.QueryStruct.class);
 

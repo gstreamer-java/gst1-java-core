@@ -24,11 +24,11 @@ import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.PadPresence;
 import org.freedesktop.gstreamer.PadTemplate;
-import org.freedesktop.gstreamer.lowlevel.GstCapsAPI.GstStaticCapsStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.PointerType;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,23 +55,25 @@ public interface GstPadTemplateAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Caps gst_pad_template_get_caps(PadTemplate template);
     void gst_pad_template_pad_created(PadTemplate templ, Pad pad);
     
-    public static final class GstStaticPadTemplate extends com.sun.jna.Structure {
-        public volatile String name_template;
-        public volatile PadDirection direction;
-        public volatile PadPresence presence;
-        public volatile GstStaticCapsStruct static_caps;
-        
-        public GstStaticPadTemplate(Pointer memory) {
-            useMemory(memory);
-            read();
+    public static final class GstStaticPadTemplate extends PointerType {
+
+        public GstStaticPadTemplate() {
         }
 
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{
-                "name_template", "direction", "presence",
-                "static_caps"
-            });
+        public GstStaticPadTemplate(Pointer p) {
+            super(p);
+        }
+        
+        public String getName() {
+            return getPointer().getPointer(0).getString(0);
+        }
+        
+        public PadDirection getPadDirection() {
+            return PadDirection.values()[getPointer().getInt(Pointer.SIZE)];
+        }
+        
+        public PadPresence getPadPresence() {
+            return PadPresence.values()[getPointer().getInt(Pointer.SIZE + 4)];
         }
     }  
     
