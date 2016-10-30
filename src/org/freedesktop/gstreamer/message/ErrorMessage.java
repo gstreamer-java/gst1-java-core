@@ -30,9 +30,8 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
  * receiving this message should stop the pipeline.
  */
 public class ErrorMessage extends GErrorMessage {
-    private static interface API extends GstMessageAPI {
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new error message.

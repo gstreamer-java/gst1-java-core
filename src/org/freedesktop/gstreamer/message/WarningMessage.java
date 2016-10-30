@@ -20,16 +20,14 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
 /**
  * This message is posted by element when a warning notice is required.
  */
 public class WarningMessage extends GErrorMessage {
-    private static interface API extends GstMessageAPI {
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new warning message.

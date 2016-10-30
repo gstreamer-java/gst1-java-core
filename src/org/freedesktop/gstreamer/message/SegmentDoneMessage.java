@@ -23,9 +23,6 @@ import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
 
 /**
  * This message is posted by elements that finish playback of a segment as a 
@@ -35,10 +32,8 @@ import com.sun.jna.Pointer;
  * have posted the segment_done.
  */
 public class SegmentDoneMessage extends Message {
-    private static interface API extends GstMessageAPI {
-    Pointer ptr_gst_message_new_segment_done(GstObject src, Format format, long position);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new segment-done message.

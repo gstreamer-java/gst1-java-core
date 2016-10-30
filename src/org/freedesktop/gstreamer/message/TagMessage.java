@@ -23,20 +23,14 @@ import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
-
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 
 /**
  * This message is posted by elements that have discovered new tags.
  */
 public class TagMessage extends Message {
-    private static interface API extends GstMessageAPI {
-        Pointer ptr_gst_message_new_tag(GstObject src, @Invalidate TagList tag_list);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new Buffering message.

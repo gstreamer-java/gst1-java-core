@@ -31,7 +31,7 @@ import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
 import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
 import org.freedesktop.gstreamer.message.BufferingMessage;
-import org.freedesktop.gstreamer.message.DurationMessage;
+import org.freedesktop.gstreamer.message.DurationChangedMessage;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.LatencyMessage;
 import org.freedesktop.gstreamer.message.SegmentDoneMessage;
@@ -137,22 +137,18 @@ public class MessageTest {
         assertEquals("Wrong percent value in message", PERCENT, ((BufferingMessage) msg).getPercent());
         pipe.dispose();
     }
-    private static final long DURATION = 1234000000;
+
     @Test public void gst_message_new_duration() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_duration(fakesink, Format.TIME, DURATION);
-        assertTrue("gst_message_new_duration did not return an instance of DurationMessage", msg instanceof DurationMessage);
+        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_duration_changed(fakesink);
+        assertTrue("gst_message_new_duration did not return an instance of DurationMessage", msg instanceof DurationChangedMessage);
     }
-    @Test public void DurationMessage_getDuration() {
-        Element fakesink = ElementFactory.make("fakesink", "sink");
-        DurationMessage msg = (DurationMessage)GstMessageAPI.GSTMESSAGE_API.gst_message_new_duration(fakesink, Format.TIME, DURATION);
-        assertEquals("Wrong duration in message", DURATION, msg.getDuration());
-    }
+
     @Test public void postDurationMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
-        pipe.getBus().connect("message::duration", new Bus.MESSAGE() {
+        pipe.getBus().connect("message::duration-changed", new Bus.MESSAGE() {
 
             public void busMessage(Bus bus, Message msg) {
                 signalFired.set(true);
@@ -160,15 +156,13 @@ public class MessageTest {
                 pipe.quit();
             }
         });
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, new DurationMessage(pipe.src, Format.TIME, DURATION));
+        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, new DurationChangedMessage(pipe.src));
         pipe.play().run();
         Message msg = signalMessage.get();
         assertNotNull("No message available on bus", msg);
-        assertEquals("Wrong message type", MessageType.DURATION, msg.getType());
-        assertTrue("Message not instance of EOSMessage", msg instanceof DurationMessage);
+        assertEquals("Wrong message type", MessageType.DURATION_CHANGED, msg.getType());
+        assertTrue("Message not instance of EOSMessage", msg instanceof DurationChangedMessage);
         assertEquals("Wrong source in message", pipe.src, msg.getSource());
-        assertEquals("Wrong duration value in message", DURATION, ((DurationMessage) msg).getDuration());
-        assertEquals("Wrong duration format in message", Format.TIME, ((DurationMessage) msg).getFormat());
         pipe.dispose();
     }
     @Test public void gst_message_new_tag() {
