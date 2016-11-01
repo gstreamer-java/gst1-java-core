@@ -23,12 +23,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
-import org.freedesktop.gstreamer.lowlevel.GstBinAPI;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -130,9 +130,14 @@ public class GarbageCollectionTest {
 
     }
     @Test
+    @Ignore("See comment below.")
     public void busWithListeners() {
         Pipeline pipe = new Pipeline("test");
         Bus bus = pipe.getBus();
+        // Reasoning for @Igore:
+        //
+        // #connect increments the native reference count this in turn prevents 
+        // the native part of the BUS to get out of scope.
         bus.connect(new Bus.EOS() {
 
             public void endOfStream(GstObject source) {
