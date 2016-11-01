@@ -229,7 +229,7 @@ public class ElementFactory extends PluginFeature {
             cls = (Class<Element>)GstTypes.classFor(Element.getType(ptr));
             ElementFactory.typeMap.put(factoryName, cls);
         }
-        return NativeObject.objectFor(ptr, cls);
+        return NativeObject.objectFor(ptr, cls, false);
     }
 
 	/**
