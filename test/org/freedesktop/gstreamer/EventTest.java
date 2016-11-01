@@ -66,14 +66,6 @@ public class EventTest {
         Gst.deinit();
     }
 
-    public boolean waitGC(WeakReference<? extends Object> ref) throws InterruptedException {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 20; ++i) {
-            Thread.sleep(10);
-            System.gc();
-        }
-        return ref.get() == null;
-    }
     @Test public void verifyFlags() {
         // Verify that the flags in the enum match the native ones.
         EventType[] types = EventType.values();
@@ -164,9 +156,9 @@ public class EventTest {
         TagList tl = ev.getTagList();
         WeakReference<Event> evRef = new WeakReference<Event>(ev);
         ev = null;
-        assertFalse("Event ref collected before TagList is unreferenced", waitGC(evRef));
+        assertFalse("Event ref collected before TagList is unreferenced", GCTracker.waitGC(evRef));
         tl = null;
-        assertTrue("Event ref not collected after TagList is unreferenced", waitGC(evRef));
+        assertTrue("Event ref not collected after TagList is unreferenced", GCTracker.waitGC(evRef));
     }
     @Test public void Event_testGC() throws Exception {
         Event ev = new LatencyEvent(ClockTime.NONE);
@@ -174,9 +166,9 @@ public class EventTest {
         Structure s = ev.getStructure();
         WeakReference<Event> evRef = new WeakReference<Event>(ev);
         ev = null;
-        assertFalse("Event ref collected before Structure is unreferenced", waitGC(evRef));
+        assertFalse("Event ref collected before Structure is unreferenced", GCTracker.waitGC(evRef));
         s = null;
-        assertTrue("Event ref not collected after Structure is unreferenced", waitGC(evRef));
+        assertTrue("Event ref not collected after Structure is unreferenced", GCTracker.waitGC(evRef));
     }
     @Test public void gst_event_new_buffer_size() {
         final long MIN = 0x1234;

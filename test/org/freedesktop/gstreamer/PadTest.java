@@ -60,14 +60,6 @@ public class PadTest {
     @After
     public void tearDown() throws Exception {
     }
-    public boolean waitGC(WeakReference<? extends Object> ref) throws InterruptedException {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 100; ++i) {
-            Thread.sleep(10);
-            System.gc();
-        }
-        return ref.get() == null;
-    }
     
     // Does not work yet (<- this comment was here in the 0.10 code)
     @Ignore("Didn't work in the 0.10 either by the comment so still ignored")
@@ -85,8 +77,8 @@ public class PadTest {
         WeakReference<Pad> sinkRef = new WeakReference<Pad>(sinkPad);
         srcPad = null;
         sinkPad = null;
-        assertTrue("Src pad not garbage collected", waitGC(srcRef));
-        assertTrue("Sink pad not garbage collected", waitGC(sinkRef));
+        assertTrue("Src pad not garbage collected", GCTracker.waitGC(srcRef));
+        assertTrue("Sink pad not garbage collected", GCTracker.waitGC(sinkRef));
     }
     @Test
     public void padLink() throws Exception {
