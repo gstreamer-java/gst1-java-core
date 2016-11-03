@@ -24,20 +24,15 @@ package org.freedesktop.gstreamer.event;
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * Navigation events are usually used for communicating user requests, such as 
  * mouse or keyboard movements, to upstream elements.
  */
 public class NavigationEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_navigation(@Invalidate Structure structure);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

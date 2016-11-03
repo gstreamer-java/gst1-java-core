@@ -31,49 +31,22 @@ import com.sun.jna.Pointer;
  * The duration of a pipeline has changed. The application can get the new 
  * duration with a duration query.
  */
-public class DurationMessage extends Message {
-    private static interface API extends GstMessageAPI {
-        Pointer ptr_gst_message_new_duration(GstObject src, Format format, long duration);
-    }
-    private static final API gst = GstNative.load(API.class);
+public class DurationChangedMessage extends Message {
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
-     * Creates a new Buffering message.
+     * Creates a new DurationChanged message.
      * @param init internal initialization data.
      */
-    public DurationMessage(Initializer init) {
+    public DurationChangedMessage(Initializer init) {
         super(init);
     }
     
     /**
-     * Creates a new Buffering message.
-     * @param src the object originating the message.
-     * @param format the format of the duration
-     * @param duration the new duration.
+     * Creates a new DurationChanged Message
      */
-    public DurationMessage(GstObject src, Format format, long duration) {
-        this(initializer(gst.ptr_gst_message_new_duration(src, format, duration)));
-    }
-    
-    /**
-     * Gets the format of the duration contained in this message.
-     * 
-     * @return the format of the duration.
-     */
-    public Format getFormat() {
-        Format[] fmt = new Format[1];
-        gst.gst_message_parse_duration(this, fmt, null);
-        return fmt[0];
-    }
-    
-    /**
-     * Gets the duration of this message.
-     * 
-     * @return the new duration.
-     */
-    public long getDuration() {
-        long[] duration = { 0 };
-        gst.gst_message_parse_duration(this, null, duration);
-        return duration[0];
+    public DurationChangedMessage(GstObject src) {
+        this(initializer(gst.ptr_gst_message_new_duration_changed(src)));
     }
 }

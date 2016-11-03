@@ -94,22 +94,4 @@ public class Message extends MiniObject {
 		return type;
     }
     
-    /**
-     * Gets a writable version of this Message.
-     * 
-     * @return a new Message (possibly a duplicate) that is writable.
-     */
-    public Message makeWritable() {
-        return makeWritable(getClass());
-    }
-    
-    /**
-     * Creates a copy of the message.
-     * 
-     * @return a copy of this message.
-     */
-    public Message copy() {
-        return (Message)gst.gst_mini_object_copy(this);
-    }
-    
 }

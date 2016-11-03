@@ -138,28 +138,20 @@ public class ElementFactoryTest {
         assertTrue("Element not a subclass of Pipeline", e instanceof Pipeline);
         assertTrue("Element not a subclass of PlayBin", e instanceof PlayBin);
     }
-    public boolean waitGC(WeakReference<? extends Object> ref) throws InterruptedException {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 10; ++i) {
-            Thread.sleep(10);
-            System.gc();
-        }
-        return ref.get() == null;
-    }
     @Test
     public void testGarbageCollection() throws Throwable {
         ElementFactory factory = ElementFactory.find("fakesrc");
         assertNotNull("Could not locate fakesrc factory", factory);
         WeakReference<ElementFactory> ref = new WeakReference<ElementFactory>(factory);
         factory = null;
-        assertTrue("Factory not garbage collected", waitGC(ref));
+        assertTrue("Factory not garbage collected", GCTracker.waitGC(ref));
     }
     @Test
     public void testMakeGarbageCollection() throws Throwable {
         Element e = ElementFactory.make("fakesrc", "test");
         WeakReference<Element> ref = new WeakReference<Element>(e);
         e = null;
-        assertTrue("Element not garbage collected", waitGC(ref));
+        assertTrue("Element not garbage collected", GCTracker.waitGC(ref));
         
     }
     @Test
@@ -169,7 +161,7 @@ public class ElementFactoryTest {
         Element e = factory.create("bin");
         WeakReference<Element> ref = new WeakReference<Element>(e);
         e = null;
-        assertTrue("Element not garbage collected", waitGC(ref));
+        assertTrue("Element not garbage collected", GCTracker.waitGC(ref));
     }
     @Test
     public void getStaticPadTemplates() {

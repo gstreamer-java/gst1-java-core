@@ -27,9 +27,8 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
  * This message is posted by element to provide information to the application.
  */
 public class InfoMessage extends GErrorMessage {
-    private static interface API extends GstMessageAPI {
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new info message.

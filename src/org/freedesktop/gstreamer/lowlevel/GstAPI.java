@@ -48,21 +48,43 @@ public interface GstAPI extends Library {
     void gst_deinit();
     
     public static final class GstSegmentStruct extends com.sun.jna.Structure {
+
+        public GstSegmentStruct() {
+        }
+
+        public GstSegmentStruct(Pointer p) {
+            super(p);
+        }
+
+        public GstSegmentStruct(int flags, double rate, double applied_rate, Format format, long base, long offset, long start, long stop, long time, long position, long duration) {
+            this.flags = flags;
+            this.rate = rate;
+            this.applied_rate = applied_rate;
+            this.format = format;
+            this.base = base;
+            this.offset = offset;
+            this.start = start;
+            this.stop = stop;
+            this.time = time;
+            this.position = position;
+            this.duration = duration;
+        }
+        
         /*< public >*/
-        public double rate;
-        public double abs_rate;
-        public Format format;
         public int flags;
+        
+        public double rate;
+        public double applied_rate;
+        
+        public Format format;
+        public long base;
+        public long offset;
         public long start;
         public long stop;
         public long time;
-        public long accum;
 
-        public long last_stop;
+        public long position;
         public long duration;
-
-        /* API added 0.10.6 */
-        public double applied_rate;
 
         /*< private >*/
         public volatile byte[] _gst_reserved = new byte[(Pointer.SIZE * GST_PADDING) - (Double.SIZE / 8)];
@@ -70,10 +92,10 @@ public interface GstAPI extends Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "rate", "abs_rate", "format",
-                "flags", "start", "stop",
-                "time", "accum", "last_stop",
-                "duration", "applied_rate", "_gst_reserved"
+                "flags", "rate", "applied_rate",
+                "format", "base", "offset",
+                "start", "stop", "time",
+                "position", "duration", "_gst_reserved"
             });
         }
     };

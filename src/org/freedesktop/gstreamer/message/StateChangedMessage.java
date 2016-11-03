@@ -23,9 +23,6 @@ import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.State;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
 
 /**
  * A state change message. 
@@ -33,10 +30,8 @@ import com.sun.jna.Pointer;
  * This message is posted whenever an element changes its state.
  */
 public class StateChangedMessage extends Message {
-    private static interface API extends GstMessageAPI {
-        Pointer ptr_gst_message_new_state_changed(GstObject src, State oldstate, State newstate, State pending);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new Buffering message.

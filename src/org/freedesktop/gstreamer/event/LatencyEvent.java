@@ -23,9 +23,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * Notification of new latency adjustment.
@@ -38,11 +36,8 @@ import com.sun.jna.Pointer;
  * the time format.
  */
 public class LatencyEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_latency(ClockTime latency);
-        void gst_event_parse_latency(Event event, ClockTime[] latency);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

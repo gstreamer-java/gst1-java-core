@@ -62,14 +62,7 @@ public class BinTest {
     @After
     public void tearDown() throws Exception {
     }
-    public boolean waitGC(WeakReference<? extends Object> ref) throws InterruptedException {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 20; ++i) {
-            Thread.sleep(10);
-            System.gc();
-        }
-        return ref.get() == null;
-    }
+
     @Test
     public void testGetElements() {
         Bin bin = new Bin("test");

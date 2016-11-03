@@ -1,6 +1,7 @@
-/* 
+/*
+ * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,6 +19,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.sun.jna.FromNativeContext;
 import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
@@ -29,68 +33,83 @@ import com.sun.jna.Native;
 public class GType extends IntegerType {
     /** Size of a native <code>GType</code>, in bytes. */
     public static final int SIZE = Native.SIZE_T_SIZE;
+    private static final int G_TYPE_FUNDAMENTAL_SHIFT = 2;
 
-    private static final GType[] cache;
-    static {
-        cache = new GType[22];
-        for (int i = 0; i < cache.length; ++i) {
-            cache[i] = new GType(i << 2);
-        }        
-    };
+    private interface API extends GObjectAPI {}
+    private static final API gst = GstNative.load(API.class);
+
+    private static final Map<Long, GType> gTypeByValues = new ConcurrentHashMap<Long, GType>();
+    private static final Map<String, GType> gTypeByNames = new ConcurrentHashMap<String, GType>();
     
-    public static final GType INVALID = init(0, "INVALID");
-    public static final GType NONE = init(1, "NONE");
-    public static final GType INTERFACE = init(2, "INTERFACE");
-    public static final GType CHAR = init(3, "CHAR");
-    public static final GType UCHAR = init(4, "UCHAR");
-    public static final GType BOOLEAN = init(5, "BOOLEAN");
-    public static final GType INT = init(6, "INT");
-    public static final GType UINT = init(7, "UINT");
-    public static final GType LONG = init(8, "LONG");
-    public static final GType ULONG = init(9, "ULONG");
-    public static final GType INT64 = init(10, "INT64");
-    public static final GType UINT64 = init(11, "UINT64");
-    public static final GType ENUM = init(12, "ENUM");
-    public static final GType FLAGS = init(13, "FLAGS");
-    public static final GType FLOAT = init(14, "FLOAT");
-    public static final GType DOUBLE = init(15, "DOUBLE");
-    public static final GType STRING = init(16, "STRING");
-    public static final GType POINTER = init(17, "POINTER");
-    public static final GType BOXED = init(18, "BOXED");
-    public static final GType PARAM = init(19, "PARAM");
-    public static final GType OBJECT = init(20, "OBJECT");
-    public static final GType VARIANT = init(21, "VARIANT");
+    public static final GType INVALID = init(0);
+    public static final GType NONE = init(1);
+    public static final GType INTERFACE = init(2);
+    public static final GType CHAR = init(3);
+    public static final GType UCHAR = init(4);
+    public static final GType BOOLEAN = init(5);
+    public static final GType INT = init(6);
+    public static final GType UINT = init(7);
+    public static final GType LONG = init(8);
+    public static final GType ULONG = init(9);
+    public static final GType INT64 = init(10);
+    public static final GType UINT64 = init(11);
+    public static final GType ENUM = init(12);
+    public static final GType FLAGS = init(13);
+    public static final GType FLOAT = init(14);
+    public static final GType DOUBLE = init(15);
+    public static final GType STRING = init(16);
+    public static final GType POINTER = init(17);
+    public static final GType BOXED = init(18);
+    public static final GType PARAM = init(19);
+    public static final GType OBJECT = init(20);
+    public static final GType VARIANT = init(21);
 
-    private final String description;
-
-    private static GType init(int v, String description) {
-        return valueOf(v << 2, description);
+    // descriptions set in lazy
+    private GType parent;
+    private String name;
+    
+    /**
+     * @param value the fundamental type number.
+     * @return the GType
+     */
+    private static GType init(int value) {
+        return valueOf(value << G_TYPE_FUNDAMENTAL_SHIFT);
     }
     
-    public GType(long t, String description) {
+    protected GType(long t) {
     	super(SIZE, t);
-    	this.description = description;
     }
-    
-    public GType(long t) {
-        this(t, "?");
-    }
-    
+
+    /**
+     * Default constructor needed by NativeMappedConverter
+     */
     public GType() {
         this(0L);
     }
-    
+
     public static GType valueOf(long value) {
-    	return valueOf(value, "?");
+    	GType result = gTypeByValues.get(value);
+    	if (result == null) {
+    		gTypeByValues.put(value, result = new GType(value));
+    	}
+    	return result;
+    }
+
+    public static GType valueOf(String typeName) {
+    	GType result = gTypeByNames.get(typeName);
+    	if (result == null) {
+    		result = gst.g_type_from_name(typeName);
+    		if (result.equals(INVALID)) {
+    			// no type has been registered yet
+    		} else {
+        		gTypeByNames.put(typeName, result);
+        		result.name = typeName;
+    		}
+    	}
+    	return result;
     }
     
-    public static GType valueOf(long value, String description) {
-        if (value >= 0 && (value >> 2) < cache.length) {
-            return cache[(int)value >> 2];
-        }
-        return new GType(value, description);
-    }
-    
+    // FIXME : to move in GstTypes
     public static GType valueOf(Class<?> javaType) {
         if (Integer.class == javaType || int.class == javaType) {
             return INT;
@@ -106,13 +125,32 @@ public class GType extends IntegerType {
             throw new IllegalArgumentException("No GType for " + javaType);
         }
     }
-    
+
     @Override
     public Object fromNative(Object nativeValue, FromNativeContext context) {
-        return valueOf(((Number) nativeValue).longValue(), "");
-    }    
+        return GType.valueOf(((Number) nativeValue).longValue());
+    }
+
+    /**
+     * Return the direct parent type of the current type.
+     * @return the direct parent type or INVALID if the type has no parent
+     */
+    public GType getParentType() {
+    	if (this.parent == null) 
+    		this.parent = gst.g_type_parent(this);
+    	return this.parent;
+    }
     
-    public String toString() {
-    	return ("[" + description + ":" + longValue() + "]");
+    public String getTypeName() {
+    	if (this.name == null) {
+    		this.name = gst.g_type_name(this);
+    		gTypeByNames.put(this.name, this);
+    	}
+    	return this.name;    	
+    }
+    
+    @Override
+	public String toString() {
+    	return "[" + this.getTypeName() + ":" + super.longValue() + "]";
     }
 }

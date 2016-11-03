@@ -22,9 +22,6 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
 
 /**
  * This message can be posted by an element that
@@ -39,10 +36,8 @@ import com.sun.jna.Pointer;
  * completed prerolling. 
  */
 public class BufferingMessage extends Message {
-    private static interface API extends GstMessageAPI {
-        Pointer ptr_gst_message_new_buffering(GstObject src, int percent);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
     
     /**
      * Creates a new Buffering message.

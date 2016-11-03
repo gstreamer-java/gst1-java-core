@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -56,22 +57,12 @@ public class GarbageCollectionTest {
     @After
     public void tearDown() throws Exception {
     }
-    
-    public static boolean waitGC(WeakReference<?> ref) {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 10; ++i) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {}
-            System.gc();
-        }
-        return ref.get() == null;
-    }
+
     @Test
     public void testElement() throws Exception {
         
         Element e = ElementFactory.make("fakesrc", "test element");
-        Tracker tracker = new Tracker(e);
+        GCTracker tracker = new GCTracker(e);
         e = null;        
         assertTrue("Element not garbage collected", tracker.waitGC());        
         assertTrue("GObject not destroyed", tracker.waitDestroyed());
@@ -87,14 +78,14 @@ public class GarbageCollectionTest {
         assertEquals("sink not returned", e2, bin.getElementByName("sink"));
         WeakReference<Element> binRef = new WeakReference<Element>(bin);
         bin = null;
-        assertTrue("Bin not garbage collected", waitGC(binRef));
+        assertTrue("Bin not garbage collected", GCTracker.waitGC(binRef));
         WeakReference<Element> e1Ref = new WeakReference<Element>(e1);
         WeakReference<Element> e2Ref = new WeakReference<Element>(e2);
         e1 = null;
         e2 = null;
         
-        assertTrue("First Element not garbage collected", waitGC(e1Ref));
-        assertTrue("Second Element not garbage collected", waitGC(e2Ref));
+        assertTrue("First Element not garbage collected", GCTracker.waitGC(e1Ref));
+        assertTrue("Second Element not garbage collected", GCTracker.waitGC(e2Ref));
         
     }
     @Test
@@ -117,7 +108,7 @@ public class GarbageCollectionTest {
     @Test
     public void pipeline() {
         Pipeline pipe = new Pipeline("test");
-        Tracker pipeTracker = new Tracker(pipe);
+        GCTracker pipeTracker = new GCTracker(pipe);
         pipe = null;
         assertTrue("Pipe not garbage collected", pipeTracker.waitGC());
         System.out.println("checking if pipeline is destroyed");
@@ -127,8 +118,8 @@ public class GarbageCollectionTest {
     public void pipelineBus() {
         Pipeline pipe = new Pipeline("test");
         Bus bus = pipe.getBus();
-        Tracker busTracker = new Tracker(bus);
-        Tracker pipeTracker = new Tracker(pipe);
+        GCTracker busTracker = new GCTracker(bus);
+        GCTracker pipeTracker = new GCTracker(pipe);
         
         pipe = null;
         bus = null;
@@ -139,17 +130,22 @@ public class GarbageCollectionTest {
 
     }
     @Test
+    @Ignore("See comment below.")
     public void busWithListeners() {
         Pipeline pipe = new Pipeline("test");
         Bus bus = pipe.getBus();
+        // Reasoning for @Igore:
+        //
+        // #connect increments the native reference count this in turn prevents 
+        // the native part of the BUS to get out of scope.
         bus.connect(new Bus.EOS() {
 
             public void endOfStream(GstObject source) {
             }
         });
         
-        Tracker busTracker = new Tracker(bus);
-        Tracker pipeTracker = new Tracker(pipe);
+        GCTracker busTracker = new GCTracker(bus);
+        GCTracker pipeTracker = new GCTracker(pipe);
         bus = null;
         pipe = null;
         assertTrue("Bus not garbage collected", busTracker.waitGC());

@@ -23,9 +23,8 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
  * Notification of new latency adjustment.
@@ -38,12 +37,8 @@ import com.sun.jna.Pointer;
  * the time format.
  */
 public class BufferSizeEvent extends Event {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_event_new_buffer_size(Format format, long minsize, long maxsize, boolean async);
-        void gst_event_parse_buffer_size(Event event, Format[] format, long[] minsize,
-						 long[] maxsize, boolean[] async);
-    }
-    private static final API gst = GstNative.load(API.class);
+
+    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.

@@ -33,10 +33,11 @@ import org.freedesktop.gstreamer.event.EOSEvent;
 import org.freedesktop.gstreamer.event.FlushStartEvent;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.LatencyEvent;
-import org.freedesktop.gstreamer.event.NewSegmentEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
 import org.freedesktop.gstreamer.event.QOSEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
+import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.junit.After;
@@ -65,27 +66,12 @@ public class EventTest {
         Gst.deinit();
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-    public boolean waitGC(WeakReference<? extends Object> ref) throws InterruptedException {
-        System.gc();
-        for (int i = 0; ref.get() != null && i < 20; ++i) {
-            Thread.sleep(10);
-            System.gc();
-        }
-        return ref.get() == null;
-    }
     @Test public void verifyFlags() {
         // Verify that the flags in the enum match the native ones.
         EventType[] types = EventType.values();
         for (EventType t : types) {
             int flags = gst.gst_event_type_get_flags(t);
-            assertEquals("Incorrect flags", flags, t.intValue() & 0xf);
+            assertEquals("Incorrect flags for: " + t.name(), flags, t.intValue() & 0xFF);
         }
     }
     @Test public void createEOSEvent() throws Exception {
@@ -101,7 +87,12 @@ public class EventTest {
         new LatencyEvent(ClockTime.ZERO);
     }
     @Test public void createSegmentEvent() throws Exception {
-        new NewSegmentEvent(false, 1.0, Format.TIME, 0L, 0L, 0L);
+        GstAPI.GstSegmentStruct struct = new GstAPI.GstSegmentStruct();
+        struct.flags = SegmentFlags.NONE;
+        struct.rate = 1.0;
+        struct.applied_rate = 1.0;
+        struct.format = Format.TIME;
+        new SegmentEvent(struct);
     }
     @Test public void gst_event_new_eos() {
         Event eos = gst.gst_event_new_eos();
@@ -124,35 +115,35 @@ public class EventTest {
         assertTrue("gst_event_new_latency returned a non-LATENCY event", ev instanceof LatencyEvent);
     }
     @Test public void gst_event_new_new_segment() {
-        Event ev = gst.gst_event_new_new_segment(false, 1.0, Format.TIME, 0L, 0L, 0L);
+        GstAPI.GstSegmentStruct struct = new GstAPI.GstSegmentStruct();
+        struct.flags = SegmentFlags.NONE;
+        struct.rate = 1.0;
+        struct.applied_rate = 1.0;
+        struct.format = Format.TIME;
+        Event ev = gst.gst_event_new_segment(struct);
         assertNotNull("gst_event_new_latency returned null", ev);
-        assertTrue("gst_event_new_latency returned a non-NEWSEGMENT event", ev instanceof NewSegmentEvent);
+        assertTrue("gst_event_new_latency returned a non-NEWSEGMENT event", ev instanceof SegmentEvent);
     }
     @Test public void getLatency() {
         final ClockTime MAGIC = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
         LatencyEvent ev = new LatencyEvent(MAGIC);
         assertEquals("Incorrect latency returned", MAGIC, ev.getLatency());
     }
-    @Test public void NewSegment_isUpdate() {
-        NewSegmentEvent ev = new NewSegmentEvent(false, 1.0, Format.TIME, 0L, 0L, 0L);
-        assertFalse("Segment should not be an update", ev.isUpdate());
-        ev = new NewSegmentEvent(true, 1.0, Format.TIME, 0L, 0L, 0L);
-        assertTrue("Segment should be an update", ev.isUpdate());
-    }
+
     @Test public void NewSegment_getRate() {
         final double RATE = (double) 0xdeadbeef;
-        NewSegmentEvent ev = new NewSegmentEvent(false, RATE, Format.TIME, 0L, 0L, 0L);
-        assertEquals("Incorrect rate returned from getRate", RATE, ev.getRate(), 0.0);
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, RATE, RATE, Format.TIME, 0, 0, 0, 0, 0, 0, 0));
+        assertEquals("Incorrect rate returned from getRate", RATE, ev.getSegment().rate, 0.0);
     }
     @Test public void NewSegment_getStart() {
         final long START = 0xdeadbeefL;
-        NewSegmentEvent ev = new NewSegmentEvent(false, 0.1, Format.TIME, START, -1L, 0L);
-        assertEquals("Incorrect rate returned from getRate", START, ev.getStart());
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, 0.1, 0.1, Format.TIME, 0, 0, START, -1L, 0, 0, 0));
+        assertEquals("Incorrect rate returned from getStart", START, ev.getSegment().start);
     }
     @Test public void NewSegment_getStop() {
         final long STOP = 0xdeadbeefL;
-        NewSegmentEvent ev = new NewSegmentEvent(false, 1.0, Format.TIME, 0L, STOP, 0L);
-        assertEquals("Incorrect rate returned from getRate", STOP, ev.getEnd());
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, 0.1, 0.1, Format.TIME, 0, 0, 0L, STOP, 0, 0, 0));
+        assertEquals("Incorrect rate returned from getRate", STOP, ev.getSegment().stop);
     }
     @Test public void gst_event_new_tag() {
         Event ev = gst.gst_event_new_tag(new TagList());
@@ -165,9 +156,9 @@ public class EventTest {
         TagList tl = ev.getTagList();
         WeakReference<Event> evRef = new WeakReference<Event>(ev);
         ev = null;
-        assertFalse("Event ref collected before TagList is unreferenced", waitGC(evRef));
+        assertFalse("Event ref collected before TagList is unreferenced", GCTracker.waitGC(evRef));
         tl = null;
-        assertTrue("Event ref not collected after TagList is unreferenced", waitGC(evRef));
+        assertTrue("Event ref not collected after TagList is unreferenced", GCTracker.waitGC(evRef));
     }
     @Test public void Event_testGC() throws Exception {
         Event ev = new LatencyEvent(ClockTime.NONE);
@@ -175,9 +166,9 @@ public class EventTest {
         Structure s = ev.getStructure();
         WeakReference<Event> evRef = new WeakReference<Event>(ev);
         ev = null;
-        assertFalse("Event ref collected before Structure is unreferenced", waitGC(evRef));
+        assertFalse("Event ref collected before Structure is unreferenced", GCTracker.waitGC(evRef));
         s = null;
-        assertTrue("Event ref not collected after Structure is unreferenced", waitGC(evRef));
+        assertTrue("Event ref not collected after Structure is unreferenced", GCTracker.waitGC(evRef));
     }
     @Test public void gst_event_new_buffer_size() {
         final long MIN = 0x1234;
@@ -211,25 +202,30 @@ public class EventTest {
         assertEquals("Wrong minimum size stored", !ASYNC, ev2.isAsync());
     }
     @Test public void gst_event_new_qos() {
-        Event ev = gst.gst_event_new_qos(0.0, 0, ClockTime.NONE);
+        Event ev = gst.gst_event_new_qos(QOSType.THROTTLE, 0.0, 0, ClockTime.NONE);
         assertNotNull("gst_event_new_qos returned null", ev);
         assertTrue("gst_event_new_qos returned a non-QOS event", ev instanceof QOSEvent);
     }
     @Test public void QOS_getProportion() {
         final double PROPORTION = (double) 0xdeadbeef;
-        QOSEvent ev = new QOSEvent(PROPORTION, 0, ClockTime.ZERO);
+        QOSEvent ev = new QOSEvent(QOSType.THROTTLE, PROPORTION, 0, ClockTime.ZERO);
         assertEquals("Wrong proportion", PROPORTION, ev.getProportion(), 0d);
     }
-    /*@Test */public void QOS_getDifference() {
-        long DIFF = 0xdeadbeef;
-        
-        QOSEvent ev = new QOSEvent(0.0, DIFF, ClockTime.ZERO);
+    @Test public void QOS_getDifference() {
+        long DIFF = 0x4096;
+        QOSEvent ev = new QOSEvent(QOSType.THROTTLE, 0d, DIFF, ClockTime.ZERO);
         assertEquals("Wrong difference", DIFF, ev.getDifference());
     }
     @Test public void QOS_getTimestamp() {
         final ClockTime STAMP = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
-        QOSEvent ev = new QOSEvent(0d, 0, STAMP);
+        QOSEvent ev = new QOSEvent(QOSType.THROTTLE, 0d, 0, STAMP);
         assertEquals("Wrong timestamp", STAMP, ev.getTimestamp());
+    }
+    @Test
+    public void QOS_getType() {
+        final ClockTime STAMP = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
+        QOSEvent ev = new QOSEvent(QOSType.THROTTLE, 0d, 0, STAMP);
+        assertEquals("Wrong QOSType", QOSType.THROTTLE, ev.getType());
     }
     @Test public void gst_event_new_seek() {
         Event ev = gst.gst_event_new_seek(1.0, Format.TIME, 0, 

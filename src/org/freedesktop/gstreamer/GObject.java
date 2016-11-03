@@ -136,14 +136,23 @@ public abstract class GObject extends RefCountedObject {
      * Gives the type value.
      */
     public GType getType() {
-    	return new GType(new GObjectStruct(this).g_type_instance.g_class.getNativeLong(0).longValue());
+    	return GObject.getType(this.handle());
     }
+
+    public static GType getType(Pointer ptr) {
+    	// Quick getter for GType without allocation
+    	// same as : new GObjectStruct(ptr).g_type_instance.g_class.g_type 
+    	Pointer g_class = ptr.getPointer(0);
+    	return GType.valueOf(g_class.getNativeLong(0).longValue());
+    }
+
     /**
      * Gives the type name.
      */
     public String getTypeName() {
-    	return GOBJECT_API.g_type_name(getType());
+    	return this.getType().getTypeName();
     }
+    
     /**
      * Sets the value of a <tt>GObject</tt> property.
      *

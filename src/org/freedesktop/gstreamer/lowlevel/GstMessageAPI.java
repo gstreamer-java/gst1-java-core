@@ -47,13 +47,14 @@ public interface GstMessageAPI extends com.sun.jna.Library {
 
     public static final class MessageStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
-//        public volatile Pointer lock;
-//        public volatile Pointer cond;
         public volatile MessageType type;
         public volatile long timestamp;
         public volatile GstObject src;
         public volatile int seqnum;
-        
+
+        public volatile Pointer lock;
+        public volatile Pointer cond;
+
         /**
          * Creates a new instance of MessageStruct
          */
@@ -66,9 +67,10 @@ public interface GstMessageAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", // "lock", "cond",
+                "mini_object", 
                 "type", "timestamp", "src",
-                "seqnum"
+                "seqnum",
+                "lock", "cond"
             });
         }
     }
@@ -92,12 +94,16 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     void gst_message_parse_async_start(Message message, boolean[] new_base_time);
     
     @CallerOwnsReturn Message gst_message_new_eos(GstObject src);
+    Pointer ptr_gst_message_new_eos(GstObject src);
     @CallerOwnsReturn Message gst_message_new_error(GstObject src, GErrorStruct error, String debug);
     @CallerOwnsReturn Message gst_message_new_warning(GstObject src, GErrorStruct error, String debug);
     @CallerOwnsReturn Message gst_message_new_info(GstObject src, GErrorStruct error, String debug);
     @CallerOwnsReturn Message gst_message_new_tag(GstObject src, @Invalidate TagList tag_list);
+    Pointer ptr_gst_message_new_tag(GstObject src, @Invalidate TagList tag_list);
     @CallerOwnsReturn Message gst_message_new_buffering(GstObject src, int percent);
+    Pointer ptr_gst_message_new_buffering(GstObject src, int percent);
     @CallerOwnsReturn Message gst_message_new_state_changed(GstObject src, State oldstate, State newstate, State pending);
+    Pointer ptr_gst_message_new_state_changed(GstObject src, State oldstate, State newstate, State pending);
     @CallerOwnsReturn Message gst_message_new_state_dirty(GstObject src);
     @CallerOwnsReturn Message gst_message_new_clock_provide(GstObject src, Clock clock, boolean ready);
     @CallerOwnsReturn Message gst_message_new_clock_lost(GstObject src, Clock clock);
@@ -106,10 +112,13 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Message gst_message_new_element(GstObject src, Structure structure);
     @CallerOwnsReturn Message gst_message_new_segment_start(GstObject src, Format format, long position);
     @CallerOwnsReturn Message gst_message_new_segment_done(GstObject src, Format format, long position);
-    @CallerOwnsReturn Message gst_message_new_duration(GstObject src, Format format, long duration);
+    Pointer ptr_gst_message_new_segment_done(GstObject src, Format format, long position);
+    @CallerOwnsReturn Message gst_message_new_duration_changed(GstObject src);
+    Pointer ptr_gst_message_new_duration_changed(GstObject src);
     @CallerOwnsReturn Message gst_message_new_async_start(GstObject src, boolean new_base_time);
     @CallerOwnsReturn Message gst_message_new_async_done(GstObject src);
     @CallerOwnsReturn Message gst_message_new_latency(GstObject src);
+    Pointer ptr_gst_message_new_latency(GstObject source);
     @CallerOwnsReturn Message gst_message_new_custom(MessageType type, GstObject src, @Invalidate Structure structure);
     @ConstReturn Structure gst_message_get_structure(Message message);
 }
