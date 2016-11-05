@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.elements.PlayBin;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +28,9 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.ElementFactory.ElementFactoryListType;
 import org.freedesktop.gstreamer.PluginFeature.Rank;
+import org.freedesktop.gstreamer.elements.DecodeBin;
+import org.freedesktop.gstreamer.elements.PlayBin;
+import org.freedesktop.gstreamer.elements.URIDecodeBin;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -90,18 +92,32 @@ public class ElementFactoryTest {
     }
     @Test
     public void testMakePipeline() {
-        Element e = ElementFactory.make("pipeline", "bin");
-        assertNotNull("Failed to create pipeline", e);
+        Element e = ElementFactory.make(Pipeline.GST_NAME, "bin");
+        assertNotNull("Failed to create " + Pipeline.GST_NAME, e);
         assertTrue("Element not a subclass of Bin", e instanceof Bin);
         assertTrue("Element not a subclass of Pipeline", e instanceof Pipeline);
     }
     @Test
     public void testMakePlaybin() {
-        Element e = ElementFactory.make("playbin", "bin");
-        assertNotNull("Failed to create playbin", e);
+        Element e = ElementFactory.make(PlayBin.GST_NAME, "bin");
+        assertNotNull("Failed to create " + PlayBin.GST_NAME, e);
         assertTrue("Element not a subclass of Bin", e instanceof Bin);
         assertTrue("Element not a subclass of Pipeline", e instanceof Pipeline);
         assertTrue("Element not a subclass of PlayBin", e instanceof PlayBin);
+    }
+    @Test
+    public void testMakeDecodeBin() {
+        Element e = ElementFactory.make(DecodeBin.GST_NAME, "bin");
+        assertNotNull("Failed to create " + DecodeBin.GST_NAME, e);
+        assertTrue("Element not a subclass of Bin", e instanceof Bin);
+        assertTrue("Element not a subclass of DecodeBin", e instanceof DecodeBin);
+    }
+    @Test
+    public void testMakeURIDecodeBin() {
+        Element e = ElementFactory.make(URIDecodeBin.GST_NAME, "bin");
+        assertNotNull("Failed to create " + URIDecodeBin.GST_NAME, e);
+        assertTrue("Element not a subclass of Bin", e instanceof Bin);
+        assertTrue("Element not a subclass of DecodeBin", e instanceof URIDecodeBin);
     }
     @Test
     public void testCreateFakesrc() {
