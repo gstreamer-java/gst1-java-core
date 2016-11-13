@@ -28,14 +28,18 @@ import org.freedesktop.gstreamer.MessageType;
 import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.QueryType;
 import org.freedesktop.gstreamer.event.BufferSizeEvent;
+import org.freedesktop.gstreamer.event.CapsEvent;
 import org.freedesktop.gstreamer.event.EOSEvent;
 import org.freedesktop.gstreamer.event.FlushStartEvent;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.LatencyEvent;
 import org.freedesktop.gstreamer.event.NavigationEvent;
-import org.freedesktop.gstreamer.event.SegmentEvent;
 import org.freedesktop.gstreamer.event.QOSEvent;
+import org.freedesktop.gstreamer.event.ReconfigureEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
+import org.freedesktop.gstreamer.event.StepEvent;
+import org.freedesktop.gstreamer.event.StreamStartEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.message.BufferingMessage;
 import org.freedesktop.gstreamer.message.DurationChangedMessage;
@@ -86,6 +90,9 @@ class SubtypeMapper {
                 = new HashMap<EventType, Class<? extends Event>>() {{
                 put(EventType.BUFFERSIZE, BufferSizeEvent.class);
                 put(EventType.EOS, EOSEvent.class);
+                put(EventType.CAPS, CapsEvent.class);
+                put(EventType.RECONFIGURE, ReconfigureEvent.class);
+                put(EventType.STREAM_START, StreamStartEvent.class);
                 put(EventType.LATENCY, LatencyEvent.class);
                 put(EventType.FLUSH_START, FlushStartEvent.class);
                 put(EventType.FLUSH_STOP, FlushStopEvent.class);
@@ -94,6 +101,7 @@ class SubtypeMapper {
                 put(EventType.SEEK, SeekEvent.class);
                 put(EventType.TAG, TagEvent.class);
                 put(EventType.QOS, QOSEvent.class);
+                put(EventType.STEP, StepEvent.class);
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstEventAPI.EventStruct struct = new GstEventAPI.EventStruct(ptr);
