@@ -21,7 +21,6 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 
 public class StreamStartEvent extends Event {
@@ -40,6 +39,6 @@ public class StreamStartEvent extends Event {
      * Creates a new EOS event.
      */
     public StreamStartEvent(final String stream_id) {
-        super(NativeObject.initializer(gst.ptr_gst_event_new_stream_start(stream_id)));
+        super(initializer(gst.ptr_gst_event_new_stream_start(stream_id)));
     }
 }

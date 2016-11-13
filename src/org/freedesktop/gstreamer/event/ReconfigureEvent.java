@@ -21,7 +21,6 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 
 public class ReconfigureEvent extends Event {
@@ -40,7 +39,7 @@ public class ReconfigureEvent extends Event {
      * Creates a new reconfigure event.
      */
     public ReconfigureEvent() {
-        super(NativeObject.initializer(gst.ptr_gst_event_new_reconfigure()));
+        super(initializer(gst.ptr_gst_event_new_reconfigure()));
     }
 
 }

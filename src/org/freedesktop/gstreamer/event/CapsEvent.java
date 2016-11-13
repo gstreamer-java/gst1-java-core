@@ -22,7 +22,6 @@ package org.freedesktop.gstreamer.event;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 
 public class CapsEvent extends Event {
@@ -41,6 +40,6 @@ public class CapsEvent extends Event {
      * Creates a new caps event.
      */
     public CapsEvent(final Caps caps) {
-        super(NativeObject.initializer(gst.ptr_gst_event_new_caps(caps)));
+        super(initializer(gst.ptr_gst_event_new_caps(caps)));
     }
 }
