@@ -227,6 +227,8 @@ public class ElementFactory extends PluginFeature {
         Class<? extends Element> cls = ElementFactory.typeMap.get(factoryName);
         if (cls == null) {
             cls = (Class<Element>)GstTypes.classFor(Element.getType(ptr));
+            if (cls == null) cls = Element.class;
+
             ElementFactory.typeMap.put(factoryName, cls);
         }
         return NativeObject.objectFor(ptr, cls, false);
