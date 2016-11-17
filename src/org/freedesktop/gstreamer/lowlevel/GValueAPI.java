@@ -21,7 +21,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
@@ -30,8 +32,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -90,11 +90,16 @@ public interface GValueAPI extends Library {
         }
         
         public GValue() {}
+        
         public GValue(Pointer ptr) {
             useMemory(ptr);
             read();
         }
         
+        public void reset() {
+        	GValueAPI.GVALUE_API.g_value_reset(this);
+        }
+
         private <T> T validateVal(Object val, Class<T> clazz) {
             return validateVal(val, clazz, false);
         }

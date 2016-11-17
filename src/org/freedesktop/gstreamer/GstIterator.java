@@ -25,14 +25,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GstIteratorAPI;
-
-import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
+import org.freedesktop.gstreamer.lowlevel.GstIteratorAPI;
+import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
+
+import com.sun.jna.Pointer;
 
 /**
  *
@@ -78,10 +78,10 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         
         private T getNext() {
             if (gst.gst_iterator_next(handle(), gValue) == 1) {
-                next = (T) gValue.getValue();
+                T result = (T) gValue.getValue();
                 // reset cached structure or we get a memory leak
-                GValueAPI.GVALUE_API.g_value_reset(gValue);
-                return next;
+                gValue.reset();
+                return result;
             } else {
                 return null;
             }
