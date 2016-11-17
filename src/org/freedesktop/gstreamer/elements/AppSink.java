@@ -172,7 +172,7 @@ public class AppSink extends BaseSink {
          *
          * @param elem
          */
-        public FlowReturn newBuffer(AppSink elem);
+        public FlowReturn newSample(AppSink elem);
     }
     /**
      * Adds a listener for the <code>new-buffer</code> signal. If a blocking
@@ -186,7 +186,7 @@ public class AppSink extends BaseSink {
         connect(NEW_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public FlowReturn callback(AppSink elem) {
-                return listener.newBuffer(elem);
+                return listener.newSample(elem);
             }
         });
     }
