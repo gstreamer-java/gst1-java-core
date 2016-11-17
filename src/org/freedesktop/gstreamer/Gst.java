@@ -39,10 +39,12 @@ import org.freedesktop.gstreamer.elements.AppSink;
 import org.freedesktop.gstreamer.elements.AppSrc;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.elements.BaseSrc;
+import org.freedesktop.gstreamer.elements.BaseTransform;
+import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
+import org.freedesktop.gstreamer.elements.URIDecodeBin;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
-import org.freedesktop.gstreamer.interfaces.ColorBalanceChannel;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
@@ -58,7 +60,6 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import org.freedesktop.gstreamer.elements.BaseTransform;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -478,9 +479,11 @@ public final class Gst {
 		BaseSink.class,
 		BaseTransform.class,
 		Bin.class,
+		DecodeBin.class,
 		Pipeline.class,
 		PlayBin.class,
-                //
-                TagList.class
+		URIDecodeBin.class,
+        //
+        TagList.class
 	};
 }
