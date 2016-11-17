@@ -48,7 +48,7 @@ public class GstTypes {
      * Retrieve the class of a GType
      *
      * @param gType The type of Class
-     * @return The Class of the desired type.
+     * @return The Class of the desired type or null.
      */
     public static final Class<? extends NativeObject> classFor(final GType gType) {
     	final String gTypeName = gType.getTypeName();
@@ -61,7 +61,7 @@ public class GstTypes {
 
         // Search for a parent class registration
         GType type = gType.getParentType();
-        while (!type.equals(GType.OBJECT) && !type.equals(GType.INVALID)) {
+        while (!type.equals(GType.OBJECT) && !type.equals(GType.POINTER) && !type.equals(GType.INVALID)) {
            	cls = gtypeNameMap.get(type.getTypeName());
             if (cls != null) {
                 if (GstTypes.logger.isLoggable(Level.FINER)) {
@@ -73,9 +73,8 @@ public class GstTypes {
         	type = type.getParentType();
         }
 
-        // Should never appeared
-        throw new IllegalStateException("Could not find a registered class for " + gType);
-
+        // No registered class found for this gType
+        return null;
     }
 
     public static final GType typeFor(Class<? extends NativeObject> cls) {

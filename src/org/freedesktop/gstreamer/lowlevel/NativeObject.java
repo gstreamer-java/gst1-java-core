@@ -190,7 +190,7 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
 		// exact class match
 		//
         if (gType != null) {
-            cls = NativeObject.classFor(ptr, gType);
+            cls = NativeObject.classFor(ptr, gType, cls);
         }
 
         try {
@@ -213,13 +213,15 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     }
     
     @SuppressWarnings("unchecked")
-    protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType) {
-        Class<? extends NativeObject> cls = GstTypes.classFor(gType);
-
-    	if (cls.isAnnotationPresent(HasSubtype.class)) {
-    		cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
-    	}
-    	return (Class<T>)cls;
+    protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType, final Class<T> defaultClass) {
+        Class<T> cls = (Class<T>)GstTypes.classFor(gType);
+        if (cls == null) cls = defaultClass;
+        
+		if (cls.isAnnotationPresent(HasSubtype.class)) {
+			cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
+		}
+    	
+    	return cls;
     }
     
     @Override
