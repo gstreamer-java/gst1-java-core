@@ -19,10 +19,15 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.EventType;
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.QOSType;
 import org.freedesktop.gstreamer.SeekType;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.TagList;
@@ -31,9 +36,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.List;
-import org.freedesktop.gstreamer.QOSType;
 
 /**
  * GstEvent functions
@@ -45,22 +47,22 @@ public interface GstEventAPI extends com.sun.jna.Library {
     int gst_event_type_get_flags(EventType type);
 
     GType gst_event_get_type();
-    
-    /* custom event */
-    Event gst_event_new_custom(EventType type, @Invalidate Structure structure);
 
     Structure gst_event_get_structure(Event event);
+
+    /* custom event */
+    Event gst_event_new_custom(EventType type, @Invalidate Structure structure);
 
     /* flush events */
     @CallerOwnsReturn Event gst_event_new_flush_start();
     Pointer ptr_gst_event_new_flush_start();
     @CallerOwnsReturn Event gst_event_new_flush_stop();
     Pointer ptr_gst_event_new_flush_stop();
+    
     /* EOS event */
     @CallerOwnsReturn Event gst_event_new_eos();
     Pointer ptr_gst_event_new_eos();
     
-
     /* newsegment events */
     @CallerOwnsReturn Event gst_event_new_segment( GstAPI.GstSegmentStruct segmentStruct );
     Pointer ptr_gst_event_new_segment( GstAPI.GstSegmentStruct segment);            
@@ -72,7 +74,7 @@ public interface GstEventAPI extends com.sun.jna.Library {
     void gst_event_parse_tag(Event event, PointerByReference taglist);
     void gst_event_parse_tag(Event event, Pointer[] taglist);
     
-    /* buffer */
+    /* buffer event */
     @CallerOwnsReturn Event gst_event_new_buffer_size(Format format, long minsize, long maxsize, boolean async);
     Pointer ptr_gst_event_new_buffer_size(Format format, long minsize, long maxsize, boolean async);
     void gst_event_parse_buffer_size(Event event, Format[] format, long[] minsize,
@@ -105,7 +107,21 @@ public interface GstEventAPI extends com.sun.jna.Library {
     void gst_event_parse_latency(Event event, ClockTime[] latency);
     
     /* step event */
+    @CallerOwnsReturn Event gst_event_new_step(Format format, long amount, double rate, boolean flush, boolean intermediate);
     Pointer ptr_gst_event_new_step(Format format, long amount, double rate, boolean flush, boolean intermediate);
+    
+    /* caps event */
+    @CallerOwnsReturn Event gst_event_new_caps(Caps caps);
+    Pointer ptr_gst_event_new_caps(Caps caps);
+    
+    /* reconfigure event */
+    @CallerOwnsReturn Event gst_event_new_reconfigure();
+    Pointer ptr_gst_event_new_reconfigure();
+    
+    /* stream start event */
+    @CallerOwnsReturn Event gst_event_new_stream_start(final String stream_id);
+    Pointer ptr_gst_event_new_stream_start(final String stream_id);
+    
     
     public static final class EventStruct extends com.sun.jna.Structure {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;

@@ -29,20 +29,22 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 import org.freedesktop.gstreamer.event.BufferSizeEvent;
+import org.freedesktop.gstreamer.event.CapsEvent;
 import org.freedesktop.gstreamer.event.EOSEvent;
 import org.freedesktop.gstreamer.event.FlushStartEvent;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.LatencyEvent;
-import org.freedesktop.gstreamer.event.SegmentEvent;
 import org.freedesktop.gstreamer.event.QOSEvent;
+import org.freedesktop.gstreamer.event.ReconfigureEvent;
 import org.freedesktop.gstreamer.event.SeekEvent;
+import org.freedesktop.gstreamer.event.SegmentEvent;
+import org.freedesktop.gstreamer.event.StepEvent;
+import org.freedesktop.gstreamer.event.StreamStartEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -94,6 +96,18 @@ public class EventTest {
         struct.format = Format.TIME;
         new SegmentEvent(struct);
     }
+    @Test public void createCapsEvent() throws Exception {
+        new CapsEvent(Caps.fromString("video/x-raw,format=I420"));
+    }
+    @Test public void createReconfigureEvent() throws Exception {
+        new ReconfigureEvent();
+    }
+    @Test public void createStreamStartEvent() throws Exception {
+        new StreamStartEvent("a stream_id");
+    }
+    @Test public void createStepEvent() throws Exception {
+        new StepEvent(Format.BUFFERS, 1, 1, true, false);
+    }
     @Test public void gst_event_new_eos() {
         Event eos = gst.gst_event_new_eos();
         assertNotNull("gst_event_new_eos returned null", eos);
@@ -129,7 +143,6 @@ public class EventTest {
         LatencyEvent ev = new LatencyEvent(MAGIC);
         assertEquals("Incorrect latency returned", MAGIC, ev.getLatency());
     }
-
     @Test public void NewSegment_getRate() {
         final double RATE = (double) 0xdeadbeef;
         SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, RATE, RATE, Format.TIME, 0, 0, 0, 0, 0, 0, 0));
@@ -274,5 +287,25 @@ public class EventTest {
         } catch (IllegalArgumentException ex) {
             
         }
+    }
+    @Test public void gst_event_new_caps() {
+        Event ev = gst.gst_event_new_caps(Caps.fromString("video/x-raw,format=I420"));
+        assertNotNull("gst_event_new_caps returned null", ev);
+        assertTrue("gst_event_new_caps returned a non-CAPS event", ev instanceof CapsEvent);
+    }
+    @Test public void gst_event_new_reconfigure() {
+        Event ev = gst.gst_event_new_reconfigure();
+        assertNotNull("gst_event_new_reconfigure returned null", ev);
+        assertTrue("gst_event_new_reconfigure returned a non-RECONFIGURE event", ev instanceof ReconfigureEvent);
+    }
+    @Test public void gst_event_new_stream_start() {
+        Event ev = gst.gst_event_new_stream_start("a stream id");
+        assertNotNull("gst_event_new_stream_start returned null", ev);
+        assertTrue("gst_event_new_stream_start returned a non-STREAM-START event", ev instanceof StreamStartEvent);
+    }
+    @Test public void gst_event_new_step() {
+        Event ev = gst.gst_event_new_step(Format.BUFFERS, 1, 1, true, false);
+        assertNotNull("gst_event_new_step returned null", ev);
+        assertTrue("gst_event_new_step returned a non-STEP event", ev instanceof StepEvent);
     }
 }
