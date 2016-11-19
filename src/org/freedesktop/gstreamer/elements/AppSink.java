@@ -175,9 +175,9 @@ public class AppSink extends BaseSink {
         public FlowReturn newSample(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>new-buffer</code> signal. If a blocking
+     * Adds a listener for the <code>new-sample</code> signal. If a blocking
      * behaviour is not desirable, setting the "emit-signals" property to TRUE
-     * will make appsink emit the "new-buffer" and "new-preroll" signals when a
+     * will make appsink emit the "new-sample" and "new-preroll" signals when a
      * buffer can be pulled without blocking.
      *
      * @param listener
