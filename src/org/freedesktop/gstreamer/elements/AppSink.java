@@ -25,6 +25,7 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -181,10 +182,12 @@ public class AppSink extends BaseSink {
      * @param listener
      */
     public void connect(final NEW_SAMPLE listener) {
+
         connect(NEW_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public void callback(AppSink elem) {
+            public FlowReturn callback(AppSink elem) {
                 listener.newBuffer(elem);
+                return FlowReturn.OK;
             }
         });
     }
