@@ -23,22 +23,13 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  * Used for querying the seeking properties of the stream.
  */
 public class SeekingQuery extends Query {
-    private static interface API extends com.sun.jna.Library {
-        Pointer gst_query_new_seeking(Format format);
-        void gst_query_set_seeking(Query query, Format format,
-            boolean seekable, /* gint64 */ long segment_start, /* gint64 */ long segment_end);
-        void gst_query_parse_seeking(Query query, Format[] format,
-            boolean[] seekable, /* gint64 * */ long[] segment_start, /* gint64 * */ long[] segment_end);
-    }
-    private static final API gst = GstNative.load(API.class);
+
     public SeekingQuery(Initializer init) {
         super(init);
     }
@@ -49,7 +40,7 @@ public class SeekingQuery extends Query {
      * @param format the default {@link Format} for the new query.
      */
     public SeekingQuery(Format format) {
-        this(initializer(gst.gst_query_new_seeking(format)));
+        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_seeking(format)));
     }
     
     /**
@@ -61,7 +52,7 @@ public class SeekingQuery extends Query {
      * @param end the end of the segment.
      */
     public void setSeeking(Format format, boolean seekable, long start, long end) {
-        gst.gst_query_set_seeking(this, format, seekable, start, end);
+        GstQueryAPI.GSTQUERY_API.gst_query_set_seeking(this, format, seekable, start, end);
     }
     
     /**
@@ -71,7 +62,7 @@ public class SeekingQuery extends Query {
      */
     public boolean isSeekable() {
         boolean[] value = { false };
-        gst.gst_query_parse_seeking(this, null, value, null, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_seeking(this, null, value, null, null);
         return value[0];
     }
     
@@ -82,7 +73,7 @@ public class SeekingQuery extends Query {
      */
     public Format getFormat() {
         Format[] value = { Format.UNDEFINED };
-        gst.gst_query_parse_seeking(this, value, null, null, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_seeking(this, value, null, null, null);
         return value[0];
     }
     
@@ -93,7 +84,7 @@ public class SeekingQuery extends Query {
      */
     public long getStart() {
         long[] value = { 0 };
-        gst.gst_query_parse_seeking(this, null, null, value, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_seeking(this, null, null, value, null);
         return value[0];
     }
     
@@ -104,7 +95,7 @@ public class SeekingQuery extends Query {
      */
     public long getEnd() {
         long[] value = { 0 };
-        gst.gst_query_parse_seeking(this, null, null, null, value);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_seeking(this, null, null, null, value);
         return value[0];
     }
 }

@@ -22,15 +22,13 @@
 
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Pointer;
+import java.nio.ByteBuffer;
 
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
-import com.sun.jna.Pointer;
-import java.nio.ByteBuffer;
+import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 /**
  * Data-passing buffer type, supporting sub-buffers.
@@ -92,12 +90,6 @@ import java.nio.ByteBuffer;
 public class Buffer extends MiniObject {
     public static final String GTYPE_NAME = "GstBuffer";
 
-    private static interface API extends GstBufferAPI, GstMiniObjectAPI {
-        @CallerOwnsReturn Pointer ptr_gst_buffer_new();
-        @CallerOwnsReturn Pointer ptr_gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
     private final MapInfoStruct mapInfo;
     
     public Buffer(Initializer init) {
@@ -109,7 +101,7 @@ public class Buffer extends MiniObject {
      * Creates a newly allocated buffer without any data.
      */
     public Buffer() {
-        this(initializer(gst.ptr_gst_buffer_new()));
+        this(initializer(GSTBUFFER_API.ptr_gst_buffer_new()));
     }
     
     /**
@@ -126,7 +118,7 @@ public class Buffer extends MiniObject {
     }
     
     private static Pointer allocBuffer(int size) {
-        Pointer ptr = gst.ptr_gst_buffer_new_allocate(null, size, null);
+        Pointer ptr = GSTBUFFER_API.ptr_gst_buffer_new_allocate(null, size, null);
         if (ptr == null) {
             throw new OutOfMemoryError("Could not allocate Buffer of size "+ size);
         }
@@ -139,7 +131,7 @@ public class Buffer extends MiniObject {
 //     * @return the size of the buffer data in bytes.
 //     */
 //    public int getSize() {
-//    	return gst.gst_buffer_get_size(this).intValue();
+//    	return GstBufferAPI.GSTBUFFER_API.gst_buffer_get_size(this).intValue();
 //    }
     
     /**
@@ -149,7 +141,7 @@ public class Buffer extends MiniObject {
      * @return A {@link java.nio.ByteBuffer} that can access this Buffer's data.
      */
     public ByteBuffer map(boolean writeable) {
-        boolean ok = gst.gst_buffer_map(this, mapInfo,
+        boolean ok = GSTBUFFER_API.gst_buffer_map(this, mapInfo,
                 writeable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
         if (ok) {
             return mapInfo.data.getByteBuffer(0, mapInfo.size.intValue());
@@ -159,7 +151,7 @@ public class Buffer extends MiniObject {
     }
     
     public void unmap() {
-        gst.gst_buffer_unmap(this, mapInfo);
+        GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
     }
     
 }

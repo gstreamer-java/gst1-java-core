@@ -20,9 +20,10 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
+
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
  * The standard event types that can be sent in a pipeline.
@@ -166,10 +167,6 @@ public enum EventType implements IntegerEnum {
     CUSTOM_BOTH_OOB(320, Flags.BOTH)
     ;
     
-    private static interface API extends com.sun.jna.Library {
-        String gst_event_type_get_name(EventType type);
-    }
-    private static final API gst = GstNative.load(API.class);
     EventType(int num, int flags) {
         this.value = (num << SHIFT) | flags;
     }
@@ -180,7 +177,7 @@ public enum EventType implements IntegerEnum {
     }
     /** Gets a human-readable name for this value */
     public String getName() {
-        return gst.gst_event_type_get_name(this);
+        return GSTEVENT_API.gst_event_type_get_name(this);
     }
     
     /** Gets the Enum for a native value */

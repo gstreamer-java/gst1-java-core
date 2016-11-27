@@ -22,16 +22,14 @@
 package org.freedesktop.gstreamer;
 import java.util.concurrent.TimeUnit;
 
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstParseAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPipelineAPI;
-import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+
+import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
+import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPipelineAPI.GSTPIPELINE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 
 /**
  * A {@code Pipeline} is a special {@link Bin} used as the toplevel container for
@@ -91,11 +89,6 @@ public class Pipeline extends Bin {
     public static final String GST_NAME = "pipeline";
     public static final String GTYPE_NAME = "GstPipeline";
 
-    private static interface API extends GstElementAPI, GstPipelineAPI, GstParseAPI {
-        @CallerOwnsReturn Pointer ptr_gst_pipeline_new(String name);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
     public Pipeline(Initializer init) { 
         super(init);
     }
@@ -104,7 +97,7 @@ public class Pipeline extends Bin {
      * Creates a new instance of Pipeline with a unique name.
      */
     public Pipeline() {
-        this(initializer(gst.ptr_gst_pipeline_new(null), false));
+        this(initializer(GSTPIPELINE_API.ptr_gst_pipeline_new(null), false));
         initBus();
     }
     
@@ -119,7 +112,7 @@ public class Pipeline extends Bin {
     }
 
 	private static Initializer initializer(String name) {
-		Pointer new_pipeline = gst.ptr_gst_pipeline_new(name);
+		Pointer new_pipeline = GSTPIPELINE_API.ptr_gst_pipeline_new(name);
 		return initializer(new_pipeline, false);
 	}
     
@@ -134,7 +127,7 @@ public class Pipeline extends Bin {
      */
     public static Pipeline launch(String pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = gst.gst_parse_launch(pipelineDecription, err);
+        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -153,7 +146,7 @@ public class Pipeline extends Bin {
      */
     public static Pipeline launch(String... pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = gst.gst_parse_launchv(pipelineDecription, err);
+        Pipeline pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -175,7 +168,7 @@ public class Pipeline extends Bin {
      * @param flush true if automatic flushing is desired, else false.
      */
     public void setAutoFlushBus(boolean flush) {
-        gst.gst_pipeline_set_auto_flush_bus(this, flush);
+        GSTPIPELINE_API.gst_pipeline_set_auto_flush_bus(this, flush);
     }
     
     /**
@@ -184,7 +177,7 @@ public class Pipeline extends Bin {
      * @return true if the pipeline automatically flushes messages.
      */     
     public boolean getAutoFlushBus() {
-        return gst.gst_pipeline_get_auto_flush_bus(this);
+        return GSTPIPELINE_API.gst_pipeline_get_auto_flush_bus(this);
     }
     
     /**
@@ -198,7 +191,7 @@ public class Pipeline extends Bin {
      *
      */
     public boolean setClock(Clock clock) {
-        return gst.gst_pipeline_set_clock(this, clock);
+        return GSTPIPELINE_API.gst_pipeline_set_clock(this, clock);
     }
     
     /**
@@ -207,7 +200,7 @@ public class Pipeline extends Bin {
      * @return The {@link Clock} currently in use.
      */
     public Clock getClock() {
-        return gst.gst_pipeline_get_clock(this);
+        return GSTPIPELINE_API.gst_pipeline_get_clock(this);
     }
     
     /**
@@ -221,7 +214,7 @@ public class Pipeline extends Bin {
      *      
      */
     public void useClock(Clock clock) {
-        gst.gst_pipeline_use_clock(this, clock);
+        GSTPIPELINE_API.gst_pipeline_use_clock(this, clock);
     }
     
     /**
@@ -231,7 +224,7 @@ public class Pipeline extends Bin {
      */
     @Override
     public Bus getBus() {
-        return gst.gst_pipeline_get_bus(this);
+        return GSTPIPELINE_API.gst_pipeline_get_bus(this);
     }
     
     /**
@@ -301,7 +294,7 @@ public class Pipeline extends Bin {
     public boolean seek(double rate, Format format, int flags,
             SeekType startType, long start, SeekType stopType, long stop) {
         
-        return gst.gst_element_seek(this, rate, format, flags, 
+        return GSTELEMENT_API.gst_element_seek(this, rate, format, flags, 
             startType, start, stopType, stop);
     }
     
@@ -332,7 +325,7 @@ public class Pipeline extends Bin {
      */
     public long queryPosition(Format format) {
         long[] pos = { 0 };
-        return gst.gst_element_query_position(this, format, pos) ? pos[0] : -1L;
+        return GSTELEMENT_API.gst_element_query_position(this, format, pos) ? pos[0] : -1L;
     }
     
     /**
@@ -362,7 +355,7 @@ public class Pipeline extends Bin {
      */
     public long queryDuration(Format format) {
         long[] dur = { 0 };
-        return gst.gst_element_query_duration(this, format, dur) ? dur[0] : -1L;
+        return GSTELEMENT_API.gst_element_query_duration(this, format, dur) ? dur[0] : -1L;
     }
 
     /**
@@ -381,13 +374,13 @@ public class Pipeline extends Bin {
      * @return The information regarding the current {@code Segment}.
      */
     public Segment querySegment(Format format) {
-        Query qry = GstQueryAPI.GSTQUERY_API.gst_query_new_segment(format);
-        gst.gst_element_query(this, qry);
+        Query qry = GSTQUERY_API.gst_query_new_segment(format);
+        GSTELEMENT_API.gst_element_query(this, qry);
         double[] rate = { 0.0D };
         Format[] fmt = { Format.UNDEFINED };
         long[] start_value = { 0 };
         long[] stop_value = { 0 };
-        GstQueryAPI.GSTQUERY_API.gst_query_parse_segment(qry, rate, fmt, start_value, stop_value);
+        GSTQUERY_API.gst_query_parse_segment(qry, rate, fmt, start_value, stop_value);
         return new Segment(rate[0], fmt[0], start_value[0], stop_value[0]);
     }
 }

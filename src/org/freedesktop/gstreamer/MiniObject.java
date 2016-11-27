@@ -21,13 +21,13 @@
 
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Pointer;
+
 import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 
 /**
  * Lightweight base class for the GStreamer object hierarchy
@@ -38,7 +38,6 @@ import com.sun.jna.Pointer;
  * It has no properties and no signal-support though.
  */
 public class MiniObject extends RefCountedObject {
-    private static final GstMiniObjectAPI gst = GstNative.load(GstMiniObjectAPI.class);
     /**
      * Creates a new instance of MiniObject
      */
@@ -64,7 +63,7 @@ public class MiniObject extends RefCountedObject {
      * @return true if the object is writable.
      */
     public boolean isWritable() {
-        return gst.gst_mini_object_is_writable(this);
+        return GSTMINIOBJECT_API.gst_mini_object_is_writable(this);
     }
 
     /**
@@ -74,7 +73,7 @@ public class MiniObject extends RefCountedObject {
      * @return a writable version (possibly a duplicate) of this MiniObject.
      */
     protected <T extends MiniObject> T makeWritable() {
-        MiniObject result = gst.gst_mini_object_make_writable(this);
+        MiniObject result = GSTMINIOBJECT_API.gst_mini_object_make_writable(this);
         if (result == null) {
             throw new NullPointerException("Could not make " + this.getClass().getSimpleName() + " writable");
         }
@@ -87,7 +86,7 @@ public class MiniObject extends RefCountedObject {
      * @return the new MiniObject.
      */
     public <T extends MiniObject> T copy() {
-    	MiniObject result = gst.gst_mini_object_copy(this);
+    	MiniObject result = GSTMINIOBJECT_API.gst_mini_object_copy(this);
         if (result == null) {
             throw new NullPointerException("Could not make a copy of " + this.getClass().getSimpleName());
         }
@@ -96,12 +95,12 @@ public class MiniObject extends RefCountedObject {
 
     @Override
 	protected void ref() {
-        gst.gst_mini_object_ref(this);
+        GSTMINIOBJECT_API.gst_mini_object_ref(this);
     }
     
     @Override
 	protected void unref() {
-    	gst.gst_mini_object_unref(this);
+    	GSTMINIOBJECT_API.gst_mini_object_unref(this);
     }
 
     public int getRefCount() {
@@ -112,7 +111,7 @@ public class MiniObject extends RefCountedObject {
     @Override
 	protected void disposeNativeHandle(Pointer ptr) {
     	if (ownsHandle.get()) {
-    		gst.gst_mini_object_unref(ptr);
+    		GSTMINIOBJECT_API.gst_mini_object_unref(ptr);
     	}
     }    
 }

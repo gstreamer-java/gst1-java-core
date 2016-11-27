@@ -16,30 +16,21 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstDateTimeAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+import com.sun.jna.Pointer;
+
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstDateTimeAPI.GSTDATETIME_API;
 
 /**
  */
 public class DateTime extends NativeObject {
-	public static final String GTYPE_NAME = "GstDateTime";
+    public static final String GTYPE_NAME = "GstDateTime";
 
-	private static final GstDateTimeAPI gst = GstNative.load(GstDateTimeAPI.class);
-    
     public static DateTime createInstanceLocalEpoch(long secs) {
-    	return new DateTime(gst.gst_date_time_new_from_unix_epoch_local_time(secs), false, true);
+    	return new DateTime(GSTDATETIME_API.gst_date_time_new_from_unix_epoch_local_time(secs), false, true);
     }
-/*	@CallerOwnsReturn DateTime gst_date_time_new_from_unix_epoch_utc(long secs);
-	@CallerOwnsReturn DateTime gst_date_time_new_local_time(int year, 
-			int month, int day, int hour, int minute, double seconds);
-	@CallerOwnsReturn DateTime gst_date_time_new(float tzoffset, int year, 
-			int month, int day, int hour, int minute, double seconds);
-	@CallerOwnsReturn DateTime gst_date_time_new_now_local_time();
-	@CallerOwnsReturn DateTime gst_date_time_new_now_utc();*/
-    
+
     public DateTime(Initializer init) {
         super(init); 
     }
@@ -49,7 +40,7 @@ public class DateTime extends NativeObject {
 
     @Override
     protected void disposeNativeHandle(Pointer ptr) {
-    	gst.gst_date_time_unref(ptr);
+    	GSTDATETIME_API.gst_date_time_unref(ptr);
     }
     
 }

@@ -17,10 +17,11 @@
  */
 
 package org.freedesktop.gstreamer;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+
+import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 
 /**
  * Base query type
@@ -29,11 +30,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 public class Query extends MiniObject {
     public static final String GTYPE_NAME = "GstQuery";
 
-    private static interface API extends com.sun.jna.Library, GstMiniObjectAPI {
-        Structure gst_query_get_structure(Query query);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
     /**
      * Internally used constructor.  Do not use.
      * 
@@ -49,7 +45,7 @@ public class Query extends MiniObject {
      * @return The structure of this Query.
      */
     public Structure getStructure() {
-        return ReferenceManager.addKeepAliveReference(gst.gst_query_get_structure(this), this);
+        return ReferenceManager.addKeepAliveReference(GSTQUERY_API.gst_query_get_structure(this), this);
     }
     
 }

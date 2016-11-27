@@ -20,9 +20,9 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  * Base class for ERROR, WARNING and INFO messages.
@@ -49,7 +49,7 @@ abstract public class GErrorMessage extends Message {
             throw new NullPointerException("Could not parse message");
         }
         int code = err.code;
-        GlibAPI.GLIB_API.g_error_free(err);
+        GLIB_API.g_error_free(err);
         return code;
     }
     
@@ -64,7 +64,7 @@ abstract public class GErrorMessage extends Message {
             throw new NullPointerException("Could not parse message");
         }
         String message = err.getMessage();
-        GlibAPI.GLIB_API.g_error_free(err);
+        GLIB_API.g_error_free(err);
         return message;
     }
 

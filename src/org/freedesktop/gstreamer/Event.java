@@ -18,9 +18,10 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
  * Base type of all events.
@@ -42,10 +43,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 public class Event extends MiniObject {
     public static final String GTYPE_NAME = "GstEvent";
 
-    private static interface API extends com.sun.jna.Library {
-        Structure gst_event_get_structure(Event event);
-    }
-    private static final API gst = GstNative.load(API.class);
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
@@ -60,6 +57,6 @@ public class Event extends MiniObject {
      * @return a structure.
      */
     public Structure getStructure() {
-    	return ReferenceManager.addKeepAliveReference(gst.gst_event_get_structure(this), this);
+    	return ReferenceManager.addKeepAliveReference(GSTEVENT_API.gst_event_get_structure(this), this);
     }
 }

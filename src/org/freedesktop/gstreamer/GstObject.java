@@ -27,10 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstObjectAPI;
-
 import com.sun.jna.Pointer;
+
+import static org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GSTOBJECT_API;
 
 /**
  * Base class for the GStreamer object hierarchy
@@ -43,8 +42,6 @@ import com.sun.jna.Pointer;
 public class GstObject extends GObject {
     private static Logger logger = Logger.getLogger(GstObject.class.getName());
 
-    private static final GstObjectAPI gst = GstNative.load(GstObjectAPI.class);
-    
     /**
      * Wraps an underlying C GstObject with a Java proxy
      * 
@@ -90,7 +87,7 @@ public class GstObject extends GObject {
      */
     public boolean setName(String name) {
         logger.entering("GstObject", "setName", name);
-        return gst.gst_object_set_name(this, name);
+        return GSTOBJECT_API.gst_object_set_name(this, name);
     }
     
     /**
@@ -102,7 +99,7 @@ public class GstObject extends GObject {
      */
     public String getName() {
         logger.entering("GstObject", "getName");
-        return gst.gst_object_get_name(this);
+        return GSTOBJECT_API.gst_object_get_name(this);
     }
     
     @Override
@@ -110,19 +107,19 @@ public class GstObject extends GObject {
         return String.format("%s: [%s]", getClass().getSimpleName(), getName());
     }
     protected void ref() {
-        gst.gst_object_ref(this);
+        GSTOBJECT_API.gst_object_ref(this);
     }
     protected void unref() {
-        gst.gst_object_unref(this);
+        GSTOBJECT_API.gst_object_unref(this);
     }
     
     @Override
     protected void sink() {
-        gst.gst_object_ref_sink(this);
+        GSTOBJECT_API.gst_object_ref_sink(this);
     }
     
     public GstObject getParent() {
-    	return gst.gst_object_get_parent(this);
+    	return GSTOBJECT_API.gst_object_get_parent(this);
     }
     
     /**

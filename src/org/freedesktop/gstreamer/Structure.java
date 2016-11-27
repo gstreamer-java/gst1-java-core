@@ -19,16 +19,15 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstStructureAPI;
-import org.freedesktop.gstreamer.lowlevel.GstValueAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
+
+import static org.freedesktop.gstreamer.lowlevel.GstStructureAPI.GSTSTRUCTURE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
 
 /**
  * Generic structure containing fields of names and values.
@@ -55,14 +54,7 @@ import com.sun.jna.ptr.PointerByReference;
  * @see Event
  */
 public class Structure extends NativeObject {
-    private static interface API extends GstStructureAPI, GstValueAPI {
-        @CallerOwnsReturn Pointer ptr_gst_structure_from_string(String data, PointerByReference end);
-        @CallerOwnsReturn Pointer ptr_gst_structure_new_empty(String name);
-        @CallerOwnsReturn Pointer ptr_gst_structure_new(String name, String firstField, Object... args);
-        void gst_structure_free(Pointer ptr);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
+
     /**
      * Creates a new instance of Structure
      */
@@ -80,7 +72,7 @@ public class Structure extends NativeObject {
      * @param name The name of new structure.
      */
     public Structure(String name) {
-        this(gst.ptr_gst_structure_new_empty(name));
+        this(GSTSTRUCTURE_API.ptr_gst_structure_new_empty(name));
     }
 
     /**
@@ -94,7 +86,7 @@ public class Structure extends NativeObject {
      * @param data Additional arguments.
      */
     public Structure(String name, String firstFieldName, Object... data) {
-        this(gst.ptr_gst_structure_new(name, firstFieldName, data));
+        this(GSTSTRUCTURE_API.ptr_gst_structure_new(name, firstFieldName, data));
     }
 
     /**
@@ -104,11 +96,11 @@ public class Structure extends NativeObject {
      * @return A new Structure or null when the string could not be parsed.
      */
     public static Structure fromString(String data) {
-        return new Structure(gst.ptr_gst_structure_from_string(data, new PointerByReference()));
+        return new Structure(GSTSTRUCTURE_API.ptr_gst_structure_from_string(data, new PointerByReference()));
     }
 
     public Structure copy() {
-        return gst.gst_structure_copy(this);
+        return GSTSTRUCTURE_API.gst_structure_copy(this);
     }
 
     public class InvalidFieldException extends RuntimeException {
@@ -126,7 +118,7 @@ public class Structure extends NativeObject {
      * @return field as ValueList
      */
     public ValueList getValueList(String fieldName) {
-    	GValue val = gst.gst_structure_get_value(this, fieldName);
+    	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
     	if (val == null) {
     		throw new InvalidFieldException("ValueList", fieldName);        	
     	}
@@ -134,7 +126,7 @@ public class Structure extends NativeObject {
 	}
     
     public Object getValue(String fieldName) {
-    	GValue val = gst.gst_structure_get_value(this, fieldName);
+    	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
     	
     	if (val == null) {
     		throw new InvalidFieldException("Object", fieldName);        	
@@ -145,7 +137,7 @@ public class Structure extends NativeObject {
     
     public int getInteger(String fieldName) {
         int[] val = { 0 };
-        if (!gst.gst_structure_get_int(this, fieldName, val)) {
+        if (!GSTSTRUCTURE_API.gst_structure_get_int(this, fieldName, val)) {
             throw new InvalidFieldException("integer", fieldName);
         }
         return val[0];
@@ -155,7 +147,7 @@ public class Structure extends NativeObject {
     }
     public double getDouble(String fieldName) {
         double[] val = { 0d };
-        if (!gst.gst_structure_get_double(this, fieldName, val)) {
+        if (!GSTSTRUCTURE_API.gst_structure_get_double(this, fieldName, val)) {
             throw new InvalidFieldException("double", fieldName);
         }
         return val[0];
@@ -164,7 +156,7 @@ public class Structure extends NativeObject {
     	return getValueList(fieldName).getDouble(i);
     }
     public String getString(String fieldName) {
-        return gst.gst_structure_get_string(this, fieldName);
+        return GSTSTRUCTURE_API.gst_structure_get_string(this, fieldName);
     }
     public String getString(String fieldName, int i) {
     	return getValueList(fieldName).getString(i);
@@ -176,7 +168,7 @@ public class Structure extends NativeObject {
      */
     public boolean getBoolean(String fieldName) {
         int[] val = { 0 };
-        if (!gst.gst_structure_get_boolean(this, fieldName, val)) {
+        if (!GSTSTRUCTURE_API.gst_structure_get_boolean(this, fieldName, val)) {
             throw new InvalidFieldException("boolean", fieldName);
         }
         return val[0] != 0;
@@ -187,7 +179,7 @@ public class Structure extends NativeObject {
     public Fraction getFraction(String fieldName) {
         int[] numerator = { 0 };
         int[] denominator = { 0 };
-        if (!gst.gst_structure_get_fraction(this, fieldName, numerator, denominator)) {
+        if (!GSTSTRUCTURE_API.gst_structure_get_fraction(this, fieldName, numerator, denominator)) {
             throw new InvalidFieldException("fraction", fieldName);
         }
         return new Fraction(numerator[0], denominator[0]);
@@ -199,7 +191,7 @@ public class Structure extends NativeObject {
      */
     public int getFourcc(String fieldName) {
     	int[] val = { 0 };
-        if (!gst.gst_structure_get_fourcc(this, fieldName, val)) {
+        if (!GSTSTRUCTURE_API.gst_structure_get_fourcc(this, fieldName, val)) {
             throw new InvalidFieldException("FOURCC", fieldName);
         }
         return val[0];    	
@@ -221,7 +213,7 @@ public class Structure extends NativeObject {
      * @return field as Range
      */
     public Range getRange(String fieldName) {
-    	GValue val = gst.gst_structure_get_value(this, fieldName);
+    	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
         if (val == null) {
             throw new InvalidFieldException("Range", fieldName);        	
         }
@@ -229,7 +221,7 @@ public class Structure extends NativeObject {
     }
 
     public boolean fixateNearestInteger(String field, Integer value) {
-        return gst.gst_structure_fixate_field_nearest_int(this, field, value);
+        return GSTSTRUCTURE_API.gst_structure_fixate_field_nearest_int(this, field, value);
     }
     
     /**
@@ -239,33 +231,33 @@ public class Structure extends NativeObject {
      * @param value the value to set for the field.
      */
     public void setInteger(String field, Integer value) {
-        gst.gst_structure_set(this, field, GType.INT, value);
+        GSTSTRUCTURE_API.gst_structure_set(this, field, GType.INT, value);
     }
         
     public void setValue(String field, GType type, Object value) {
-    	gst.gst_structure_set(this, field, type, value);
+    	GSTSTRUCTURE_API.gst_structure_set(this, field, type, value);
     }
         
     public void setDouble(String field, Double value) {
-        gst.gst_structure_set(this, field, GType.DOUBLE, value);
+        GSTSTRUCTURE_API.gst_structure_set(this, field, GType.DOUBLE, value);
     }
 
     public void setPointer(String field, Pointer value) {
-        gst.gst_structure_set(this, field, GType.POINTER, value);
+        GSTSTRUCTURE_API.gst_structure_set(this, field, GType.POINTER, value);
     }
 
     public void setIntegerRange(String field, Integer min, Integer max) {
-        gst.gst_structure_set(this, field, 
-                gst.gst_int_range_get_type(), min, max);
+        GSTSTRUCTURE_API.gst_structure_set(this, field, 
+                GSTVALUE_API.gst_int_range_get_type(), min, max);
     }
     public void setDoubleRange(String field, Double min, Double max) {
-        gst.gst_structure_set(this, field, 
-                gst.gst_double_range_get_type(), min, max);
+        GSTSTRUCTURE_API.gst_structure_set(this, field, 
+                GSTVALUE_API.gst_double_range_get_type(), min, max);
     }
 
     public void setFraction(String field, Integer numerator, Integer denominator) {
-        gst.gst_structure_set(this, field,
-                gst.gst_fraction_get_type(), numerator, denominator);
+        GSTSTRUCTURE_API.gst_structure_set(this, field,
+                GSTVALUE_API.gst_fraction_get_type(), numerator, denominator);
     }
     
     /**
@@ -274,7 +266,7 @@ public class Structure extends NativeObject {
      * @return The name of the structure.
      */
     public String getName() {
-        return gst.gst_structure_get_name(this);
+        return GSTSTRUCTURE_API.gst_structure_get_name(this);
     }
     
     /**
@@ -286,7 +278,7 @@ public class Structure extends NativeObject {
      * @param name The new name of the structure.
      */
     public void setName(String name) {
-        gst.gst_structure_set_name(this, name);
+        GSTSTRUCTURE_API.gst_structure_set_name(this, name);
     }
     
     /**
@@ -296,7 +288,7 @@ public class Structure extends NativeObject {
      * @return true if @name matches the name of the structure.
      */
     public boolean hasName(String name) {
-        return gst.gst_structure_has_name(this, name);
+        return GSTSTRUCTURE_API.gst_structure_has_name(this, name);
     }
     /**
      * Check if the {@link Structure} contains a field named fieldName.
@@ -305,7 +297,7 @@ public class Structure extends NativeObject {
      * @return true if the structure contains a field with the given name.
      */
     public boolean hasField(String fieldName) {
-        return gst.gst_structure_has_field(this, fieldName);
+        return GSTSTRUCTURE_API.gst_structure_has_field(this, fieldName);
     }
 
     /**
@@ -314,7 +306,7 @@ public class Structure extends NativeObject {
      * @return the structure's filed number.
      */
     public int getFields() {
-        return gst.gst_structure_n_fields(this);
+        return GSTSTRUCTURE_API.gst_structure_n_fields(this);
     }
     
     /**
@@ -325,7 +317,7 @@ public class Structure extends NativeObject {
      * @return true if the structure contains a field named fieldName and of type fieldType
      */
     public boolean hasField(String fieldName, GType fieldType) {
-        return gst.gst_structure_has_field_typed(this, fieldName, fieldType);
+        return GSTSTRUCTURE_API.gst_structure_has_field_typed(this, fieldName, fieldType);
     }
     
     /**
@@ -336,7 +328,7 @@ public class Structure extends NativeObject {
      * @return true if the structure contains a field named fieldName and of type fieldType
      */
     public boolean hasField(String fieldName, Class<?> fieldType) {
-        return gst.gst_structure_has_field_typed(this, fieldName, GType.valueOf(fieldType));
+        return GSTSTRUCTURE_API.gst_structure_has_field_typed(this, fieldName, GType.valueOf(fieldType));
     }
     
     /**
@@ -365,7 +357,7 @@ public class Structure extends NativeObject {
      * @param fieldName The name of the field to remove.
      */
     public void removeField(String fieldName) {
-        gst.gst_structure_remove_field(this, fieldName);
+        GSTSTRUCTURE_API.gst_structure_remove_field(this, fieldName);
     }
     
     /**
@@ -375,7 +367,7 @@ public class Structure extends NativeObject {
      * @param fieldNames A list of field names to remove.
      */
     public void removeFields(String... fieldNames) {
-        gst.gst_structure_remove_fields(this, fieldNames);
+        GSTSTRUCTURE_API.gst_structure_remove_fields(this, fieldNames);
     }
     
     /**
@@ -384,19 +376,19 @@ public class Structure extends NativeObject {
      * @return The name of the structure.
      */
     public String getName(int i) {
-        return gst.gst_structure_nth_field_name(this, i);
+        return GSTSTRUCTURE_API.gst_structure_nth_field_name(this, i);
     }
     
     @Override
     public String toString() {
-        return gst.gst_structure_to_string(this);
+        return GSTSTRUCTURE_API.gst_structure_to_string(this);
     }
     public static Structure objectFor(Pointer ptr, boolean needRef, boolean ownsHandle) {
         return NativeObject.objectFor(ptr, Structure.class, needRef, ownsHandle);
     }
     //--------------------------------------------------------------------------
     protected void disposeNativeHandle(Pointer ptr) {
-        gst.gst_structure_free(ptr);
+        GSTSTRUCTURE_API.gst_structure_free(ptr);
     }
     
 }

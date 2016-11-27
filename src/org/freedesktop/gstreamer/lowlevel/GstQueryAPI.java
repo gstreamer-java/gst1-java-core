@@ -42,16 +42,19 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 
     /* position query */
     @CallerOwnsReturn Query gst_query_new_position(Format format);
+    @CallerOwnsReturn Pointer ptr_gst_query_new_position(Format format);
     void gst_query_set_position(Query query, Format format, /* gint64 */ long cur);
     void gst_query_parse_position(Query query, Format[] format, /* gint64 * */ long[] cur);
 
     /* duration query */
     @CallerOwnsReturn Query gst_query_new_duration(Format format);
+    @CallerOwnsReturn Pointer ptr_gst_query_new_duration(Format format);
     void gst_query_set_duration(Query query, Format format, /* gint64 */ long duration);
     void gst_query_parse_duration(Query query, /* Format **/ Format[] format, /* gint64 * */ long[] duration);
 
     /* latency query */
     @CallerOwnsReturn Query gst_query_new_latency();
+    @CallerOwnsReturn Pointer ptr_gst_query_new_latency();
     void gst_query_set_latency(Query query, boolean live, ClockTime min_latency,
          ClockTime max_latency);
     void gst_query_parse_latency(Query query, boolean[] live, ClockTime[] min_latency, 
@@ -59,12 +62,14 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 
     /* convert query */
     @CallerOwnsReturn Query gst_query_new_convert(Format src_format, /* gint64 */ long value, Format dest_format);
+    @CallerOwnsReturn Pointer ptr_gst_query_new_convert(Format src_format, /* gint64 */ long value, Format dest_format);
     void gst_query_set_convert(Query query, Format src_format, /* gint64 */ long src_value,
 						 Format dest_format, /* gint64 */ long dest_value);
     void gst_query_parse_convert(Query query, Format[] src_format, /*gint64 **/ long[] src_value,
 						 Format[] dest_format, /*gint64 **/ long[] dest_value);
     /* segment query */
     @CallerOwnsReturn Query gst_query_new_segment(Format format);
+    @CallerOwnsReturn Pointer ptr_gst_query_new_segment(Format format);
     void gst_query_set_segment(Query query, double rate, Format format,
          /* gint64 */ long start_value, /* gint64 */ long stop_value);
     void gst_query_parse_segment(Query query, double[] rate, Format[] format,
@@ -74,6 +79,7 @@ public interface GstQueryAPI extends com.sun.jna.Library {
 
     /* seeking query */
     @CallerOwnsReturn Query gst_query_new_seeking(Format format);
+    @CallerOwnsReturn Pointer ptr_gst_query_new_seeking(Format format);
     void gst_query_set_seeking(Query query, Format format,
         boolean seekable, /* gint64 */ long segment_start, /* gint64 */ long segment_end);
     void gst_query_parse_seeking(Query query, Format[] format,

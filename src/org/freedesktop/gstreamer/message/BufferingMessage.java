@@ -21,7 +21,7 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * This message can be posted by an element that
@@ -37,8 +37,6 @@ import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
  */
 public class BufferingMessage extends Message {
 
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new Buffering message.
      * @param init internal initialization data.
@@ -52,7 +50,7 @@ public class BufferingMessage extends Message {
      * @param src The object originating the message.
      */
     public BufferingMessage(GstObject src, int percent) {
-        this(initializer(gst.ptr_gst_message_new_buffering(src, percent)));
+        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_buffering(src, percent)));
     }
     
     /**
@@ -62,7 +60,7 @@ public class BufferingMessage extends Message {
      */
     public int getPercent() {
         int[] percent = { 0 };
-        gst.gst_message_parse_buffering(this, percent);
+        GSTMESSAGE_API.gst_message_parse_buffering(this, percent);
         return percent[0];
     }
 }

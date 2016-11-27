@@ -19,17 +19,14 @@
 
 package org.freedesktop.gstreamer.message;
 
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * This message is posted by element to provide information to the application.
  */
 public class InfoMessage extends GErrorMessage {
 
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new info message.
      * 
@@ -47,7 +44,7 @@ public class InfoMessage extends GErrorMessage {
     @Override
     GErrorStruct parseMessage() {
         GErrorStruct[] err = { null };
-        gst.gst_message_parse_info(this, err, null);
+        GSTMESSAGE_API.gst_message_parse_info(this, err, null);
         return err[0];
     }
 }

@@ -20,10 +20,10 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
+
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * Lightweight objects to signal the occurrence of pipeline events.
@@ -52,8 +52,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 public class Message extends MiniObject {
     public static final String GTYPE_NAME = "GstMessage";
 
-    static interface API extends GstMessageAPI, GstMiniObjectAPI {}
-    static final API gst = GstNative.load(API.class);
     protected GstMessageAPI.MessageStruct messageStruct;
     
     /**
@@ -81,7 +79,7 @@ public class Message extends MiniObject {
      * @return a structure.
      */
     public Structure getStructure() {
-        return ReferenceManager.addKeepAliveReference(gst.gst_message_get_structure(this), this);
+        return ReferenceManager.addKeepAliveReference(GSTMESSAGE_API.gst_message_get_structure(this), this);
     }
     
     /**

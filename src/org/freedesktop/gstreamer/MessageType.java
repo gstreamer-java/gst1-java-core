@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * The different message types that are available.
@@ -215,8 +215,6 @@ public enum MessageType implements IntegerEnum {
     
     MessageType(int type) {
         this.type = type;
-        GstMessageAPI messageAPI = GstNative.load(GstMessageAPI.class);
-        this.name = messageAPI.gst_message_type_get_name(this);
     }
     
     /**
@@ -234,6 +232,9 @@ public enum MessageType implements IntegerEnum {
      * @return the name of the message type.
      */
     public String getName() {
+        if(name == null) {
+            name = GSTMESSAGE_API.gst_message_type_get_name(this);
+        }
         return name;
     }
     
@@ -258,7 +259,7 @@ public enum MessageType implements IntegerEnum {
         return type != null ? type : UNKNOWN;
     }
     private final int type;
-    private final String name;
+    private String name;
     private static final class MapHolder {
         private static final Map<String, MessageType> typeMap = new HashMap<String, MessageType>();
         static {

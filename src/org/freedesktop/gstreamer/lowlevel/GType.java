@@ -26,6 +26,8 @@ import com.sun.jna.FromNativeContext;
 import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
 
+import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+
 /**
  *
  */
@@ -34,9 +36,6 @@ public class GType extends IntegerType {
     /** Size of a native <code>GType</code>, in bytes. */
     public static final int SIZE = Native.SIZE_T_SIZE;
     private static final int G_TYPE_FUNDAMENTAL_SHIFT = 2;
-
-    private interface API extends GObjectAPI {}
-    private static final API gst = GstNative.load(API.class);
 
     private static final Map<Long, GType> gTypeByValues = new ConcurrentHashMap<Long, GType>();
     private static final Map<String, GType> gTypeByNames = new ConcurrentHashMap<String, GType>();
@@ -98,7 +97,7 @@ public class GType extends IntegerType {
     public static GType valueOf(String typeName) {
     	GType result = gTypeByNames.get(typeName);
     	if (result == null) {
-    		result = gst.g_type_from_name(typeName);
+    		result = GOBJECT_API.g_type_from_name(typeName);
     		if (result.equals(INVALID)) {
     			// no type has been registered yet
     		} else {
@@ -137,13 +136,13 @@ public class GType extends IntegerType {
      */
     public GType getParentType() {
     	if (this.parent == null) 
-    		this.parent = gst.g_type_parent(this);
+    		this.parent = GOBJECT_API.g_type_parent(this);
     	return this.parent;
     }
     
     public String getTypeName() {
     	if (this.name == null) {
-    		this.name = gst.g_type_name(this);
+    		this.name = GOBJECT_API.g_type_name(this);
     		gTypeByNames.put(this.name, this);
     	}
     	return this.name;    	

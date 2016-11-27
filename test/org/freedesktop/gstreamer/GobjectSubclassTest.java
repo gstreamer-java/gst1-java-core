@@ -21,8 +21,6 @@ package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.lowlevel.BaseSrcAPI;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GClassInitFunc;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GInstanceInitFunc;
@@ -37,14 +35,14 @@ import com.sun.jna.Pointer;
 
 import static org.junit.Assert.assertEquals;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
 
 /**
  *
  * @author wayne
  */
 public class GobjectSubclassTest {
-    private static final GstPadTemplateAPI gst = GstNative.load(GstPadTemplateAPI.class);
-    
+
     public GobjectSubclassTest() {
     }
 
@@ -80,7 +78,7 @@ public class GobjectSubclassTest {
         final GObjectAPI.GBaseInitFunc baseInit = new GObjectAPI.GBaseInitFunc() {
 
             public void callback(Pointer g_class) {
-                gst.gst_element_class_add_pad_template(g_class, template);                    
+                GSTPADTEMPLATE_API.gst_element_class_add_pad_template(g_class, template);                    
             }
         };
         final boolean[] instanceInitCalled  = { false };

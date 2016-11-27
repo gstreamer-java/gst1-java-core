@@ -20,6 +20,8 @@
 
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Pointer;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,19 +29,15 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
-import org.freedesktop.gstreamer.lowlevel.GstIteratorAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstIteratorAPI.GSTITERATOR_API;
 
 /**
  *
  */
 class GstIterator<T extends NativeObject> extends NativeObject implements java.lang.Iterable<T> {
-    private static final GstIteratorAPI gst = GstNative.load(GstIteratorAPI.class);
-
     private final GType gtype;
     
     GstIterator(Pointer ptr, Class<T> cls) {
@@ -54,7 +52,7 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
     
     @Override
     protected void disposeNativeHandle(Pointer ptr) {
-        gst.gst_iterator_free(ptr);
+        GSTITERATOR_API.gst_iterator_free(ptr);
     }
     
     public List<T> asList() {
@@ -77,7 +75,7 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         }
         
         private T getNext() {
-            if (gst.gst_iterator_next(handle(), gValue) == 1) {
+            if (GSTITERATOR_API.gst_iterator_next(handle(), gValue) == 1) {
                 T result = (T) gValue.getValue();
                 // reset cached structure or we get a memory leak
                 gValue.reset();
