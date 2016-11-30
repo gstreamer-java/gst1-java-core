@@ -22,7 +22,6 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.lowlevel.GstCapsAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 
 import com.sun.jna.Pointer;
 
@@ -61,7 +60,7 @@ import com.sun.jna.Pointer;
 public class Caps extends MiniObject {
     public static final String GTYPE_NAME = "GstCaps";
     
-    private static final GstCapsAPI gst = GstNative.load(GstCapsAPI.class);
+    private static final GstCapsAPI gst = GstCapsAPI.GSTCAPS_API;
     
     /**
      * Creates a new Caps that is empty.  
@@ -149,7 +148,8 @@ public class Caps extends MiniObject {
      *
      * @return The new Caps.
      */
-    public Caps copy() {
+    @SuppressWarnings("unchecked")
+	public Caps copy() {
         return gst.gst_caps_copy(this);
     }
     
@@ -399,4 +399,5 @@ public class Caps extends MiniObject {
         }
         return other == this || isEqual((Caps) other);
     }
+    
 }
