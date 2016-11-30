@@ -35,14 +35,44 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import org.freedesktop.gstreamer.elements.AacParse;
+import org.freedesktop.gstreamer.elements.AlsaSink;
+import org.freedesktop.gstreamer.elements.AlsaSrc;
 import org.freedesktop.gstreamer.elements.AppSink;
 import org.freedesktop.gstreamer.elements.AppSrc;
+import org.freedesktop.gstreamer.elements.AutoAudioSink;
+import org.freedesktop.gstreamer.elements.AutoVideoSink;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.elements.BaseSrc;
 import org.freedesktop.gstreamer.elements.BaseTransform;
+import org.freedesktop.gstreamer.elements.CapsSetter;
 import org.freedesktop.gstreamer.elements.DecodeBin;
+import org.freedesktop.gstreamer.elements.FakeSink;
+import org.freedesktop.gstreamer.elements.FlvDemux;
+import org.freedesktop.gstreamer.elements.FlvMux;
+import org.freedesktop.gstreamer.elements.GlImageSink;
+import org.freedesktop.gstreamer.elements.H264Parse;
 import org.freedesktop.gstreamer.elements.PlayBin;
+import org.freedesktop.gstreamer.elements.Queue;
+import org.freedesktop.gstreamer.elements.RtmpSink;
+import org.freedesktop.gstreamer.elements.RtmpSrc;
+import org.freedesktop.gstreamer.elements.RtpBin;
+import org.freedesktop.gstreamer.elements.RtpH264Depay;
+import org.freedesktop.gstreamer.elements.RtpH264Pay;
+import org.freedesktop.gstreamer.elements.RtpMp4gDepay;
+import org.freedesktop.gstreamer.elements.RtpMp4gPay;
+import org.freedesktop.gstreamer.elements.RtpPcmuDepay;
+import org.freedesktop.gstreamer.elements.RtpPcmuPay;
+import org.freedesktop.gstreamer.elements.SpeexEnc;
+import org.freedesktop.gstreamer.elements.TypeFind;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
+import org.freedesktop.gstreamer.elements.UdpSink;
+import org.freedesktop.gstreamer.elements.UdpSrc;
+import org.freedesktop.gstreamer.elements.V4l2Src;
+import org.freedesktop.gstreamer.elements.Volume;
+import org.freedesktop.gstreamer.elements.WebRtcDsp;
+import org.freedesktop.gstreamer.elements.X264Enc;
+import org.freedesktop.gstreamer.elements.XvImageSink;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
@@ -473,16 +503,46 @@ public final class Gst {
 		Registry.class,
         Sample.class,
 		// ----------- Elements -------------
+        AacParse.class,
+        AlsaSink.class,
+        AlsaSrc.class,
 		AppSink.class,
 		AppSrc.class,
+		AutoAudioSink.class,
+		AutoVideoSink.class,
 		BaseSrc.class,
 		BaseSink.class,
 		BaseTransform.class,
 		Bin.class,
+		CapsSetter.class,
 		DecodeBin.class,
+		FakeSink.class,
+		FlvDemux.class,
+		FlvMux.class,
+		GlImageSink.class,
+		H264Parse.class,
 		Pipeline.class,
 		PlayBin.class,
+		Queue.class,
+		RtmpSink.class,
+		RtmpSrc.class,
+		RtpBin.class,
+		RtpH264Depay.class,
+		RtpH264Pay.class,
+		RtpMp4gDepay.class,
+		RtpMp4gPay.class,
+		RtpPcmuPay.class,
+		RtpPcmuDepay.class,
+		SpeexEnc.class,
+		TypeFind.class,
+		UdpSink.class,
+		UdpSrc.class,
 		URIDecodeBin.class,
+		V4l2Src.class,
+		WebRtcDsp.class,
+		X264Enc.class,
+		XvImageSink.class,
+		Volume.class,
         //
         TagList.class
 	};

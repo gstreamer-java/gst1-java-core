@@ -266,7 +266,7 @@ public class Bin extends Element {
      */
     public void debugToDotFile(int details, String fileName, boolean timestampFileName) {
     	if (timestampFileName)
-    		gst._gst_debug_bin_to_dot_file_with_ts(this, details, fileName);
+    		gst.gst_debug_bin_to_dot_file_with_ts(this, details, fileName);
     	else 
     		gst.gst_debug_bin_to_dot_file(this, details, fileName);	
     }

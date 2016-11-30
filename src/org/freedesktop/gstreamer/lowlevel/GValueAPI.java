@@ -162,6 +162,12 @@ public interface GValueAPI extends Library {
             } else if (g_type.equals(GType.STRING)) { return toJavaString();
 //            } else if (g_type.equals(GType.OBJECT)) { return toObject();
             } else if (g_type.equals(GType.POINTER)) { return toPointer();
+            } else if (g_type.getParentType().equals(GType.BOXED)) {
+                Class<? extends NativeObject> cls = GstTypes.classFor(g_type);
+                if (cls != null) {
+                    Pointer ptr = GVALUE_API.g_value_get_boxed(this);
+                    return NativeObject.objectFor(ptr, cls, -1, true);
+                }
             }
             return GVALUE_API.g_value_get_object(this);
         }

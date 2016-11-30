@@ -84,6 +84,11 @@
             <artifactId>jna</artifactId>
             <version>4.1.0</version>
         </dependency>
+        <dependency>
+        	<groupId>es.scio.libs.commons</groupId>
+        	<artifactId>commons-string</artifactId>
+        	<version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -134,7 +139,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.13</version>
                 <configuration>
-                    <!--<skipTests>true</skipTests>-->
+                    <skipTests>true</skipTests>
                     <forkMode>pertest</forkMode>
                     <argLine>-Djna.nosys=true ${maven.test.jvmargs}</argLine>
                     <excludes>

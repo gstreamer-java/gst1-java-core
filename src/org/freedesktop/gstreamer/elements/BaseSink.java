@@ -53,6 +53,13 @@ public class BaseSink extends Element {
     public boolean isSync() {
         return gst().gst_base_sink_get_sync(this);
     }
+    public void setASync(boolean async) {
+    	gst().gst_base_sink_set_async_enabled(this,async);
+    }
+    public boolean isASync() {
+        return gst().gst_base_sink_is_async_enabled(this);
+    }
+
     public void setMaximumLateness(long lateness, TimeUnit units) {
     	gst().gst_base_sink_set_max_lateness(this, units.toNanos(lateness));
     }
