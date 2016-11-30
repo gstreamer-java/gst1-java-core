@@ -279,7 +279,13 @@ public abstract class GObject extends RefCountedObject {
      *
      * @return A java value representing the <tt>GObject</tt> property value.
      */
-    public Object get(String property) {
+    @SuppressWarnings("unchecked")
+	public <R extends Object> R get(String property) {
+    	return (R) getRawValue(property);
+    }
+    
+    
+    private Object getRawValue(String property) {
         logger.entering("GObject", "get", new Object[] { property });
         GObjectAPI.GParamSpec propertySpec = findProperty(property);
         if (propertySpec == null) {
