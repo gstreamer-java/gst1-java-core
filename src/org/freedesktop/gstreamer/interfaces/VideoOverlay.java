@@ -129,7 +129,7 @@ public class VideoOverlay extends GstInterface {
      * @param width
      * @param height
      */
-    public boolean setRenderRectangle(VideoOverlay overlay, int x, int y, int width, int height) {
+    public boolean setRenderRectangle(int x, int y, int width, int height) {
     	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
     }
 }
