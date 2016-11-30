@@ -5,3 +5,7 @@
 *.war
 *.ear
 /target/
+/.settings/
+/hs_err_*.log
+/.classpath
+/.project
