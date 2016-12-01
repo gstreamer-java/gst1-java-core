@@ -42,4 +42,9 @@ public class CapsEvent extends Event {
     public CapsEvent(final Caps caps) {
         super(initializer(gst.ptr_gst_event_new_caps(caps)));
     }
+    
+    
+    public Caps getCaps() {
+    	return (Caps) getStructure().getValue("caps");
+    }
 }
