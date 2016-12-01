@@ -1,8 +1,31 @@
-gstreamer1.x-java
-=================
+GStreamer 1.x Java Core (gst1-java-core)
+========================================
 
-This is a version of gstreamer-java mostly compatible with gstreamer 1.0/1.2.
+This is an unofficial set of Java bindings for [GStreamer 1.x][gstreamer], an open-source 
+multimedia framework. The bindings are a fork of the original [GStreamer-Java][gstreamer-java]
+bindings for GStreamer 0.10. 
 
-Originally this code was taken from https://code.google.com/p/gstreamer-java/.
+These bindings are still under development. They are now mostly functional, but there has
+not yet been a formal first release. Check under [releases][gst1-releases] for latest
+test binaries, or build from source.
 
-This code is generally working well for creating elements and simple pipelines.  However certain parts of the code base haven't been fully ported so certain capabilities do not yet work.  There is no official list of what is working or not and please do not get upset if you application crashes.
+The bindings have been tested on Linux, Windows and OSX. You will need to have GStreamer 1.x
+available in your path in order to use the bindings. Windows and OSX downloads of GStreamer are
+available from the GStreamer project itself.
+
+You will also need the [JNA (Java Native Access)][jna] library.
+
+See the examples repository for usage. More documentation will follow. Please use the
+[GStreamer-Java Google Group][gstreamer-java-group] to discuss usage or ask questions.
+
+Please note: this is not an easy-to-use multimedia framework for beginners. It currently
+requires people to both know the Java language and be familiar with the GStreamer framework
+(or be prepared to apply things from tutorials on GStreamer programming in other languages
+(e.g. python or C#) to the Java bindings).
+
+
+[gstreamer]: https://gstreamer.freedesktop.org/
+[gstreamer-java]: https://github.com/gstreamer-java/gstreamer-java
+[gst1-releases]: https://github.com/gstreamer-java/gst1-java-core/releases
+[gstreamer-java-group]: https://groups.google.com/forum/#!forum/gstreamer-java
+[jna]: https://github.com/java-native-access/jna
