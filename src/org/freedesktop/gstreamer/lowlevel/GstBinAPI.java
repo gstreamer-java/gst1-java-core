@@ -52,6 +52,6 @@ public interface GstBinAPI extends com.sun.jna.Library {
 
     //Debugging
     void gst_debug_bin_to_dot_file (Bin bin, int details, String file_name);
-    void _gst_debug_bin_to_dot_file_with_ts (Bin bin, int details, String file_name);
+    void gst_debug_bin_to_dot_file_with_ts (Bin bin, int details, String file_name);
     
 }
