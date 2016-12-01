@@ -22,14 +22,15 @@
 
 package org.freedesktop.gstreamer.interfaces;
 
+import static org.freedesktop.gstreamer.lowlevel.GstVideoOverlayAPI.GSTVIDEOOVERLAY_API;
+
+import org.freedesktop.gstreamer.BusSyncReply;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.Message;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Platform;
-
-import static org.freedesktop.gstreamer.lowlevel.GstVideoOverlayAPI.GSTVIDEOOVERLAY_API;
 
 /**
  * Interface for elements providing tuner operations
@@ -123,13 +124,36 @@ public class VideoOverlay extends GstInterface {
      * This method is needed for non fullscreen video overlay in UI toolkits 
      * that do not support subwindows.
      * 
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
+    public boolean setRenderRectangle(int x, int y, int width, int height) {
+    	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
+    }
+    
+    /**
+     * Configure a subregion as a video target within the window set by 
+     * {@link #setWindowHandle(long)}. If this is not used or not supported 
+     * the video will fill the area of the window set as the overlay to 100%. 
+     * By specifying the rectangle, the video can be overlayed to a specific 
+     * region of that window only. After setting the new rectangle one should 
+     * call {@link #expose()} to force a redraw. To unset the region pass -1 
+     * for the width and height parameters.
+     * 
+     * This method is needed for non fullscreen video overlay in UI toolkits 
+     * that do not support subwindows.
+     * 
      * @param overlay
      * @param x
      * @param y
      * @param width
      * @param height
      */
+    @Deprecated
     public boolean setRenderRectangle(VideoOverlay overlay, int x, int y, int width, int height) {
     	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
     }
+
 }
