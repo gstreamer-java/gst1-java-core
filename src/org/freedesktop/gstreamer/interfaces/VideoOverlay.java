@@ -123,13 +123,12 @@ public class VideoOverlay extends GstInterface {
      * This method is needed for non fullscreen video overlay in UI toolkits 
      * that do not support subwindows.
      * 
-     * @param overlay
      * @param x
      * @param y
      * @param width
      * @param height
      */
-    public boolean setRenderRectangle(VideoOverlay overlay, int x, int y, int width, int height) {
+    public boolean setRenderRectangle(int x, int y, int width, int height) {
     	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
     }
 }
