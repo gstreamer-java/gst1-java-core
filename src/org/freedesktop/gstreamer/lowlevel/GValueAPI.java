@@ -166,7 +166,7 @@ public interface GValueAPI extends Library {
                 Class<? extends NativeObject> cls = GstTypes.classFor(g_type);
                 if (cls != null) {
                     Pointer ptr = GVALUE_API.g_value_get_boxed(this);
-                    return NativeObject.objectFor(ptr, cls, -1, true);
+                    return NativeObject.objectFor(ptr, cls, 1, true);
                 }
             }
             return GVALUE_API.g_value_get_object(this);        
