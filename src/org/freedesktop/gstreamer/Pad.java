@@ -22,13 +22,13 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
 import com.sun.jna.Pointer;
+
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
+import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
+
+import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
 
 /**
  * Object contained by elements that allows links to other elements.
@@ -70,12 +70,6 @@ import com.sun.jna.Pointer;
 public class Pad extends GstObject {
     public static final String GTYPE_NAME = "GstPad";
 
-    private static interface API extends GstPadAPI {
-        @CallerOwnsReturn Pointer ptr_gst_pad_new(String name, PadDirection direction);
-        @CallerOwnsReturn Pointer ptr_gst_pad_new_from_template(PadTemplate templ, String name);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
     /**
      * Creates a new instance of Pad
      */
@@ -91,7 +85,7 @@ public class Pad extends GstObject {
      * @param direction The direction of the new pad.
      */
     public Pad(String name, PadDirection direction) {
-        this(initializer(gst.ptr_gst_pad_new(name, direction)));
+        this(initializer(GSTPAD_API.ptr_gst_pad_new(name, direction)));
     }
     
     /**
@@ -104,7 +98,7 @@ public class Pad extends GstObject {
      * @param name The name of the new pad.
      */
     public Pad(PadTemplate template, String name) {
-        this(initializer(gst.ptr_gst_pad_new_from_template(template, name)));
+        this(initializer(GSTPAD_API.ptr_gst_pad_new_from_template(template, name)));
     }
     
     /**
@@ -119,7 +113,7 @@ public class Pad extends GstObject {
      * @return a newly allocated copy of the {@link Caps} of this pad.
      */
     public Caps getCaps() {
-        return gst.gst_pad_query_caps(this, null);
+        return GSTPAD_API.gst_pad_query_caps(this, null);
     }
     
     /**
@@ -136,7 +130,7 @@ public class Pad extends GstObject {
      * or bad parameters were provided to this function.
      */
     public boolean setCaps(Caps caps) {
-        return gst.gst_pad_set_caps(this, caps);
+        return GSTPAD_API.gst_pad_set_caps(this, caps);
     }
     
     /**
@@ -149,7 +143,7 @@ public class Pad extends GstObject {
      * @return The allowed {@link Caps} of the pad link, or null if this pad has no peer.
      */
     public Caps getAllowedCaps() {
-        return gst.gst_pad_get_allowed_caps(this);
+        return GSTPAD_API.gst_pad_get_allowed_caps(this);
     }
     
     /**
@@ -166,7 +160,7 @@ public class Pad extends GstObject {
      * 
      */
     public Caps getNegotiatedCaps() {
-        return gst.gst_pad_get_current_caps(this);
+        return GSTPAD_API.gst_pad_get_current_caps(this);
     }
     
     /**
@@ -176,7 +170,7 @@ public class Pad extends GstObject {
      * @return The peer Pad of this Pad.
      */
     public Pad getPeer() {
-        return gst.gst_pad_get_peer(this);
+        return GSTPAD_API.gst_pad_get_peer(this);
     }
     /**
      * Get the capabilities of the peer connected to this pad.
@@ -184,7 +178,7 @@ public class Pad extends GstObject {
      * @return the {@link Caps} of the peer pad, or null if there is no peer pad.
      */
     public Caps getPeerCaps() {
-        return gst.gst_pad_peer_get_caps(this);
+        return GSTPAD_API.gst_pad_peer_get_caps(this);
     }
     
     /**
@@ -194,7 +188,7 @@ public class Pad extends GstObject {
      * @return true if the pad can accept the caps.
      */
     public boolean acceptCaps(Caps caps) {
-        return gst.gst_pad_query_accept_caps(this, caps);
+        return GSTPAD_API.gst_pad_query_accept_caps(this, caps);
     }
     
     /**
@@ -205,7 +199,7 @@ public class Pad extends GstObject {
      * @return true if the peer pad can accept the caps or this pad no peer.
      */
     public boolean peerAcceptCaps(Caps caps) {
-        return gst.gst_pad_peer_accept_caps(this, caps);
+        return GSTPAD_API.gst_pad_peer_accept_caps(this, caps);
     }
     
     /**
@@ -216,7 +210,7 @@ public class Pad extends GstObject {
      * @return A result code indicating if the connection worked or what went wrong.
      */
     public PadLinkReturn link(Pad pad) {
-        return gst.gst_pad_link(this, pad);
+        return GSTPAD_API.gst_pad_link(this, pad);
     }
     
     /**
@@ -231,7 +225,7 @@ public class Pad extends GstObject {
      * the pads were not linked together.
      */
     public boolean unlink(Pad pad) {
-        return gst.gst_pad_unlink(this, pad);
+        return GSTPAD_API.gst_pad_unlink(this, pad);
     }
     
     /**
@@ -240,7 +234,7 @@ public class Pad extends GstObject {
      * @return true if the pad is linked, else false.
      */
     public boolean isLinked() {
-        return gst.gst_pad_is_linked(this);
+        return GSTPAD_API.gst_pad_is_linked(this);
     }
     
     /**
@@ -251,7 +245,7 @@ public class Pad extends GstObject {
      * @return The {@link PadDirection} of the pad.
      */
     public PadDirection getDirection() {
-        return gst.gst_pad_get_direction(this);
+        return GSTPAD_API.gst_pad_get_direction(this);
     }
     
     /**
@@ -261,7 +255,7 @@ public class Pad extends GstObject {
      * @return The parent of the pad.
      */
     public Element getParentElement() {
-        return gst.gst_pad_get_parent_element(this);
+        return GSTPAD_API.gst_pad_get_parent_element(this);
     }
     
     /**
@@ -280,7 +274,7 @@ public class Pad extends GstObject {
      * @return true if the operation was successful.
      */
     public boolean setActive(boolean active) {
-        return gst.gst_pad_set_active(this, active);
+        return GSTPAD_API.gst_pad_set_active(this, active);
     }
          
     /**
@@ -291,7 +285,7 @@ public class Pad extends GstObject {
      * @return true if the pad is blocked.
      */
     public boolean isBlocked() {
-        return gst.gst_pad_is_blocked(this);
+        return GSTPAD_API.gst_pad_is_blocked(this);
     }
     
     /**
@@ -318,7 +312,7 @@ public class Pad extends GstObject {
      * @return true if the pad is blocking.
      */
     public boolean isBlocking() {
-        return gst.gst_pad_is_blocking(this);
+        return GSTPAD_API.gst_pad_is_blocking(this);
     }
     
     /**
@@ -500,7 +494,7 @@ public class Pad extends GstObject {
         	public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
         	    System.out.println("CALLBACK " + probeInfo.padProbeType);
         	    if ((probeInfo.padProbeType & mask) != 0) {
-        			Event event = gst.gst_pad_probe_info_get_event(probeInfo);
+        			Event event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
         			return listener.eventReceived(pad, event);
         		}
         		
@@ -509,10 +503,10 @@ public class Pad extends GstObject {
             }
         };
         
-        GCallback cb = new GCallback(gst.gst_pad_add_probe(this, mask, probe, null, null), probe) {
+        GCallback cb = new GCallback(GSTPAD_API.gst_pad_add_probe(this, mask, probe, null, null), probe) {
             @Override
             protected void disconnect() {
-                gst.gst_pad_remove_probe(Pad.this, id);
+                GSTPAD_API.gst_pad_remove_probe(Pad.this, id);
             }
         };
         addCallback(EVENT_PROBE.class, listener, cb);
@@ -540,7 +534,7 @@ public class Pad extends GstObject {
      * @return <tt>true</tt> if the event was handled.
      */
     public boolean sendEvent(Event event) {
-        return gst.gst_pad_send_event(this, event);
+        return GSTPAD_API.gst_pad_send_event(this, event);
     }
     
     /**
@@ -552,7 +546,7 @@ public class Pad extends GstObject {
      * @return true if the event was handled
      */
     public boolean pushEvent(Event event) {
-        return gst.gst_pad_push_event(this, event);
+        return GSTPAD_API.gst_pad_push_event(this, event);
     }
     
     /**
@@ -574,7 +568,7 @@ public class Pad extends GstObject {
      * @return a org.gstreamer.FlowReturn
      */
     public FlowReturn chain(Buffer buffer) {
-    	return gst.gst_pad_chain(this, buffer);
+    	return GSTPAD_API.gst_pad_chain(this, buffer);
     }
     
     /**
@@ -592,7 +586,7 @@ public class Pad extends GstObject {
      * @return a FlowReturn from the peer pad. When this function returns OK, buffer will contain a valid Buffer.
      */
     public FlowReturn getRange(long offset, int size, Buffer[] buffer) {
-    	return gst.gst_pad_get_range(this, offset, size, buffer);
+    	return GSTPAD_API.gst_pad_get_range(this, offset, size, buffer);
     }
 
     /**
@@ -613,6 +607,6 @@ public class Pad extends GstObject {
      * MT safe.
      */
     public FlowReturn pullRange(long offset, int size, Buffer[] buffer) {
-    	return gst.gst_pad_pull_range(this, offset, size, buffer);
+    	return GSTPAD_API.gst_pad_pull_range(this, offset, size, buffer);
     }
 }

@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer;
 
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -35,6 +34,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
+
 import org.freedesktop.gstreamer.elements.AppSink;
 import org.freedesktop.gstreamer.elements.AppSrc;
 import org.freedesktop.gstreamer.elements.BaseSink;
@@ -48,18 +52,13 @@ import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
-import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.TimedValue;
 import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -74,8 +73,7 @@ public final class Gst {
     private static GMainContext mainContext;
     private static boolean useDefaultContext = false;
     private static final AtomicInteger initCount = new AtomicInteger(0);
-    private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
-    private static final GstAPI gst = GstNative.load(GstAPI.class);    
+    private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());  
     
     public static class NativeArgs {
         public IntByReference argcRef;
@@ -132,7 +130,7 @@ public final class Gst {
      */
     public static Version getVersion() {
         long[] major = { 0 }, minor = { 0 }, micro = { 0 }, nano = { 0 };
-        gst.gst_version(major, minor, micro, nano);
+        GST_API.gst_version(major, minor, micro, nano);
         return new Version(major[0], minor[0], micro[0], nano[0]);
     }
     
@@ -142,21 +140,21 @@ public final class Gst {
      * @return a string representation of the version.
      */
     public static String getVersionString() {
-        return gst.gst_version_string();
+        return GST_API.gst_version_string();
     }
     /**
      * Get Segmentation Trap status.
      * @return Segmentation Trap status.
      */
     public static boolean isSegTrapEnabled() {
-    	return gst.gst_segtrap_is_enabled();
+    	return GST_API.gst_segtrap_is_enabled();
     }
     /**
      * Set Segmentation Trap status.
      * @param enabled
      */
     public static void setSegTrap(boolean enabled) {
-    	gst.gst_segtrap_set_enabled(enabled);
+    	GST_API.gst_segtrap_set_enabled(enabled);
     }
 
     /**
@@ -295,7 +293,7 @@ public final class Gst {
         NativeArgs argv = new NativeArgs(progname, args);
         
         Pointer[] error = { null };
-        if (!gst.gst_init_check(argv.argcRef, argv.argvRef, error)) {
+        if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
             initCount.decrementAndGet();
             throw new GstException(new GError(new GErrorStruct(error[0])));
         }
@@ -347,7 +345,7 @@ public final class Gst {
         
         mainContext = null;
         System.gc(); // Make sure any dangling objects are unreffed before calling deinit().
-        gst.gst_deinit();
+        GST_API.gst_deinit();
     }
     
     /**

@@ -24,9 +24,10 @@ package org.freedesktop.gstreamer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GstQueryTypeFlags;
+
+import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 
 /**
  * Standard predefined Query types
@@ -34,8 +35,6 @@ import org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GstQueryTypeFlags;
 public final class QueryType implements Comparable<QueryType> {
 
     private static final Map<Integer,String> nameCache = new HashMap<Integer,String>();
-
-    private static final GstQueryAPI gst = GstNative.load(GstQueryAPI.class);
     
     /** invalid query type */
     public static final QueryType UNKNOWN = makeType(0, 0);
@@ -116,7 +115,7 @@ public final class QueryType implements Comparable<QueryType> {
     public String getName() {
         String cachedName = nameCache.get(value);
         if(cachedName == null) {
-            cachedName = gst.gst_query_type_get_name(this);
+            cachedName = GSTQUERY_API.gst_query_type_get_name(this);
             nameCache.put(value, cachedName);
         }
         return cachedName;

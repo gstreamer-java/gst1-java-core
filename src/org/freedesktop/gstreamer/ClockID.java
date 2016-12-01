@@ -18,35 +18,33 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstClockAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+import com.sun.jna.Pointer;
+
 import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstClockAPI.GSTCLOCK_API;
 
 /**
  * A datatype to hold the handle to an outstanding sync or async clock callback.
  */
 public class ClockID extends RefCountedObject implements Comparable<ClockID> {
-    private static final GstClockAPI gst = GstNative.load(GstClockAPI.class);
-	
-	public ClockID(Initializer init) {
+    public ClockID(Initializer init) {
         super(init);
     }
     
     @Override
     protected void disposeNativeHandle(Pointer ptr) {
-        gst.gst_clock_id_unref(ptr);
+        GSTCLOCK_API.gst_clock_id_unref(ptr);
     }
 
     @Override
     protected void ref() {
-        gst.gst_clock_id_ref(this);
+        GSTCLOCK_API.gst_clock_id_ref(this);
     }
 
     @Override
     protected void unref() {
-        gst.gst_clock_id_unref(this);
+        GSTCLOCK_API.gst_clock_id_unref(this);
     }
     
     /**
@@ -56,7 +54,7 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * async notifications, you need to create a new #GstClockID.
      */
     public void unschedule() {
-        gst.gst_clock_id_unschedule(this);
+        GSTCLOCK_API.gst_clock_id_unschedule(this);
     }
     
     /**
@@ -67,7 +65,7 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * @return The time of this clock id.
      */
     public ClockTime getTime() {
-        return gst.gst_clock_id_get_time(this);
+        return GSTCLOCK_API.gst_clock_id_get_time(this);
     }
     
     /**
@@ -77,6 +75,6 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * @return negative value if a < b; zero if a = b; positive value if a > b
      */
     public int compareTo(ClockID other) {
-        return gst.gst_clock_id_compare_func(this, other);
+        return GSTCLOCK_API.gst_clock_id_compare_func(this, other);
     }
 }

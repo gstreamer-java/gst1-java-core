@@ -20,8 +20,7 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstClockAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+import static org.freedesktop.gstreamer.lowlevel.GstClockAPI.GSTCLOCK_API;
 
 /**
  * Abstract class for global clocks.
@@ -92,9 +91,7 @@ import org.freedesktop.gstreamer.lowlevel.GstNative;
  */
 public class Clock extends GstObject {
     public static final String GTYPE_NAME = "GstClock";
-    
-    private static final GstClockAPI gst = GstNative.load(GstClockAPI.class);
-    
+
     public Clock(Initializer init) {
         super(init); 
     }
@@ -111,7 +108,7 @@ public class Clock extends GstObject {
      * @return the new resolution of the clock.
      */
     public ClockTime setResolution(ClockTime resolution) {
-        return gst.gst_clock_set_resolution(this, resolution);
+        return GSTCLOCK_API.gst_clock_set_resolution(this, resolution);
     }
     
     /**
@@ -121,7 +118,7 @@ public class Clock extends GstObject {
      * @return the resolution of the clock in nanoseconds.
      */
     public ClockTime getResolution() {
-        return gst.gst_clock_get_resolution(this);
+        return GSTCLOCK_API.gst_clock_get_resolution(this);
     }
     
     /**
@@ -135,7 +132,7 @@ public class Clock extends GstObject {
      * given incorrect input.
      */
     public ClockTime getTime() {
-        return gst.gst_clock_get_time(this);
+        return GSTCLOCK_API.gst_clock_get_time(this);
     }
     /**
      * Gets the current internal time of this clock. The time is returned
@@ -146,7 +143,7 @@ public class Clock extends GstObject {
      * @return the internal time of the clock. Or {@link ClockTime#NONE} when given wrong input.
      */
     public ClockTime getInternalTime() {
-        return gst.gst_clock_get_internal_time(this);
+        return GSTCLOCK_API.gst_clock_get_internal_time(this);
     }
     
     /**
@@ -157,7 +154,7 @@ public class Clock extends GstObject {
      * clock.
      */
     public Clock getMaster() {
-        return gst.gst_clock_get_master(this);
+        return GSTCLOCK_API.gst_clock_get_master(this);
     }
     
     /**
@@ -178,7 +175,7 @@ public class Clock extends GstObject {
      * this function return false.
      */
     public boolean setMaster(Clock master) {
-        return gst.gst_clock_set_master(this, master);
+        return GSTCLOCK_API.gst_clock_set_master(this, master);
     }
     
     /**
@@ -193,7 +190,7 @@ public class Clock extends GstObject {
      * @param rateDenominator the denominator of the rate of the clock
      */
     public void getCalibration(ClockTime internal, ClockTime external, ClockTime rateNumerator, ClockTime rateDenominator) {
-        gst.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
+        GSTCLOCK_API.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
     }
     
     /**
@@ -226,7 +223,7 @@ public class Clock extends GstObject {
      * @param rateDenominator the denominator of the rate of the clock
      */
     public void setCalibration(ClockTime internal, ClockTime external, ClockTime rateNumerator, ClockTime rateDenominator) {
-        gst.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
+        GSTCLOCK_API.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
     }
     
     /**
@@ -239,7 +236,7 @@ public class Clock extends GstObject {
      * @return A {@link ClockID} that can be used to request the time notification.
      */
     public ClockID newSingleShotID(ClockTime time) {
-        return gst.gst_clock_new_single_shot_id(this, time);
+        return GSTCLOCK_API.gst_clock_new_single_shot_id(this, time);
     }
     
     /**
@@ -254,6 +251,6 @@ public class Clock extends GstObject {
      * @return A {@link ClockID} that can be used to request the time notification.
      */
     public ClockID newPeriodicID(ClockTime startTime, ClockTime interval) {
-        return gst.gst_clock_new_periodic_id(this, startTime, interval);
+        return GSTCLOCK_API.gst_clock_new_periodic_id(this, startTime, interval);
     }
 }

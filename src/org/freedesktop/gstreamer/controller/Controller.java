@@ -20,13 +20,13 @@ package org.freedesktop.gstreamer.controller;
 
 import java.util.logging.Logger;
 
+import com.sun.jna.Pointer;
+
 import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.GstException;
 import org.freedesktop.gstreamer.Gst.NativeArgs;
-import org.freedesktop.gstreamer.lowlevel.GstControllerAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstControllerAPI.GSTCONTROLLER_API;
 
 /**
  * The controller subsystem offers a lightweight way to adjust gobject properties over stream-time.
@@ -54,12 +54,10 @@ import com.sun.jna.Pointer;
  */
 public class Controller extends GObject {
     private static Logger logger = Logger.getLogger(Controller.class.getName());
-    
-    private static final GstControllerAPI gst = GstNative.load(GstControllerAPI.class);
-    
+
     static {
         NativeArgs argv = new NativeArgs("gstreamer-java", new String[] {});
-        if (!gst.gst_controller_init(argv.argcRef, argv.argvRef)) {
+        if (! GSTCONTROLLER_API.gst_controller_init(argv.argcRef, argv.argvRef)) {
             throw new GstException("Can't initialize GstController");
         }       
         logger.fine("after gst_init, argc=" + argv.argcRef.getValue());

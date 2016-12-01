@@ -23,20 +23,13 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  * Used to query the total duration of a stream.
  */
 public class DurationQuery extends Query {
-    private static interface API extends com.sun.jna.Library { 
-        Pointer ptr_gst_query_new_duration(Format format);
-        void gst_query_set_duration(Query query, Format format, /* gint64 */ long duration);
-        void gst_query_parse_duration(Query query, Format[] format, /* gint64 * */ long[] duration);
-    }
-    private static final API gst = GstNative.load(API.class);
+
     public DurationQuery(Initializer init) {
         super(init);
     }
@@ -47,7 +40,7 @@ public class DurationQuery extends Query {
      * @param format the {@link Format} for this duration query.
      */
     public DurationQuery(Format format) {
-        super(initializer(gst.ptr_gst_query_new_duration(format)));
+        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_duration(format)));
     }
     /**
      * Answers a duration query by setting the requested value in the given format.
@@ -55,7 +48,7 @@ public class DurationQuery extends Query {
      * @param duration the duration of the stream
      */
     public void setDuration(Format format, long duration) {
-        gst.gst_query_set_duration(this, format, duration);
+        GstQueryAPI.GSTQUERY_API.gst_query_set_duration(this, format, duration);
     }
     /**
      * Gets the format of this duration query.
@@ -64,7 +57,7 @@ public class DurationQuery extends Query {
      */
     public Format getFormat() {
         Format[] fmt = new Format[1];
-        gst.gst_query_parse_duration(this, fmt, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_duration(this, fmt, null);
         return fmt[0];
     }
 
@@ -75,7 +68,7 @@ public class DurationQuery extends Query {
      */
     public long getDuration() {
         long[] duration = new long[1];
-        gst.gst_query_parse_duration(this, null, duration);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_duration(this, null, duration);
         return duration[0];
     }
     

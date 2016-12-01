@@ -42,8 +42,7 @@ import org.freedesktop.gstreamer.event.StepEvent;
 import org.freedesktop.gstreamer.event.StreamStartEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -53,8 +52,6 @@ import org.junit.Test;
  * @author wayne
  */
 public class EventTest {
-    private static final GstEventAPI gst = GstNative.load(GstEventAPI.class);
-
     public EventTest() {
     }
 
@@ -72,7 +69,7 @@ public class EventTest {
         // Verify that the flags in the enum match the native ones.
         EventType[] types = EventType.values();
         for (EventType t : types) {
-            int flags = gst.gst_event_type_get_flags(t);
+            int flags = GSTEVENT_API.gst_event_type_get_flags(t);
             assertEquals("Incorrect flags for: " + t.name(), flags, t.intValue() & 0xFF);
         }
     }
@@ -109,22 +106,22 @@ public class EventTest {
         new StepEvent(Format.BUFFERS, 1, 1, true, false);
     }
     @Test public void gst_event_new_eos() {
-        Event eos = gst.gst_event_new_eos();
+        Event eos = GSTEVENT_API.gst_event_new_eos();
         assertNotNull("gst_event_new_eos returned null", eos);
         assertTrue("gst_event_new_eos returned a non-EOS event", eos instanceof EOSEvent);
     }
     @Test public void gst_event_new_flush_start() {
-        Event ev = gst.gst_event_new_flush_start();
+        Event ev = GSTEVENT_API.gst_event_new_flush_start();
         assertNotNull("gst_event_new_flush_start returned null", ev);
         assertTrue("gst_event_new_flush_start returned a non-FLUSH_START event", ev instanceof FlushStartEvent);
     }
     @Test public void gst_event_new_flush_stop() {
-        Event ev = gst.gst_event_new_flush_stop();
+        Event ev = GSTEVENT_API.gst_event_new_flush_stop();
         assertNotNull("gst_event_new_flush_stop returned null", ev);
         assertTrue("gst_event_new_flush_stop returned a non-FLUSH_STOP event", ev instanceof FlushStopEvent);
     }
     @Test public void gst_event_new_latency() {
-        Event ev = gst.gst_event_new_latency(ClockTime.ZERO);
+        Event ev = GSTEVENT_API.gst_event_new_latency(ClockTime.ZERO);
         assertNotNull("gst_event_new_latency returned null", ev);
         assertTrue("gst_event_new_latency returned a non-LATENCY event", ev instanceof LatencyEvent);
     }
@@ -134,7 +131,7 @@ public class EventTest {
         struct.rate = 1.0;
         struct.applied_rate = 1.0;
         struct.format = Format.TIME;
-        Event ev = gst.gst_event_new_segment(struct);
+        Event ev = GSTEVENT_API.gst_event_new_segment(struct);
         assertNotNull("gst_event_new_latency returned null", ev);
         assertTrue("gst_event_new_latency returned a non-NEWSEGMENT event", ev instanceof SegmentEvent);
     }
@@ -159,7 +156,7 @@ public class EventTest {
         assertEquals("Incorrect rate returned from getRate", STOP, ev.getSegment().stop);
     }
     @Test public void gst_event_new_tag() {
-        Event ev = gst.gst_event_new_tag(new TagList());
+        Event ev = GSTEVENT_API.gst_event_new_tag(new TagList());
         assertNotNull("gst_event_new_tag returned null", ev);
         assertTrue("gst_event_new_tag returned a non-TAG event", ev instanceof TagEvent);
     }
@@ -187,7 +184,7 @@ public class EventTest {
         final long MIN = 0x1234;
         final long MAX = 0xdeadbeef;
         final boolean ASYNC = false;
-        Event ev = gst.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
+        Event ev = GSTEVENT_API.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
         assertNotNull("gst_event_new_buffer_size returned null", ev);
         assertTrue("gst_event_new_buffer_size returned a non-BUFFERSIZE event", ev instanceof BufferSizeEvent);
     }
@@ -195,27 +192,27 @@ public class EventTest {
         final long MIN = 0x1234;
         final long MAX = 0xdeadbeef;
         final boolean ASYNC = false;
-        BufferSizeEvent ev = (BufferSizeEvent) gst.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
+        BufferSizeEvent ev = (BufferSizeEvent) GSTEVENT_API.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
         assertEquals("Wrong minimum size stored", MIN, ev.getMinimumSize());
     }
     @Test public void BufferSize_getMaximumSize() {
         final long MIN = 0x1234;
         final long MAX = 0xdeadbeef;
         final boolean ASYNC = false;
-        BufferSizeEvent ev = (BufferSizeEvent) gst.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
+        BufferSizeEvent ev = (BufferSizeEvent) GSTEVENT_API.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
         assertEquals("Wrong minimum size stored", MAX, ev.getMaximumSize());
     }
     @Test public void BufferSize_isAsync() {
         final long MIN = 0x1234;
         final long MAX = 0xdeadbeef;
         final boolean ASYNC = false;
-        BufferSizeEvent ev = (BufferSizeEvent) gst.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
+        BufferSizeEvent ev = (BufferSizeEvent) GSTEVENT_API.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, ASYNC);
         assertEquals("Wrong minimum size stored", ASYNC, ev.isAsync());
-        BufferSizeEvent ev2 = (BufferSizeEvent) gst.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, !ASYNC);
+        BufferSizeEvent ev2 = (BufferSizeEvent) GSTEVENT_API.gst_event_new_buffer_size(Format.BYTES, MIN, MAX, !ASYNC);
         assertEquals("Wrong minimum size stored", !ASYNC, ev2.isAsync());
     }
     @Test public void gst_event_new_qos() {
-        Event ev = gst.gst_event_new_qos(QOSType.THROTTLE, 0.0, 0, ClockTime.NONE);
+        Event ev = GSTEVENT_API.gst_event_new_qos(QOSType.THROTTLE, 0.0, 0, ClockTime.NONE);
         assertNotNull("gst_event_new_qos returned null", ev);
         assertTrue("gst_event_new_qos returned a non-QOS event", ev instanceof QOSEvent);
     }
@@ -241,7 +238,7 @@ public class EventTest {
         assertEquals("Wrong QOSType", QOSType.THROTTLE, ev.getType());
     }
     @Test public void gst_event_new_seek() {
-        Event ev = gst.gst_event_new_seek(1.0, Format.TIME, 0, 
+        Event ev = GSTEVENT_API.gst_event_new_seek(1.0, Format.TIME, 0, 
                 SeekType.SET, 0, SeekType.SET, 0);
         assertNotNull("gst_event_new_seek returned null", ev);
         assertTrue("gst_event_new_seek returned a non-SEEK event", ev instanceof SeekEvent);
@@ -289,22 +286,22 @@ public class EventTest {
         }
     }
     @Test public void gst_event_new_caps() {
-        Event ev = gst.gst_event_new_caps(Caps.fromString("video/x-raw,format=I420"));
+        Event ev = GSTEVENT_API.gst_event_new_caps(Caps.fromString("video/x-raw,format=I420"));
         assertNotNull("gst_event_new_caps returned null", ev);
         assertTrue("gst_event_new_caps returned a non-CAPS event", ev instanceof CapsEvent);
     }
     @Test public void gst_event_new_reconfigure() {
-        Event ev = gst.gst_event_new_reconfigure();
+        Event ev = GSTEVENT_API.gst_event_new_reconfigure();
         assertNotNull("gst_event_new_reconfigure returned null", ev);
         assertTrue("gst_event_new_reconfigure returned a non-RECONFIGURE event", ev instanceof ReconfigureEvent);
     }
     @Test public void gst_event_new_stream_start() {
-        Event ev = gst.gst_event_new_stream_start("a stream id");
+        Event ev = GSTEVENT_API.gst_event_new_stream_start("a stream id");
         assertNotNull("gst_event_new_stream_start returned null", ev);
         assertTrue("gst_event_new_stream_start returned a non-STREAM-START event", ev instanceof StreamStartEvent);
     }
     @Test public void gst_event_new_step() {
-        Event ev = gst.gst_event_new_step(Format.BUFFERS, 1, 1, true, false);
+        Event ev = GSTEVENT_API.gst_event_new_step(Format.BUFFERS, 1, 1, true, false);
         assertNotNull("gst_event_new_step returned null", ev);
         assertTrue("gst_event_new_step returned a non-STEP event", ev instanceof StepEvent);
     }

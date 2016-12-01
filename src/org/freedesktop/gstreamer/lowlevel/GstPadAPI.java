@@ -75,6 +75,8 @@ public interface GstPadAPI extends com.sun.jna.Library {
     GType gst_ghost_pad_get_type();
     @CallerOwnsReturn Pad gst_pad_new(String name, PadDirection direction);
     @CallerOwnsReturn Pad gst_pad_new_from_template(PadTemplate templ, String name);
+    @CallerOwnsReturn Pointer ptr_gst_pad_new(String name, PadDirection direction);
+    @CallerOwnsReturn Pointer ptr_gst_pad_new_from_template(PadTemplate templ, String name);
     @FreeReturnValue String gst_pad_get_name(Pad pad);
     PadLinkReturn gst_pad_link(Pad src, Pad sink);
     boolean gst_pad_unlink(Pad src, Pad sink);

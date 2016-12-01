@@ -23,25 +23,14 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  *
  * @author wayne
  */
 public class LatencyQuery extends Query {
-    private static interface API extends com.sun.jna.Library { 
-        /* latency query */
-        Pointer ptr_gst_query_new_latency();
-        void gst_query_set_latency(Query query, boolean live, ClockTime min_latency,
-             ClockTime max_latency);
-        void gst_query_parse_latency(Query query, boolean[] live, ClockTime[] min_latency, 
-                                                     ClockTime[] max_latency);
-    }
-    private static final API gst = GstNative.load(API.class);
-    
+
     public LatencyQuery(Initializer init) {
         super(init);
     }
@@ -51,7 +40,7 @@ public class LatencyQuery extends Query {
      * used to query the current position of playback in the streams, in some format.
      */
     public LatencyQuery() {
-        super(initializer(gst.ptr_gst_query_new_latency()));
+        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_latency()));
     }
     
     /**
@@ -62,7 +51,7 @@ public class LatencyQuery extends Query {
      * @param maxLatency the maximal latency of the live element
      */
     public void setLatency(boolean live, ClockTime minLatency, ClockTime maxLatency) {
-        gst.gst_query_set_latency(this, live, minLatency, maxLatency);
+        GstQueryAPI.GSTQUERY_API.gst_query_set_latency(this, live, minLatency, maxLatency);
     }
     /**
      * Gets whether the element has a live element upstream or not.
@@ -71,7 +60,7 @@ public class LatencyQuery extends Query {
      */
     public boolean isLive() {
         boolean[] live = new boolean[1];
-        gst.gst_query_parse_latency(this, live, null, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_latency(this, live, null, null);
         return live[0];
     }
     
@@ -82,7 +71,7 @@ public class LatencyQuery extends Query {
      */
     public ClockTime getMinimumLatency() {
         ClockTime[] latency = new ClockTime[1];
-        gst.gst_query_parse_latency(this, null, latency, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_latency(this, null, latency, null);
         return latency[0];
     }
     
@@ -93,7 +82,7 @@ public class LatencyQuery extends Query {
      */
     public ClockTime getMaximumLatency() {
         ClockTime[] latency = new ClockTime[1];
-        gst.gst_query_parse_latency(this, null, null, latency);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_latency(this, null, null, latency);
         return latency[0];
     }
     

@@ -19,22 +19,15 @@
 
 package org.freedesktop.gstreamer.message;
 
-import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * The duration of a pipeline has changed. The application can get the new 
  * duration with a duration query.
  */
 public class DurationChangedMessage extends Message {
-
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new DurationChanged message.
      * @param init internal initialization data.
@@ -47,6 +40,6 @@ public class DurationChangedMessage extends Message {
      * Creates a new DurationChanged Message
      */
     public DurationChangedMessage(GstObject src) {
-        this(initializer(gst.ptr_gst_message_new_duration_changed(src)));
+        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_duration_changed(src)));
     }
 }

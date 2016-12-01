@@ -40,8 +40,11 @@ public interface GstStructureAPI extends com.sun.jna.Library {
     boolean gst_structure_fixate_field_nearest_int(Structure structure, String field, int target);
     @FreeReturnValue String gst_structure_to_string(Structure structure);
     @CallerOwnsReturn Structure gst_structure_from_string(String data, PointerByReference end);
-    @CallerOwnsReturn Structure gst_structure_empty_new(String name);
+    @CallerOwnsReturn Structure gst_structure_new_empty(String name);
     @CallerOwnsReturn Structure gst_structure_new(String name, String firstField, Object... args);
+    @CallerOwnsReturn Pointer ptr_gst_structure_from_string(String data, PointerByReference end);
+    @CallerOwnsReturn Pointer ptr_gst_structure_new_empty(String name);
+    @CallerOwnsReturn Pointer ptr_gst_structure_new(String name, String firstField, Object... args);
     @CallerOwnsReturn Structure gst_structure_copy(Structure src);
     void gst_structure_remove_field(Structure structure, String fieldName);
     void gst_structure_remove_fields(Structure structure, String... fieldNames);
@@ -73,4 +76,6 @@ public interface GstStructureAPI extends com.sun.jna.Library {
 							    int[] value_denominator);
     GValue gst_structure_get_value(Structure structure, String fieldname);
     void gst_structure_set(Structure structure, String fieldname, Object... args);
+    
+    void gst_structure_free(Pointer ptr);
 }

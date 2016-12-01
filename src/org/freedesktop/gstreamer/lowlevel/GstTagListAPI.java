@@ -40,12 +40,16 @@ public interface GstTagListAPI extends com.sun.jna.Library {
         void callback(Pointer dest, Pointer src);
     }
     
+    @CallerOwnsReturn Pointer ptr_gst_tag_list_new_empty();
+    
     void gst_tag_list_add(TagList list, TagMergeMode mode, String tag, Object... tags);
     @CallerOwnsReturn TagList gst_tag_list_copy(TagList list);
+    @CallerOwnsReturn Pointer ptr_gst_tag_list_copy(TagList list);
     boolean gst_tag_list_is_empty(TagList list);
     void gst_tag_list_insert(TagList into, TagList from, TagMergeMode mode);
 
     @CallerOwnsReturn TagList gst_tag_list_merge(TagList list1, TagList list2, TagMergeMode mode);
+    @CallerOwnsReturn Pointer ptr_gst_tag_list_merge(TagList list1, TagList list2, TagMergeMode mode);
     int gst_tag_list_get_tag_size(TagList list, String tag);
     void gst_tag_list_remove_tag(TagList list, TagList tag);
     void gst_tag_list_foreach(TagList list, TagForeachFunc func, Pointer user_data);

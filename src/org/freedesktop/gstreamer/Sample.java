@@ -21,9 +21,7 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstSampleAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstSampleAPI.GSTMESSAGE_API;
 
 /**
  * Lightweight objects to signal the occurrence of pipeline events.
@@ -51,9 +49,6 @@ import org.freedesktop.gstreamer.lowlevel.GstSampleAPI;
 public class Sample extends MiniObject {
     public static final String GTYPE_NAME = "GstSample";
 
-    static interface API extends GstSampleAPI, GstMiniObjectAPI {}
-    static final API gst = GstNative.load(API.class);
-    
     /**
      * Creates a new instance of Message.
      * 
@@ -64,7 +59,7 @@ public class Sample extends MiniObject {
     }
     
     public Caps getCaps() {
-        return gst.gst_sample_get_caps(this);
+        return GSTMESSAGE_API.gst_sample_get_caps(this);
     }
     
     /**
@@ -78,7 +73,7 @@ public class Sample extends MiniObject {
 //         // Buffer is owned alongside sample - freeing sample
 //         // will unref the buffer so add another ref
 //         return new Buffer(new Initializer(ptr, true, true));
-        return gst.gst_sample_get_buffer(this);
+        return GSTMESSAGE_API.gst_sample_get_buffer(this);
     }
     
 }

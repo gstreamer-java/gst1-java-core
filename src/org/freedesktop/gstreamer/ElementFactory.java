@@ -24,18 +24,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
+import com.sun.jna.Pointer;
+
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
-import org.freedesktop.gstreamer.lowlevel.GstCapsAPI;
-import org.freedesktop.gstreamer.lowlevel.GstElementFactoryAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI;
 import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GstStaticPadTemplate;
-import org.freedesktop.gstreamer.lowlevel.GstPluginAPI;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+import static org.freedesktop.gstreamer.lowlevel.GstElementFactoryAPI.GSTELEMENTFACTORY_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
 
 /**
  * ElementFactory is used to create instances of elements.
@@ -52,10 +51,7 @@ public class ElementFactory extends PluginFeature {
         = new HashMap<String, Class<? extends Element>>();
 
     public static final String GTYPE_NAME = "GstElementFactory";
-    
-    private static interface API extends GstElementFactoryAPI, GstCapsAPI, GstPadTemplateAPI, GstPluginAPI, GlibAPI {}
-    private static final API gst = GstNative.load(API.class);
-    
+
     /**
      * Register a new class into the typeMap.
      */    
@@ -72,7 +68,7 @@ public class ElementFactory extends PluginFeature {
      */
     public static ElementFactory find(String name) {
         logger.entering("ElementFactory", "find", name);
-        ElementFactory factory = gst.gst_element_factory_find(name);
+        ElementFactory factory = GSTELEMENTFACTORY_API.gst_element_factory_find(name);
         if (factory == null) {
             throw new IllegalArgumentException("No such Gstreamer factory: " + name);
         }        
@@ -103,7 +99,7 @@ public class ElementFactory extends PluginFeature {
      * @return a List of ElementFactory elements.
      */
     public static List<ElementFactory> listGetElement(ElementFactoryListType type, Rank minrank) {
-        GList glist = gst.gst_element_factory_list_get_elements(type.getValue(), minrank.getValue());
+        GList glist = GSTELEMENTFACTORY_API.gst_element_factory_list_get_elements(type.getValue(), minrank.getValue());
         List<ElementFactory> list = new ArrayList<ElementFactory>();
 
         GList next = glist;
@@ -115,7 +111,7 @@ public class ElementFactory extends PluginFeature {
             next = next.next();
         }
 
-        gst.gst_plugin_list_free(glist);
+        GSTPLUGIN_API.gst_plugin_list_free(glist);
 
         return list;
     }
@@ -146,10 +142,10 @@ public class ElementFactory extends PluginFeature {
 
         for (ElementFactory fact : list) {
             fact.ref();
-            glist = gst.g_list_append(glist, fact.handle());
+            glist = GLIB_API.g_list_append(glist, fact.handle());
         }
 
-        GList gFilterList = gst.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
+        GList gFilterList = GSTELEMENTFACTORY_API.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
 
         GList next = gFilterList;
         while (next != null) {
@@ -160,8 +156,8 @@ public class ElementFactory extends PluginFeature {
             next = next.next();
         }
 
-        gst.gst_plugin_list_free(glist);
-        gst.gst_plugin_list_free(gFilterList);
+        GSTPLUGIN_API.gst_plugin_list_free(glist);
+        GSTPLUGIN_API.gst_plugin_list_free(gFilterList);
 
         return filterList;
     }
@@ -192,9 +188,9 @@ public class ElementFactory extends PluginFeature {
             Caps caps, PadDirection direction, boolean subsetonly) {
         List<ElementFactory> filterList = new ArrayList<ElementFactory>();
 
-        GList glist = gst.gst_element_factory_list_get_elements(type.getValue(), minrank.getValue());
+        GList glist = GSTELEMENTFACTORY_API.gst_element_factory_list_get_elements(type.getValue(), minrank.getValue());
 
-        GList gFilterList = gst.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
+        GList gFilterList = GSTELEMENTFACTORY_API.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
 
         GList next = gFilterList;
         while (next != null) {
@@ -205,15 +201,15 @@ public class ElementFactory extends PluginFeature {
             next = next.next();
         }
 
-        gst.gst_plugin_list_free(glist);
-        gst.gst_plugin_list_free(gFilterList);
+        GSTPLUGIN_API.gst_plugin_list_free(glist);
+        GSTPLUGIN_API.gst_plugin_list_free(gFilterList);
 
         return filterList;
     }
 
     public static Pointer makeRawElement(String factoryName, String name) {
         logger.entering("ElementFactory", "makeRawElement", new Object[] { factoryName, name});
-        Pointer elem = gst.ptr_gst_element_factory_make(factoryName, name);
+        Pointer elem = GSTELEMENTFACTORY_API.ptr_gst_element_factory_make(factoryName, name);
         logger.log(DEBUG, "Return from gst_element_factory_make=" + elem);
         if (elem == null) {
             throw new IllegalArgumentException("No such Gstreamer factory: "
@@ -251,7 +247,7 @@ public class ElementFactory extends PluginFeature {
      */
     public Element create(String name) {
         logger.entering("ElementFactory", "create", name);
-        Pointer elem = gst.ptr_gst_element_factory_create(this, name);
+        Pointer elem = GSTELEMENTFACTORY_API.ptr_gst_element_factory_create(this, name);
         logger.log(DEBUG, "gst_element_factory_create returned: " + elem);
         if (elem == null) {
             throw new IllegalArgumentException("Cannot create GstElement");
@@ -265,7 +261,7 @@ public class ElementFactory extends PluginFeature {
      */
     public String getAuthor() {
         logger.entering("ElementFactory", "getAuthor");
-        return gst.gst_element_factory_get_author(this);
+        return GSTELEMENTFACTORY_API.gst_element_factory_get_author(this);
     }
     /**
      * Returns a description of the factory.
@@ -274,7 +270,7 @@ public class ElementFactory extends PluginFeature {
      */
     public String getDescription() {
         logger.entering("ElementFactory", "getDescription");
-        return gst.gst_element_factory_get_description(this);
+        return GSTELEMENTFACTORY_API.gst_element_factory_get_description(this);
     }
     /**
      * Returns the long, English name for the factory.
@@ -283,7 +279,7 @@ public class ElementFactory extends PluginFeature {
      */
     public String getLongName() {
         logger.entering("ElementFactory", "getLongName");
-        return gst.gst_element_factory_get_longname(this);
+        return GSTELEMENTFACTORY_API.gst_element_factory_get_longname(this);
     }
     
     /**
@@ -294,7 +290,7 @@ public class ElementFactory extends PluginFeature {
      */
     public String getKlass() {
         logger.entering("ElementFactory", "getKlass");
-        return gst.gst_element_factory_get_klass(this);
+        return GSTELEMENTFACTORY_API.gst_element_factory_get_klass(this);
     }
     
     /**
@@ -304,15 +300,15 @@ public class ElementFactory extends PluginFeature {
      */
     public List<StaticPadTemplate> getStaticPadTemplates() {
         logger.entering("ElementFactory", "getStaticPadTemplates");
-        GList glist = gst.gst_element_factory_get_static_pad_templates(this);
-        logger.log(DEBUG, "gst.gst_element_factory_get_static_pad_templates returned: " + glist);
+        GList glist = GSTELEMENTFACTORY_API.gst_element_factory_get_static_pad_templates(this);
+        logger.log(DEBUG, "GSTELEMENTFACTORY_API.gst_element_factory_get_static_pad_templates returned: " + glist);
         List<StaticPadTemplate> templates = new ArrayList<StaticPadTemplate>();
         GList next = glist;
         while (next != null) {
             if (next.data != null) {
                 GstStaticPadTemplate temp = new GstStaticPadTemplate(next.data);
                 templates.add(new StaticPadTemplate(temp.getName(), temp.getPadDirection(),
-                        temp.getPadPresence(), gst.gst_static_pad_template_get_caps(temp)));
+                        temp.getPadPresence(), GSTPADTEMPLATE_API.gst_static_pad_template_get_caps(temp)));
             }
             next = next.next();
         }

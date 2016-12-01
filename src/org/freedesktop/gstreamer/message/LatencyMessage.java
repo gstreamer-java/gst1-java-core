@@ -21,15 +21,12 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * Message posted by elements when their latency requirements have changed.
  */
 public class LatencyMessage extends Message {
-
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new Latency message.
      * 
@@ -45,6 +42,6 @@ public class LatencyMessage extends Message {
      * @param source the object originating the message.
      */
     public LatencyMessage(GstObject source) {
-        this(initializer(gst.ptr_gst_message_new_latency(source)));
+        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_latency(source)));
     }
 }

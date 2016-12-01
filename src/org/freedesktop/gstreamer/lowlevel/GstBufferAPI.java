@@ -21,11 +21,9 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -69,6 +67,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     GType gst_buffer_get_type();
     @CallerOwnsReturn Buffer gst_buffer_new();
     @CallerOwnsReturn Buffer gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
+    @CallerOwnsReturn Pointer ptr_gst_buffer_new();
+    @CallerOwnsReturn Pointer ptr_gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
     NativeLong gst_buffer_get_size(Buffer buffer);
     boolean gst_buffer_map(Buffer buffer, MapInfoStruct info, int flags);
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);

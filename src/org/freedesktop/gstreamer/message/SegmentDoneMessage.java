@@ -22,7 +22,7 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * This message is posted by elements that finish playback of a segment as a 
@@ -33,8 +33,6 @@ import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
  */
 public class SegmentDoneMessage extends Message {
 
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new segment-done message.
      * 
@@ -52,7 +50,7 @@ public class SegmentDoneMessage extends Message {
      * @param position the position of the segment being done
      */
     public SegmentDoneMessage(GstObject src, Format format, long position) {
-        this(initializer(gst.ptr_gst_message_new_segment_done(src, format, position)));
+        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_segment_done(src, format, position)));
     }
     
     /**
@@ -62,7 +60,7 @@ public class SegmentDoneMessage extends Message {
      */
     public Format getFormat() {
         Format[] format = new Format[1];
-        gst.gst_message_parse_segment_done(this, format, null);
+        GSTMESSAGE_API.gst_message_parse_segment_done(this, format, null);
         return format[0];
     }
     
@@ -73,7 +71,7 @@ public class SegmentDoneMessage extends Message {
      */
     public long getPosition() {
         long[] position = { 0 };
-        gst.gst_message_parse_segment_done(this, null, position);
+        GSTMESSAGE_API.gst_message_parse_segment_done(this, null, position);
         return position[0];
     }
 }

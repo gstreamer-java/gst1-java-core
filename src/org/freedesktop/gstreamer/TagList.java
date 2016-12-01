@@ -28,17 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.freedesktop.gstreamer.glib.GDate;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstTagAPI;
-import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 
+import org.freedesktop.gstreamer.glib.GDate;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
+
+import static org.freedesktop.gstreamer.lowlevel.GstTagAPI.GSTTAG_API;
+import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
 
 /**
  * List of tags and values used to describe media metadata.
@@ -47,13 +45,6 @@ import com.sun.jna.ptr.PointerByReference;
 public class TagList extends MiniObject {
     
     public static final String GTYPE_NAME = "GstTagList";
-    
-    private static interface API extends GstTagListAPI, GstTagAPI, GstMiniObjectAPI {
-        @CallerOwnsReturn Pointer ptr_gst_tag_list_copy(TagList list);
-        @CallerOwnsReturn Pointer ptr_gst_tag_list_merge(TagList list1, TagList list2, TagMergeMode mode);
-        @CallerOwnsReturn Pointer ptr_gst_tag_list_new_empty();
-    }
-    private static final API gst = GstNative.load(API.class);
     
     /**
      * Creates a new instance of TagList
@@ -71,7 +62,7 @@ public class TagList extends MiniObject {
     }
 
 	private static Initializer initializer() {
-		final Pointer ptr_new_tag_list = gst.ptr_gst_tag_list_new_empty();
+		final Pointer ptr_new_tag_list = GSTTAGLIST_API.ptr_gst_tag_list_new_empty();
 		return initializer(ptr_new_tag_list);
 	}
     
@@ -82,7 +73,7 @@ public class TagList extends MiniObject {
      * @return the number of values for {@code tag} in this list.
      */
     public int getValueCount(String tag) {
-        return gst.gst_tag_list_get_tag_size(this, tag);
+        return GSTTAGLIST_API.gst_tag_list_get_tag_size(this, tag);
     }
     
     /**
@@ -193,7 +184,7 @@ public class TagList extends MiniObject {
      */
     public List<String> getTagNames() {
         final List<String> list = new LinkedList<String>();
-        gst.gst_tag_list_foreach(this, new GstTagListAPI.TagForeachFunc() {
+        GSTTAGLIST_API.gst_tag_list_foreach(this, new GstTagListAPI.TagForeachFunc() {
             public void callback(Pointer ptr, String tag, Pointer user_data) {
                 list.add(tag);
             }
@@ -210,7 +201,7 @@ public class TagList extends MiniObject {
      * @return a new tag list.
      */
     public TagList merge(TagList list2, TagMergeMode mode) {
-        return gst.gst_tag_list_merge(this, list2, mode);
+        return GSTTAGLIST_API.gst_tag_list_merge(this, list2, mode);
     }
     
     /**
@@ -225,7 +216,7 @@ public class TagList extends MiniObject {
         if (type != null) {
             return type;
         }
-        MapHolder.tagTypeMap.put(tag, type = gst.gst_tag_get_type(tag));
+        MapHolder.tagTypeMap.put(tag, type = GSTTAG_API.gst_tag_get_type(tag));
         return type;
     }
     
@@ -242,35 +233,35 @@ public class TagList extends MiniObject {
            put(GType.INT, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     int[] value = { 0 };
-                    gst.gst_tag_list_get_int_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_int_index(tl, tag, index, value);
                     return value[0];
                 }
             });
             put(GType.UINT, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     int[] value = { 0 };
-                    gst.gst_tag_list_get_uint_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_uint_index(tl, tag, index, value);
                     return value[0];
                 }
             });
             put(GType.INT64, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     long[] value = { 0 };
-                    gst.gst_tag_list_get_int64_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_int64_index(tl, tag, index, value);
                     return value[0];
                 }
             });
             put(GType.DOUBLE, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     double[] value = { 0d };
-                    gst.gst_tag_list_get_double_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_double_index(tl, tag, index, value);
                     return value[0];
                 }
             });
             put(GType.STRING, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     Pointer[] value = { null };
-                    gst.gst_tag_list_get_string_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_string_index(tl, tag, index, value);
                     if (value[0] == null) {
                         return null;
                     }
@@ -282,7 +273,7 @@ public class TagList extends MiniObject {
             put(GDate.GTYPE, new TagGetter() {
                 public Object get(TagList tl, String tag, int index) {
                     PointerByReference value = new PointerByReference();
-                    gst.gst_tag_list_get_date_index(tl, tag, index, value);
+                    GSTTAGLIST_API.gst_tag_list_get_date_index(tl, tag, index, value);
                     if (value.getValue() == null) {
                         return null;
                     }

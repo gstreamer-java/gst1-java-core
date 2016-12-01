@@ -23,21 +23,12 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  * Used to query an element for the current position in the stream.
  */
 public class PositionQuery extends Query {
-    private static interface API extends com.sun.jna.Library { 
-        /* position query */
-        Pointer ptr_gst_query_new_position(Format format);
-        void gst_query_set_position(Query query, Format format, /* gint64 */ long cur);
-        void gst_query_parse_position(Query query, int[] format, /* gint64 * */ long[] cur);
-    }
-    private static final API gst = GstNative.load(API.class);
     
     public PositionQuery(Initializer init) {
         super(init);
@@ -50,7 +41,7 @@ public class PositionQuery extends Query {
      * @param format the default {@link Format} for the new query
      */
     public PositionQuery(Format format) {
-        super(initializer(gst.ptr_gst_query_new_position(format)));
+        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_position(format)));
     }
     
     /**
@@ -60,7 +51,7 @@ public class PositionQuery extends Query {
      * @param position the position to set in the answer
      */
     public void setPosition(Format format, long position) {
-        gst.gst_query_set_position(this, format, position);
+        GstQueryAPI.GSTQUERY_API.gst_query_set_position(this, format, position);
     }
     
     /**
@@ -69,9 +60,9 @@ public class PositionQuery extends Query {
      * @return The format of the query.
      */
     public Format getFormat() {
-        int[] fmt = new int[1];
-        gst.gst_query_parse_position(this, fmt, null);
-        return Format.valueOf(fmt[0]);
+        Format[] fmt = new Format[1];
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_position(this, fmt, null);
+        return fmt[0];
     }
     
     /**
@@ -81,7 +72,7 @@ public class PositionQuery extends Query {
      */
     public long getPosition() {
         long[] pos = new long[1];
-        gst.gst_query_parse_position(this, null, pos);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_position(this, null, pos);
         return pos[0];
     }
     

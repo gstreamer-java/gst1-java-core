@@ -27,10 +27,9 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstPluginAPI;
-import org.freedesktop.gstreamer.lowlevel.GstRegistryAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
+import static org.freedesktop.gstreamer.lowlevel.GstRegistryAPI.GSTREGISTRY_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI.GSTPLUGINFEATURE_API;
 
 /**
  * Abstract base class for management of {@link Plugin} objects.
@@ -98,11 +97,6 @@ import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
 public class Registry extends GstObject {
     public static final String GTYPE_NAME = "GstRegistry";
 
-    private static interface API extends GstPluginAPI, GstRegistryAPI, GstPluginFeatureAPI {
-    }
-    
-    private static final API gst = GstNative.load(API.class);
-    
     public static interface PluginFilter {
         public boolean accept(Plugin plugin);
     }
@@ -119,7 +113,7 @@ public class Registry extends GstObject {
     public static Registry get() {
         // Need to handle the return value here, as it is a persistent object
         // i.e. the java proxy should not dispose of the underlying object when finalized
-        return GstObject.objectFor(gst.gst_registry_get(), Registry.class,
+        return GstObject.objectFor(GSTREGISTRY_API.gst_registry_get(), Registry.class,
                 false, false);
     }
     /** Creates a new instance of Registry */
@@ -134,7 +128,7 @@ public class Registry extends GstObject {
      * @return The plugin with the given name or null if the plugin was not found.
      */
     public Plugin findPlugin(String name) {
-        return gst.gst_registry_find_plugin(this, name);
+        return GSTREGISTRY_API.gst_registry_find_plugin(this, name);
     }
     /**
      * Add the plugin to the registry. The plugin-added signal will be emitted.
@@ -143,7 +137,7 @@ public class Registry extends GstObject {
      * @return true on success.
      */
     public boolean addPlugin(Plugin plugin) {
-        return gst.gst_registry_add_plugin(this, plugin);
+        return GSTREGISTRY_API.gst_registry_add_plugin(this, plugin);
     }
     
     /**
@@ -152,7 +146,7 @@ public class Registry extends GstObject {
      * @param plugin The plugin to remove.
      */
     public void removePlugin(Plugin plugin) {
-        gst.gst_registry_remove_plugin(this, plugin);
+        GSTREGISTRY_API.gst_registry_remove_plugin(this, plugin);
     }
     
     /**
@@ -164,7 +158,7 @@ public class Registry extends GstObject {
      * if the plugin was not found.
      */
     public PluginFeature findPluginFeature(String name, GType type) {
-        return gst.gst_registry_find_feature(this, name, type);
+        return GSTREGISTRY_API.gst_registry_find_feature(this, name, type);
     }
     
     /**
@@ -174,7 +168,7 @@ public class Registry extends GstObject {
      * @return The {@link PluginFeature} or null if not found.
      */
     public PluginFeature findPluginFeature(String name) {
-        return gst.gst_registry_lookup_feature(this, name);
+        return GSTREGISTRY_API.gst_registry_lookup_feature(this, name);
     }
     
     /**
@@ -184,9 +178,9 @@ public class Registry extends GstObject {
      */
     public List<Plugin> getPluginList() {
 
-        GList glist = gst.gst_registry_get_plugin_list(this);      
+        GList glist = GSTREGISTRY_API.gst_registry_get_plugin_list(this);      
         List<Plugin> list = objectList(glist, Plugin.class);
-        gst.gst_plugin_list_free(glist);
+        GSTPLUGIN_API.gst_plugin_list_free(glist);
         return list;
     }
     
@@ -214,9 +208,9 @@ public class Registry extends GstObject {
      * @return a List of {@link PluginFeature} for the plugin type.
      */
     public List<PluginFeature> getPluginFeatureListByType(GType type) {
-        GList glist = gst.gst_registry_get_feature_list(this, type);
+        GList glist = GSTREGISTRY_API.gst_registry_get_feature_list(this, type);
         List<PluginFeature> list = objectList(glist, PluginFeature.class);
-        gst.gst_plugin_feature_list_free(glist);
+        GSTPLUGINFEATURE_API.gst_plugin_feature_list_free(glist);
         return list;
     }
     
@@ -227,9 +221,9 @@ public class Registry extends GstObject {
      * @return a List of {@link PluginFeature} for the named plugin.
      */
     public List<PluginFeature> getPluginFeatureListByPlugin(String name) {
-        GList glist = gst.gst_registry_get_feature_list_by_plugin(this, name);
+        GList glist = GSTREGISTRY_API.gst_registry_get_feature_list_by_plugin(this, name);
         List<PluginFeature> list = objectList(glist, PluginFeature.class);
-        gst.gst_plugin_feature_list_free(glist);
+        GSTPLUGINFEATURE_API.gst_plugin_feature_list_free(glist);
         return list;
     }
     
@@ -242,7 +236,7 @@ public class Registry extends GstObject {
      * @return true if the registry changed.
      */
     public boolean scanPath(String path) {
-        return gst.gst_registry_scan_path(this, path);
+        return GSTREGISTRY_API.gst_registry_scan_path(this, path);
     }
     
     /**

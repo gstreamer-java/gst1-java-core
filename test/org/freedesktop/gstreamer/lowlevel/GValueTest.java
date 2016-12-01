@@ -45,18 +45,20 @@ import com.sun.jna.Pointer;
  *
  */
 public class GValueTest {
-	private static final GValueAPI api = GValueAPI.GVALUE_API;
-	
-	public interface  GValueTestAPI extends Library {
-		   @SuppressWarnings("serial")
-		GValueTestAPI API = GNative.loadLibrary("gobject-2.0", GValueTestAPI.class,
-		    		new HashMap<String, Object>() {});
-		   
-		   void g_value_set_object(Pointer value, Pointer obj);
+    private static final GValueAPI api = GValueAPI.GVALUE_API;
 
-		   Pointer g_value_get_object(Pointer pointer);
-		
-	}
+    public interface GValueTestAPI extends Library {
+
+        @SuppressWarnings("serial")
+        GValueTestAPI API = GNative.loadLibrary("gobject-2.0", GValueTestAPI.class,
+                new HashMap<String, Object>() {
+        });
+
+        void g_value_set_object(Pointer value, Pointer obj);
+
+        Pointer g_value_get_object(Pointer pointer);
+
+    }
 	
     public GValueTest() {
     }

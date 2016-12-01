@@ -23,23 +23,13 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
  * Used to discover information about the currently configured segment for playback.
  */
 public class SegmentQuery extends Query {
-    private static interface API extends com.sun.jna.Library {
-        Pointer ptr_gst_query_new_segment(Format format);
-        void gst_query_set_segment(SegmentQuery query, double rate, Format format,
-         /* gint64 */ long start_value, /* gint64 */ long stop_value);
-        void gst_query_parse_segment(SegmentQuery query, double[] rate, /*GstFormat **/ int[] format,
-         /* gint64 * */ long[] start_value, /* gint64 * */ long[] stop_value);
 
-    }
-    private static final API gst = GstNative.load(API.class);
     public SegmentQuery(Initializer init) {
         super(init);
     }
@@ -49,7 +39,7 @@ public class SegmentQuery extends Query {
      * @param format the {@link Format} for the new query.
      */
     public SegmentQuery(Format format) {
-        this(initializer(gst.ptr_gst_query_new_segment(format)));
+        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_segment(format)));
     }
     
     /**
@@ -72,7 +62,7 @@ public class SegmentQuery extends Query {
      * @param stopValue the stop value.
      */
     public void setSegment(double rate, Format format, long startValue, long stopValue) {
-        gst.gst_query_set_segment(this, rate, format, startValue, stopValue);
+        GstQueryAPI.GSTQUERY_API.gst_query_set_segment(this, rate, format, startValue, stopValue);
     }
     
     /**
@@ -82,7 +72,7 @@ public class SegmentQuery extends Query {
      */
     public double getRate() {
         double[] rate = new double[1];
-        gst.gst_query_parse_segment(this, rate, null, null, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_segment(this, rate, null, null, null);
         return rate[0];
     }
     
@@ -92,9 +82,9 @@ public class SegmentQuery extends Query {
      * @return The format for the start and stop values.
      */
     public Format getFormat() {
-        int[] fmt = new int[1];
-        gst.gst_query_parse_segment(this, null, fmt, null, null);
-        return Format.valueOf(fmt[0]);
+        Format[] fmt = new Format[1];
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_segment(this, null, fmt, null, null);
+        return fmt[0];
     }
     
     /**
@@ -104,7 +94,7 @@ public class SegmentQuery extends Query {
      */
     public long getStart() {
         long[] value = new long[1];
-        gst.gst_query_parse_segment(this, null, null, value, null);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_segment(this, null, null, value, null);
         return value[0];
     }
     
@@ -115,7 +105,7 @@ public class SegmentQuery extends Query {
      */
     public long getEnd() {
         long[] value = new long[1];
-        gst.gst_query_parse_segment(this, null, null, null, value);
+        GstQueryAPI.GSTQUERY_API.gst_query_parse_segment(this, null, null, null, value);
         return value[0];
     }
 }

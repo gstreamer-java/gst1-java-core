@@ -76,12 +76,12 @@ public class PluginTest {
 
     @Test
     public void testGetPackage() {
-        assertTrue(playbackPlugin.getPackage().contains("GStreamer Base Plugins"));
+        assertTrue(playbackPlugin.getPackage().contains("GStreamer Base"));
     }
 
     @Test
     public void testGetOrigin() {
-        assertTrue(playbackPlugin.getOrigin().startsWith("http"));
+        assertTrue(playbackPlugin.getOrigin().length() > 0);
     }
     
     @Test

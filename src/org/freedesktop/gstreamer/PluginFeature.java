@@ -19,9 +19,8 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-import org.freedesktop.gstreamer.lowlevel.GstObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GSTOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI.GSTPLUGINFEATURE_API;
 
 /**
  * Base class for contents of a {@link Plugin}
@@ -31,11 +30,6 @@ import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
  */
 public class PluginFeature extends GstObject {
     public static final String GTYPE_NAME = "GstPluginFeature";
-
-    private static interface API extends GstObjectAPI, GstPluginFeatureAPI {
-    }
-
-    private static final API gst = GstNative.load(API.class);
 
     public enum Rank {
         GST_RANK_NONE(0),
@@ -71,7 +65,7 @@ public class PluginFeature extends GstObject {
      */
     @Override
     public String getName() {
-        return gst.gst_object_get_name(this);
+        return GSTOBJECT_API.gst_object_get_name(this);
     }
 
     /**
@@ -82,7 +76,7 @@ public class PluginFeature extends GstObject {
      */
     @Override
     public boolean setName(String name) {
-        gst.gst_object_set_name(this, name);
+        GSTOBJECT_API.gst_object_set_name(this, name);
         return true;
     }
 
@@ -93,7 +87,7 @@ public class PluginFeature extends GstObject {
      * @param rank The rank value - higher number means more priority rank
      */
     public void setRank(int rank) {
-        gst.gst_plugin_feature_set_rank(this, rank);
+        GSTPLUGINFEATURE_API.gst_plugin_feature_set_rank(this, rank);
     }
     public void setRank(Rank rank) {
         setRank(rank.getValue());
@@ -105,7 +99,7 @@ public class PluginFeature extends GstObject {
      * @return The rank of the feature.
      */
     public int getRank() {
-        return gst.gst_plugin_feature_get_rank(this);
+        return GSTPLUGINFEATURE_API.gst_plugin_feature_get_rank(this);
     }
 
     /**
@@ -117,7 +111,7 @@ public class PluginFeature extends GstObject {
      * @return true if the plugin feature has at least the required version, otherwise false.
      */
     public boolean checkVersion(int major, int minor, int micro) {
-        return gst.gst_plugin_feature_check_version(this, minor, minor, micro);
+        return GSTPLUGINFEATURE_API.gst_plugin_feature_check_version(this, minor, minor, micro);
     }
     
     /**
@@ -127,7 +121,7 @@ public class PluginFeature extends GstObject {
      *         feature is not associated with a plugin.
      */
     public String getPluginName() {
-        return gst.gst_plugin_feature_get_plugin_name(this);
+        return GSTPLUGINFEATURE_API.gst_plugin_feature_get_plugin_name(this);
     }
     
     /**
@@ -136,6 +130,6 @@ public class PluginFeature extends GstObject {
      * @return the plugin that provides this feature, or NULL.
      */
     public Plugin getPlugin() {
-        return gst.gst_plugin_feature_get_plugin(this);
+        return GSTPLUGINFEATURE_API.gst_plugin_feature_get_plugin(this);
     }
 }

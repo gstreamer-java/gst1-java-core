@@ -21,8 +21,6 @@
 
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,19 +29,21 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.event.BusSyncHandler;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
-import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+
+import org.freedesktop.gstreamer.event.BusSyncHandler;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
+import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
+
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 
 /**
  * The {@link Bus} is an object responsible for delivering {@link Message}s in
@@ -79,11 +79,7 @@ public class Bus extends GstObject {
     static final Level LOG_DEBUG = Level.FINE;
 
     public static final String GTYPE_NAME = "GstBus";
-    
-    // Create an API with just the subset needed.
-    private static interface API extends GstBusAPI, GstMessageAPI, GstMiniObjectAPI {}
-    private static final API gst = GstNative.load(API.class);
-    
+
     private final Object lock = new Object();
     private boolean watchAdded = false;
 
@@ -94,8 +90,8 @@ public class Bus extends GstObject {
      */
     public Bus(Initializer init) { 
         super(init); 
-        gst.gst_bus_set_sync_handler(this, null, null, null);
-        gst.gst_bus_set_sync_handler(this, syncCallback, null, null);
+        GSTBUS_API.gst_bus_set_sync_handler(this, null, null, null);
+        GSTBUS_API.gst_bus_set_sync_handler(this, syncCallback, null, null);
     }
     
     /**
@@ -107,7 +103,7 @@ public class Bus extends GstObject {
      * @param flushing true if flushing is desired.
      */
     public void setFlushing(boolean flushing) {
-        gst.gst_bus_set_flushing(this, flushing ? 1 : 0);
+        GSTBUS_API.gst_bus_set_flushing(this, flushing ? 1 : 0);
     }
     
     /**
@@ -374,7 +370,7 @@ public class Bus extends GstObject {
         connect(ERROR.class, listener, new BusCallback() {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
-                gst.gst_message_parse_error(msg, err, null);
+                GSTMESSAGE_API.gst_message_parse_error(msg, err, null);
                 GErrorStruct error = new GErrorStruct(err.getValue());
                 listener.errorMessage(msg.getSource(), error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
@@ -401,7 +397,7 @@ public class Bus extends GstObject {
         connect(WARNING.class, listener, new BusCallback() {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
-                gst.gst_message_parse_warning(msg, err, null);                
+                GSTMESSAGE_API.gst_message_parse_warning(msg, err, null);                
                 GErrorStruct error = new GErrorStruct(err.getValue());
                 listener.warningMessage(msg.getSource(), error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
@@ -428,7 +424,7 @@ public class Bus extends GstObject {
         connect(INFO.class, listener, new BusCallback() {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
-                gst.gst_message_parse_info(msg, err, null);                
+                GSTMESSAGE_API.gst_message_parse_info(msg, err, null);                
                 GErrorStruct error = new GErrorStruct(err.getValue());
                 listener.infoMessage(msg.getSource(), error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
@@ -457,7 +453,7 @@ public class Bus extends GstObject {
                 State[] o = new State[1];
                 State[] n = new State[1];
                 State[] p = new State[1];
-                gst.gst_message_parse_state_changed(msg, o, n, p);
+                GSTMESSAGE_API.gst_message_parse_state_changed(msg, o, n, p);
                 listener.stateChanged(msg.getSource(), o[0], n[0], p[0]);
                 return true;
             }
@@ -480,7 +476,7 @@ public class Bus extends GstObject {
         connect(TAG.class, listener, new BusCallback() {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference list = new PointerByReference();
-                gst.gst_message_parse_tag(msg, list);
+                GSTMESSAGE_API.gst_message_parse_tag(msg, list);
                 TagList tl = new TagList(TagList.initializer(list.getValue()));
                 listener.tagsFound(msg.getSource(), tl);
                 return true;
@@ -506,7 +502,7 @@ public class Bus extends GstObject {
         connect(BUFFERING.class, listener, new BusCallback() {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 int[] percent = { 0 };
-                gst.gst_message_parse_buffering(msg, percent);
+                GSTMESSAGE_API.gst_message_parse_buffering(msg, percent);
                 listener.bufferingData(msg.getSource(), percent[0]);
                 return true;
             }
@@ -533,7 +529,7 @@ public class Bus extends GstObject {
                 System.out.println("duration update");
                 Format[] format = new Format[1];
                 long[] duration = { 0 };
-                gst.gst_message_parse_duration(msg, format, duration);
+                GSTMESSAGE_API.gst_message_parse_duration(msg, format, duration);
                 listener.durationChanged(msg.getSource(), format[0], duration[0]);
                 return true;
             }
@@ -558,7 +554,7 @@ public class Bus extends GstObject {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 Format[] format = new Format[1];
                 long[] position = { 0 };
-                gst.gst_message_parse_segment_start(msg, format, position);
+                GSTMESSAGE_API.gst_message_parse_segment_start(msg, format, position);
                 listener.segmentStart(msg.getSource(), format[0], position[0]);
                 return true;
             }
@@ -584,7 +580,7 @@ public class Bus extends GstObject {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 Format[] format = new Format[1];
                 long[] position = { 0 };
-                gst.gst_message_parse_segment_done(msg, format, position);
+                GSTMESSAGE_API.gst_message_parse_segment_done(msg, format, position);
                 listener.segmentDone(msg.getSource(), format[0], position[0]);
                 return true;
             }
@@ -676,7 +672,7 @@ public class Bus extends GstObject {
      * the bus is flushing.
      */
     public boolean post(Message message) {
-        return gst.gst_bus_post(this, message);
+        return GSTBUS_API.gst_bus_post(this, message);
     }
     
     private BusSyncHandler syncHandler = new BusSyncHandler() {
@@ -714,7 +710,7 @@ public class Bus extends GstObject {
             // Unref the message, since we are dropping it.
             // (the normal GC will drop other refs to it)
             //
-            gst.gst_mini_object_unref(msg);
+            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
             return BusSyncReply.DROP;
 	}
     };
@@ -846,7 +842,7 @@ public class Bus extends GstObject {
             if (!watchAdded)
             {
                 log.fine("Add watch");
-                gst.gst_bus_add_signal_watch(this);
+                GSTBUS_API.gst_bus_add_signal_watch(this);
                 watchAdded = true;
             }
         }
@@ -863,7 +859,7 @@ public class Bus extends GstObject {
             if (watchAdded)
             {
                 log.fine("Remove watch");
-                gst.gst_bus_remove_signal_watch(this);
+                GSTBUS_API.gst_bus_remove_signal_watch(this);
                 watchAdded = false;
             }
         }

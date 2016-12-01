@@ -22,7 +22,7 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.State;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * A state change message. 
@@ -31,8 +31,6 @@ import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
  */
 public class StateChangedMessage extends Message {
 
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new Buffering message.
      * @param init internal initialization data.
@@ -50,7 +48,7 @@ public class StateChangedMessage extends Message {
      * @param pending the pending (target) state.
      */
     public StateChangedMessage(GstObject src, State old, State current, State pending) {
-        super(initializer(gst.ptr_gst_message_new_state_changed(src, old, current, pending)));
+        super(initializer(GSTMESSAGE_API.ptr_gst_message_new_state_changed(src, old, current, pending)));
     }
     
     /**
@@ -60,7 +58,7 @@ public class StateChangedMessage extends Message {
      */
     public State getOldState() {
         State[] state = new State[1];
-        gst.gst_message_parse_state_changed(this, state, null, null);
+        GSTMESSAGE_API.gst_message_parse_state_changed(this, state, null, null);
         return state[0];
     }
     
@@ -71,7 +69,7 @@ public class StateChangedMessage extends Message {
      */
     public State getNewState() {
         State[] state = new State[1];
-        gst.gst_message_parse_state_changed(this, null, state, null);
+        GSTMESSAGE_API.gst_message_parse_state_changed(this, null, state, null);
         return state[0];
     }
     
@@ -82,7 +80,7 @@ public class StateChangedMessage extends Message {
      */
     public State getPendingState() {
         State[] state = new State[1];
-        gst.gst_message_parse_state_changed(this, null, null, state);
+        GSTMESSAGE_API.gst_message_parse_state_changed(this, null, null, state);
         return state[0];
     }
 }

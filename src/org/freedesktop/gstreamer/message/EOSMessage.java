@@ -21,7 +21,7 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Message;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * This message is generated and posted in the sink elements of a {@link org.freedesktop.gstreamer.Bin}.
@@ -30,8 +30,6 @@ import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
  */
 public class EOSMessage extends Message {
 
-    private static final GstMessageAPI gst = GstMessageAPI.GSTMESSAGE_API;
-    
     /**
      * Creates a new eos message.
      * @param init internal initialization data.
@@ -45,6 +43,6 @@ public class EOSMessage extends Message {
      * @param src The object originating the message.
      */
     public EOSMessage(GstObject src) {
-        this(initializer(gst.ptr_gst_message_new_eos(src)));
+        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_eos(src)));
     }
 }

@@ -26,10 +26,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
+import com.sun.jna.Platform;
+
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
@@ -39,12 +38,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sun.jna.Platform;
+import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 
-public class BusTest {
-    private static interface API extends GstBusAPI, GstElementAPI, GstMessageAPI {}
-    private static final API gst = GstNative.load(API.class);
-    
+public class BusTest {    
     public BusTest() {
     }
 
@@ -85,7 +81,7 @@ public class BusTest {
         // For the pipeline to post an EOS message, all sink elements must post it
         //
         for (Element elem : pipe.pipe.getSinks()) {
-            gst.gst_element_post_message(elem, gst.gst_message_new_eos(elem));
+            GSTELEMENT_API.gst_element_post_message(elem, GstMessageAPI.GSTMESSAGE_API.gst_message_new_eos(elem));
         }
         pipe.run();
         pipe.getBus().disconnect(eosSignal);
@@ -109,7 +105,7 @@ public class BusTest {
             
         };
         pipe.getBus().connect(stateChanged);
-        gst.gst_element_post_message(pipe.pipe, 
+        GSTELEMENT_API.gst_element_post_message(pipe.pipe, 
                 new StateChangedMessage(pipe.pipe, State.READY, State.PLAYING, State.VOID_PENDING));
         pipe.run();
         pipe.getBus().disconnect(stateChanged);
@@ -134,7 +130,7 @@ public class BusTest {
         pipe.getBus().connect(errorSignal);
         
         GErrorStruct msg = new GErrorStruct();
-        gst.gst_element_post_message(pipe.src, gst.gst_message_new_error(pipe.src, msg, "testing error messages"));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_error(pipe.src, msg, "testing error messages"));
         pipe.play().run();
         pipe.getBus().disconnect(errorSignal);
         pipe.dispose();
@@ -159,7 +155,7 @@ public class BusTest {
         
         GErrorStruct msg = new GErrorStruct();
         pipe.play();
-        gst.gst_element_post_message(pipe.src, gst.gst_message_new_warning(pipe.src, msg, "testing warning messages"));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_warning(pipe.src, msg, "testing warning messages"));
         pipe.run();
         pipe.getBus().disconnect(signal);
         pipe.dispose();
@@ -187,7 +183,7 @@ public class BusTest {
         
         GErrorStruct msg = new GErrorStruct();
         pipe.play();
-        gst.gst_element_post_message(pipe.src, gst.gst_message_new_info(pipe.src, msg, "testing warning messages"));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_info(pipe.src, msg, "testing warning messages"));
         pipe.run();
         pipe.getBus().disconnect(signal);
         pipe.dispose();
@@ -212,7 +208,7 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(signal);
-        gst.gst_element_post_message(pipe.src, gst.gst_message_new_buffering(pipe.src, PERCENT));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_buffering(pipe.src, PERCENT));
         pipe.play().run();
         pipe.getBus().disconnect(signal);
         pipe.dispose();
@@ -237,7 +233,7 @@ public class BusTest {
         pipe.getBus().connect(signal);
         
         TagList tagList = new TagList();
-        gst.gst_element_post_message(pipe.src, gst.gst_message_new_tag(pipe.src, tagList));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_tag(pipe.src, tagList));
         pipe.play().run();
         pipe.getBus().disconnect(signal);
         pipe.dispose();
@@ -263,7 +259,7 @@ public class BusTest {
         // For the pipeline to post an EOS message, all sink elements must post it
         //
         for (Element elem : pipe.pipe.getSinks()) {
-            gst.gst_element_post_message(elem, gst.gst_message_new_eos(elem));
+            GSTELEMENT_API.gst_element_post_message(elem, GstMessageAPI.GSTMESSAGE_API.gst_message_new_eos(elem));
         }
         pipe.play().run();
         pipe.getBus().disconnect(listener);

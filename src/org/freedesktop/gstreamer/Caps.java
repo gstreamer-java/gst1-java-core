@@ -21,10 +21,9 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstCapsAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
-
 import com.sun.jna.Pointer;
+
+import static org.freedesktop.gstreamer.lowlevel.GstCapsAPI.GSTCAPS_API;
 
 /**
  * Structure describing sets of media formats
@@ -61,8 +60,6 @@ import com.sun.jna.Pointer;
 public class Caps extends MiniObject {
     public static final String GTYPE_NAME = "GstCaps";
     
-    private static final GstCapsAPI gst = GstNative.load(GstCapsAPI.class);
-    
     /**
      * Creates a new Caps that is empty.  
      * That is, the returned Caps contains no media formats.
@@ -70,7 +67,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps emptyCaps() {
-        return new Caps(initializer(gst.ptr_gst_caps_new_empty()));
+        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
     
     /**
@@ -80,7 +77,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps anyCaps() {
-        return new Caps(initializer(gst.ptr_gst_caps_new_any()));
+        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_any()));
     }
     /**
      * Construct a new Caps from a string representation.
@@ -93,7 +90,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps fromString(String caps) {
-        return new Caps(initializer(gst.ptr_gst_caps_from_string(caps)));
+        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
     
     /**
@@ -102,7 +99,7 @@ public class Caps extends MiniObject {
      * @see #emptyCaps
      */
     public Caps() {
-        this(initializer(gst.ptr_gst_caps_new_empty()));
+        this(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
     
     /**
@@ -112,7 +109,7 @@ public class Caps extends MiniObject {
      * @see #fromString
      */
     public Caps(String caps) {
-        this(initializer(gst.ptr_gst_caps_from_string(caps)));
+        this(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
     /**
      * Create a caps that is a copy of another caps.
@@ -121,7 +118,7 @@ public class Caps extends MiniObject {
      * @see #copy
      */
     public Caps(Caps caps) {
-        this(initializer(gst.ptr_gst_caps_copy(caps)));
+        this(initializer(GSTCAPS_API.ptr_gst_caps_copy(caps)));
     }
     
     protected static Initializer initializer(Pointer ptr) {
@@ -138,7 +135,7 @@ public class Caps extends MiniObject {
      * @return the number of structures that this caps contains
      */
     public int size() {
-        return gst.gst_caps_get_size(this);
+        return GSTCAPS_API.gst_caps_get_size(this);
     }
     
     /**
@@ -150,7 +147,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public Caps copy() {
-        return gst.gst_caps_copy(this);
+        return GSTCAPS_API.gst_caps_copy(this);
     }
     
     /**
@@ -162,7 +159,7 @@ public class Caps extends MiniObject {
      * @return The new {@link Caps}
      */
     public Caps intersect(Caps other) {
-        return gst.gst_caps_intersect(this, other);
+        return GSTCAPS_API.gst_caps_intersect(this, other);
     }
     
     /**
@@ -174,7 +171,7 @@ public class Caps extends MiniObject {
      * @return The resulting caps.
      */
     public Caps subtract(Caps subtrahend) {
-        return gst.gst_caps_subtract(this, subtrahend);
+        return GSTCAPS_API.gst_caps_subtract(this, subtrahend);
     }
 
     /**
@@ -189,7 +186,7 @@ public class Caps extends MiniObject {
      */
     public Caps normalize() {
         this.ref(); // gst_caps_normalize copies "this" and drops one reference
-        return gst.gst_caps_normalize(this);
+        return GSTCAPS_API.gst_caps_normalize(this);
     }
     
     /**
@@ -202,7 +199,7 @@ public class Caps extends MiniObject {
      */
     public Caps simplify() {
         this.ref(); // gst_caps_simplify copies "this" and drops one reference
-        return gst.gst_caps_simplify(this);
+        return GSTCAPS_API.gst_caps_simplify(this);
     }
     
     /**
@@ -214,7 +211,7 @@ public class Caps extends MiniObject {
      * @param caps The Caps to append
      */
     public void append(Caps caps) {
-        gst.gst_caps_append(this, caps);
+        GSTCAPS_API.gst_caps_append(this, caps);
     }
     
     /**
@@ -225,7 +222,7 @@ public class Caps extends MiniObject {
      * @param struct The structure to append.
      */
     public void append(Structure struct) {
-        gst.gst_caps_append_structure(this, struct);
+        GSTCAPS_API.gst_caps_append_structure(this, struct);
     }
     
     /**
@@ -236,7 +233,7 @@ public class Caps extends MiniObject {
      * @param index Index of the structure to remove.
      */
     public void removeStructure(int index) {
-        gst.gst_caps_remove_structure(this, index);
+        GSTCAPS_API.gst_caps_remove_structure(this, index);
     }
     
     /**
@@ -253,7 +250,7 @@ public class Caps extends MiniObject {
      * @return merged Caps
      */
     public static Caps merge(Caps caps1, Caps caps2) {
-        return gst.gst_caps_merge(caps1, caps2);
+        return GSTCAPS_API.gst_caps_merge(caps1, caps2);
     }
 
     /**
@@ -267,11 +264,11 @@ public class Caps extends MiniObject {
      * @return A writable version of this caps object.
      */
     public Caps makeWritable() {
-        return gst.gst_caps_make_writable(this);
+        return GSTCAPS_API.gst_caps_make_writable(this);
     }
     
     public void setInteger(String field, Integer value) {
-        gst.gst_caps_set_simple(this, field, value, null);
+        GSTCAPS_API.gst_caps_set_simple(this, field, value, null);
     }
     
     /**
@@ -292,7 +289,7 @@ public class Caps extends MiniObject {
          */
         // The above means we return a Structure proxy which does not own the pointer.
         // gst_caps_get_structure is not marked as CallerOwnsReturn, so it should work
-        return gst.gst_caps_get_structure(this, index);
+        return GSTCAPS_API.gst_caps_get_structure(this, index);
     }
     
     /**
@@ -304,12 +301,12 @@ public class Caps extends MiniObject {
      */
     public Caps truncate() {
         this.ref();
-        return gst.gst_caps_truncate(this);
+        return GSTCAPS_API.gst_caps_truncate(this);
     }
     
     @Override
     public String toString() {
-        return gst.gst_caps_to_string(this);
+        return GSTCAPS_API.gst_caps_to_string(this);
     }
     
     /**
@@ -318,7 +315,7 @@ public class Caps extends MiniObject {
      * @return true if this caps represents any format.
      */
     public boolean isAny() {
-        return gst.gst_caps_is_any(this);
+        return GSTCAPS_API.gst_caps_is_any(this);
     }
     
     /**
@@ -327,7 +324,7 @@ public class Caps extends MiniObject {
      * @return true if this caps represents no formats.
      */
     public boolean isEmpty() {
-        return gst.gst_caps_is_empty(this);
+        return GSTCAPS_API.gst_caps_is_empty(this);
     }
     
     /**
@@ -340,7 +337,7 @@ public class Caps extends MiniObject {
      * @return true if this caps is fixed
      */
     public boolean isFixed() {
-        return gst.gst_caps_is_fixed(this);
+        return GSTCAPS_API.gst_caps_is_fixed(this);
     }
     
     /**
@@ -353,7 +350,7 @@ public class Caps extends MiniObject {
      * @return true if other caps equals this one.
      */
     public boolean isEqual(Caps other) {
-        return gst.gst_caps_is_equal(this, other);
+        return GSTCAPS_API.gst_caps_is_equal(this, other);
     }
     
     /**
@@ -363,7 +360,7 @@ public class Caps extends MiniObject {
      * @return true if the other caps is equal to this one.
      */
     public boolean isEqualFixed(Caps other) {
-        return gst.gst_caps_is_equal_fixed(this, other);
+        return GSTCAPS_API.gst_caps_is_equal_fixed(this, other);
     }
     
     /**
@@ -376,7 +373,7 @@ public class Caps extends MiniObject {
      * @return true if this caps is a subset of superset
      */
     public boolean isSubset(Caps superset) {
-        return gst.gst_caps_is_subset(this, superset);
+        return GSTCAPS_API.gst_caps_is_subset(this, superset);
     }
     
     /**
@@ -390,7 +387,7 @@ public class Caps extends MiniObject {
      * @return true if other is always compatible with this caps.
      */
     public boolean isAlwaysCompatible(Caps other) {
-        return gst.gst_caps_is_always_compatible(this, other);
+        return GSTCAPS_API.gst_caps_is_always_compatible(this, other);
     }
     @Override
     public boolean equals(Object other) {
