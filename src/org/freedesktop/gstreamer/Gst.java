@@ -19,6 +19,8 @@
 
 package org.freedesktop.gstreamer;
 
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -33,11 +35,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
 
 import org.freedesktop.gstreamer.elements.AppSink;
 import org.freedesktop.gstreamer.elements.AppSrc;
@@ -58,7 +55,10 @@ import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -448,11 +448,13 @@ public final class Gst {
 		GDate.class,
 		GValue.class,
 		GValueArray.class,
+        TagList.class,
 		TimedValue.class,
 		ValueArray.class,
 		ValueList.class,
 		// ----------- Base -------------
 		Buffer.class,
+		BufferPool.class,
 		Bus.class,
 		Caps.class,
 		Clock.class,
@@ -480,8 +482,6 @@ public final class Gst {
 		DecodeBin.class,
 		Pipeline.class,
 		PlayBin.class,
-		URIDecodeBin.class,
-        //
-        TagList.class
+		URIDecodeBin.class
 	};
 }

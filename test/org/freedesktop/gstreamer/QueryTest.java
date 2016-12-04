@@ -20,6 +20,7 @@
 
 package org.freedesktop.gstreamer;
 
+import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -28,8 +29,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
+import org.freedesktop.gstreamer.query.AllocationQuery;
 import org.freedesktop.gstreamer.query.DurationQuery;
 import org.freedesktop.gstreamer.query.FormatsQuery;
 import org.freedesktop.gstreamer.query.LatencyQuery;
@@ -210,5 +211,33 @@ public class QueryTest {
     
     @Test public void testQueryTypeGetName() {
         assertEquals(QueryType.JITTER.getName(), "jitter");
+    }
+    
+    @Test
+    public void gst_query_new_allocation() {
+        Query query = GstQueryAPI.GSTQUERY_API.gst_query_new_allocation(Caps.fromString("video/x-raw, format=I420"), true);
+        assertNotNull("gst_query_new_allocation returned null", query);
+        assertTrue("Returned query not instance of AllocationQuery", query instanceof AllocationQuery);
+    }    
+    @Test
+    public void newAllocationQuery() {
+        Query query = new AllocationQuery(Caps.fromString("video/x-raw, format=I420"), true);
+        assertNotNull("Query.newAllocationQuery returned null", query);
+        assertTrue("Returned query not instance of AllocationQuery", query instanceof AllocationQuery);
+    }
+    @Test
+    public void getCapsAllocationQuery() {
+    	Caps caps = Caps.fromString("video/x-raw, format=I420");
+    	AllocationQuery query = new AllocationQuery(caps, true);
+        assertEquals(caps, query.getCaps());
+    }
+    @Test
+    public void needPoolAllocationQuery() {
+    	Caps caps = Caps.fromString("video/x-raw, format=I420");
+    	AllocationQuery query = new AllocationQuery(caps, true);
+        assertEquals(true, query.isPoolNeeded());
+        query.dispose();
+    	query = new AllocationQuery(caps, false);
+        assertEquals(false, query.isPoolNeeded());
     }
 }
