@@ -1,7 +1,7 @@
-/* 
+/* Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -42,10 +42,7 @@ public interface GstElementFactoryAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Element gst_element_factory_make(String factoryName, String elementName);
     @CallerOwnsReturn Element gst_element_factory_create(ElementFactory factory, String elementName);
     GType gst_element_factory_get_element_type(ElementFactory factory);
-    String gst_element_factory_get_longname(ElementFactory factory);
-    String gst_element_factory_get_klass(ElementFactory factory);
-    String gst_element_factory_get_description(ElementFactory factory);
-    String gst_element_factory_get_author(ElementFactory factory);
+    String gst_element_factory_get_metadata(ElementFactory factory, String key);
     int gst_element_factory_get_num_pad_templates(ElementFactory factory);
     int gst_element_factory_get_uri_type(ElementFactory factory);
     GList gst_element_factory_get_static_pad_templates(ElementFactory factory);
@@ -53,7 +50,7 @@ public interface GstElementFactoryAPI extends com.sun.jna.Library {
     GList gst_element_factory_list_get_elements(long type, int minrank);
     GList gst_element_factory_list_filter(GList list, @Const Caps caps, PadDirection direction,
             boolean subsetonly);
-    
+
     /* util elementfactory functions */
     boolean gst_element_factory_can_src_caps(ElementFactory factory, @Const Caps caps);
     boolean gst_element_factory_can_sink_caps(ElementFactory factory, @Const Caps caps);
