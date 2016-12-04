@@ -19,14 +19,14 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.jna.FromNativeContext;
 import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
-
-import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
 
 /**
  *
@@ -99,7 +99,7 @@ public class GType extends IntegerType {
     	if (result == null) {
     		result = GOBJECT_API.g_type_from_name(typeName);
     		if (result.equals(INVALID)) {
-    			// no type has been registered yet
+    			throw new IllegalStateException("No GType registered for this name");
     		} else {
         		gTypeByNames.put(typeName, result);
         		result.name = typeName;
