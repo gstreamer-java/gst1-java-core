@@ -19,6 +19,8 @@
 
 package org.freedesktop.gstreamer;
 
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,11 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
-
 import org.freedesktop.gstreamer.elements.AppSink;
 import org.freedesktop.gstreamer.elements.AppSrc;
 import org.freedesktop.gstreamer.elements.BaseSink;
@@ -48,6 +45,8 @@ import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
 import org.freedesktop.gstreamer.glib.GDate;
+import org.freedesktop.gstreamer.glib.GInetAddress;
+import org.freedesktop.gstreamer.glib.GSocketAddress;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
@@ -58,7 +57,10 @@ import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
-import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -446,6 +448,10 @@ public final class Gst {
     @SuppressWarnings("rawtypes")
 	private static Class[] nativeClasses = {
 		GDate.class,
+		GInetAddress.class,
+		GSocket.class,
+		GSocketAddress.class,
+		GInetSocketAddress.class,
 		GValue.class,
 		GValueArray.class,
 		TimedValue.class,
