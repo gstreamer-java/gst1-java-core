@@ -478,6 +478,10 @@ public final class Gst {
     @SuppressWarnings("rawtypes")
 	private static Class[] nativeClasses = {
 		GDate.class,
+		GInetAddress.class,
+		GSocket.class,
+		GSocketAddress.class,
+		GInetSocketAddress.class,
 		GValue.class,
 		GValueArray.class,
 		TimedValue.class,
