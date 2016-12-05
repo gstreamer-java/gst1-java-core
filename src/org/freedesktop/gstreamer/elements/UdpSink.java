@@ -1,6 +1,6 @@
 package org.freedesktop.gstreamer.elements;
 
-public class UdpSink extends BaseSink {
+public class UdpSink extends BaseUdpSink<UdpSink> {
 	
 	public static final String GST_NAME = "udpsink";
     public static final String GTYPE_NAME = "GstUDPSink";
