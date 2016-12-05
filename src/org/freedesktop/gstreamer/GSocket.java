@@ -13,7 +13,7 @@ public class GSocket extends GObject{
 
 	public static final String GTYPE_NAME = "GSocket";
 	
-	public static GSocket create(GSocketFamily family, GSocketType type, GSocketProtocol protocol) throws GstException {
+	public static Initializer makeRawSocket(GSocketFamily family, GSocketType type, GSocketProtocol protocol) throws GstException {
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
 		Pointer socketPointer = GioAPI.g_socket_new(family.toGioValue(), type.toGioValue(), protocol.toGioValue(), reference.getPointer());
@@ -21,23 +21,19 @@ public class GSocket extends GObject{
 			errorArray[0].read();
 			throw new GstException(new GError(errorArray[0]));
 		}
-		return new GSocket(initializer(socketPointer));
+		return initializer(socketPointer);
 	}
 	
-	public static GSocket createDefaultUdpSocket() {
-		return create(GSocketFamily.IPV4, GSocketType.DATAGRAM, GSocketProtocol.UDP);
+	public GSocket(GSocketFamily family, GSocketType type, GSocketProtocol protocol) throws GstException {
+		this(makeRawSocket(family, type, protocol));
 	}
-
-	public static GSocket createDefaultUdpSocket(String bindAddress, int bindPort) {
-		return create(GSocketFamily.IPV4, GSocketType.DATAGRAM, GSocketProtocol.UDP).bind(bindAddress, bindPort);
-	}
-
+	
 	public GSocket(Initializer init) {
 		super(init);
 	}
 	
 	public GSocket bind(String address, int port) {
-		GInetSocketAddress boundAddress = GInetSocketAddress.create(address, port);
+		GInetSocketAddress boundAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
 		if ( ! GioAPI.g_socket_bind(getNativeAddress(), boundAddress.getNativeAddress(), true, reference.getPointer()) ) {
@@ -48,7 +44,7 @@ public class GSocket extends GObject{
 	}
 	
 	public void connect(String address, int port) {
-		GInetSocketAddress connectedAddress = GInetSocketAddress.create(address, port);
+		GInetSocketAddress connectedAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
 		if ( ! GioAPI.g_socket_connect(getNativeAddress(), connectedAddress.getNativeAddress(), new GCancellable().getNativeAddress(), reference.getPointer()) ) {
