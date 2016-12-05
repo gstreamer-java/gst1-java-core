@@ -33,7 +33,7 @@ public class GSocket extends GObject{
 	}
 	
 	public GSocket bind(String address, int port) {
-		GInetSocketAddress boundAddress = GInetSocketAddress.create(address, port);
+		GInetSocketAddress boundAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
 		if ( ! GioAPI.g_socket_bind(getNativeAddress(), boundAddress.getNativeAddress(), true, reference.getPointer()) ) {
@@ -44,7 +44,7 @@ public class GSocket extends GObject{
 	}
 	
 	public void connect(String address, int port) {
-		GInetSocketAddress connectedAddress = GInetSocketAddress.create(address, port);
+		GInetSocketAddress connectedAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
 		if ( ! GioAPI.g_socket_connect(getNativeAddress(), connectedAddress.getNativeAddress(), new GCancellable().getNativeAddress(), reference.getPointer()) ) {
