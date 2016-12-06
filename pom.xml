@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>oss-parent</artifactId>
+        <groupId>org.sonatype.oss</groupId>
+        <version>9</version>
+    </parent>
+
     <groupId>org.freedesktop.gstreamer</groupId>
     <artifactId>gst1-java-core</artifactId>
-    <packaging>jar</packaging>
-    <name>GStreamer 1.x Java Core</name>
     <version>0.9-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>GStreamer 1.x Java Core</name>
     <description>Unofficial Java binding for the Gstreamer framework</description>
-    <url>http://www.github.com/gstreamer-java</url>
+    <url>https://github.com/gstreamer-java/gst1-java-core</url>
+
+    <organization>
+        <name>gstreamer-java</name>
+        <url>http://www.github.com/gstreamer-java</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>git@github.com/gstreamer-java/gst1-java-core</url>
+        <connection>scm:git:git@github.com/gstreamer-java/gst1-java-core</connection>
+        <developerConnection>scm:git:git@github.com/gstreamer-java/gst1-java-core</developerConnection>
+    </scm>
+
     <developers>
         <developer>
             <id>wmeissner</id>
@@ -60,18 +88,13 @@
             </roles>
         </developer>
     </developers>
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License</name>
-            <url>http://www.gnu.org/licenses/lgpl.html</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-<!--    <scm>
-        <url>http://code.google.com/p/gstreamer-java/source/browse</url>
-        <connection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</connection>
-        <developerConnection>scm:svn:https://gstreamer-java.googlecode.com/svn/trunk/gstreamer-java</developerConnection>
-    </scm>-->
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.test.jvmargs></maven.test.jvmargs>
+        <jna.version>4.1</jna.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -119,7 +142,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -154,23 +176,6 @@
         tanaka> LANG=en_GB.UTF-8 mvn -Dgpg.Dkeyname=xxx@example.com \ -Dgpg.passphrase=xxxx 
         \ -Darguments="-Dgpg.passphrase=xxxx" \ -DconnectionUrl=scm:svn:https://gstreamer-java.googlecode.com/svn/branches/maven-release-1.x 
         \ release:perform ============================================================================================ -->
-<!--        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>-->
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.test.jvmargs></maven.test.jvmargs>
-        <jna.version>4.1</jna.version>
-    </properties>
 
     <profiles>
         <profile>
