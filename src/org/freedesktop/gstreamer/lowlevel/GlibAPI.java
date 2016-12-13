@@ -106,7 +106,7 @@ public interface GlibAPI extends Library {
     void g_source_remove(int id);
     void g_free(Pointer ptr);
     
-    GType g_date_get_type();
+//    GType g_date_get_type();
     Pointer g_date_new();
     Pointer g_date_new_dmy(int day, int month, int year);
     Pointer g_date_new_julian(int julian_day);
