@@ -53,6 +53,7 @@ import org.freedesktop.gstreamer.elements.FlvDemux;
 import org.freedesktop.gstreamer.elements.FlvMux;
 import org.freedesktop.gstreamer.elements.GlImageSink;
 import org.freedesktop.gstreamer.elements.H264Parse;
+import org.freedesktop.gstreamer.elements.MultiFileSrc;
 import org.freedesktop.gstreamer.elements.MultiUdpSink;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.Queue;
@@ -73,6 +74,7 @@ import org.freedesktop.gstreamer.elements.UdpSrc;
 import org.freedesktop.gstreamer.elements.V4l2Src;
 import org.freedesktop.gstreamer.elements.Volume;
 import org.freedesktop.gstreamer.elements.WebRtcDsp;
+import org.freedesktop.gstreamer.elements.WebRtcEchoProbe;
 import org.freedesktop.gstreamer.elements.X264Enc;
 import org.freedesktop.gstreamer.elements.XvImageSink;
 import org.freedesktop.gstreamer.glib.GDate;
@@ -526,6 +528,7 @@ public final class Gst {
 		FlvMux.class,
 		GlImageSink.class,
 		H264Parse.class,
+		MultiFileSrc.class,
 		MultiUdpSink.class,
 		Pipeline.class,
 		PlayBin.class,
@@ -546,6 +549,7 @@ public final class Gst {
 		URIDecodeBin.class,
 		V4l2Src.class,
 		WebRtcDsp.class,
+		WebRtcEchoProbe.class,
 		X264Enc.class,
 		XvImageSink.class,
 		Volume.class,
