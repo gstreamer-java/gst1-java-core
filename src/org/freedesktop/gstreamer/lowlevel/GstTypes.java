@@ -67,7 +67,11 @@ public class GstTypes {
                 if (GstTypes.logger.isLoggable(Level.FINER)) {
                     GstTypes.logger.finer("Found type of " + gType + " = " + cls);
                 }
-                gtypeNameMap.put(gTypeName, cls);
+                
+                // The following line is an optimisation but not compatible with current implementation of GstTypes.typeFor()
+                // Uncomment the following line after refactoring of GstTypes.typeFor()
+                // gtypeNameMap.put(gTypeName, cls);
+                
                 return cls;
             }
         	type = type.getParentType();
