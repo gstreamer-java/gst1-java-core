@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2010 DHoyt <david.g.hoyt@gmail.com>
  *
  * This file is part of gstreamer-java.
@@ -21,9 +22,12 @@ package org.freedesktop.gstreamer.elements;
 import org.freedesktop.gstreamer.Bin;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.ElementFactory;
 import org.freedesktop.gstreamer.Pad;
+import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 
 /**
  * Utility {@link org.gstreamer.Element} to automatically identify media stream types and hook
@@ -60,8 +64,7 @@ public class DecodeBin extends Bin {
     /**
      * Adds a listener for the <code>unknown-type</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final UNKNOWN_TYPE listener) {
         connect(UNKNOWN_TYPE.class, listener, new GstCallback() {
@@ -94,8 +97,7 @@ public class DecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-continue</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final AUTOPLUG_CONTINUE listener) {
         connect(AUTOPLUG_CONTINUE.class, listener, new GstCallback() {
@@ -133,8 +135,7 @@ public class DecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-factories</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final AUTOPLUG_FACTORIES listener) {
         connect(AUTOPLUG_FACTORIES.class, listener, new GstCallback() {
@@ -173,8 +174,7 @@ public class DecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-sort</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final AUTOPLUG_SORT listener) {
         connect(AUTOPLUG_SORT.class, listener, new GstCallback() {
@@ -193,6 +193,100 @@ public class DecodeBin extends Bin {
         disconnect(AUTOPLUG_SORT.class, listener);
     }
 
+    public enum GstAutoplugSelectResult implements IntegerEnum {
+    	GST_AUTOPLUG_SELECT_TRY(0),
+    	GST_AUTOPLUG_SELECT_EXPOSE(1),
+    	GST_AUTOPLUG_SELECT_SKIP(2);
+
+    	GstAutoplugSelectResult (final int value) {
+            this.value = value;
+        }
+        /**
+         * Gets the integer value of the enum.
+         * @return The integer value for this enum.
+         */
+        @Override
+		public int intValue() {
+            return value;
+        }
+        private final int value;
+    }
+
+    /**
+     * Once {@link DecodeBin} has found the possible ElementFactory objects to
+     * try for caps on pad, this signal is emitted. The purpose of the signal is
+     * for the application to perform additional filtering on the
+     * element factory array.
+     *
+     * The callee should copy and modify factories.
+     */
+    public static interface AUTOPLUG_SELECT {
+        /**
+         * @param element The element which has the new Pad.
+         * @param pad the new Pad.
+         * @param caps the caps of the pad that cannot be resolved.
+         * @param factories A GValueArray of possible GstElementFactory to use.
+         */
+        public GstAutoplugSelectResult autoplugSelect(final DecodeBin element, final Pad pad, final Caps caps, final ElementFactory factory);
+    }
+    /**
+     * Adds a listener for the <code>autoplug-select</code> signal
+     *
+     * @param listener Listener to be called
+     */
+    public void connect(final AUTOPLUG_SELECT listener) {
+        connect(AUTOPLUG_SELECT.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public GstAutoplugSelectResult callback(final DecodeBin elem, final Pad pad, final Caps caps, final ElementFactory factory) {
+                return listener.autoplugSelect(elem, pad, caps, factory);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>autoplug-select</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(final AUTOPLUG_SELECT listener) {
+        disconnect(AUTOPLUG_SELECT.class, listener);
+    }
+
+    /**
+     * This signal is emitted whenever an autoplugged element that is not linked downstream yet and not exposed does a query. 
+     * It can be used to tell the element about the downstream supported caps for example..
+     */
+    public static interface AUTOPLUG_QUERY {
+        /**
+         * @param element the decodebin.
+         * @param pad the pad.
+         * @param child the child element doing the query
+         * @param query the query.
+         */
+        public boolean autoplugQuery(DecodeBin element, Pad pad, Element child, Query query);
+    }
+    
+    /**
+     * Adds a listener for the <code>autoplug-query</code> signal
+     *
+     * @param listener Listener to be called
+     */
+    public void connect(final AUTOPLUG_QUERY listener) {
+        connect(AUTOPLUG_QUERY.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public boolean callback(DecodeBin elem, Pad pad, Element child, Query query) {
+                return listener.autoplugQuery(elem, pad, child, query);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>autoplug-query</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(AUTOPLUG_QUERY listener) {
+        disconnect(AUTOPLUG_QUERY.class, listener);
+    }
+    
     /**
      * This signal is emitted once {@link DecodeBin} has finished decoding all the data.
      */
@@ -205,8 +299,7 @@ public class DecodeBin extends Bin {
     /**
      * Adds a listener for the <code>drained</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final DRAINED listener) {
         connect(DRAINED.class, listener, new GstCallback() {
