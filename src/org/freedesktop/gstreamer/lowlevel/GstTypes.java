@@ -81,6 +81,7 @@ public class GstTypes {
         return null;
     }
 
+    //TODO : need refactoring to take into account derived class
     public static final GType typeFor(Class<? extends NativeObject> cls) {
         for (Map.Entry<String, Class<? extends NativeObject>> e : gtypeNameMap.entrySet()) {
             if (e.getValue().equals(cls)) {
