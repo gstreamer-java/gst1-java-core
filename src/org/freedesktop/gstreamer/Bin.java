@@ -352,6 +352,8 @@ public class Bin extends Element {
         /**
          * Called when an {@link Element} is added to a {@link Bin}
          * 
+         * Since GStreamer 1.10
+         * 
          * @param bin the Bin 
          * @param sub_bin the Bin the element was added to. 
          * @param element the {@link Element} that was added.
@@ -390,6 +392,8 @@ public class Bin extends Element {
     public static interface DEEP_ELEMENT_REMOVED {
         /**
          * Called when an {@link Element} is removed from a {@link Bin}
+         * 
+         * Since GStreamer 1.10
          * 
          * @param bin the Bin 
          * @param sub_bin the Bin the element was removed from.
