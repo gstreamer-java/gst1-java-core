@@ -19,6 +19,11 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.freedesktop.gstreamer.BufferPool;
+import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Query;
@@ -28,8 +33,6 @@ import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstQuery functions
@@ -91,6 +94,15 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     void gst_query_set_formatsv(Query query, int n_formats, Format[] formats);
     void gst_query_parse_n_formats(Query query, int[] n_formats);
     void gst_query_parse_nth_format(Query query, int nth, Format[] format);
+    
+    /* allocation query */
+    @CallerOwnsReturn Query gst_query_new_allocation(Caps caps, boolean need_pool);
+    Pointer ptr_gst_query_new_allocation(Caps caps, boolean need_pool);
+    void gst_query_parse_allocation(Query query, /* Caps ** */ Pointer[] caps, boolean[] need_pool);
+    void gst_query_add_allocation_meta(Query query, GType api, Structure params);
+    void gst_query_add_allocation_pool(Query query, BufferPool pool, /* guint */ int size, /* guint */ int min_buffers, /* guint */ int max_buffers);
+    int gst_query_get_n_allocation_pools(Query query);
+
     
     public static final class QueryStruct extends com.sun.jna.Structure {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;

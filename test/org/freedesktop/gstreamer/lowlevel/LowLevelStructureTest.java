@@ -1,28 +1,5 @@
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.lowlevel.GSignalAPI;
-import org.freedesktop.gstreamer.lowlevel.GValueStruct;
-import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI;
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
-import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GstLFOControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GstCapsAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseTransformAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.BaseSrcAPI;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-import org.freedesktop.gstreamer.lowlevel.GstAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI;
-import org.freedesktop.gstreamer.lowlevel.GstObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.GstInterpolationControlSourceAPI;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
@@ -135,7 +112,6 @@ public class LowLevelStructureTest {
         structs = new ArrayList<Class<? extends Structure>>();
 
         structs.add(BaseSinkAPI.GstBaseSinkStruct.class);
-        structs.add(BaseSinkAPI.GstBaseSinkAbi.class);
         structs.add(BaseSinkAPI.GstBaseSinkClass.class);
 
         structs.add(BaseSrcAPI.GstBaseSrcStruct.class);

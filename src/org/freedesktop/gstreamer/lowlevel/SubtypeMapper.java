@@ -51,6 +51,7 @@ import org.freedesktop.gstreamer.message.SegmentDoneMessage;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
 import org.freedesktop.gstreamer.message.TagMessage;
 import org.freedesktop.gstreamer.message.WarningMessage;
+import org.freedesktop.gstreamer.query.AllocationQuery;
 import org.freedesktop.gstreamer.query.ConvertQuery;
 import org.freedesktop.gstreamer.query.DurationQuery;
 import org.freedesktop.gstreamer.query.FormatsQuery;
@@ -144,6 +145,7 @@ class SubtypeMapper {
         static class MapHolder {
             private static final Map<QueryType, Class<? extends Query>> typeMap
                 = new HashMap<QueryType, Class<? extends Query>>() {{
+                put(QueryType.ALLOCATION, AllocationQuery.class);
                 put(QueryType.CONVERT, ConvertQuery.class);
                 put(QueryType.DURATION, DurationQuery.class);
                 put(QueryType.FORMATS, FormatsQuery.class);

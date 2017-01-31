@@ -19,6 +19,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.ActivateMode;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
@@ -28,6 +31,7 @@ import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Pad;
+import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.StateChangeReturn;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
@@ -35,13 +39,11 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementClass;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+import org.freedesktop.gstreamer.query.AllocationQuery;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
-import com.sun.jna.Union;
-import java.util.Arrays;
-import java.util.List;
 
 public interface BaseSinkAPI extends Library {
 	BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
@@ -50,7 +52,7 @@ public interface BaseSinkAPI extends Library {
     
     public static final class GstBaseSinkStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
-        
+
         /*< protected >*/
         public volatile Pad sinkpad;
         public volatile ActivateMode pad_mode;
@@ -61,13 +63,9 @@ public interface BaseSinkAPI extends Library {
         public volatile boolean can_activate_push;
 
         /*< protected >*/ /* with PREROLL_LOCK */
-        public volatile Pointer /*GQueue */ preroll_queue;
-        public volatile int preroll_queue_max_len;
-        public volatile int preroll_queued;
-        public volatile int buffers_queued;
-        public volatile int events_queued;
+        public volatile /* GMutex */ Pointer preroll_lock; 
+        public volatile /* GCond */ Pointer preroll_cond; 
         public volatile boolean eos;
-        public volatile boolean eos_queued;
         public volatile boolean need_preroll;
         public volatile boolean have_preroll;
         public volatile boolean playing_async;
@@ -78,67 +76,64 @@ public interface BaseSinkAPI extends Library {
 
         /*< private >*/ /* with LOCK */
         public volatile Pointer /* GstClockID */ clock_id;
-        public volatile long /* GstClockTime */  end_time;
         public volatile boolean sync;
         public volatile boolean flushing;
+        public volatile boolean running;
+
+        public volatile boolean max_lateness;
 
         /*< private >*/
-        public volatile GstBaseSinkAbiData abidata;
         public volatile Pointer /* GstBaseSinkPrivate */ priv;
+
+        public GstBaseSinkStruct(Pointer handle) {
+            super(handle);
+        }
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
                 "element", "sinkpad", "pad_mode",
                 "offset", "can_activate_pull", "can_activate_push",
-                "preroll_queue", "preroll_queue_max_len", "preroll_queued",
-                "buffers_queued", "events_queued", "eos",
-                "eos_queued", "need_preroll", "have_preroll",
+                "preroll_lock", "preroll_cond", 
+                "eos", "need_preroll", "have_preroll",
                 "playing_async", "have_newsegment", "segment",
-                "clock_id", "end_time", "sync",
-                "flushing", "abidata", "priv"
-            });
-        }
-    }
-
-    public static final class GstBaseSinkAbiData extends Union {
-        public volatile GstBaseSinkAbi abi;
-        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE - 1];
-    }
-
-    public static final class GstBaseSinkAbi extends com.sun.jna.Structure {
-        public volatile Pointer /* GstSegment */ clip_segment;
-        public volatile long max_lateness;
-        public volatile boolean running;
-
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{
-                "clip_segment", "max_lateness", "running"
+                "clock_id", "sync",
+                "flushing", "running", "max_lateness", "priv"
             });
         }
     }
     
     // -------------- Callbacks -----------------
     public static interface GetCaps extends Callback {
-        public Caps callback(BaseSink sink);
+        public Caps callback(BaseSink sink, Caps caps);
     }
     public static interface SetCaps extends Callback {
         public boolean callback(BaseSink sink, Caps caps);
     }
-	public static interface BufferAlloc extends Callback {
-		public FlowReturn callback(BaseSink sink, long offset, int size,
-				Caps caps, /* GstBuffer ** */Pointer bufRef);
-	}
+    public static interface Fixate extends Callback {
+        public void callback(BaseSink sink, Caps caps);
+    }
+    public static interface ActivatePull extends Callback {
+        public boolean callback(BaseSink sink, boolean active);
+    }
     public static interface GetTimes extends Callback {
-        public void callback(BaseSink sink, Buffer buffer, 
+        public void callback(BaseSink sink, Buffer buffer,
                 Pointer start, Pointer end);
     }
+	public static interface ProposeAllocation extends Callback {
+		public boolean callback(BaseSink sink, AllocationQuery query);
+	}
     public static interface BooleanFunc1 extends Callback {
         public boolean callback(BaseSink sink);
     }
+    public static interface QueryNotify extends Callback {
+    	public boolean callback(BaseSink sink, Query query);
+    }
     public static interface EventNotify extends Callback {
-        boolean callback(BaseSink sink, Event event);
+    	public boolean callback(BaseSink sink, Event event);
+    }
+    public static interface WaitEventNotify extends Callback {
+    	public FlowReturn callback(BaseSink sink, Event event);
     }
     public static interface Render extends Callback {
         public FlowReturn callback(BaseSink sink, Buffer buffer);
@@ -146,89 +141,87 @@ public interface BaseSinkAPI extends Library {
     public static interface AsyncPlay extends Callback {
         public StateChangeReturn callback(BaseSink sink);
     }
-    public static interface ActivatePull extends Callback {
-        public boolean callback(BaseSink sink, boolean active);
-    }
-    public static interface Fixate extends Callback {
-        public void callback(BaseSink sink, Caps caps);
-    }
     public static interface RenderList extends Callback {
         public FlowReturn callback(BaseSink sink, GList bufferList);
     }
-    
+
     public static final class GstBaseSinkClass extends com.sun.jna.Structure {
         public GstBaseSinkClass() {}
         public GstBaseSinkClass(Pointer ptr) {
-            useMemory(ptr);
-            read();
+            super(ptr);
         }
-        
+
         //
         // Actual data members
         //
         public GstElementClass parent_class;
-        
+
         /* get caps from subclass */
         public GetCaps get_caps;
 
         /* notify subclass of new caps */
-        public SetCaps set_caps;        
-
-        /* allocate a new buffer with given caps */
-        public BufferAlloc buffer_alloc;
-  
-        /* get the start and end times for syncing on this buffer */
-        public GetTimes get_times;
-  
-        /* start and stop processing, ideal for opening/closing the resource */
-        public BooleanFunc1 start;
-        public BooleanFunc1 stop;
-  
-        /* 
-         * unlock any pending access to the resource. subclasses should unlock
-         * any function ASAP. 
-         */
-        public BooleanFunc1 unlock;
-  
-
-        /* notify subclass of event, preroll buffer or real buffer */
-        public EventNotify event;
-        
-        public Render preroll;
-        public Render render;
- 
-        /* ABI additions */
-
-        /* when an ASYNC state change to PLAYING happens */ /* with LOCK */
-        public AsyncPlay async_play;
-
-        /* start or stop a pulling thread */
-        public ActivatePull activate_pull;
+        public SetCaps set_caps;
 
         /* fixate sink caps during pull-mode negotiation */
         public Fixate fixate;
 
+        /* start or stop a pulling thread */
+        public ActivatePull activate_pull;
+
+        /* get the start and end times for syncing on this buffer */
+        public GetTimes get_times;
+
+        /* propose allocation parameters for upstream */
+        public ProposeAllocation propose_allocation;
+
+        /* start and stop processing, ideal for opening/closing the resource */
+        public BooleanFunc1 start;
+        public BooleanFunc1 stop;
+
+        /*
+         * unlock any pending access to the resource. subclasses should unlock
+         * any function ASAP.
+         */
+        public BooleanFunc1 unlock;
+
         /* Clear a previously indicated unlock request not that unlocking is
          * complete. Sub-classes should clear any command queue or indicator they
-         * set during unlock 
+         * set during unlock
          */
         public BooleanFunc1 unlock_stop;
-        
+
+        /* notify subclass of query */
+        public QueryNotify query;
+
+        /* notify subclass of event */
+        public EventNotify event;
+
+        /* wait for eos or gap, subclasses should chain up to parent first */
+        public WaitEventNotify wait_event;
+
+        /* notify subclass of buffer or list before doing sync */
+        public Render prepare;
+        public RenderList prepare_list;
+
+        /* notify subclass of preroll buffer or real buffer */
+        public Render preroll;
+        public Render render;
+
         /* Render a BufferList */
         public RenderList render_list;
-        
+
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * (GST_PADDING_LARGE-5)];
+        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * BaseSinkAPI.GST_PADDING_LARGE];
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
                 "parent_class", "get_caps", "set_caps",
-                "buffer_alloc", "get_times", "start",
-                "stop", "unlock", "event",
-                "preroll", "render", "async_play",
-                "activate_pull", "fixate", "unlock_stop",
-                "render_list", "_gst_reserved"
+                "fixate", "activate_pull", "get_times",
+                "propose_allocation", "start", "stop",
+                "unlock", "unlock_stop", "query", "event",
+                "wait_event", "prepare", "prepare_list",
+                "preroll", "render", "render_list", "_gst_reserved"
             });
         }
     }

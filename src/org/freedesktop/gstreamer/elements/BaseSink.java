@@ -28,7 +28,11 @@ import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI;
+import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI.GstBaseSinkClass;
+import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI.GstBaseSinkStruct;
+import org.freedesktop.gstreamer.lowlevel.BaseSinkAPI.ProposeAllocation;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
+import org.freedesktop.gstreamer.query.AllocationQuery;
 
 import com.sun.jna.Pointer;
 
@@ -202,5 +206,33 @@ public class BaseSink extends Element {
      */
     public void disconnect(PREROLL_HANDOFF listener) {
         disconnect(PREROLL_HANDOFF.class, listener);
-    }    
+    }
+    
+    /**
+     * Signal emitted when this {@link BaseSink} received a {@link ProposeAllocation} query.
+     *
+     * @see #setProposeAllocationHandler(ProposeAllocationHandler)
+     */
+    public static interface ProposeAllocationHandler {
+    	public boolean proposeAllocation(BaseSink sink, AllocationQuery query);    	
+    }
+    
+    /**
+     * Set a handler for the {@link ProposeAllocation} query on this sink
+     *
+     * @param handler The handler to be called when a {@link ProposeAllocation} is received.
+     */
+    public void setProposeAllocationHandler(final ProposeAllocationHandler handler) {
+        GstBaseSinkStruct struct = new GstBaseSinkStruct(handle());
+        struct.readField("element");
+        GstBaseSinkClass basesinkClass = new GstBaseSinkClass(struct.element.object.object.g_type_instance.g_class.getPointer());
+        basesinkClass.propose_allocation = new ProposeAllocation() {
+			@Override
+			public boolean callback(BaseSink sink, AllocationQuery query) {
+				return handler.proposeAllocation(sink, query);
+			}
+        };
+        basesinkClass.writeField("propose_allocation");
+    }
+
 }
