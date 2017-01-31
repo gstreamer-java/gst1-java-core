@@ -1,5 +1,4 @@
 /* 
- * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2007 Wayne Meissner
  * 
@@ -21,8 +20,6 @@
 package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-import static org.freedesktop.gstreamer.lowlevel.GstTagAPI.GSTTAG_API;
-import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
 
 import java.util.AbstractList;
 import java.util.HashMap;
@@ -31,12 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
+import static org.freedesktop.gstreamer.lowlevel.GstTagAPI.GSTTAG_API;
+import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
 
 /**
  * List of tags and values used to describe media metadata.
@@ -280,17 +280,6 @@ public class TagList extends MiniObject {
                     return new GDate(value.getValue(), false, true);
                 }
             });
-            put(DateTime.GTYPE, new TagGetter() {
-                public Object get(TagList tl, String tag, int index) {
-                    PointerByReference value = new PointerByReference();
-                    GSTTAGLIST_API.gst_tag_list_get_date_time_index(tl, tag, index, value);
-                    if (value.getValue() == null) {
-                        return null;
-                    }
-                    return new DateTime(value.getValue(), false, true);
-                }
-            });
-
         }};
         static private final Map<String, GType> tagTypeMap = new ConcurrentHashMap<String, GType>();
     }

@@ -18,9 +18,7 @@
  */
 
 package org.freedesktop.gstreamer.lowlevel;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
@@ -29,6 +27,8 @@ import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -106,7 +106,6 @@ public interface GlibAPI extends Library {
     void g_source_remove(int id);
     void g_free(Pointer ptr);
     
-//    GType g_date_get_type();
     Pointer g_date_new();
     Pointer g_date_new_dmy(int day, int month, int year);
     Pointer g_date_new_julian(int julian_day);
