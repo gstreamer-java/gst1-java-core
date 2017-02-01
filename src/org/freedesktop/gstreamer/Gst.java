@@ -48,6 +48,7 @@ import org.freedesktop.gstreamer.elements.BaseSrc;
 import org.freedesktop.gstreamer.elements.BaseTransform;
 import org.freedesktop.gstreamer.elements.CapsSetter;
 import org.freedesktop.gstreamer.elements.DecodeBin;
+import org.freedesktop.gstreamer.elements.DtlsSrtpDec;
 import org.freedesktop.gstreamer.elements.FakeSink;
 import org.freedesktop.gstreamer.elements.FlvDemux;
 import org.freedesktop.gstreamer.elements.FlvMux;
@@ -55,6 +56,8 @@ import org.freedesktop.gstreamer.elements.GlImageSink;
 import org.freedesktop.gstreamer.elements.H264Parse;
 import org.freedesktop.gstreamer.elements.MultiFileSrc;
 import org.freedesktop.gstreamer.elements.MultiUdpSink;
+import org.freedesktop.gstreamer.elements.NiceSink;
+import org.freedesktop.gstreamer.elements.NiceSrc;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.Queue;
 import org.freedesktop.gstreamer.elements.RtmpSink;
@@ -89,6 +92,7 @@ import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.TimedValue;
 import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.nice.NiceAgent;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -487,6 +491,7 @@ public final class Gst {
 		GInetSocketAddress.class,
 		GValue.class,
 		GValueArray.class,
+		NiceAgent.class,
 		TimedValue.class,
 		ValueArray.class,
 		ValueList.class,
@@ -523,6 +528,7 @@ public final class Gst {
 		Bin.class,
 		CapsSetter.class,
 		DecodeBin.class,
+		DtlsSrtpDec.class,
 		FakeSink.class,
 		FlvDemux.class,
 		FlvMux.class,
@@ -530,6 +536,8 @@ public final class Gst {
 		H264Parse.class,
 		MultiFileSrc.class,
 		MultiUdpSink.class,
+		NiceSink.class,
+		NiceSrc.class,
 		Pipeline.class,
 		PlayBin.class,
 		Queue.class,
