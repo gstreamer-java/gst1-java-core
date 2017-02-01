@@ -27,7 +27,7 @@ public class GInetSocketAddress extends GSocketAddress{
 		super(init);
 	}
 
-	public Integer getPort() {
+	public int getPort() {
 		return (Integer) get("port");
 	}
 	
