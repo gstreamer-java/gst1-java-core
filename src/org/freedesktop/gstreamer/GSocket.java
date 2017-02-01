@@ -77,7 +77,7 @@ public class GSocket extends GObject{
 		return (Boolean) get("blocking");
 	}
 	
-	public Integer getFD() {
+	public int getFD() {
 		return (Integer) get("fd");
 	}
 	
