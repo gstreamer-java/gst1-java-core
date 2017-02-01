@@ -33,6 +33,11 @@ public class DecodeBin extends Bin {
 	public static final String GST_NAME = "decodebin";
     public static final String GTYPE_NAME = "GstDecodeBin";
 
+
+    public DecodeBin() {
+    	this((String) null);
+    }
+    
     /**
      * Creates a new DecodeBin.
      *
