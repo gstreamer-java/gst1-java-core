@@ -6,7 +6,7 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 public class V4l2Src extends PushSrc {
 	
-	public static final String GST_NAME = "v4l2Src";
+	public static final String GST_NAME = "v4l2src";
     public static final String GTYPE_NAME = "GstV4l2Src";
 
     public V4l2Src() {
