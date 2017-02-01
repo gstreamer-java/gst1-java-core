@@ -1,0 +1,8 @@
+package org.freedesktop.gstreamer.lowlevel.enums;
+
+public enum NiceCandidateTransport {
+	NICE_CANDIDATE_TRANSPORT_UDP,
+	NICE_CANDIDATE_TRANSPORT_TCP_ACTIVE,
+	NICE_CANDIDATE_TRANSPORT_TCP_PASSIVE,
+	NICE_CANDIDATE_TRANSPORT_TCP_SO;
+}

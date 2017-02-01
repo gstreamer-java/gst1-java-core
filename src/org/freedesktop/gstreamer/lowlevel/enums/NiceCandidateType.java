@@ -1,0 +1,8 @@
+package org.freedesktop.gstreamer.lowlevel.enums;
+
+public enum NiceCandidateType {
+	NICE_CANDIDATE_TYPE_HOST,
+	NICE_CANDIDATE_TYPE_SERVER_REFLEXIVE,
+	NICE_CANDIDATE_TYPE_PEER_REFLEXIVE,
+	NICE_CANDIDATE_TYPE_RELAYED		
+}
