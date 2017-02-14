@@ -10,6 +10,7 @@ import org.freedesktop.gstreamer.lowlevel.enums.NiceCompatibility;
 import org.freedesktop.gstreamer.lowlevel.enums.NiceComponentState;
 import org.freedesktop.gstreamer.lowlevel.enums.NiceRelayType;
 import org.freedesktop.gstreamer.nice.NiceAgent;
+import org.freedesktop.gstreamer.nice.NiceStream;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
@@ -36,7 +37,10 @@ public interface NiceAPI extends Library {
 		
 		// NiceAddress
 		public byte[] addr = new byte[28];
+
+		// NiceAddress
 		public byte[] base_addr = new byte[28];
+		
 		public int priority;
 		public int stream_id;
 		public int component_id;
@@ -62,6 +66,7 @@ public interface NiceAPI extends Library {
 		}
 		
 	}
+	
 	
 	public Pointer nice_agent_new(GMainContext gMainContext, NiceCompatibility niceCompatibility);
 	public Pointer nice_agent_new_reliable(GMainContext gMainContext, NiceCompatibility niceCompatibility);
@@ -108,39 +113,40 @@ public interface NiceAPI extends Library {
 	public String nice_component_state_to_string(NiceComponentState state);
 
 
-	public static interface NEW_CANDIDATE {
-		
-		public void onNewCandidate(NiceAgent agent, int streamId, int componentId, String foundation);
-		
-	}
 
 	public static interface NEW_CANDIDATE_FULL {
 		
-		public void onNewCandidate(NiceAgent agent, NiceCandidate candidate);
+		public void onNewCandidate(NiceAgent agent, NiceStream stream, NiceCandidate candidate);
+		
+	}
+
+	public static interface NEW_REMOTE_CANDIDATE_FULL {
+		
+		public void onNewRemoteCandidate(NiceAgent agent, NiceCandidate candidate);
 		
 	}
 
 	public static interface CANDIDATE_GATHERING_DONE {
 
-		public void onCandidateGatheringDone(NiceAgent agent, int streamId);
+		public void onCandidateGatheringDone(NiceAgent agent, NiceStream stream);
 
 	}
 
 	public static interface COMPONENT_STATE_CHANGED {
 
-		public void onComponentStateChanged(NiceAgent agent, int streamId, int componentId, NiceComponentState state);
+		public void onComponentStateChanged(NiceAgent agent, NiceStream stream, int componentId, NiceComponentState state);
 
 	}
 
 	public static interface NICE_RECV {
 		
-		public void onNiceMessageReceived(NiceAgent agent, int streamId, int componentId, int len, Pointer buffer);
+		public void onNiceMessageReceived(NiceAgent agent, NiceStream stream, int componentId, int len, Pointer buffer);
 		
 	}
 
 	public static interface INITIAL_BINDING_REQUEST_RECEIVED {
 		
-		
+		public void onInitialBidingRequestReceived(NiceAgent agent, int streamId);
 		
 	}
 

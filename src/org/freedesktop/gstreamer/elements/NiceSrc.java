@@ -46,5 +46,4 @@ public class NiceSrc extends PushSrc {
     	return this;
     }
     
-    
 }

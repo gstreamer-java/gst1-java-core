@@ -49,6 +49,7 @@ import org.freedesktop.gstreamer.elements.BaseTransform;
 import org.freedesktop.gstreamer.elements.CapsSetter;
 import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.DtlsSrtpDec;
+import org.freedesktop.gstreamer.elements.DtlsSrtpEnc;
 import org.freedesktop.gstreamer.elements.FakeSink;
 import org.freedesktop.gstreamer.elements.FlvDemux;
 import org.freedesktop.gstreamer.elements.FlvMux;
@@ -69,6 +70,7 @@ import org.freedesktop.gstreamer.elements.RtpMp4gDepay;
 import org.freedesktop.gstreamer.elements.RtpMp4gPay;
 import org.freedesktop.gstreamer.elements.RtpPcmuDepay;
 import org.freedesktop.gstreamer.elements.RtpPcmuPay;
+import org.freedesktop.gstreamer.elements.RtpSsrcDemux;
 import org.freedesktop.gstreamer.elements.SpeexEnc;
 import org.freedesktop.gstreamer.elements.TypeFind;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
@@ -529,6 +531,7 @@ public final class Gst {
 		CapsSetter.class,
 		DecodeBin.class,
 		DtlsSrtpDec.class,
+		DtlsSrtpEnc.class,
 		FakeSink.class,
 		FlvDemux.class,
 		FlvMux.class,
@@ -550,6 +553,7 @@ public final class Gst {
 		RtpMp4gPay.class,
 		RtpPcmuPay.class,
 		RtpPcmuDepay.class,
+		RtpSsrcDemux.class,
 		SpeexEnc.class,
 		TypeFind.class,
 		UdpSink.class,

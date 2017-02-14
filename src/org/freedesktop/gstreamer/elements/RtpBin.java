@@ -7,7 +7,11 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import com.sun.jna.Pointer;
 
 public class RtpBin extends Bin {
-	
+
+    public static enum RtpProfile {
+    	UNKNOWN, AVP, SAVP, AVPF, SAVPF;
+    }
+
 	public static final String GST_NAME = "rtpbin";
     public static final String GTYPE_NAME = "GstRtpBin";
 
@@ -22,7 +26,26 @@ public class RtpBin extends Bin {
     public RtpBin(Initializer init) {
 		super(init);
 	}
+    
+    public int getLatency() {
+    	return get("latency");
+    }
 
+    public RtpBin setLatency(int latencyInMillis) {
+    	set("latency", latencyInMillis);
+    	return this;
+    }
+    
+    public RtpProfile getRtpProfile() {
+    	return RtpProfile.values()[get("rtp-profile")];
+    }
+    
+    public RtpBin setRtpProfile(RtpProfile profile) {
+    	set("rtp-profile",profile.ordinal());
+    	return this;
+    }
+
+    
     public static interface REQUEST_PT_MAP {
     	
     	public Caps onRtpMapRequest(RtpBin rtpBin, int session, int pt);

@@ -54,6 +54,10 @@ public class NiceStream {
 		return result;
 	}
 	
+	public boolean setLocalCredentials(NiceStreamCredentials credentials) {
+		return setLocalCredentials(credentials.getUfrag(), credentials.getPwd());
+	}
+	
 	public boolean setLocalCredentials(String ufrag, String pwd) {
 		return NiceAPI.NICE_API.nice_agent_set_local_credentials(getAgent(), getStreamId(), ufrag, pwd);
 	}
@@ -69,8 +73,8 @@ public class NiceStream {
 	}
 	
 	@Override
-	protected void finalize() throws Throwable {
-		getAgent().removeStream(this);
-		super.finalize();
+	public String toString() {
+		return getClass().getSimpleName()+"{id="+getStreamId()+", name="+getName()+"}";
 	}
+	
 }
