@@ -122,7 +122,15 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     protected void finalize() throws Throwable {
         try {
             logger.log(LIFECYCLE, "Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
-//            System.out.println("Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
+            /*
+            StringBuilder elementDescr = new StringBuilder();
+            elementDescr.append("Finalizing: ");
+            elementDescr.append(getClass().getSimpleName());
+            if (this instanceof Element) {
+            	Element element = (Element) this;
+            	elementDescr.append(" (").append(element.getName()).append(")");
+            }
+            System.out.println(elementDescr);*/
             dispose();
         } finally {
             super.finalize();

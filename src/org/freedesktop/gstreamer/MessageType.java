@@ -208,6 +208,15 @@ public enum MessageType implements IntegerEnum {
      * (Since 1.4)
      */
     DEVICE_REMOVED(EXTENDED.intValue() + 2),
+    
+    PROPERTY_NOTIFY(EXTENDED.intValue() + 3),
+
+    STREAM_COLLECTION(EXTENDED.intValue() + 4),
+
+    STREAMS_SELECTED(EXTENDED.intValue() + 5),
+
+    REDIRECT(EXTENDED.intValue() + 6),
+
     /**
      * mask for all of the above messages.
      */

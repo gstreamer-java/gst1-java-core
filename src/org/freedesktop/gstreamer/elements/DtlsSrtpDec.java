@@ -49,4 +49,12 @@ public class DtlsSrtpDec extends Bin {
     	return get("peer-pem");
     }
  
+    public String getConnectionId() {
+    	return get("connection-id");
+    }
+    
+    public DtlsSrtpDec setConnectionId(String connectionId) {
+    	set("connection-id", connectionId);
+    	return this;
+    }
 }

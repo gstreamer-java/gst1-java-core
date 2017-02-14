@@ -146,10 +146,15 @@ public class Caps extends MiniObject {
      *
      * @return The new Caps.
      */
-    public Caps copy() {
+    @SuppressWarnings("unchecked")
+	public Caps copy() {
         return GSTCAPS_API.gst_caps_copy(this);
     }
-    
+
+	public Caps copy(int nth) {
+        return GSTCAPS_API.gst_caps_copy_nth(this, nth);
+    }
+
     /**
      * Creates a new {@link Caps} that contains all the formats that are common
      * to both this Caps and the other Caps.
