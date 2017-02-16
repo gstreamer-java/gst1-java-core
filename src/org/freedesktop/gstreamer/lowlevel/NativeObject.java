@@ -195,6 +195,8 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
 
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
+            constructor.setAccessible(true);
+            
             T retVal = constructor.newInstance(initializer(ptr, refAdjust > 0, ownsHandle));
             //retVal.initNativeHandle(ptr, refAdjust > 0, ownsHandle);
             return retVal;
