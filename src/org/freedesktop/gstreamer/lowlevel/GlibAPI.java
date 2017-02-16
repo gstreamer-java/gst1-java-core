@@ -39,6 +39,11 @@ public interface GlibAPI extends Library {
     		new HashMap<String, Object>() {{
     			put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
     		}});
+	
+	public static final int GLIB_SYSDEF_AF_UNIX  = 1;
+	public static final int GLIB_SYSDEF_AF_INET  = 2;
+	public static final int GLIB_SYSDEF_AF_INET6 = 23;
+
     Pointer g_main_loop_new(GMainContext context, boolean running);
     void g_main_loop_run(MainLoop loop);
     boolean g_main_loop_is_running(MainLoop loop);
