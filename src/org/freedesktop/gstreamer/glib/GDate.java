@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,8 +19,6 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import static org.freedesktop.gstreamer.lowlevel.GstDateTimeAPI.GSTDATETIME_API;
-
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
@@ -27,8 +26,8 @@ import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import com.sun.jna.Pointer;
 
 public class GDate extends NativeObject {
-	// it's by desing GstDate and not GDate see gstreamer source
-	public static final String GTYPE_NAME = "GstDate";
+    public static final String GTYPE_NAME = "GDate";
+    public static final GType GTYPE = GType.valueOf(GTYPE_NAME); 
 
     public static GDate createInstance(int day, int month, int year) {
     	return new GDate(GlibAPI.GLIB_API.g_date_new_dmy(day, month , year), false, true);
@@ -37,8 +36,6 @@ public class GDate extends NativeObject {
     	return new GDate(GlibAPI.GLIB_API.g_date_new_julian(julian_day), false, true);
     }
     
-    public static final GType GTYPE = GSTDATETIME_API.gst_date_time_get_type();
-
     public GDate(Initializer init) {
         super(init);
     }
