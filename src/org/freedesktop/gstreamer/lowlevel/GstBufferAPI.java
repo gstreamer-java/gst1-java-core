@@ -20,6 +20,9 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
@@ -27,8 +30,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstBuffer functions
@@ -53,7 +54,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
         public MapInfoStruct() {
         }
         public MapInfoStruct(Pointer ptr) {
-            useMemory(ptr);
+            super(ptr);
         }
 
         @Override
@@ -98,8 +99,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
         public long offset_end;
         
         public BufferStruct(Pointer ptr) {
-            useMemory(ptr);
-            read();
+            super(ptr);
         }
 
         @Override
