@@ -242,7 +242,7 @@ public interface GValueAPI extends Library {
         public volatile int n_prealloced;
 
         private boolean ownsMemory;
-        private static final Pointer NULL_POINTER = new Pointer(0);
+        private static final Pointer NO_MEMORY_POINTER = new Pointer(0);
 
         public GValueArray() {
             this(0);
@@ -255,7 +255,7 @@ public interface GValueAPI extends Library {
         
         public GValueArray(Pointer pointer) {
             super(pointer);
-            if (pointer != null && !NULL_POINTER.equals(pointer))
+            if (pointer != Pointer.NULL && !NO_MEMORY_POINTER.equals(pointer))
             	n_values = pointer.getInt(0);
         }
         
