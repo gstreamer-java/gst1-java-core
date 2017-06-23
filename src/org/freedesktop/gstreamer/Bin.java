@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -21,16 +22,16 @@
 
 package org.freedesktop.gstreamer;
 
-import java.util.List;
+import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
+import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 
-import com.sun.jna.Pointer;
+import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
-import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
+import com.sun.jna.Pointer;
 
 /**
  * Base class and element that can contain other elements.
@@ -294,6 +295,7 @@ public class Bin extends Element {
             }
         });
     }
+    
     /**
      * Disconnect the listener for the <code>element-added</code> signal
      * 
@@ -340,6 +342,87 @@ public class Bin extends Element {
         disconnect(ELEMENT_REMOVED.class, listener);
     }
     
+    /**
+     * Signal emitted when an {@link Element} is added to sub-bin of this {@link Bin}
+     * 
+     * @see #connect(DEEP_ELEMENT_ADDED)
+     * @see #disconnect(DEEP_ELEMENT_ADDED)
+     */
+    public static interface DEEP_ELEMENT_ADDED {
+        /**
+         * Called when an {@link Element} is added to a {@link Bin}
+         * 
+         * Since GStreamer 1.10
+         * 
+         * @param bin the Bin 
+         * @param sub_bin the Bin the element was added to. 
+         * @param element the {@link Element} that was added.
+         */
+        public void elementAdded(Bin bin, Bin sub_bin, Element element);
+    }
+    /**
+     * Add a listener for the <code>deep-element-added</code> signal on this Bin
+     * 
+     * @param listener The listener to be called when an {@link Element} is added.
+     */
+    public void connect(final DEEP_ELEMENT_ADDED listener) {
+        connect(DEEP_ELEMENT_ADDED.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(Bin bin, Bin sub_bin, Element elem) {
+                listener.elementAdded(bin, sub_bin, elem);
+            }
+        });
+    }
+    
+    /**
+     * Disconnect the listener for the <code>deep-element-added</code> signal
+     * 
+     * @param listener The listener that was registered to receive the signal.
+     */
+    public void disconnect(DEEP_ELEMENT_ADDED listener) {
+        disconnect(DEEP_ELEMENT_ADDED.class, listener);
+    }
+
+    /**
+     * Signal emitted when an {@link Element} is removed from sub-bin of this {@link Bin}
+     * 
+     * @see #connect(ELEMENT_REMOVED)
+     * @see #disconnect(ELEMENT_REMOVED)
+     */
+    public static interface DEEP_ELEMENT_REMOVED {
+        /**
+         * Called when an {@link Element} is removed from a {@link Bin}
+         * 
+         * Since GStreamer 1.10
+         * 
+         * @param bin the Bin 
+         * @param sub_bin the Bin the element was removed from.
+         * @param element the {@link Element} that was removed.
+         */
+        public void elementRemoved(Bin bin, Bin sub_bin, Element element);
+    }
+    /**
+     * Add a listener for the <code>deep-element-removed</code> signal on this Bin
+     * 
+     * @param listener The listener to be called when an {@link Element} is removed.
+     */
+    public void connect(final DEEP_ELEMENT_REMOVED listener) {
+        connect(DEEP_ELEMENT_REMOVED.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(Bin bin, Bin sub_bin, Element elem) {
+                listener.elementRemoved(bin, sub_bin, elem);
+            }
+        });
+    }
+    /**
+     * Disconnect the listener for the <code>deep-element-removed</code> signal
+     * 
+     * @param listener The listener that was registered to receive the signal.
+     */
+    public void disconnect(DEEP_ELEMENT_REMOVED listener) {
+        disconnect(DEEP_ELEMENT_REMOVED.class, listener);
+    }
+
     /**
      * Signal emitted when an {@link Element} has latency
      * 
