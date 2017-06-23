@@ -22,13 +22,15 @@
 
 package org.freedesktop.gstreamer;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
+
 import java.nio.ByteBuffer;
 
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
+import com.sun.jna.Pointer;
 
 /**
  * Data-passing buffer type, supporting sub-buffers.
@@ -91,10 +93,13 @@ public class Buffer extends MiniObject {
     public static final String GTYPE_NAME = "GstBuffer";
 
     private final MapInfoStruct mapInfo;
+    private final BufferStruct struct;
+
     
     public Buffer(Initializer init) {
         super(init);
         mapInfo = new MapInfoStruct();
+        struct = new BufferStruct(handle());
     }
     
     /**
@@ -141,17 +146,36 @@ public class Buffer extends MiniObject {
      * @return A {@link java.nio.ByteBuffer} that can access this Buffer's data.
      */
     public ByteBuffer map(boolean writeable) {
-        boolean ok = GSTBUFFER_API.gst_buffer_map(this, mapInfo,
+        final boolean ok = GSTBUFFER_API.gst_buffer_map(this, mapInfo,
                 writeable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
-        if (ok) {
+        if (ok && mapInfo.data != null) {
             return mapInfo.data.getByteBuffer(0, mapInfo.size.intValue());
-        } else {
-            return null;
         }
+        return null;
     }
     
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
     }
     
+    /**
+     * Gets the timestamps of this buffer.
+     * The buffer DTS refers to the timestamp when the buffer should be decoded and is usually monotonically increasing.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getDecodeTimestamp() {
+		return (ClockTime)this.struct.readField("dts");
+    }
+
+    /**
+     * Gets the timestamps of this buffer.
+     * The buffer PTS refers to the timestamp when the buffer content should be presented to the user and is not always monotonically increasing.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getPresentationTimestamp() {
+		return (ClockTime)this.struct.readField("pts");
+    }
+
 }
