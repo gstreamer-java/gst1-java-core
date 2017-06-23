@@ -22,6 +22,7 @@ import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.ElementFactory;
 import org.freedesktop.gstreamer.Pad;
+import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
@@ -46,6 +47,40 @@ public class URIDecodeBin extends Bin {
     /**
      * Signal is emitted when a pad for which there is no further possible decoding is added to the {@link URIDecodeBin}.
      */
+    public static interface UNKNOWN_TYPE {
+        /**
+         * @param element The element which has the new Pad.
+         * @param pad the new Pad.
+         * @param caps the caps of the pad that cannot be resolved.
+         */
+        public void unknownType(URIDecodeBin element, Pad pad, Caps caps);
+    }
+    /**
+     * Adds a listener for the <code>unknown-type</code> signal
+     *
+     * @param listener Listener to be called
+     */
+    public void connect(final UNKNOWN_TYPE listener) {
+        connect(UNKNOWN_TYPE.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(URIDecodeBin elem, Pad pad, Caps caps) {
+                listener.unknownType(elem, pad, caps);
+            }
+        });
+    }
+    
+    /**
+     * Removes a listener for the <code>unknown-type</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(UNKNOWN_TYPE listener) {
+        disconnect(UNKNOWN_TYPE.class, listener);
+    }
+
+    /**
+     * Signal is emitted when a pad for which there is no further possible decoding is added to the {@link URIDecodeBin}.
+     */
     public static interface AUTOPLUG_CONTINUE {
         /**
          * @param element The element which has the new Pad.
@@ -57,8 +92,7 @@ public class URIDecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-continue</code> signal
      *
-     * @param autoplug_CONTINUE Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param autoplug_CONTINUE Listener to be called 
      */
     public void connect(final AUTOPLUG_CONTINUE autoplug_CONTINUE) {
         connect(AUTOPLUG_CONTINUE.class, autoplug_CONTINUE, new GstCallback() {
@@ -79,7 +113,7 @@ public class URIDecodeBin extends Bin {
 
     /**
      * This function is emitted when an array of possible factories for caps on pad is needed.
-     * {@link DecodeBin} will by default return an array with all compatible factories, sorted by rank.
+     * {@link URIDecodeBin} will by default return an array with all compatible factories, sorted by rank.
      *
      * If this function returns NULL, pad will be exposed as a final caps.
      *
@@ -96,8 +130,7 @@ public class URIDecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-factories</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called 
      */
     public void connect(final AUTOPLUG_FACTORIES listener) {
         connect(AUTOPLUG_FACTORIES.class, listener, new GstCallback() {
@@ -114,6 +147,45 @@ public class URIDecodeBin extends Bin {
      */
     public void disconnect(final AUTOPLUG_FACTORIES listener) {
         disconnect(AUTOPLUG_FACTORIES.class, listener);
+    }
+
+    /**
+     * Once {@link URIDecodeBin} has found the possible ElementFactory objects to
+     * try for caps on pad, this signal is emitted. The purpose of the signal is
+     * for the application to perform additional sorting or filtering on the
+     * element factory array.
+     *
+     * The callee should copy and modify factories.
+     */
+    public static interface AUTOPLUG_SORT {
+        /**
+         * @param element The element which has the new Pad.
+         * @param pad the new Pad.
+         * @param caps the caps of the pad that cannot be resolved.
+         * @param factories A GValueArray of possible GstElementFactory to use.
+         */
+        public GValueArray autoplugSort(URIDecodeBin element, Pad pad, Caps caps, GValueArray factories);
+    }
+    /**
+     * Adds a listener for the <code>autoplug-sort</code> signal
+     *
+     * @param listener Listener to be called 
+     */
+    public void connect(final AUTOPLUG_SORT listener) {
+        connect(AUTOPLUG_SORT.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public GValueArray callback(URIDecodeBin elem, Pad pad, Caps caps, GValueArray factories) {
+                return listener.autoplugSort(elem, pad, caps, factories);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>autoplug-sort</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(AUTOPLUG_SORT listener) {
+        disconnect(AUTOPLUG_SORT.class, listener);
     }
 
     public enum GstAutoplugSelectResult implements IntegerEnum {
@@ -136,7 +208,7 @@ public class URIDecodeBin extends Bin {
     }
 
     /**
-     * Once {@link URIdecodebin} has found the possible ElementFactory objects to
+     * Once {@link URIDecodeBin} has found the possible ElementFactory objects to
      * try for caps on pad, this signal is emitted. The purpose of the signal is
      * for the application to perform additional filtering on the
      * element factory array.
@@ -155,8 +227,7 @@ public class URIDecodeBin extends Bin {
     /**
      * Adds a listener for the <code>autoplug-select</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
     public void connect(final AUTOPLUG_SELECT listener) {
         connect(AUTOPLUG_SELECT.class, listener, new GstCallback() {
@@ -167,7 +238,7 @@ public class URIDecodeBin extends Bin {
         });
     }
     /**
-     * Removes a listener for the <code>autoplug-sort</code> signal
+     * Removes a listener for the <code>autoplug-select</code> signal
      *
      * @param listener The listener that was previously added.
      */
@@ -176,45 +247,105 @@ public class URIDecodeBin extends Bin {
     }
 
     /**
-     * Once {@link DecodeBin} has found the possible ElementFactory objects to
-     * try for caps on pad, this signal is emitted. The purpose of the signal is
-     * for the application to perform additional sorting or filtering on the
-     * element factory array.
-     *
-     * The callee should copy and modify factories.
+     * This signal is emitted whenever an autoplugged element that is not linked downstream yet and not exposed does a query. 
+     * It can be used to tell the element about the downstream supported caps for example..
      */
-    public static interface AUTOPLUG_SORT {
+    public static interface AUTOPLUG_QUERY {
         /**
-         * @param element The element which has the new Pad.
-         * @param pad the new Pad.
-         * @param caps the caps of the pad that cannot be resolved.
-         * @param factories A GValueArray of possible GstElementFactory to use.
+         * @param element the uridecodebin.
+         * @param pad the pad.
+         * @param child the child element doing the query
+         * @param query the query.
          */
-        public GValueArray autoplugSort(URIDecodeBin element, Pad pad, Caps caps, GValueArray factories);
+        public boolean autoplugQuery(URIDecodeBin element, Pad pad, Element child, Query query);
     }
+    
     /**
-     * Adds a listener for the <code>autoplug-sort</code> signal
+     * Adds a listener for the <code>autoplug-query</code> signal
      *
-     * @param listener Listener to be called when a new {@link Pad} is encountered
-     * on the {@link Element}
+     * @param listener Listener to be called
      */
-    public void connect(final AUTOPLUG_SORT listener) {
-        connect(AUTOPLUG_SORT.class, listener, new GstCallback() {
+    public void connect(final AUTOPLUG_QUERY listener) {
+        connect(AUTOPLUG_QUERY.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public GValueArray callback(URIDecodeBin elem, Pad pad, Caps caps, GValueArray factories) {
-                return listener.autoplugSort(elem, pad, caps, factories);
+            public boolean callback(URIDecodeBin elem, Pad pad, Element child, Query query) {
+                return listener.autoplugQuery(elem, pad, child, query);
             }
         });
     }
     /**
-     * Removes a listener for the <code>autoplug-sort</code> signal
+     * Removes a listener for the <code>autoplug-query</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(AUTOPLUG_SORT listener) {
-        disconnect(AUTOPLUG_SORT.class, listener);
+    public void disconnect(AUTOPLUG_QUERY listener) {
+        disconnect(AUTOPLUG_QUERY.class, listener);
     }
 
+    /**
+     * This signal is emitted once {@link URIDecodeBin} has finished decoding all the data.
+     */
+    public static interface DRAINED {
+        /**
+         * @param element The element
+         */
+        public GValueArray drained(URIDecodeBin element);
+    }
+    /**
+     * Adds a listener for the <code>drained</code> signal
+     *
+     * @param listener Listener to be called
+     */
+    public void connect(final DRAINED listener) {
+        connect(DRAINED.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public GValueArray callback(URIDecodeBin elem) {
+                return listener.drained(elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>drained</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(DRAINED listener) {
+        disconnect(DRAINED.class, listener);
+    }
+
+    /**
+     * Signal is emitted after the source has been created, so it can be configured by setting additionnal properties.
+     */
+    public static interface SOURCE_SETUP {
+        /**
+         *
+         * @param bin the container.
+         * @param elem the created source
+         */
+        public void sourceSetup(Element bin, Element elem);
+    }
+
+    /**
+     * Adds a listener for the <code>source-setup</code> signal
+     *
+     * @param source-setup Listener to be called
+     */
+    public void connect(final SOURCE_SETUP listener) {
+        this.connect(SOURCE_SETUP.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(final Element bin, final Element elem) {
+                listener.sourceSetup(bin, elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>source-setup</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(final SOURCE_SETUP listener) {
+        this.disconnect(SOURCE_SETUP.class, listener);
+    }
 
 
 }
