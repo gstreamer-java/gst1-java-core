@@ -232,7 +232,7 @@ public interface GValueAPI extends Library {
         	return GVALUE_API.g_strdup_value_contents(this);
         }
     }
-
+    
     public static final class GValueArray extends com.sun.jna.Structure {
     	public static final String GTYPE_NAME = "GValueArray";
 
@@ -242,6 +242,7 @@ public interface GValueAPI extends Library {
         public volatile int n_prealloced;
 
         private boolean ownsMemory;
+        private static final Pointer NO_MEMORY_POINTER = new Pointer(0);
 
         public GValueArray() {
             this(0);
@@ -254,7 +255,8 @@ public interface GValueAPI extends Library {
         
         public GValueArray(Pointer pointer) {
             super(pointer);
-            n_values = pointer.getInt(0);
+            if (pointer != Pointer.NULL && !NO_MEMORY_POINTER.equals(pointer))
+            	n_values = pointer.getInt(0);
         }
         
         @SuppressWarnings("unused")
