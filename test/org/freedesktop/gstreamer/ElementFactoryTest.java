@@ -35,6 +35,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -155,6 +156,7 @@ public class ElementFactoryTest {
         assertTrue("Element not a subclass of PlayBin", e instanceof PlayBin);
     }
     @Test
+    @Ignore
     public void testGarbageCollection() throws Throwable {
         ElementFactory factory = ElementFactory.find("fakesrc");
         assertNotNull("Could not locate fakesrc factory", factory);
