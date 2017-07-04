@@ -123,15 +123,15 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                 //
                 boolean ownsHandle = ((MethodResultContext) context).getMethod().isAnnotationPresent(CallerOwnsReturn.class);
                 int refadj = ownsHandle ? -1 : 0;
-                return NativeObject.objectFor((Pointer) result, context.getTargetType(), refadj, ownsHandle);
+                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), refadj, ownsHandle);
             }
             if (context instanceof CallbackParameterContext) {
-                return NativeObject.objectFor((Pointer) result, context.getTargetType(), 1, true);
+                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, true);
             }
             if (context instanceof StructureReadContext) {
                 StructureReadContext sctx = (StructureReadContext) context;
                 boolean ownsHandle = sctx.getField().getAnnotation(ConstField.class) == null;
-                return NativeObject.objectFor((Pointer) result, context.getTargetType(), 1, ownsHandle);
+                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, ownsHandle);
             }
             throw new IllegalStateException("Cannot convert to NativeObject from " + context);
         }
@@ -144,7 +144,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 
         @SuppressWarnings(value = "unchecked")
         public Object fromNative(Object value, FromNativeContext context) {
-            return EnumMapper.getInstance().valueOf((Integer) value, context.getTargetType());
+            return EnumMapper.getInstance().valueOf((Integer) value, (Class<? extends Enum>) context.getTargetType());
         }
 
         public Class<?> nativeType() {
