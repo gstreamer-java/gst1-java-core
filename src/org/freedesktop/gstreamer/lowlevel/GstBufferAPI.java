@@ -25,11 +25,13 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.ClockTime;
+import org.freedesktop.gstreamer.Meta;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
  * GstBuffer functions
@@ -75,6 +77,9 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
+    Meta gst_buffer_get_meta (Buffer buffer, GType api);
+    Meta gst_buffer_iterate_meta(Buffer buffer, PointerByReference state);
+
 //    boolean gst_buffer_is_metadata_writable(Buffer buf);
 //    Buffer gst_buffer_make_metadata_writable(@Invalidate Buffer buf);
 //    /* creating a subbuffer */

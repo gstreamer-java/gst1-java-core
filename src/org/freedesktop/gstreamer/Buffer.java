@@ -25,7 +25,9 @@ package org.freedesktop.gstreamer;
 import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
+import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
@@ -176,6 +178,25 @@ public class Buffer extends MiniObject {
      */
     public ClockTime getPresentationTimestamp() {
 		return (ClockTime)this.struct.readField("pts");
+    }
+
+    /**
+     * Get the metadata for api on buffer. When there is no such metadata, NULL is returned.
+     * @param api the GType of an API
+     * @return the metadata or null.
+     */
+    @SuppressWarnings("unchecked")
+	public <T extends Meta> T getMeta(final GType api) {
+    	return (T)GSTBUFFER_API.gst_buffer_get_meta(this, api);
+    }
+
+    /**
+     * Retrieve a list of the {@link Meta}s contained in the Buffer.
+     * 
+     * @return The List of {@link Meta}s.
+     */
+    public List<Meta> getMetaList() {
+    	return new GstMetaIterator(this).asList();
     }
 
 }

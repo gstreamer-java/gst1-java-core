@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.Meta;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 
@@ -183,6 +184,7 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     	final GType gType =
     			GObject.class.isAssignableFrom(cls) ? GObject.getType(ptr) :
     			MiniObject.class.isAssignableFrom(cls) ? MiniObject.getType(ptr) :
+    			Meta.class.isAssignableFrom(cls) ? Meta.getType(ptr) :
     			null; // shall never appears
         
 		//
