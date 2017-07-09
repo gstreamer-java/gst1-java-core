@@ -47,8 +47,10 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 
 /**
- * GstElement methods
+ * GstElement methods and structures
+ * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
  */
+
 public interface GstElementAPI extends com.sun.jna.Library {
     GstElementAPI GSTELEMENT_API = GstNative.load(GstElementAPI.class);
 
@@ -115,6 +117,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
             });
         }
     }
+    
     public static final class GstElementStruct extends com.sun.jna.Structure {
         public GstObjectStruct object;
         public volatile Pointer state_lock;
@@ -158,6 +161,10 @@ public interface GstElementAPI extends com.sun.jna.Library {
             });
         }
     }
+    
+    /**
+     * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
+     */
     public static final class GstElementClass extends com.sun.jna.Structure {
         //
         // Callbacks for this class
