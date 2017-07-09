@@ -45,14 +45,16 @@ import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 
+/**
+ * GstBaseSink methods and structures
+ * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
+ */
+
 public interface BaseSinkAPI extends Library {
 	BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
-    /**
-     * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
-     */
     public static final class GstBaseSinkStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
 
