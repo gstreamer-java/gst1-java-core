@@ -50,6 +50,9 @@ public interface BaseSinkAPI extends Library {
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
+    /**
+     * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
+     */
     public static final class GstBaseSinkStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
 
@@ -86,7 +89,7 @@ public interface BaseSinkAPI extends Library {
         public volatile Pointer /* GstBaseSinkPrivate */ priv;
         
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * GST_PADDING_LARGE];
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
         public GstBaseSinkStruct(Pointer handle) {
             super(handle);
