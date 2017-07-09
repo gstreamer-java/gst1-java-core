@@ -27,7 +27,7 @@ import com.sun.jna.Pointer;
 
 /**
  * 
- * Buffer metadata : base class for Meta
+ * Base class for Meta
  *
  */
 public class Meta extends NativeObject {
