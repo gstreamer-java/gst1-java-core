@@ -1,7 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (c) 2017 Neil C Smith
+ * Copyright (c) 2015 Andres Colubri <andres.colubri@gmail.com>
+ * Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
+ *
+ * This file is part of gstreamer-java.
+ *
+ * This code is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3 only, as
+ * published by the Free Software Foundation.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * version 3 for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.freedesktop.gstreamer.device;
 
@@ -13,7 +27,8 @@ import org.freedesktop.gstreamer.Plugin;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.GstDeviceProviderAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+
+import static org.freedesktop.gstreamer.lowlevel.GstDeviceProviderAPI.GSTDEVICEPROVIDER_API;
 
 /**
  *
@@ -22,52 +37,50 @@ import org.freedesktop.gstreamer.lowlevel.GstNative;
 public class DeviceProvider extends GstObject {
     public static final String GTYPE_NAME = "GstDeviceProvider";
     
-    private static final GstDeviceProviderAPI gst = GstNative.load(GstDeviceProviderAPI.class);
-
     public DeviceProvider(Initializer init) {
         super(init);
     }
     
     public boolean canMonitor() {
-        return gst.gst_device_provider_can_monitor(this);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_can_monitor(this);
     }
 
     public void addMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key, String value) {
-        gst.gst_device_provider_class_add_metadata(klass, key, value);        
+        GSTDEVICEPROVIDER_API.gst_device_provider_class_add_metadata(klass, key, value);        
     }
     
     public void addStaticMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key, String value) {
-        gst.gst_device_provider_class_add_static_metadata(klass, key, value);
+        GSTDEVICEPROVIDER_API.gst_device_provider_class_add_static_metadata(klass, key, value);
     }
     
     public String getMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key) {
-        return gst.gst_device_provider_class_get_metadata(klass, key);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_class_get_metadata(klass, key);
     }
     
     public void setMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass,
                             String longname, String classification, String description, String author) {
-        gst.gst_device_provider_class_set_metadata(klass, longname, classification, description, author);
+        GSTDEVICEPROVIDER_API.gst_device_provider_class_set_metadata(klass, longname, classification, description, author);
     }
     
     public void setStaticMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass,
                                   String longname, String classification, String description, String author) {
-        gst.gst_device_provider_class_set_static_metadata(klass, longname, classification, description, author);
+        GSTDEVICEPROVIDER_API.gst_device_provider_class_set_static_metadata(klass, longname, classification, description, author);
     }
     
     public void add(Device device) {
-        gst.gst_device_provider_device_add(this, device);
+        GSTDEVICEPROVIDER_API.gst_device_provider_device_add(this, device);
     }
     
     public void remove(Device device) {
-        gst.gst_device_provider_device_remove(this, device);  
+        GSTDEVICEPROVIDER_API.gst_device_provider_device_remove(this, device);  
     }
     
     public Bus getBus() {
-        return gst.gst_device_provider_get_bus(this);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_get_bus(this);
     }
     
     public List<Device> getDevices() {
-        GlibAPI.GList glist = gst.gst_device_provider_get_devices(this);        
+        GlibAPI.GList glist = GSTDEVICEPROVIDER_API.gst_device_provider_get_devices(this);        
         List<Device> list = new ArrayList<Device>();
 
         GlibAPI.GList next = glist;
@@ -83,18 +96,18 @@ public class DeviceProvider extends GstObject {
     }
     
     public DeviceProviderFactory getFactory() {
-        return gst.gst_device_provider_get_factory(this);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_get_factory(this);
     }
 
     public boolean register(Plugin plugin, String name, int rank, GType type) {
-        return gst.gst_device_provider_register(plugin, name, rank, type);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_register(plugin, name, rank, type);
     }
     
     public boolean start() {
-        return gst.gst_device_provider_start(this);
+        return GSTDEVICEPROVIDER_API.gst_device_provider_start(this);
     }
 
     public void stop() {
-        gst.gst_device_provider_stop(this);
+        GSTDEVICEPROVIDER_API.gst_device_provider_stop(this);
     }    
 }

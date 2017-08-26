@@ -1,6 +1,7 @@
 /*
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2015 Andres Colubri <andres.colubri@gmail.com>
-*  Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
+ * Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
  *
  * This file is part of gstreamer-java.
  *
@@ -18,6 +19,7 @@
  */
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.Structure;
@@ -33,8 +35,8 @@ public interface GstDeviceAPI extends com.sun.jna.Library {
     
     @CallerOwnsReturn Element gst_device_create_element(Device device, String name);
     @CallerOwnsReturn Caps gst_device_get_caps(Device device);
-    String gst_device_get_device_class(Device device);
-    String gst_device_get_display_name(Device device);
+    Pointer gst_device_get_device_class(Device device);
+    Pointer gst_device_get_display_name(Device device);
     boolean gst_device_has_classes(Device device, String classes);
     boolean gst_device_has_classesv(Device device, String[] classes);
     boolean gst_device_reconfigure_element(Device device, Element element);

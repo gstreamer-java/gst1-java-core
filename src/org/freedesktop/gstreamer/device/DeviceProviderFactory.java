@@ -1,6 +1,7 @@
 /*
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2015 Andres Colubri <andres.colubri@gmail.com>
-*  Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
+ * Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
  *
  * This file is part of gstreamer-java.
  *
@@ -24,8 +25,8 @@ import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.PluginFeature.Rank;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
-import org.freedesktop.gstreamer.lowlevel.GstDeviceProviderFactoryAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+
+import static org.freedesktop.gstreamer.lowlevel.GstDeviceProviderFactoryAPI.GSTDEVICEPROVIDERFACTORY_API;
 
 /**
  *
@@ -34,46 +35,44 @@ import org.freedesktop.gstreamer.lowlevel.GstNative;
 public class DeviceProviderFactory extends GstObject {
     public static final String GTYPE_NAME = "GstDeviceProviderFactory";
     
-    private static final GstDeviceProviderFactoryAPI gst = GstNative.load(GstDeviceProviderFactoryAPI.class);
-
     public DeviceProviderFactory(Initializer init) {
         super(init);
     }
     
     static public DeviceProviderFactory find(String name) {
-      return gst.gst_device_provider_factory_find(name);
+      return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_find(name);
     }
     
     public DeviceProvider get() {
-        return gst.gst_device_provider_factory_get(this);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get(this);
     }
     
     public DeviceProvider getByName(String factoryName) {
-        return gst.gst_device_provider_factory_get_by_name(factoryName);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get_by_name(factoryName);
     }
     
     public GType getDeviceProviderType() {
-        return gst.gst_device_provider_factory_get_device_provider_type(this);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get_device_provider_type(this);
     }
     
     public String getMetadata(String key) {
-        return gst.gst_device_provider_factory_get_metadata(this, key);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get_metadata(this, key);
     }
     
     public String[] getMetadataKeys() {
-        return gst.gst_device_provider_factory_get_metadata_keys(this);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get_metadata_keys(this);
     }
     
     public boolean hasClasses(String classes) {
-        return gst.gst_device_provider_factory_has_classes(this, classes);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_has_classes(this, classes);
     }
     
     public boolean hasClasses(String[] classes) {
-        return gst.gst_device_provider_factory_has_classesv(this, classes);
+        return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_has_classesv(this, classes);
     }
 
     public List<DeviceProvider> getDeviceProviders(Rank minRank) {
-        GList glist = gst.gst_device_provider_factory_list_get_device_providers(minRank);
+        GList glist = GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_list_get_device_providers(minRank);
         List<DeviceProvider> list = new ArrayList<DeviceProvider>();
               
         GList next = glist;

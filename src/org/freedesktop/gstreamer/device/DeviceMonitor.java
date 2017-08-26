@@ -1,6 +1,8 @@
 /*
+ * 
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2015 Andres Colubri <andres.colubri@gmail.com>
-*  Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
+ * Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
  *
  * This file is part of gstreamer-java.
  *
@@ -24,59 +26,58 @@ import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
-import org.freedesktop.gstreamer.lowlevel.GstDeviceMonitorAPI;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
+
+import static org.freedesktop.gstreamer.lowlevel.GstDeviceMonitorAPI.GSTDEVICEMONITOR_API;
 
 /**
  *
  * @author andres
  */
 public class DeviceMonitor extends GstObject {
+
     public static final String GTYPE_NAME = "GstDeviceMonitor";
-    
-    private static final GstDeviceMonitorAPI gst = GstNative.load(GstDeviceMonitorAPI.class);
-    
-    public DeviceMonitor(Initializer init) { 
-        super(init); 
+
+    public DeviceMonitor(Initializer init) {
+        super(init);
     }
-    
+
     static public DeviceMonitor createNew() {
-        return gst.gst_device_monitor_new();
+        return GSTDEVICEMONITOR_API.gst_device_monitor_new();
     }
-    
+
     public Bus getBus() {
-        return gst.gst_device_monitor_get_bus(this);
+        return GSTDEVICEMONITOR_API.gst_device_monitor_get_bus(this);
     }
-    
+
     public int addFilter(String classes, Caps caps) {
-        return gst.gst_device_monitor_add_filter(this, classes, caps);
+        return GSTDEVICEMONITOR_API.gst_device_monitor_add_filter(this, classes, caps);
     }
-    
+
     public boolean removeFilter(int filterId) {
-        return gst.gst_device_monitor_remove_filter(this, filterId);
+        return GSTDEVICEMONITOR_API.gst_device_monitor_remove_filter(this, filterId);
     }
 
     public boolean start() {
-        return gst.gst_device_monitor_start(this);
-    }
-    
-    public void stop() {
-      gst.gst_device_monitor_stop(this);
+        return GSTDEVICEMONITOR_API.gst_device_monitor_start(this);
     }
 
-    List<Device> getDevices() {
-        GList glist = gst.gst_device_monitor_get_devices(this);        
+    public void stop() {
+        GSTDEVICEMONITOR_API.gst_device_monitor_stop(this);
+    }
+
+    public List<Device> getDevices() {
+        GList glist = GSTDEVICEMONITOR_API.gst_device_monitor_get_devices(this);
         List<Device> list = new ArrayList<Device>();
 
         GList next = glist;
         while (next != null) {
             if (next.data != null) {
-                Device dev = new Device(initializer(next.data, true, true));
+                Device dev = new Device(initializer(next.data, false, true));
                 list.add(dev);
             }
             next = next.next();
         }
-        
+
         return list;
     }
 }
