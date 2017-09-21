@@ -24,6 +24,7 @@ import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
 
+import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -62,6 +63,7 @@ public interface GstStructureAPI extends com.sun.jna.Library {
     boolean gst_structure_get_boolean(Structure structure, String fieldname, int[] value);
     boolean gst_structure_get_int(Structure structure, String fieldname, int[] value);
     boolean gst_structure_get_uint(Structure structure, String fieldname, int[] value);
+    boolean gst_structure_get_uint64(Structure structure, String fieldname, long[] value);
     boolean gst_structure_get_fourcc(Structure structure, String fieldname, int[] value);
     boolean gst_structure_get_double(Structure structure, String fieldname, double[] value);
     

@@ -134,6 +134,23 @@ public class Structure extends NativeObject {
 
 	return val.getValue();
     }
+
+    public int getUnsignedInteger(String fieldName) {
+        int[] val = { 0 };
+        if (!GSTSTRUCTURE_API.gst_structure_get_uint(this, fieldName, val)) {
+            throw new InvalidFieldException("uint", fieldName);
+        }
+        return val[0];
+    }
+
+    public long getUnsignedLong(String fieldName) {
+        long[] val = { 0 };
+        if (!GSTSTRUCTURE_API.gst_structure_get_uint64(this, fieldName, val)) {
+            throw new InvalidFieldException("uint64", fieldName);
+        }
+        return val[0];
+    }
+
     
     public int getInteger(String fieldName) {
         int[] val = { 0 };
