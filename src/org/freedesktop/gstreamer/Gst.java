@@ -55,6 +55,7 @@ import org.freedesktop.gstreamer.elements.FlvDemux;
 import org.freedesktop.gstreamer.elements.FlvMux;
 import org.freedesktop.gstreamer.elements.GlImageSink;
 import org.freedesktop.gstreamer.elements.H264Parse;
+import org.freedesktop.gstreamer.elements.HlsDemux;
 import org.freedesktop.gstreamer.elements.MultiFileSrc;
 import org.freedesktop.gstreamer.elements.MultiUdpSink;
 import org.freedesktop.gstreamer.elements.NiceSink;
@@ -537,6 +538,7 @@ public final class Gst {
 		FlvMux.class,
 		GlImageSink.class,
 		H264Parse.class,
+		HlsDemux.class,
 		MultiFileSrc.class,
 		MultiUdpSink.class,
 		NiceSink.class,
