@@ -302,7 +302,7 @@ public class Pad extends GstObject {
                 pad.removeCallback(EVENT_PROBE.class, this);
                 return PadProbeReturn.DROP;
             }
-        }, GstPadAPI.GST_PAD_PROBE_TYPE_BLOCKING | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM);
+        }, GstPadAPI.GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM);
     }
     
     /**
