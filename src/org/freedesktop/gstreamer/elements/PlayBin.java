@@ -20,6 +20,9 @@
 
 package org.freedesktop.gstreamer.elements;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.ByReference;
+import com.sun.jna.ptr.PointerByReference;
 import java.awt.Dimension;
 import java.io.File;
 import java.net.URI;
@@ -30,8 +33,10 @@ import org.freedesktop.gstreamer.Fraction;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Pipeline;
+import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.Video;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 
 /**
@@ -200,6 +205,16 @@ public class PlayBin extends Pipeline {
     }
 
     /**
+     * Sets the text output Element.
+     * <p> To disable text output, call this method with a <tt>null</tt> argument.
+     *
+     * @param element The element to use for text output.
+     */
+    public void setTextSink(Element element) {
+        setElement("text-sink", element);
+    }
+
+    /**
      * Sets the visualization output Element.
      *
      * @param element The element to use for visualization.
@@ -289,7 +304,103 @@ public class PlayBin extends Pipeline {
         }
       }
       return null;
-    }    
+    }
+
+    /**
+     * Get the currently playing audio stream. By default the first audio stream with data is played.
+     * Default value: -1
+     * @return the currently playing audio stream index (index is zero based).
+     */
+    public int getCurrentAudio() {
+        return (Integer)get("current-audio");
+    }
+
+    /**
+     * Set the currently playing audio stream. By default the first audio stream with data is played.
+     * @param n audio stream index to switch to (index is zero based).
+     */
+    public void setCurrentAudio(int n) {
+        set("current-audio", n);
+    }
+
+    /**
+     * Get the total number of available audio streams.
+     * @return total number of available audio streams
+     */
+    public int getNAudio() {
+        return (Integer)get("n-audio");
+    }
+
+    /**
+     * Retrieve the stream-combiner sinkpad for a specific text stream.
+     * This pad can be used for notifications of caps changes,
+     * stream-specific queries, etc.
+     *
+     * @param audioStreamIndex a text stream number
+     * @return a GstPad, or NULL when the stream number does not exist.
+     */
+    public Pad getAudioPad(int audioStreamIndex) {
+        return emit(Pad.class, "get-audio-pad", audioStreamIndex);
+    }
+
+    /**
+     * Retrieve the tags of a specific audio stream number.
+     * This information can be used to select a stream.
+     *
+     * @param audioStreamIndex an audio stream number
+     * @return a GstTagList with tags or {@code null} when the stream number does not exist.
+     */
+    public TagList getAudioTags(int audioStreamIndex) {
+        return emit(TagList.class, "get-audio-tags", audioStreamIndex);
+    }
+
+    /**
+     * Get the currently playing text stream. By default the first text stream with data is played.
+     * Default value: -1
+     * @return the currently playing text stream index (index is zero based).
+     */
+    public int getCurrentText() {
+        return (Integer)get("current-text");
+    }
+
+    /**
+     * Set the currently playing text stream. By default the first text stream with data is played.
+     * @param n text stream index to switch to (index is zero based).
+     */
+    public void setCurrentText(int n) {
+        set("current-text", n);
+    }
+
+    /**
+     * Get the total number of available text streams.
+     * @return total number of available text streams
+     */
+    public int getNText() {
+        return (Integer)get("n-text");
+    }
+
+    /**
+     * Retrieve the stream-combiner sinkpad for a specific text stream.
+     * This pad can be used for notifications of caps changes,
+     * stream-specific queries, etc.
+     *
+     * @param textStreamIndex a text stream number
+     * @return a GstPad, or {@code null} when the stream number does not exist.
+     */
+    public Pad getTextPad(int textStreamIndex) {
+        return emit(Pad.class, "get-text-pad", textStreamIndex);
+    }
+
+    /**
+     * Retrieve the tags of a specific text stream number.
+     * This information can be used to select a stream.
+     *
+     * @param textStreamIndex a text stream number
+     * @return a GstTagList with tags or {@code null} when the stream number does not exist.
+     */
+    public TagList getTextTags(int textStreamIndex) {
+        return emit(TagList.class, "get-text-tags", textStreamIndex);
+    }
 
     /**
      * Signal emitted when the current uri is about to finish. You can set 
