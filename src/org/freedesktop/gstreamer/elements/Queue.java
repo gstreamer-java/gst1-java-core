@@ -20,15 +20,15 @@ public class Queue extends Element{
 		super(init);
 	}
     
-    public Integer getCurrentLevelBuffers() {
+    public Long getCurrentLevelBuffers() {
     	return get("current-level-buffers");
     }
 
-    public Integer getCurrentLevelBytes() {
+    public Long getCurrentLevelBytes() {
     	return get("current-level-bytes");
     }
 
-    public Integer getCurrentLevelTime() {
+    public Long getCurrentLevelTime() {
     	return get("current-level-time");
     }
     
