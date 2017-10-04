@@ -73,7 +73,9 @@ import org.freedesktop.gstreamer.elements.RtpMp4gPay;
 import org.freedesktop.gstreamer.elements.RtpPcmuDepay;
 import org.freedesktop.gstreamer.elements.RtpPcmuPay;
 import org.freedesktop.gstreamer.elements.RtpSsrcDemux;
+import org.freedesktop.gstreamer.elements.SoupHttpSrc;
 import org.freedesktop.gstreamer.elements.SpeexEnc;
+import org.freedesktop.gstreamer.elements.TsDemux;
 import org.freedesktop.gstreamer.elements.TypeFind;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
 import org.freedesktop.gstreamer.elements.UdpSink;
@@ -558,7 +560,9 @@ public final class Gst {
 		RtpPcmuPay.class,
 		RtpPcmuDepay.class,
 		RtpSsrcDemux.class,
+		SoupHttpSrc.class,
 		SpeexEnc.class,
+		TsDemux.class,
 		TypeFind.class,
 		UdpSink.class,
 		UdpSrc.class,
