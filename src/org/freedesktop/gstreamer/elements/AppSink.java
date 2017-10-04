@@ -132,6 +132,33 @@ public class AppSink extends BaseSink {
     public Sample pullSample() {
         return gst().gst_app_sink_pull_sample(this);
     }
+    
+    public Long getMaxQueuedBuffers() {
+		return get("max-buffers");
+	}
+	
+	public AppSink setMaxQueuedBuffers(long maxQueueBuffers) {
+		set("max-buffers", maxQueueBuffers);
+		return this;
+	}
+	
+	public Boolean isSampleDroppingEnabled() {
+		return get("drop");
+	}
+	
+	public AppSink setSampleDroppingEnabled(boolean enabled) {
+		set("drop", enabled);
+		return this;
+	}
+
+	public Boolean isEmitSignalsEnabled() {
+		return get("emit-signals");
+	}
+	
+	public AppSink setEmitSignalsEnabled(boolean enabled) {
+		set("emit-signals", enabled);
+		return this;
+	}
 
     /**
      * Signal emitted when this {@link AppSink} got EOS.
