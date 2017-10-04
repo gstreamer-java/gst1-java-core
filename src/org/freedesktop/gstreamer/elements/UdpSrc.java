@@ -3,7 +3,7 @@ package org.freedesktop.gstreamer.elements;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.GSocket;
 
-public class UdpSrc extends BaseSink {
+public class UdpSrc extends BaseSrc {
 
 	public static final String GST_NAME = "udpsrc";
 	public static final String GTYPE_NAME = "GstUDPSrc";
