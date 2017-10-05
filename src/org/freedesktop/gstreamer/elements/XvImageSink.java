@@ -1,6 +1,6 @@
 package org.freedesktop.gstreamer.elements;
 
-public class XvImageSink extends VideoSink{
+public class XvImageSink extends VideoSink<XvImageSink>{
 	
 	public static final String GST_NAME = "xvimagesink";
     public static final String GTYPE_NAME = "GstXvImageSink";
