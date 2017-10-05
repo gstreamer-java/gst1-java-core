@@ -75,6 +75,7 @@ import org.freedesktop.gstreamer.elements.RtpPcmuPay;
 import org.freedesktop.gstreamer.elements.RtpSsrcDemux;
 import org.freedesktop.gstreamer.elements.SoupHttpSrc;
 import org.freedesktop.gstreamer.elements.SpeexEnc;
+import org.freedesktop.gstreamer.elements.TeletextDec;
 import org.freedesktop.gstreamer.elements.TsDemux;
 import org.freedesktop.gstreamer.elements.TypeFind;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
@@ -562,6 +563,7 @@ public final class Gst {
 		RtpSsrcDemux.class,
 		SoupHttpSrc.class,
 		SpeexEnc.class,
+		TeletextDec.class,
 		TsDemux.class,
 		TypeFind.class,
 		UdpSink.class,
