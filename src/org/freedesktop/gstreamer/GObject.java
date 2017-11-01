@@ -58,6 +58,7 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.Arrays;
 
 /**
  * This is an abstract class providing some GObject-like facilities in a common 
@@ -738,7 +739,20 @@ public abstract class GObject extends RefCountedObject {
     public synchronized void emit(String signal, Object... arguments) {
     	GSIGNAL_API.g_signal_emit_by_name(this, signal, arguments);
     }
-    
+
+    public synchronized <T extends NativeObject> T emit(Class<T> resultType, String signal, Object... arguments) {
+        PointerByReference pointerToResult = new PointerByReference(null);
+        Object[] fullArguments = Arrays.copyOf(arguments, arguments.length + 1);
+        fullArguments[arguments.length] = pointerToResult;
+        emit(signal, fullArguments);
+        Pointer result = pointerToResult.getValue();
+        if (result == null) {
+            return null;
+        } else {
+            return NativeObject.objectFor(result, resultType, false, true);
+        }
+    }
+
 //    public static <T extends GObject> T objectFor(Pointer ptr, Class<T> defaultClass) {
 //        return objectFor(ptr, defaultClass, true);
 //    }
