@@ -45,6 +45,11 @@ import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 
+/**
+ * GstBaseSink methods and structures
+ * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
+ */
+
 public interface BaseSinkAPI extends Library {
 	BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
     int GST_PADDING = GstAPI.GST_PADDING;
@@ -84,6 +89,9 @@ public interface BaseSinkAPI extends Library {
 
         /*< private >*/
         public volatile Pointer /* GstBaseSinkPrivate */ priv;
+        
+        /*< private >*/
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
         public GstBaseSinkStruct(Pointer handle) {
             super(handle);
@@ -98,7 +106,8 @@ public interface BaseSinkAPI extends Library {
                 "eos", "need_preroll", "have_preroll",
                 "playing_async", "have_newsegment", "segment",
                 "clock_id", "sync",
-                "flushing", "running", "max_lateness", "priv"
+                "flushing", "running", "max_lateness", "priv",
+                "_gst_reserved"
             });
         }
     }
