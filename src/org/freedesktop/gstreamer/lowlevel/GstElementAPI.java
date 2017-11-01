@@ -20,6 +20,9 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Clock;
@@ -42,12 +45,12 @@ import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * GstElement methods
+ * GstElement methods and structures
+ * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
  */
+
 public interface GstElementAPI extends com.sun.jna.Library {
     GstElementAPI GSTELEMENT_API = GstNative.load(GstElementAPI.class);
 
@@ -114,11 +117,13 @@ public interface GstElementAPI extends com.sun.jna.Library {
             });
         }
     }
+    
     public static final class GstElementStruct extends com.sun.jna.Structure {
         public GstObjectStruct object;
         public volatile Pointer state_lock;
         public volatile Pointer state_cond;
         public volatile int state_cookie;
+        public volatile State target_state;
         public volatile State current_state;
         public volatile State next_state; 
         public volatile State pending_state;         
@@ -126,6 +131,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public volatile Pointer bus;
         public volatile Pointer clock;
         public volatile long base_time;
+        public volatile long start_time;
         public volatile short numpads;
         public volatile Pointer pads;
         public volatile short numsrcpads;
@@ -133,22 +139,32 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public volatile short numsinkpads;
         public volatile Pointer sinkpads;
         public volatile int pads_cookie;
+        public volatile Pointer contexts;
+        
         // Use an array of byte as arrays of Pointer don't work
-        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];
+        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING-1];
+
+        public GstElementStruct(Pointer handle) {
+            super(handle);
+        }
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "object", "state_lock", "state_cond",
-                "state_cookie", "current_state", "next_state",
+                "state_cookie", "target_state", "current_state", "next_state",
                 "pending_state", "last_return", "bus",
-                "clock", "base_time", "numpads",
+                "clock", "base_time", "start_time", "numpads",
                 "pads", "numsrcpads", "srcpads",
-                "numsinkpads", "sinkpads", "pads_cookie",
+                "numsinkpads", "sinkpads", "pads_cookie", "contexts",
                 "_gst_reserved"
             });
         }
     }
+    
+    /**
+     * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
+     */
     public static final class GstElementClass extends com.sun.jna.Structure {
         //
         // Callbacks for this class
@@ -160,7 +176,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
             public void callback(Element element, Pad pad);
         }
         public static interface GetState extends GstCallback {
-            public StateChangeReturn callback(Element element, Pointer p_state, 
+            public StateChangeReturn callback(Element element, Pointer p_state,
                     Pointer p_pending, long timeout);
         }
         public static interface SetState extends GstCallback {
@@ -169,12 +185,23 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public static interface ChangeState extends GstCallback {
             public StateChangeReturn callback(Element element, int transition);
         }
+        public static interface StateChanged extends GstCallback {
+            public StateChangeReturn callback(Element element, State oldState, State newState, State pending);
+        }
+        public static interface QueryNotify extends GstCallback {
+            boolean callback(Element element, Query query);
+        }
+
+
         //
         // Actual data members
         //
         public GstObjectClass parent_class;
-        public volatile GstElementDetails details;
+        /* the element metadata */
+        public volatile Pointer metadata;
+        /* factory that the element was created from */
         public volatile ElementFactory elementfactory;
+        /* templates for our pads */
         public volatile Pointer padtemplates;
         public volatile int numpadtemplates;
         public volatile int pad_templ_cookie;
@@ -190,37 +217,43 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public GetState get_state;
         public SetState set_state;
         public ChangeState change_state;
+        public StateChanged state_changed;
         /* bus */
         public volatile Pointer set_bus;
         /* set/get clocks */
         public volatile Pointer provide_clock;
         public volatile Pointer set_clock;
-        
-        /* index */
-        public volatile Pointer get_index;
-        public volatile Pointer set_index;
-        public volatile Pointer send_event;
+
         /* query functions */
-        public volatile Pointer get_query_types;
-        public volatile Pointer query;
-      
-        /*< private >*/  
+        public volatile Pointer send_event;
+        public volatile QueryNotify query;
+        public volatile Pointer post_message;
+
+        public volatile Pointer set_context;
+
+        /*< private >*/
         // Use an array of byte if arrays of Pointer don't work
-        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];
-        
+        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING_LARGE-2];
+
+        public GstElementClass(Pointer ptr) {
+            super(ptr);
+            //this.read();
+        }
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "parent_class", "details", "elementfactory",
+                "parent_class", "metadata", "elementfactory",
                 "padtemplates", "numpadtemplates", "pad_templ_cookie",
                 "pad_added", "pad_removed", "no_more_pads",
                 "request_new_pad", "release_pad", "get_state",
-                "set_state", "change_state", "set_bus",
-                "provide_clock", "set_clock", "get_index",
-                "set_index", "send_event", "get_query_types",
-                "query", "_gst_reserved"
-            });       
+                "set_state", "change_state", "state_changed", "set_bus",
+                "provide_clock", "set_clock",
+                "send_event", "query", "post_message",
+                "set_context",
+                "_gst_reserved"
+            });
         }
-        
+
     }
 }
