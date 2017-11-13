@@ -76,6 +76,7 @@ import org.freedesktop.gstreamer.elements.RtpSsrcDemux;
 import org.freedesktop.gstreamer.elements.SoupHttpSrc;
 import org.freedesktop.gstreamer.elements.SpeexEnc;
 import org.freedesktop.gstreamer.elements.SubParse;
+import org.freedesktop.gstreamer.elements.TcpServerSink;
 import org.freedesktop.gstreamer.elements.TeletextDec;
 import org.freedesktop.gstreamer.elements.TsDemux;
 import org.freedesktop.gstreamer.elements.TypeFind;
@@ -83,6 +84,9 @@ import org.freedesktop.gstreamer.elements.URIDecodeBin;
 import org.freedesktop.gstreamer.elements.UdpSink;
 import org.freedesktop.gstreamer.elements.UdpSrc;
 import org.freedesktop.gstreamer.elements.V4l2Src;
+import org.freedesktop.gstreamer.elements.VideoConvert;
+import org.freedesktop.gstreamer.elements.VideoFilter;
+import org.freedesktop.gstreamer.elements.VideoRate;
 import org.freedesktop.gstreamer.elements.Volume;
 import org.freedesktop.gstreamer.elements.WebRtcDsp;
 import org.freedesktop.gstreamer.elements.WebRtcEchoProbe;
@@ -565,6 +569,7 @@ public final class Gst {
 		SoupHttpSrc.class,
 		SpeexEnc.class,
 		SubParse.class,
+		TcpServerSink.class,
 		TeletextDec.class,
 		TsDemux.class,
 		TypeFind.class,
@@ -576,6 +581,9 @@ public final class Gst {
 		WebRtcEchoProbe.class,
 		X264Enc.class,
 		XvImageSink.class,
+		VideoConvert.class,
+		VideoFilter.class,
+		VideoRate.class,
 		Volume.class,
         //
         TagList.class
