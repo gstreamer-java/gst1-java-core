@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2015 Neil C Smith
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -49,11 +49,7 @@ import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.TimedValue;
-import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.ValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
@@ -61,6 +57,7 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.Arrays;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -439,55 +436,51 @@ public final class Gst {
 
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
-        for(Class<?> cls : nativeClasses)
-            registerClass((Class<? extends NativeObject>)cls);
+        for(Class<? extends NativeObject> cls : nativeClasses) {
+            registerClass(cls);
+        }
     }
     // to generate the list we use:
     // egrep -rl "GST_NAME|GTYPE_NAME" src 2>/dev/null | egrep -v ".svn|Gst.java" | sort
     // even though the best would be all subclasses of NativeObject
     @SuppressWarnings("rawtypes")
-	private static Class[] nativeClasses = {
-		GDate.class,
-		GInetAddress.class,
-		GSocket.class,
-		GSocketAddress.class,
-		GInetSocketAddress.class,
-		GValue.class,
-		GValueArray.class,
-        TagList.class,
-		TimedValue.class,
-		ValueArray.class,
-		ValueList.class,
-		// ----------- Base -------------
-		Buffer.class,
-		BufferPool.class,
-		Bus.class,
-		Caps.class,
-		Clock.class,
-		DateTime.class,
-		Element.class,
-		ElementFactory.class,
-		Event.class,
-		GhostPad.class,
-		Message.class,
-		Pad.class,
-		PadTemplate.class,
-		Plugin.class,
-		PluginFeature.class,
-		Query.class,
-		Range.class,
-		Registry.class,
-        Sample.class,
-		// ----------- Elements -------------
-		AppSink.class,
-		AppSrc.class,
-		BaseSrc.class,
-		BaseSink.class,
-		BaseTransform.class,
-		Bin.class,
-		DecodeBin.class,
-		Pipeline.class,
-		PlayBin.class,
-		URIDecodeBin.class
-	};
+    private static List<Class<? extends NativeObject>> nativeClasses
+            = Arrays.<Class<? extends NativeObject>>asList(
+                    GDate.class,
+                    GInetAddress.class,
+                    GSocket.class,
+                    GSocketAddress.class,
+                    GInetSocketAddress.class,
+                    TagList.class,
+                    // ----------- Base -------------
+                    Buffer.class,
+                    BufferPool.class,
+                    Bus.class,
+                    Caps.class,
+                    Clock.class,
+                    DateTime.class,
+                    Element.class,
+                    ElementFactory.class,
+                    Event.class,
+                    GhostPad.class,
+                    Message.class,
+                    Pad.class,
+                    PadTemplate.class,
+                    Plugin.class,
+                    PluginFeature.class,
+                    Query.class,
+                    Registry.class,
+                    Sample.class,
+                    // ----------- Elements -------------
+                    AppSink.class,
+                    AppSrc.class,
+                    BaseSrc.class,
+                    BaseSink.class,
+                    BaseTransform.class,
+                    Bin.class,
+                    DecodeBin.class,
+                    Pipeline.class,
+                    PlayBin.class,
+                    URIDecodeBin.class
+            );
 }
