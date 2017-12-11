@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Neil C Smith
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Andres Colubri
  * Copyright (c) 2008 Wayne Meissner
@@ -162,6 +162,8 @@ public interface GValueAPI extends Library {
             } else if (g_type.equals(GType.STRING)) { return toJavaString();
 //            } else if (g_type.equals(GType.OBJECT)) { return toObject();
             } else if (g_type.equals(GType.POINTER)) { return toPointer();
+            } else if (g_type.equals(GValueArray.GTYPE)) {
+                return new GValueArray(GVALUE_API.g_value_get_boxed(this));
             } else if (g_type.getParentType().equals(GType.BOXED)) {
                 Class<? extends NativeObject> cls = GstTypes.classFor(g_type);
                 if (cls != null) {
@@ -235,6 +237,7 @@ public interface GValueAPI extends Library {
     
     public static final class GValueArray extends com.sun.jna.Structure {
     	public static final String GTYPE_NAME = "GValueArray";
+        static final GType GTYPE = GType.valueOf(GTYPE_NAME);
 
     	public volatile int n_values;
         public volatile Pointer values;

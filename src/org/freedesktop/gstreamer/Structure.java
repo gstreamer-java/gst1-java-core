@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2017 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm> 
  * Copyright (C) 2007 Wayne Meissner
@@ -21,8 +22,12 @@ package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
@@ -117,6 +122,7 @@ public class Structure extends NativeObject {
      * @param fieldName The name of the field.
      * @return field as ValueList
      */
+    @Deprecated
     public ValueList getValueList(String fieldName) {
     	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
     	if (val == null) {
@@ -125,6 +131,13 @@ public class Structure extends NativeObject {
     	return new ValueList(val);
 	}
     
+    /**
+     * Get the value of the named field. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field.
+     * 
+     * @param fieldName name of field
+     * @return Object representation of the named field
+     */
     public Object getValue(String fieldName) {
     	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
     	
@@ -132,9 +145,60 @@ public class Structure extends NativeObject {
     		throw new InvalidFieldException("Object", fieldName);        	
     	}
 
-	return val.getValue();
+        return val.getValue();
     }
     
+    /**
+     * Extract the values of the named field as a List of the provided type.
+     * If the native GType of the field is a GValueArray then this
+     * method will return a list of the contained values, assuming all contained
+     * values can be converted to the provided Java type T. Else if the field GType
+     * can be directly converted to the provided Java type T, a singleton List will
+     * be returned.
+     * <p>
+     * Throws {@link InvalidFieldException} if the field does not exist, or the
+     * field values cannot be converted to type T.
+     * <p>
+     * This method only currently supports lists of values inside a GValueArray - 
+     * other native list types will be supported in future.
+     * 
+     * @param <T>
+     * @param type type of values
+     * @param fieldName name of field
+     * @return List of values from the named field
+     */
+    public <T> List<T> getValues(Class<T> type, String fieldName) {
+        Object val = getValue(fieldName);
+        if (val instanceof GValueAPI.GValueArray) {
+            GValueAPI.GValueArray arr = (GValueAPI.GValueArray) val;
+            int count = arr.getNValues();
+            List<T> values = new ArrayList<T>(count);
+            for (int i = 0; i < count; i++) {
+                Object o = arr.getValue(i);
+                if (type.isInstance(o)) {
+                    values.add(type.cast(o));
+                } else {
+                    throw new InvalidFieldException(type.getSimpleName(), fieldName);
+                }
+            }
+            return values;
+        } else {
+            if (type.isInstance(val)) {
+                return Collections.singletonList(type.cast(val));
+            } else {
+                throw new InvalidFieldException(type.getSimpleName(), fieldName);
+            }
+        }
+    }
+    
+    /**
+     * Get the value of the named field as an int. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field or the named field is not an
+     * integer.
+     * 
+     * @param fieldName name of field
+     * @return int value of the named field
+     */
     public int getInteger(String fieldName) {
         int[] val = { 0 };
         if (!GSTSTRUCTURE_API.gst_structure_get_int(this, fieldName, val)) {
@@ -142,9 +206,68 @@ public class Structure extends NativeObject {
         }
         return val[0];
     }
+    
+    /**
+     * Extract the values of the named field as an array of integers.
+     * If the native GType of the field is a GValueArray then this
+     * method will return an array of the contained values, assuming all contained
+     * values are of G_TYPE_INT. Else if the field is of G_TYPE_INT a single value
+     * array will be returned.
+     * <p>
+     * An array may be passed into this method to contain the result. A new array
+     * will be created if the array is null or not of the correct length.
+     * <p>
+     * Throws {@link InvalidFieldException} if the field does not exist, or the
+     * field values contained are not of type G_TYPE_INT.
+     * <p>
+     * This method only currently supports lists of values inside a GValueArray - 
+     * other native list types will be supported in future.
+     * 
+     * @param fieldName name of field
+     * @param array an array to hold values, or null
+     * @return List of values from the named field
+     */
+    public int[] getIntegers(String fieldName, int[] array) {
+        Object val = getValue(fieldName);
+        if (val instanceof GValueAPI.GValueArray) {
+            GValueAPI.GValueArray arr = (GValueAPI.GValueArray) val;
+            int count = arr.getNValues();
+            int[] values = array == null || array.length != count ?
+                    new int[count] : array;
+            for (int i = 0; i < count; i++) {
+                GValue gval = arr.nth(i);
+                if (gval.checkHolds(GType.INT)) {
+                    values[i] = GValueAPI.GVALUE_API.g_value_get_int(gval);
+                } else {
+                    throw new InvalidFieldException("integers", fieldName);
+                }
+            }
+            return values;
+        } else {
+            if (Integer.class.isInstance(val)) {
+                int[] values = array == null || array.length != 1 ?
+                    new int[1] : array;
+                values[0] = ((Integer) val);
+                return values;
+            } else {
+                throw new InvalidFieldException("integer", fieldName);
+            }
+        }
+    }
+    
+    @Deprecated
     public int getInteger(String fieldName, int i) {
     	return getValueList(fieldName).getInteger(i);
     }
+
+    /**
+     * Get the value of the named field as a double. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field or the named field is not a
+     * double.
+     * 
+     * @param fieldName name of field
+     * @return double value of the named field
+     */
     public double getDouble(String fieldName) {
         double[] val = { 0d };
         if (!GSTSTRUCTURE_API.gst_structure_get_double(this, fieldName, val)) {
@@ -152,19 +275,81 @@ public class Structure extends NativeObject {
         }
         return val[0];
     }
+    
+    /**
+     * Extract the values of the named field as an array of doubles.
+     * If the native GType of the field is a GValueArray then this
+     * method will return an array of the contained values, assuming all contained
+     * values are of G_TYPE_DOUBLE. Else if the field is of G_TYPE_DOUBLE a single value
+     * array will be returned.
+     * <p>
+     * An array may be passed into this method to contain the result. A new array
+     * will be created if the array is null or not of the correct length.
+     * <p>
+     * Throws {@link InvalidFieldException} if the field does not exist, or the
+     * field values contained are not of type G_TYPE_DOUBLE.
+     * <p>
+     * This method only currently supports lists of values inside a GValueArray - 
+     * other native list types will be supported in future.
+     * 
+     * @param fieldName name of field
+     * @param array an array to hold values, or null
+     * @return List of values from the named field
+     */
+    public double[] getDoubles(String fieldName, double[] array) {
+        Object val = getValue(fieldName);
+        if (val instanceof GValueAPI.GValueArray) {
+            GValueAPI.GValueArray arr = (GValueAPI.GValueArray) val;
+            int count = arr.getNValues();
+            double[] values = array == null || array.length != count ?
+                    new double[count] : array;
+            for (int i = 0; i < count; i++) {
+                GValue gval = arr.nth(i);
+                if (gval.checkHolds(GType.DOUBLE)) {
+                    values[i] = GValueAPI.GVALUE_API.g_value_get_double(gval);
+                } else {
+                    throw new InvalidFieldException("doubles", fieldName);
+                }
+            }
+            return values;
+        } else {
+            if (Double.class.isInstance(val)) {
+                double[] values = array == null || array.length != 1 ?
+                    new double[1] : array;
+                values[0] = ((Double) val);
+                return values;
+            } else {
+                throw new InvalidFieldException("double", fieldName);
+            }
+        }
+    }
+    
+    @Deprecated
     public double getDouble(String fieldName, int i) {
     	return getValueList(fieldName).getDouble(i);
     }
+    
+    /**
+     * Get the value of the named field as a String.
+     * 
+     * @param fieldName name of field
+     * @return String value of the named field
+     */
     public String getString(String fieldName) {
         return GSTSTRUCTURE_API.gst_structure_get_string(this, fieldName);
     }
+    
+    @Deprecated
     public String getString(String fieldName, int i) {
     	return getValueList(fieldName).getString(i);
     }
     /**
+     * Get the value of the named field as a boolean. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field or the named field is not a
+     * boolean.
      * 
-     * @param fieldName
-     * @return The boolean value for fieldName
+     * @param fieldName name of field
+     * @return boolean value of the named field
      */
     public boolean getBoolean(String fieldName) {
         int[] val = { 0 };
@@ -173,9 +358,20 @@ public class Structure extends NativeObject {
         }
         return val[0] != 0;
     }
+    
+    @Deprecated
     public boolean getBoolean(String fieldName, int i) {
     	return getValueList(fieldName).getBoolean(i);
     }
+
+    /**
+     * Get the value of the named field as a Fraction. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field or the named field is not a
+     * Fraction.
+     * 
+     * @param fieldName name of field
+     * @return boolean value of the named field
+     */
     public Fraction getFraction(String fieldName) {
         int[] numerator = { 0 };
         int[] denominator = { 0 };
@@ -208,9 +404,11 @@ public class Structure extends NativeObject {
     	return new String(b);
     }
     /**
-     * Gets Range field representation
-     * @param fieldName The name of the field.
-     * @return field as Range
+     * Get the value of the named field as a Range. Throws {@link InvalidFieldException} if
+     * the Structure does not contain the named field.
+     * 
+     * @param fieldName name of field
+     * @return Range value of the named field
      */
     public Range getRange(String fieldName) {
     	GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
