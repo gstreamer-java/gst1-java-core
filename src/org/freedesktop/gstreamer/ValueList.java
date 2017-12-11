@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.lowlevel.GstValueAPI;
 
+@Deprecated
 public class ValueList {
 	public static final String GTYPE_NAME = "GstValueList";
 
