@@ -214,6 +214,29 @@ public class Structure extends NativeObject {
      * values are of G_TYPE_INT. Else if the field is of G_TYPE_INT a single value
      * array will be returned.
      * <p>
+     * This method will create a new array each time. If you are repeatedly calling
+     * this method consider using {@link #getIntegers(java.lang.String, int[])}.
+     * <p>
+     * Throws {@link InvalidFieldException} if the field does not exist, or the
+     * field values contained are not of type G_TYPE_INT.
+     * <p>
+     * This method only currently supports lists of values inside a GValueArray - 
+     * other native list types will be supported in future.
+     * 
+     * @param fieldName name of field
+     * @return List of values from the named field
+     */
+    public int[] getIntegers(String fieldName) {
+        return getIntegers(fieldName, null);
+    }
+    
+    /**
+     * Extract the values of the named field as an array of integers.
+     * If the native GType of the field is a GValueArray then this
+     * method will return an array of the contained values, assuming all contained
+     * values are of G_TYPE_INT. Else if the field is of G_TYPE_INT a single value
+     * array will be returned.
+     * <p>
      * An array may be passed into this method to contain the result. A new array
      * will be created if the array is null or not of the correct length.
      * <p>
@@ -274,6 +297,29 @@ public class Structure extends NativeObject {
             throw new InvalidFieldException("double", fieldName);
         }
         return val[0];
+    }
+    
+    /**
+     * Extract the values of the named field as an array of doubles.
+     * If the native GType of the field is a GValueArray then this
+     * method will return an array of the contained values, assuming all contained
+     * values are of G_TYPE_DOUBLE. Else if the field is of G_TYPE_DOUBLE a single value
+     * array will be returned.
+     * <p>
+     * This method will create a new array each time. If you are repeatedly calling
+     * this method consider using {@link #getDoubles(java.lang.String, double[])}.
+     * <p>
+     * Throws {@link InvalidFieldException} if the field does not exist, or the
+     * field values contained are not of type G_TYPE_DOUBLE.
+     * <p>
+     * This method only currently supports lists of values inside a GValueArray - 
+     * other native list types will be supported in future.
+     * 
+     * @param fieldName name of field
+     * @return List of values from the named field
+     */
+    public double[] getDoubles(String fieldName) {
+        return getDoubles(fieldName, null);
     }
     
     /**
