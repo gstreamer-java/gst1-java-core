@@ -1,9 +1,10 @@
 package org.freedesktop.gstreamer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import java.util.List;
+import static org.junit.Assert.*;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,8 +50,28 @@ public class StructureTest {
 		assertEquals(true, structure.getValue("bool"));
 		
 	}
-
-
+    
+    @Test
+    public void testGetValues() {
+        GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
+        ar.append(new GValueAPI.GValue(GType.DOUBLE, 7.5));
+        ar.append(new GValueAPI.GValue(GType.DOUBLE, 14.3));
+        structure.setValue("valuearray", GType.valueOf(GValueAPI.GValueArray.GTYPE_NAME), ar);
+        List<Double> doubles = structure.getValues(Double.class, "valuearray");
+        assertEquals(7.5, doubles.get(0), 0.001);
+        assertEquals(14.3, doubles.get(1), 0.001);
+        try {
+            List<String> strings = structure.getValues(String.class, "valuearray");
+            fail("Trying to extract the wrong type from GValueArray not throwing exception");
+        } catch (Structure.InvalidFieldException ex) {
+        }
+        try {
+            List<Double> strings = structure.getValues(Double.class, "non_existent");
+            fail("Trying to extract a non-existent GValueArray field");
+        } catch (Structure.InvalidFieldException ex) {
+        }
+    }
+    
 	@Test
 	public void testGetInteger() {
 		structure.setInteger("int", 9);		
@@ -59,7 +80,30 @@ public class StructureTest {
 		structure.setInteger("int", -9);		
 		assertEquals(-9, structure.getInteger("int"));				
 	}
-
+    
+    @Test
+    public void testGetIntegers() {
+        GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
+        ar.append(new GValueAPI.GValue(GType.INT, 32));
+        ar.append(new GValueAPI.GValue(GType.INT, -49));
+        structure.setValue("integers", GType.valueOf(GValueAPI.GValueArray.GTYPE_NAME), ar);
+        int[] in = new int[2];
+        int[] ints = structure.getIntegers("integers", in);
+        assertTrue(in == ints);
+        assertEquals(32, ints[0]);
+        assertEquals(-49, ints[1]);
+        
+        in = new int[1];
+        ints = structure.getIntegers("integers", in);
+        assertFalse(in == ints);
+        assertEquals(32, ints[0]);
+        assertEquals(-49, ints[1]);
+        
+        structure.setInteger("single_integer", 18);
+        int[] single = structure.getIntegers("single_integer", in);
+        assertTrue(in == single);
+        assertEquals(18, single[0]);
+    }
 
 	@Test
 	public void testGetDouble() {
@@ -69,6 +113,30 @@ public class StructureTest {
 		structure.setDouble("double", -9.0);		
 		assertEquals(-9.0, structure.getDouble("double"), 0);				
 	}
+    
+    @Test
+    public void testGetDoubles() {
+        GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
+        ar.append(new GValueAPI.GValue(GType.DOUBLE, 3.25));
+        ar.append(new GValueAPI.GValue(GType.DOUBLE, 79.6));
+        structure.setValue("doubles", GType.valueOf(GValueAPI.GValueArray.GTYPE_NAME), ar);
+        double[] in = new double[2];
+        double[] doubles = structure.getDoubles("doubles", in);
+        assertTrue(in == doubles);
+        assertEquals(3.25, doubles[0], 0.001);
+        assertEquals(79.6, doubles[1], 0.001);
+        
+        in = new double[1];
+        doubles = structure.getDoubles("doubles", in);
+        assertFalse(in == doubles);
+        assertEquals(3.25, doubles[0], 0.001);
+        assertEquals(79.6, doubles[1], 0.001);
+        
+        structure.setDouble("single_double", 18.2);
+        double[] single = structure.getDoubles("single_double", in);
+        assertTrue(in == single);
+        assertEquals(18.2, single[0], 0.001);
+    }
 
 	@Test
 	public void testFraction() {
