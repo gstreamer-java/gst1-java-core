@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2018 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -677,5 +678,21 @@ public class Element extends GstObject {
     public void setStartTime(ClockTime time) {
     	GSTELEMENT_API.gst_element_set_start_time(this, time);
     }
+    
+    /**
+     * Performs a query on the element.
+     * 
+     * For elements that don't implement a query handler, this function forwards
+     * the query to a random srcpad or to the peer of a random linked sinkpad of
+     * this element.
+     * 
+     * Please note that some queries might need a running pipeline to work.
+     * 
+     * @param query the Query to perform
+     * @return true if the query could be performed
+     */
+    public boolean query(Query query) {
+        return GSTELEMENT_API.gst_element_query(this, query);
+    }
+    
 }
-
