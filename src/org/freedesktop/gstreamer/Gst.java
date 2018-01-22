@@ -51,6 +51,7 @@ import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.DtlsSrtpDec;
 import org.freedesktop.gstreamer.elements.DtlsSrtpEnc;
 import org.freedesktop.gstreamer.elements.FakeSink;
+import org.freedesktop.gstreamer.elements.FileSrc;
 import org.freedesktop.gstreamer.elements.FlvDemux;
 import org.freedesktop.gstreamer.elements.FlvMux;
 import org.freedesktop.gstreamer.elements.GlImageSink;
@@ -543,6 +544,7 @@ public final class Gst {
 		DtlsSrtpDec.class,
 		DtlsSrtpEnc.class,
 		FakeSink.class,
+		FileSrc.class,
 		FlvDemux.class,
 		FlvMux.class,
 		GlImageSink.class,
