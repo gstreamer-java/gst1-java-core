@@ -22,13 +22,15 @@
 
 package org.freedesktop.gstreamer;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
+
 import java.nio.ByteBuffer;
 
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
+import com.sun.jna.Pointer;
 
 /**
  * Data-passing buffer type, supporting sub-buffers.
@@ -91,10 +93,12 @@ public class Buffer extends MiniObject {
     public static final String GTYPE_NAME = "GstBuffer";
 
     private final MapInfoStruct mapInfo;
+    private final BufferStruct struct;
     
     public Buffer(Initializer init) {
         super(init);
         mapInfo = new MapInfoStruct();
+        struct = new BufferStruct(handle());
     }
     
     /**
@@ -152,6 +156,59 @@ public class Buffer extends MiniObject {
     
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
+    }
+    
+    /**
+     * Gets the offset of this buffer.
+     * The buffer offset is media specific. For video buffers, the start offset will generally be the frame number. 
+     * For audio buffers, it will be the number of samples produced so far.
+     *
+     * @return offset
+     */
+    public Long getOffset() {
+    	return (Long) this.struct.readField("offset");
+    }
+
+    /**
+     * Gets the offset end of this buffer.
+     * The buffer offset is media specific. 
+     *
+     * @return offset
+     */
+    public Long getOffsetEnd() {
+    	return  (Long) this.struct.readField("offset_end");
+    }
+
+    /**
+     * Gets the duration of this buffer.
+     *
+     * @return a ClockTime representing the duration of this buffer in nanoseconds 
+     * or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime gfetDuration() {
+		return (ClockTime)this.struct.readField("duration");
+    }
+
+    
+
+    /**
+     * Gets the timestamps of this buffer.
+     * The buffer DTS refers to the timestamp when the buffer should be decoded and is usually monotonically increasing.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getDecodeTimestamp() {
+		return (ClockTime)this.struct.readField("dts");
+    }
+
+    /**
+     * Gets the timestamps of this buffer.
+     * The buffer PTS refers to the timestamp when the buffer content should be presented to the user and is not always monotonically increasing.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getPresentationTimestamp() {
+		return (ClockTime)this.struct.readField("pts");
     }
     
 }
