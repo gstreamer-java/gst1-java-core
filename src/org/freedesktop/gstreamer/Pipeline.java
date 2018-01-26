@@ -125,9 +125,9 @@ public class Pipeline extends Bin {
      * @param pipelineDecription  the command line describing the pipeline
      * @return The new Pipeline.
      */
-    public static Pipeline launch(String pipelineDecription) {
+    public static Pipeline launch(String pipelineDescription) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
+        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
