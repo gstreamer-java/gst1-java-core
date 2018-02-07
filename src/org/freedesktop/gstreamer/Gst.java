@@ -79,6 +79,7 @@ import org.freedesktop.gstreamer.elements.SoupHttpSrc;
 import org.freedesktop.gstreamer.elements.SpeexEnc;
 import org.freedesktop.gstreamer.elements.SubParse;
 import org.freedesktop.gstreamer.elements.TcpServerSink;
+import org.freedesktop.gstreamer.elements.Tee;
 import org.freedesktop.gstreamer.elements.TeletextDec;
 import org.freedesktop.gstreamer.elements.TsDemux;
 import org.freedesktop.gstreamer.elements.TypeFind;
@@ -574,6 +575,7 @@ public final class Gst {
 		SpeexEnc.class,
 		SubParse.class,
 		TcpServerSink.class,
+		Tee.class,
 		TeletextDec.class,
 		TsDemux.class,
 		TypeFind.class,
