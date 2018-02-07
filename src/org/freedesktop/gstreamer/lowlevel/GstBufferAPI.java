@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.ClockTime;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
@@ -74,6 +75,9 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
+    
+    @CallerOwnsReturn Pointer ptr_gst_buffer_new_wrapped_full(int flags, Pointer data, int maxSize, int offset, int size, Pointer userData, GDestroyNotify destroyCallback);
+    
 //    boolean gst_buffer_is_metadata_writable(Buffer buf);
 //    Buffer gst_buffer_make_metadata_writable(@Invalidate Buffer buf);
 //    /* creating a subbuffer */
