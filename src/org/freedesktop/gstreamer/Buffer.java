@@ -178,4 +178,24 @@ public class Buffer extends MiniObject {
 		return (ClockTime)this.struct.readField("pts");
     }
 
+    public void setPresentationTimestamp(ClockTime val)
+    {
+        this.struct.writeField("pts", val);
+    }
+
+    public void setDuration(ClockTime val)
+    {
+        this.struct.writeField("duration", val);
+    }
+
+    public void setOffset(long val)
+    {
+        this.struct.writeField("offset", val);
+    }
+
+    public void setFlags(int val)
+    {
+        GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, val);
+    }
+
 }

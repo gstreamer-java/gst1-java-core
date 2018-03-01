@@ -75,6 +75,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
+    boolean gst_buffer_set_flags(Buffer buffer, int flags);
 //    boolean gst_buffer_is_metadata_writable(Buffer buf);
 //    Buffer gst_buffer_make_metadata_writable(@Invalidate Buffer buf);
 //    /* creating a subbuffer */
