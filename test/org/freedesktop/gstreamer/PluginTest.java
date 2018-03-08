@@ -76,7 +76,9 @@ public class PluginTest {
 
     @Test
     public void testGetPackage() {
-        assertTrue(playbackPlugin.getPackage().contains("GStreamer Base"));
+        String pkg = playbackPlugin.getPackage();
+        assertTrue(pkg.contains("GStreamer Base")
+        || pkg.contains("Gentoo GStreamer ebuild"));
     }
 
     @Test
