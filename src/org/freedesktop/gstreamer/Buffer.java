@@ -169,6 +169,15 @@ public class Buffer extends MiniObject {
     }
 
     /**
+     * Set the decode timestamp of the Buffer
+     * @param val a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public void setDecodeTimestamp(ClockTime val)
+    {
+        this.struct.writeField("dts", val);
+    }
+
+    /**
      * Gets the timestamps of this buffer.
      * The buffer PTS refers to the timestamp when the buffer content should be presented to the user and is not always monotonically increasing.
      *
@@ -178,24 +187,96 @@ public class Buffer extends MiniObject {
 		return (ClockTime)this.struct.readField("pts");
     }
 
+    /**
+     * Set the presentation timestamp of the Buffer
+     * @param val a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
     public void setPresentationTimestamp(ClockTime val)
     {
         this.struct.writeField("pts", val);
     }
 
+    /**
+     * Gets the duration of this buffer.
+     *
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
+    public ClockTime getDuration() {
+        return (ClockTime)this.struct.readField("duration");
+    }
+
+    /**
+     * Set the duration of this buffer.
+     * @param val a ClockTime representing the duration or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     */
     public void setDuration(ClockTime val)
     {
         this.struct.writeField("duration", val);
     }
 
+    /**
+     * Get the offset (media-specific) of this buffer
+     * @return a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     */
+    public long getOffset()
+    {
+        return (Long)this.struct.readField("offset");
+    }
+
+    /**
+     * Set the offset (media-specific) of this buffer
+     * @param val a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     */
     public void setOffset(long val)
     {
         this.struct.writeField("offset", val);
     }
 
-    public void setFlags(int val)
+    /**
+     * Get the offset (media-specific) of this buffer
+     * @return a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     */
+    public long getOffsetEnd()
     {
-        GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, val);
+        return (Long)this.struct.readField("offset_end");
+    }
+
+    /**
+     * Set the offset (media-specific) of this buffer
+     * @param val a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     */
+    public void setOffsetEnd(long val)
+    {
+        this.struct.writeField("offset_end", val);
+    }
+
+    /**
+     * get the GstBufferFlags describing this buffer
+     * @return
+     */
+    public int getFlags()
+    {
+        return GstBufferAPI.GSTBUFFER_API.gst_buffer_get_flags(this);
+    }
+
+    /**
+     * set some of the GstBufferFlags describing this buffer.  This is a union operation and does not clear flags that are not mentioned in val
+     * @param val a bit mask of flags to be set on the buffer.  bits which are zero in val do not get cleared in this buffer.
+     * @return true if flags were successfully set on this buffer
+     */
+    public boolean setFlags(int val)
+    {
+        return GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, val);
+    }
+
+    /**
+     * unset the GstBufferFlags describing this buffer.  This is a difference operation and does not clear flags that are not mentioned in val
+     * @param val a bit mask of flags to be cleared on the buffer.  bits which are zero in val do not get cleared in this buffer.
+     * @return true if flags were successfully cleared on this buffer
+     */
+    public boolean unsetFlags(int val)
+    {
+        return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, val);
     }
 
 }
