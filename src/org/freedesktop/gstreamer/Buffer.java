@@ -252,7 +252,7 @@ public class Buffer extends MiniObject {
 
     /**
      * get the GstBufferFlags describing this buffer
-     * @return
+     * @return a bit mask whose values can be interpreted by comparing them with {@link BufferFlag}
      */
     public int getFlags()
     {
@@ -263,6 +263,7 @@ public class Buffer extends MiniObject {
      * set some of the GstBufferFlags describing this buffer.  This is a union operation and does not clear flags that are not mentioned in val
      * @param val a bit mask of flags to be set on the buffer.  bits which are zero in val do not get cleared in this buffer.
      * @return true if flags were successfully set on this buffer
+     * @see BufferFlag
      */
     public boolean setFlags(int val)
     {
@@ -273,7 +274,8 @@ public class Buffer extends MiniObject {
      * unset the GstBufferFlags describing this buffer.  This is a difference operation and does not clear flags that are not mentioned in val
      * @param val a bit mask of flags to be cleared on the buffer.  bits which are zero in val do not get cleared in this buffer.
      * @return true if flags were successfully cleared on this buffer
-     */
+     * @see BufferFlag
+     * */
     public boolean unsetFlags(int val)
     {
         return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, val);
