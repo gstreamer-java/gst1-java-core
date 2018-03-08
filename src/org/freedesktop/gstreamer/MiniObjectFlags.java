@@ -24,8 +24,20 @@ import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
  *
  */
 public enum MiniObjectFlags implements IntegerEnum {
-    /** The {@link MiniObject} is read-only */
-    READONLY(1 << 0),
+    /**
+     * the object can be locked and unlocked with gst_mini_object_lock() and gst_mini_object_unlock()
+     * */
+    LOCKABLE(1 << 0),
+
+    /**
+     * the object is permanently locked in READONLY mode. Only read locks can be performed on the object.
+     */
+    LOCK_READONLY(1<<1),
+
+    /**
+     * the object is expected to stay alive even after gst_deinit() has been called and so should be ignored by leak detection tools. (Since 1.10)
+     */
+    MAY_BE_LEAKED(1<<2),
     
     /** The last valid MiniObject flag */
     LAST(1 << 4);

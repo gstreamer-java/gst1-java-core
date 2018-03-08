@@ -27,13 +27,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
  * A set of buffer flags used to describe properties of a {@link Buffer}.
  */
 public enum BufferFlag implements IntegerEnum {
-    /** 
-     * The {@link Buffer} is read-only.
-     * This means the data of the buffer should not be modified. The metadata 
-     * might still be modified.
-     */
-    READONLY(MiniObjectFlags.READONLY.intValue()),
-    
+
     /**  
      * the {@link Buffer} is live data and should be discarded in the PAUSED state.
      */
