@@ -90,6 +90,7 @@ import org.freedesktop.gstreamer.elements.V4l2Src;
 import org.freedesktop.gstreamer.elements.VideoConvert;
 import org.freedesktop.gstreamer.elements.VideoFilter;
 import org.freedesktop.gstreamer.elements.VideoRate;
+import org.freedesktop.gstreamer.elements.VideoScale;
 import org.freedesktop.gstreamer.elements.Volume;
 import org.freedesktop.gstreamer.elements.WebRtcDsp;
 import org.freedesktop.gstreamer.elements.WebRtcEchoProbe;
@@ -590,6 +591,7 @@ public final class Gst {
 		VideoConvert.class,
 		VideoFilter.class,
 		VideoRate.class,
+		VideoScale.class,
 		Volume.class,
         //
         TagList.class
