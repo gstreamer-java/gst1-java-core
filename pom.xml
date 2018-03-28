@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>4.1.0</version>
+			<version>${jna.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -194,7 +194,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.test.jvmargs></maven.test.jvmargs>
-		<jna.version>4.1</jna.version>
+		<jna.version>4.1.0</jna.version>
 	</properties>
 
 	<profiles>
