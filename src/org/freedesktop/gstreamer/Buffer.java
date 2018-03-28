@@ -159,6 +159,24 @@ public class Buffer extends MiniObject {
     }
     
     /**
+     * Gets a pointer to the data pool for this buffer
+     *
+     * @return pointer
+     */
+    public Pointer data() {
+    	return (Pointer) this.struct.readField("pool");
+    }
+    
+    /**
+     * Gets the memory address of the data pool for this buffer
+     *
+     * @return address
+     */
+    public long dataAddress() {
+    	return Pointer.nativeValue(data());
+    }
+    
+    /**
      * Gets the offset of this buffer.
      * The buffer offset is media specific. For video buffers, the start offset will generally be the frame number. 
      * For audio buffers, it will be the number of samples produced so far.
