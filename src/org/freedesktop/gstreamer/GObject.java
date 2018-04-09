@@ -144,7 +144,13 @@ public abstract class GObject extends RefCountedObject {
     	// Quick getter for GType without allocation
     	// same as : new GObjectStruct(ptr).g_type_instance.g_class.g_type 
     	Pointer g_class = ptr.getPointer(0);
-    	return GType.valueOf(g_class.getNativeLong(0).longValue());
+    	if(Native.SIZE_T_SIZE == 8) {
+            return GType.valueOf(g_class.getLong(0));
+        } else if (Native.SIZE_T_SIZE == 4) {
+            return GType.valueOf( ((long) g_class.getInt(0)) & 0xffffffffL );
+        } else {
+            throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
+        }
     }
 
     /**
