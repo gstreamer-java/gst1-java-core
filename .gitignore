@@ -11,4 +11,6 @@
 .project
 .settings
 
+# NetBeans Files #
 /nbproject/
+nb-configuration.xml
