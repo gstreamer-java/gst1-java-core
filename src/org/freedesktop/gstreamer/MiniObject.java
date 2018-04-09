@@ -21,6 +21,7 @@
 
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
@@ -49,9 +50,15 @@ public class MiniObject extends RefCountedObject {
      * Gives the type value.
      */
     public static GType getType(Pointer ptr) {
-    	// Quick getter for GType without allocation
-    	// same as : new MiniObjectStruct(ptr).type
-    	return GType.valueOf(ptr.getNativeLong(0).longValue());
+        // Quick getter for GType without allocation
+        // same as : new MiniObjectStruct(ptr).type
+        if (Native.SIZE_T_SIZE == 8) {
+            return GType.valueOf(ptr.getLong(0));
+        } else if (Native.SIZE_T_SIZE == 4) {
+            return GType.valueOf( ((long) ptr.getInt(0)) & 0xffffffffL );
+        } else {
+            throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
+        }
     }
 
     /**
@@ -87,7 +94,7 @@ public class MiniObject extends RefCountedObject {
      * @return the new MiniObject.
      */
     public <T extends MiniObject> T copy() {
-    	MiniObject result = GSTMINIOBJECT_API.gst_mini_object_copy(this);
+        MiniObject result = GSTMINIOBJECT_API.gst_mini_object_copy(this);
         if (result == null) {
             throw new NullPointerException("Could not make a copy of " + this.getClass().getSimpleName());
         }
@@ -95,24 +102,24 @@ public class MiniObject extends RefCountedObject {
     }
 
     @Override
-	protected void ref() {
+    protected void ref() {
         GSTMINIOBJECT_API.gst_mini_object_ref(this);
     }
-    
+
     @Override
-	protected void unref() {
-    	GSTMINIOBJECT_API.gst_mini_object_unref(this);
+    protected void unref() {
+        GSTMINIOBJECT_API.gst_mini_object_unref(this);
     }
 
     public int getRefCount() {
-    	final MiniObjectStruct struct = new MiniObjectStruct(handle());
-    	return (Integer) struct.readField("refcount");
+        final MiniObjectStruct struct = new MiniObjectStruct(handle());
+        return (Integer) struct.readField("refcount");
     }
 
     @Override
-	protected void disposeNativeHandle(Pointer ptr) {
-    	if (ownsHandle.get()) {
-    		GSTMINIOBJECT_API.gst_mini_object_unref(ptr);
-    	}
-    }    
+    protected void disposeNativeHandle(Pointer ptr) {
+        if (ownsHandle.get()) {
+            GSTMINIOBJECT_API.gst_mini_object_unref(ptr);
+        }
+    }
 }
