@@ -1,21 +1,27 @@
 package org.freedesktop.gstreamer;
 
 /**
- * The exception you can throw when a pad link operation returns a non-OK result
+ * The exception thrown when a pad link operation returns a non-OK result
  */
-public class PadLinkException
-    extends GstException
-{
-    public final PadLinkReturn linkResult;
+public class PadLinkException extends GstException {
 
-    public PadLinkException(PadLinkReturn result)
-    {
-        this("failed to link pads ("+result+")", result);
+    private final PadLinkReturn linkResult;
+
+    PadLinkException(PadLinkReturn result) {
+        this("failed to link pads (" + result + ")", result);
     }
 
-    public PadLinkException(String message, PadLinkReturn result)
-    {
+    PadLinkException(String message, PadLinkReturn result) {
         super(message);
         linkResult = result;
     }
+
+    /**
+     * Get the PadLinkReturn result that caused this exception.
+     * @return PadLinkReturn
+     */
+    public PadLinkReturn getLinkResult() {
+        return linkResult;
+    }
+    
 }

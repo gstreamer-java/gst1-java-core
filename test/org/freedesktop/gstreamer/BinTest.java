@@ -179,7 +179,7 @@ public class BinTest {
             fail("Should not be able to link pads in different hierarchy");
         } catch (PadLinkException e) {
             assertEquals("Should not be able to link pads in different hierarchy",
-                PadLinkReturn.WRONG_HIERARCHY, e.linkResult);
+                PadLinkReturn.WRONG_HIERARCHY, e.getLinkResult());
         }
 
         /* adding other element to bin as well */

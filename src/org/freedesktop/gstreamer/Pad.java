@@ -207,20 +207,13 @@ public class Pad extends GstObject {
      *
      * MT Safe.
      * @param sink the sink Pad to link.
-     * @throws
+     * @throws PadLinkException if pads cannot be linked.
      */
-    public void link(Pad sink)
-        throws PadLinkException
-    {
-        PadLinkReturn result = link_(sink);
-        if (result!=PadLinkReturn.OK) {
+    public void link(Pad sink) throws PadLinkException {
+        PadLinkReturn result = GSTPAD_API.gst_pad_link(this, sink);
+        if (result != PadLinkReturn.OK) {
             throw new PadLinkException(result);
         }
-    }
-
-    public PadLinkReturn link_(Pad sink)
-    {
-        return GSTPAD_API.gst_pad_link(this, sink);
     }
 
     /**
