@@ -209,6 +209,22 @@ public enum MessageType implements IntegerEnum {
      */
     DEVICE_REMOVED(EXTENDED.intValue() + 2),
     /**
+     * Message indicating a {@link GObject} property has changed (Since 1.10)
+     */
+    PROPERTY_NOTIFY(EXTENDED.intValue() + 3),
+    /**
+     * Message indicating a new {@link GstStreamCollection} is available (Since 1.10)
+     */
+    STREAM_COLLECTION(EXTENDED.intValue()+4),
+    /**
+     * Message indicating the active selection of {@link GstStreams} has changed (Since 1.10)
+     */
+    STREAMS_SELECTED(EXTENDED.intValue() + 5),
+    /**
+     * Message indicating to request the application to try to play the given URL(s). Useful if for example a HTTP 302/303 response is received with a non-HTTP URL inside. (Since 1.10)
+     */
+    REDIRECT(EXTENDED.intValue() + 6),
+    /**
      * mask for all of the above messages.
      */
     ANY(~0);

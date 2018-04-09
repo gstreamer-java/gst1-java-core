@@ -81,12 +81,14 @@ public class PadTest {
         assertTrue("Sink pad not garbage collected", GCTracker.waitGC(sinkRef));
     }
     @Test
-    public void padLink() throws Exception {
+    public void padLink()
+        throws Exception
+    {
         Element src = ElementFactory.make("fakesrc", "src");
         Element sink = ElementFactory.make("fakesink", "src");
         Pad srcPad = src.getStaticPad("src");
         Pad sinkPad = sink.getStaticPad("sink");
-        assertEquals("Could not link pads", PadLinkReturn.OK, srcPad.link(sinkPad));
+        srcPad.link(sinkPad);
     }
 
     @Ignore("This seems to fail because gst1.0 doesn't actually send the event because pads " +

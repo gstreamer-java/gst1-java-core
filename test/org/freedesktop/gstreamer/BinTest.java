@@ -23,8 +23,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -143,7 +143,9 @@ public class BinTest {
         assertEquals("Callback not called", 2, removed.get());
     }
     @Test 
-    public void addLinked() {
+    public void addLinked()
+        throws PadLinkException
+    {
         /* adding an element with linked pads to a bin unlinks the pads */
         Pipeline pipeline = new Pipeline((String) null);
         assertNotNull("Could not create pipeline", pipeline);
@@ -158,7 +160,7 @@ public class BinTest {
         Pad sinkpad = sink.getStaticPad("sink");
         assertNotNull("Could not get sink pad", sinkpad);
         
-        assertEquals("Could not link src and sink pads", PadLinkReturn.OK, srcpad.link(sinkpad));
+        srcpad.link(sinkpad);
 
         /* pads are linked now */
         assertTrue("srcpad not linked", srcpad.isLinked());
@@ -172,14 +174,19 @@ public class BinTest {
         assertFalse("sinkpad is still linked after being added to bin", sinkpad.isLinked());
         
         /* cannot link pads in wrong hierarchy */
-        assertEquals("Should not be able to link pads in different hierarchy", 
-                PadLinkReturn.WRONG_HIERARCHY, srcpad.link(sinkpad));
+        try {
+            srcpad.link(sinkpad);
+            fail("Should not be able to link pads in different hierarchy");
+        } catch (PadLinkException e) {
+            assertEquals("Should not be able to link pads in different hierarchy",
+                PadLinkReturn.WRONG_HIERARCHY, e.getLinkResult());
+        }
 
         /* adding other element to bin as well */
         pipeline.add(sink);
 
         /* now we can link again */
-        assertEquals("Could not link src and sink pads when in same bin", PadLinkReturn.OK, srcpad.link(sinkpad));
+        srcpad.link(sinkpad);
 
         /* check if pads really are linked */
         assertTrue("srcpad not linked", srcpad.isLinked());
