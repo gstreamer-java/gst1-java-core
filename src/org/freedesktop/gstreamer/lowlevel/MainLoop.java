@@ -45,7 +45,10 @@ public class MainLoop extends RefCountedObject {
     public MainLoop() {
         super(initializer(GLIB_API.g_main_loop_new(Gst.getMainContext(), false)));
     }
-    
+
+    public MainLoop(GMainContext ctx) {
+        super(initializer(GLIB_API.g_main_loop_new(ctx, false)));
+    }
     /**
      * Creates a new instance of {@code MainLoop}
      * 

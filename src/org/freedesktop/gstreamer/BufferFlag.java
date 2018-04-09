@@ -27,39 +27,74 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
  * A set of buffer flags used to describe properties of a {@link Buffer}.
  */
 public enum BufferFlag implements IntegerEnum {
-    /** 
-     * The {@link Buffer} is read-only.
-     * This means the data of the buffer should not be modified. The metadata 
-     * might still be modified.
-     */
-    READONLY(MiniObjectFlags.READONLY.intValue()),
-    
+
     /**  
-     * The {@link Buffer} is part of a preroll and should not be displayed.
+     * the {@link Buffer} is live data and should be discarded in the PAUSED state.
      */
-    PREROLL(MiniObjectFlags.LAST.intValue() << 0),
+    LIVE(MiniObjectFlags.LAST.intValue() << 0),
+
+    /**
+     * the {@link Buffer} contains data that should be dropped
+     * because it will be clipped against the segment
+     * boundaries or because it does not contain data
+     * that should be shown to the user.
+     */
+    DECODE_ONLY(MiniObjectFlags.LAST.intValue() << 1),
+
     /**
      * The {@link Buffer} marks a discontinuity in the stream.
      * This typically occurs after a seek or a dropped buffer from a live or
      * network source.
      */
-    DISCONT(MiniObjectFlags.LAST.intValue() << 1),
-    
-    /** The {@link Buffer} has been added as a field in a {@link Caps}. */
-    IN_CAPS(MiniObjectFlags.LAST.intValue() << 2),
-    
+    DISCONT(MiniObjectFlags.LAST.intValue() << 2),
+
+    /**
+     * The {@link Buffer} timestamps might have a discontinuity and this buffer is a good point to resynchronize.
+     */
+    RESYNC(MiniObjectFlags.LAST.intValue() << 3),
+
+    /**
+     * the {@link Buffer} data is corrupted.
+     */
+    CORRUPTED(MiniObjectFlags.LAST.intValue() << 4),
+
+    /**
+     * the buffer contains a media specific marker. for video this is typically the end of a frame boundary, for audio this is usually the start of a talkspurt.
+     */
+    MARKER(MiniObjectFlags.LAST.intValue() << 5),
+
+    /**
+     * he buffer contains header information that is needed to decode the following data.
+     */
+    HEADER(MiniObjectFlags.LAST.intValue() << 6),
+
     /**
      * The {@link Buffer} has been created to fill a gap in the
      * stream and contains media neutral data (elements can switch to optimized code
      * path that ignores the buffer content).
      */
-    GAP(MiniObjectFlags.LAST.intValue() << 3),
+    GAP(MiniObjectFlags.LAST.intValue() << 7),
+
+    /**
+     * the {@link Buffer} can be dropped without breaking the stream, for example to reduce bandwidth.
+     */
+    DROPPABLE(MiniObjectFlags.LAST.intValue() << 8),
     
     /** This unit cannot be decoded independently. */
-    DELTA_UNIT(MiniObjectFlags.LAST.intValue() << 4),
+    DELTA_UNIT(MiniObjectFlags.LAST.intValue() << 9),
+
+    /**
+     * this flag is set when memory of the {@link Buffer} is added/removed
+     */
+    TAG_MEMORY(MiniObjectFlags.LAST.intValue() << 10),
+
+    /**
+     * Elements which write to disk or permanent storage should ensure the data is synced after writing the contents of this {@link Buffer}. (Since 1.6)
+     */
+    SYNC_AFTER(MiniObjectFlags.LAST.intValue() << 11),
     
     /* padding */
-    LAST(MiniObjectFlags.LAST.intValue() << 8),
+    LAST(MiniObjectFlags.LAST.intValue() << 16),
     
     /** The value used for unknown native values */
     @DefaultEnumValue
