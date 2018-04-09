@@ -55,10 +55,11 @@ public class MiniObject extends RefCountedObject {
     }
 
     /**
-     * Checks if a mini-object is writable.  A mini-object is writable
-     * if the reference count is one and the {@link MiniObjectFlags#READONLY}
-     * flag is not set.  Modification of a mini-object should only be
-     * done after verifying that it is writable.
+     * If mini_object has the LOCKABLE flag set, check if the current EXCLUSIVE lock on object is the only one, this means that changes to the object will not be visible to any other object.
+     *
+     * <p></p>If the LOCKABLE flag is not set, check if the refcount of mini_object is exactly 1, meaning that no other reference exists to the object and that the object is therefore writable.
+     *
+     * <p></p>Modification of a mini-object should only be done after verifying that it is writable.
      *
      * @return true if the object is writable.
      */
