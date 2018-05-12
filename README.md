@@ -33,8 +33,8 @@ available in your path in order to use the bindings. Windows and OSX installers 
 available from the [GStreamer project itself][gstreamer-download]. Linux users should be
 able to get GStreamer from their distribution repository if it isn't already installed.
 
-It is possible to ship GStreamer with your application should you not wish your users
-to have to install it separately.
+It is possible to ship GStreamer with your application if you not wish your users
+to have to install it separately. [Check it here](https://gstreamer.freedesktop.org/documentation/deploying/index.html)
 
 The minimum supported version of GStreamer is 1.8.x.
 
