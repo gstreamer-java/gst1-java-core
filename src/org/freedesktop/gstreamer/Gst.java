@@ -54,6 +54,7 @@ import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -84,7 +85,7 @@ public final class Gst {
             // Allocate some native memory to pass the args down to the native layer
             //
             argsCopy = new Memory[args.length + 2];
-            argvMemory = new Memory(argsCopy.length * Pointer.SIZE);
+            argvMemory = new Memory(argsCopy.length * Native.POINTER_SIZE);
             
             //
             // Insert the program name as argv[0]
@@ -109,7 +110,7 @@ public final class Gst {
             List<String> args = new ArrayList<String>();
             Pointer argv = argvRef.getValue();
             for (int i = 1; i < argcRef.getValue(); i++) {
-                Pointer arg = argv.getPointer(i * Pointer.SIZE);
+                Pointer arg = argv.getPointer(i * Native.POINTER_SIZE);
                 if (arg != null) {
                     args.add(arg.getString(0, false));
                 }
