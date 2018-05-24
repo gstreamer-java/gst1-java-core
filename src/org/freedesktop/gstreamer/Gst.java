@@ -619,9 +619,11 @@ public final class Gst {
                     PadTemplate.class,
                     Plugin.class,
                     PluginFeature.class,
+                    Promise.class,
                     Query.class,
                     Registry.class,
                     Sample.class,
+                    WebRTCSessionDescription.class,
                     // ----------- Elements -------------
                     AppSink.class,
                     AppSrc.class,
