@@ -33,18 +33,18 @@ import com.sun.jna.Pointer;
 public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library
 {
   GstWebRTCSessionDescriptionAPI GSTWEBRTCSESSIONDESCRIPTION_API =
-      GstNative.load(GstWebRTCSessionDescriptionAPI.class);
+      GstNative.load("gstwebrtc", GstWebRTCSessionDescriptionAPI.class);
 
-  public static final class GstWebRTCSessionDescription extends com.sun.jna.Structure
+  public static final class WebRTCSessionDescriptionStruct extends com.sun.jna.Structure
   {
     public volatile Pointer type;
     public volatile Pointer sdp;
 
-    public GstWebRTCSessionDescription()
+    public WebRTCSessionDescriptionStruct()
     {
     }
 
-    public GstWebRTCSessionDescription(final Pointer ptr)
+    public WebRTCSessionDescriptionStruct(final Pointer ptr)
     {
       useMemory(ptr);
     }
