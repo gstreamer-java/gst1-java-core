@@ -35,6 +35,11 @@ public class Promise extends MiniObject
     super(init);
   }
 
+  public Promise() 
+  {
+    this(initializer(GSTPROMISE_API.ptr_gst_promise_new()));
+  }
+
   public Promise(final GstCallback callback)
   {
     this(initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(callback)));
@@ -45,9 +50,9 @@ public class Promise extends MiniObject
     return new Initializer(ptr, false, true);
   }
 
-  public void waitResult()
+  public PromiseResult waitResult()
   {
-    GSTPROMISE_API.gst_promise_wait(this);
+    return GSTPROMISE_API.gst_promise_wait(this);
   }
 
   public void reply(final Structure s)
