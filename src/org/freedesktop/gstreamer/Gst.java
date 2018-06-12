@@ -58,6 +58,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
+import java.util.logging.Level;
+import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -199,6 +201,109 @@ public final class Gst {
     public static void quit() {
         quit.countDown();
     }
+    
+    
+    /**
+     * Create a new pipeline based on command line syntax.
+     * 
+     * Please note that you might get a return value that is not NULL even 
+     * though the error is set. 
+     * In this case there was a recoverable parsing error and you can try 
+     * to play the pipeline.
+     * 
+     * @param pipelineDescription  the command line describing the pipeline
+     * @return a new element on success. 
+     *         If more than one toplevel element is specified by 
+     *         the pipeline_description , all elements are put into a GstPipeline, 
+     *         which than is returned. 
+     */
+    public static Pipeline parseLaunch(String pipelineDescription, List<GError> errors) {
+        Pointer[] err = { null };
+        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
+        if (pipeline == null) {
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+        
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+
+        return pipeline;
+    }    
+    public static Pipeline parseLaunch(String pipelineDescription) {
+        return parseLaunch(pipelineDescription, null);
+    }
+    
+    /**
+     * Create a new element based on command line syntax. 
+     * 
+     * error will contain an error message if an erroneous pipeline is specified. 
+     * An error does not mean that the pipeline could not be constructed.
+     * 
+     * @param pipelineDescription An array of strings containing the command line describing the pipeline.
+     * @return a new element on success. 
+     */
+    public static Pipeline parseLaunch(String[] pipelineDescription, List<GError> errors) {
+        Pointer[] err = { null };
+        Pipeline pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDescription, err);
+        if (pipeline == null) {
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+        
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+
+        return pipeline;
+    }
+    public static Pipeline parseLaunch(String[] pipelineDescription) {
+        return parseLaunch(pipelineDescription, null);
+    }
+    
+    /**
+    * Creates a bin from a text bin description. 
+    * 
+    * This function allows creation of a bin based on the syntax used in the
+    * gst-launch utillity.
+    * 
+    * @param binDescription the command line describing the bin
+    * @param ghostUnlinkedPads whether to create ghost pads for the bin from any unlinked pads
+    * @return The new Bin.
+    */
+   public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads, List<GError> errors) {
+        
+        Pointer[] err = { null };
+        Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
+
+        if (bin == null) {       
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+        
+        return bin;
+   }
+   public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads) {
+       return parseBinFromDescription(binDescription, ghostUnlinkedPads, null);
+   }
+    
     
     /**
      * Waits for the gstreamer system to shutdown via a call to {@link #quit}.
