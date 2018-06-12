@@ -23,6 +23,8 @@ package org.freedesktop.gstreamer;
 import java.util.concurrent.TimeUnit;
 
 import com.sun.jna.Pointer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
@@ -89,6 +91,8 @@ public class Pipeline extends Bin {
     public static final String GST_NAME = "pipeline";
     public static final String GTYPE_NAME = "GstPipeline";
 
+    private static Logger logger = Logger.getLogger(Pipeline.class.getName());
+        
     public Pipeline(Initializer init) { 
         super(init);
     }
@@ -131,6 +135,12 @@ public class Pipeline extends Bin {
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
+        
+        // check for error
+        if (err[0] != null) { 
+            logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+        }
+
         pipeline.initBus();
         return pipeline;
     }
@@ -150,6 +160,13 @@ public class Pipeline extends Bin {
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
+        
+        // check for error
+        if (err[0] != null) {
+            // log error!            
+            logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+        }
+
         pipeline.initBus();
         return pipeline;
     }
