@@ -18,7 +18,7 @@ package org.freedesktop.gstreamer.glib;
 
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 
-public class GlibUtils {
+public class GLib {
     
     public static boolean setEnv(String variable, final String value, boolean overwrite) {        
         return GlibAPI.GLIB_API.g_setenv(variable, value, overwrite);       

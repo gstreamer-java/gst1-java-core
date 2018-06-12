@@ -16,16 +16,16 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.glib.GlibUtils;
+import org.freedesktop.gstreamer.glib.GLib;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-public class GlibUtilsTest {
+public class GLibTest {
     
     @Test
     public void getEnv() {       
-        String user = GlibUtils.getEnv("USER");
-        String pwd = GlibUtils.getEnv("PWD");
+        String user = GLib.getEnv("USER");
+        String pwd = GLib.getEnv("PWD");
         System.out.println("user: " + user);
         System.out.println("path: " + pwd);        
     }
@@ -34,13 +34,13 @@ public class GlibUtilsTest {
     public void setUnsetEnv() {
         
         // set environment
-        GlibUtils.setEnv("TESTVAR", "foo", true);
+        GLib.setEnv("TESTVAR", "foo", true);
         
         // get environment
-        assertEquals("could not set TESTVAR!", GlibUtils.getEnv("TESTVAR"), "foo");
+        assertEquals("could not set TESTVAR!", GLib.getEnv("TESTVAR"), "foo");
         
         // unset
-        GlibUtils.unsetEnv("TESTVAR");
-        assertEquals("could not unset TESTVAR!", GlibUtils.getEnv("TESTVAR"), null);
+        GLib.unsetEnv("TESTVAR");
+        assertEquals("could not unset TESTVAR!", GLib.getEnv("TESTVAR"), null);
     }
 }
