@@ -21,6 +21,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI;
 import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
 
 /**
@@ -78,5 +79,40 @@ public class PadTemplate extends GstObject {
      */
     public Caps getCaps() {
         return GSTPADTEMPLATE_API.gst_pad_template_get_caps(this);
+    }
+    
+    /**
+     * Gets the name of this template
+     * 
+     * @return the name of this template
+     */
+    public String getTemplateName() {
+        return get("name-template").toString();        
+    }
+    
+    /**
+     * Gets the direction of this template
+     * 
+     * @return {@link PadDirection}
+     */
+    public PadDirection getDirection() {
+        Object d = get("direction");
+        if (d instanceof Number) {
+            return PadDirection.values()[((Number) d).intValue()];
+        }        
+        return null;
+    }
+    
+    /**
+     * Gets presence of this template
+     * 
+     * @return {@link PadPresence}
+     */
+    public PadPresence getPresence() {
+        Object p = get("presence");
+        if (p instanceof Number) {
+            return PadPresence.values()[((Number) p).intValue()];
+        }
+        return null;
     }
 }
