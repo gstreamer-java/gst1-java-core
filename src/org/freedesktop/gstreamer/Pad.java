@@ -392,6 +392,17 @@ public class Pad extends GstObject {
     }
     
     /**
+     * Signal emitted when new data is available on the {@link Pad}
+     * 
+     * @see #addDataProbe(DATA_PROBE) 
+     * @see #removeDataProbe(DATA_PROBE) 
+     */
+    public static interface DATA_PROBE {
+        public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
+    }
+
+    
+    /**
      * Add a listener for the <code>have-data</code> signal on this {@link Pad}
      * 
      * @param listener The listener to be called when data is available.
@@ -518,6 +529,36 @@ public class Pad extends GstObject {
     public void removeEventProbe(EVENT_PROBE listener) {
         removeCallback(EVENT_PROBE.class, listener);
     }
+    
+    
+    public synchronized void addDataProbe(final DATA_PROBE listener) {
+        
+        final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
+            public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
+                if ((probeInfo.padProbeType & GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER) != 0) {
+                    Buffer buffer = GSTPAD_API.gst_pad_probe_info_get_buffer(probeInfo);
+                    return listener.dataReceived(pad, buffer);
+                }
+
+            	//We have to negate the return value to keep consistency with gstreamer's API
+                return PadProbeReturn.OK;
+            }
+        };
+        
+        GCallback cb = new GCallback(GSTPAD_API.gst_pad_add_probe(this, GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER, probe, null, null), probe) {
+            @Override
+            protected void disconnect() {
+                GSTPAD_API.gst_pad_remove_probe(Pad.this, id);                
+            }
+        };        
+        
+        addCallback(DATA_PROBE.class, listener, cb);       
+    }
+    
+    public void removeDataProbe(DATA_PROBE listener) {
+        removeCallback(DATA_PROBE.class, listener);
+    }
+
 
     /**
      * Sends the event to this pad. 
@@ -611,5 +652,30 @@ public class Pad extends GstObject {
      */
     public FlowReturn pullRange(long offset, int size, Buffer[] buffer) {
     	return GSTPAD_API.gst_pad_pull_range(this, offset, size, buffer);
+    }
+    
+        
+    
+    /**
+     * Pushes a buffer to the peer of pad .
+     * This function will call installed block probes before triggering any 
+     * installed data probes.
+     * 
+     * The function proceeds calling gst_pad_chain() on the peer pad and returns 
+     * the value from that function. If pad has no peer, GST_FLOW_NOT_LINKED 
+     * will be returned.
+     * 
+     * In all cases, success or failure, the caller loses its reference to 
+     * buffer after calling this function.
+     *
+     * @param buffer
+     *       the GstBuffer to push returns GST_FLOW_ERROR if not. [transfer full]
+     * @return 
+     *       a GstFlowReturn from the peer pad.
+     * 
+     * MT safe.
+     */
+    public FlowReturn push(final Buffer buffer) {
+        return GSTPAD_API.gst_pad_push(this, buffer);
     }
 }

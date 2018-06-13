@@ -121,4 +121,42 @@ public class PadTest {
         sink.sendEvent(ev2);
         assertNotSame("event_prober.probeEvent() should not have been called", ev2, e.get());
     }
+        
+    
+    @Test
+    public void addDataProbe() {
+        
+        Element elem = ElementFactory.make("identity", "src");
+        TagList taglist = new TagList();
+        Buffer buf = new Buffer(3);
+        Buffer buf2 = new Buffer(2);
+        final AtomicReference<Buffer> b = new AtomicReference<Buffer>();
+        
+        Pad src = elem.getStaticPad("src");
+        
+        Pad.DATA_PROBE data_probe = new Pad.DATA_PROBE() {
+         
+            @Override
+            public PadProbeReturn dataReceived(Pad pad, Buffer buffer) {
+                b.set(buffer);
+                return PadProbeReturn.OK;
+            }
+        };
+        
+        elem.play();
+        
+        // add a dataprobe
+        src.addDataProbe(data_probe);
+
+        // push data
+        FlowReturn res = src.push(buf);
+        assertEquals("event_prober.probeEvent() was not called", buf, b.get());
+        
+        // remove the dataprobe
+        src.removeDataProbe(data_probe);       
+        
+        // push data
+        res = src.push(buf2);        
+        assertNotSame("event_prober.probeEvent() should not have been called", buf2, b.get());
+    }
 }
