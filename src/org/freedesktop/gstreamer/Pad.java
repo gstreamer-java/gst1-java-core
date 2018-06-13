@@ -678,4 +678,15 @@ public class Pad extends GstObject {
     public FlowReturn push(final Buffer buffer) {
         return GSTPAD_API.gst_pad_push(this, buffer);
     }
+    
+    /**
+     * Gets the template for pad.
+     * 
+     * @return the GstPadTemplate from which this pad was instantiated, 
+     * or NULL if this pad has no template. Unref after usage. 
+     */
+    public PadTemplate getTemplate() {
+        return GSTPAD_API.gst_pad_get_pad_template(this);
+    }
+
 }
