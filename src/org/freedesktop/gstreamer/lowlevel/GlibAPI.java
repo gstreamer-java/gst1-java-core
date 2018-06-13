@@ -176,4 +176,45 @@ public interface GlibAPI extends Library {
             });
         }
     }
+    
+    /*
+     * Miscellaneous Utility Functions
+     */
+    
+    /**
+     * Returns the value of an environment variable.
+     * 
+     * On UNIX, the name and value are byte strings which might or might not be 
+     * in some consistent character set and encoding. On Windows, they are in UTF-8. 
+     * On Windows, in case the environment variable's value contains references 
+     * to other environment variables, they are expanded.
+     * 
+     * @param variable the environment variable to get.     
+     * @return the value of the environment variable, or NULL if the 
+     *         environment variable is not found. 
+     */
+    String g_getenv(String variable);
+    
+    
+    /**
+     * Sets an environment variable. 
+     * 
+     * On UNIX, both the variable's name and value can be arbitrary byte strings, 
+     * except that the variable's name cannot contain '='. 
+     * On Windows, they should be in UTF-8.
+     * 
+     * @param variable the environment variable to set, must not contain '='. 
+     * @param value the value for to set the variable to. 
+     * @param overwrite whether to change the variable if it already exists.
+     * @return FALSE if the environment variable couldn't be set.
+     */
+    boolean g_setenv(String variable, String value, boolean overwrite);
+    
+    
+    /**
+     * Removes an environment variable from the environment.
+     * 
+     * @param variable the environment variable to remove, must not contain '='. 
+     */
+    void g_unsetenv(String variable);
 }
