@@ -37,6 +37,7 @@ import com.sun.jna.FromNativeContext;
 import com.sun.jna.FromNativeConverter;
 import com.sun.jna.MethodParameterContext;
 import com.sun.jna.MethodResultContext;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.StructureReadContext;
 import com.sun.jna.ToNativeContext;
@@ -230,7 +231,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
         }
 
         public Class<?> nativeType() {
-            return Pointer.SIZE == 8 ? Long.class : Integer.class;
+            return Native.POINTER_SIZE == 8 ? Long.class : Integer.class;
         }
     };
     private TypeConverter querytypeConverter = new TypeConverter() {

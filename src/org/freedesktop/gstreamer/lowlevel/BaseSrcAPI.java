@@ -34,6 +34,7 @@ import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
@@ -229,7 +230,7 @@ public interface BaseSrcAPI extends Library {
         public PrepareSeek prepare_seek_segment;
         
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * (GST_PADDING_LARGE - 6)];
+        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * (GST_PADDING_LARGE - 6)];
     
         @Override
         protected List<String> getFieldOrder() {

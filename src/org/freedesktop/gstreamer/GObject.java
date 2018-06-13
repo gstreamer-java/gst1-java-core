@@ -356,7 +356,7 @@ public abstract class GObject extends RefCountedObject {
 		int offset = 0;
 		for (int i = 0; i < len.getValue(); i++) {
 			props[i] = new GObjectAPI.GParamSpec(ptrs.getPointer(offset));
-			offset += Pointer.SIZE;
+			offset += Native.POINTER_SIZE;
 		}
 		return props;
 	}

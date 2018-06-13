@@ -43,6 +43,7 @@ import org.freedesktop.gstreamer.query.AllocationQuery;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -220,7 +221,7 @@ public interface BaseSinkAPI extends Library {
         public RenderList render_list;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * BaseSinkAPI.GST_PADDING_LARGE];
+        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * BaseSinkAPI.GST_PADDING_LARGE];
 
         @Override
         protected List<String> getFieldOrder() {
