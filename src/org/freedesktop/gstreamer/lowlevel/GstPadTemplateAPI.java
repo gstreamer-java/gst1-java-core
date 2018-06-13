@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Native;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
@@ -29,8 +30,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstPadTemplate functions
@@ -69,11 +68,11 @@ public interface GstPadTemplateAPI extends com.sun.jna.Library {
         }
         
         public PadDirection getPadDirection() {
-            return PadDirection.values()[getPointer().getInt(Pointer.SIZE)];
+            return PadDirection.values()[getPointer().getInt(Native.POINTER_SIZE)];
         }
         
         public PadPresence getPadPresence() {
-            return PadPresence.values()[getPointer().getInt(Pointer.SIZE + 4)];
+            return PadPresence.values()[getPointer().getInt(Native.POINTER_SIZE + 4)];
         }
     }  
     

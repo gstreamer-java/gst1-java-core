@@ -31,6 +31,7 @@ import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure.ByReference;
@@ -178,7 +179,7 @@ public interface GObjectAPI extends Library {
         public Finalize finalize;
         public volatile Pointer dispatch_properties_changed;
         public Notify notify;
-        public volatile byte[] p_dummy = new byte[8 * Pointer.SIZE];
+        public volatile byte[] p_dummy = new byte[8 * Native.POINTER_SIZE];
         
         public static interface Constructor extends Callback {
             public Pointer callback(GType type, int n_construct_properties, 

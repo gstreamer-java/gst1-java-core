@@ -33,6 +33,7 @@ import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import java.util.Arrays;
@@ -175,7 +176,7 @@ public interface BaseTransformAPI extends Library {
         public AcceptCaps accept_caps;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Pointer.SIZE * (GST_PADDING_LARGE - 3)];
+        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * (GST_PADDING_LARGE - 3)];
 
         @Override
         protected List<String> getFieldOrder() {

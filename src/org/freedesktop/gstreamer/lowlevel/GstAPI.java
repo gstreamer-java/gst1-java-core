@@ -23,6 +23,7 @@ import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -87,7 +88,7 @@ public interface GstAPI extends Library {
         public long duration;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[(Pointer.SIZE * GST_PADDING) - (Double.SIZE / 8)];
+        public volatile byte[] _gst_reserved = new byte[(Native.POINTER_SIZE * GST_PADDING) - (Double.SIZE / 8)];
 
         @Override
         protected List<String> getFieldOrder() {
