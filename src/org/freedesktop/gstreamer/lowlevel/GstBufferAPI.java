@@ -30,6 +30,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**
  * GstBuffer functions
@@ -41,12 +42,32 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final int GST_LOCK_FLAG_WRITE = (1 << 1);
     public static final int GST_MAP_READ = GST_LOCK_FLAG_READ;
     public static final int GST_MAP_WRITE = GST_LOCK_FLAG_WRITE;
+    
+    /**
+    * GstMapInfo:
+    * @memory: a pointer to the mapped memory
+    * @flags: flags used when mapping the memory
+    * @data: (array length=size): a pointer to the mapped data
+    * @size: the valid size in @data
+    * @maxsize: the maximum bytes in @data
+    * @user_data: extra private user_data that the implementation of the memory
+    *             can use to store extra info.
+    *
+    * A structure containing the result of a map operation such as
+    * gst_memory_map(). It contains the data and size.
+    */
     public static final class MapInfoStruct extends com.sun.jna.Structure {
     	public volatile Pointer memory; // Pointer to GstMemory
     	public volatile int flags; // GstMapFlags
         public volatile Pointer data;
         public volatile NativeLong size;
         public volatile NativeLong maxSize;
+        
+        /*< protected >*/
+        public volatile Pointer[] user_data = new Pointer[4];
+        
+        /*< private >*/
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
         
         /**
          * Creates a new instance of MessageStruct
@@ -60,7 +81,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "memory", "flags", "data", "size", "maxSize"
+                "memory", "flags", "data", "size", "maxSize",
+                "user_data", "_gst_reserved"
             });
         }
     }
@@ -92,12 +114,40 @@ public interface GstBufferAPI extends com.sun.jna.Library {
 //    @CallerOwnsReturn Buffer gst_buffer_merge(Buffer buf1, Buffer buf2);
 //    @CallerOwnsReturn Buffer gst_buffer_join(@Invalidate Buffer buf1, @Invalidate Buffer buf2);
     
+    /**
+    * GstBuffer:
+    * @mini_object: the parent structure
+    * @pool: pointer to the pool owner of the buffer
+    * @pts: presentation timestamp of the buffer, can be #GST_CLOCK_TIME_NONE when the
+    *     pts is not known or relevant. The pts contains the timestamp when the
+    *     media should be presented to the user.
+    * @dts: decoding timestamp of the buffer, can be #GST_CLOCK_TIME_NONE when the
+    *     dts is not known or relevant. The dts contains the timestamp when the
+    *     media should be processed.
+    * @duration: duration in time of the buffer data, can be #GST_CLOCK_TIME_NONE
+    *     when the duration is not known or relevant.
+    * @offset: a media specific offset for the buffer data.
+    *     For video frames, this is the frame number of this buffer.
+    *     For audio samples, this is the offset of the first sample in this buffer.
+    *     For file data or compressed data this is the byte offset of the first
+    *       byte in this buffer.
+    * @offset_end: the last offset contained in this buffer. It has the same
+    *     format as @offset.
+    *
+    * The structure of a #GstBuffer. Use the associated macros to access the public
+    * variables.
+    */
     public static final class BufferStruct extends com.sun.jna.Structure {
         volatile public MiniObjectStruct mini_object;
+        
         public Pointer pool;
+        
+        /* timestamp */
         public ClockTime pts;
         public ClockTime dts;
         public ClockTime duration;
+        
+        /* media specific offset */
         public long offset;
         public long offset_end;
         
