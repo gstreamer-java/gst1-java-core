@@ -114,12 +114,40 @@ public interface GstBufferAPI extends com.sun.jna.Library {
 //    @CallerOwnsReturn Buffer gst_buffer_merge(Buffer buf1, Buffer buf2);
 //    @CallerOwnsReturn Buffer gst_buffer_join(@Invalidate Buffer buf1, @Invalidate Buffer buf2);
     
+    /**
+    * GstBuffer:
+    * @mini_object: the parent structure
+    * @pool: pointer to the pool owner of the buffer
+    * @pts: presentation timestamp of the buffer, can be #GST_CLOCK_TIME_NONE when the
+    *     pts is not known or relevant. The pts contains the timestamp when the
+    *     media should be presented to the user.
+    * @dts: decoding timestamp of the buffer, can be #GST_CLOCK_TIME_NONE when the
+    *     dts is not known or relevant. The dts contains the timestamp when the
+    *     media should be processed.
+    * @duration: duration in time of the buffer data, can be #GST_CLOCK_TIME_NONE
+    *     when the duration is not known or relevant.
+    * @offset: a media specific offset for the buffer data.
+    *     For video frames, this is the frame number of this buffer.
+    *     For audio samples, this is the offset of the first sample in this buffer.
+    *     For file data or compressed data this is the byte offset of the first
+    *       byte in this buffer.
+    * @offset_end: the last offset contained in this buffer. It has the same
+    *     format as @offset.
+    *
+    * The structure of a #GstBuffer. Use the associated macros to access the public
+    * variables.
+    */
     public static final class BufferStruct extends com.sun.jna.Structure {
         volatile public MiniObjectStruct mini_object;
+        
         public Pointer pool;
+        
+        /* timestamp */
         public ClockTime pts;
         public ClockTime dts;
         public ClockTime duration;
+        
+        /* media specific offset */
         public long offset;
         public long offset_end;
         
