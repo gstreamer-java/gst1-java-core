@@ -30,6 +30,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**
  * GstBuffer functions
@@ -41,12 +42,32 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final int GST_LOCK_FLAG_WRITE = (1 << 1);
     public static final int GST_MAP_READ = GST_LOCK_FLAG_READ;
     public static final int GST_MAP_WRITE = GST_LOCK_FLAG_WRITE;
+    
+    /**
+    * GstMapInfo:
+    * @memory: a pointer to the mapped memory
+    * @flags: flags used when mapping the memory
+    * @data: (array length=size): a pointer to the mapped data
+    * @size: the valid size in @data
+    * @maxsize: the maximum bytes in @data
+    * @user_data: extra private user_data that the implementation of the memory
+    *             can use to store extra info.
+    *
+    * A structure containing the result of a map operation such as
+    * gst_memory_map(). It contains the data and size.
+    */
     public static final class MapInfoStruct extends com.sun.jna.Structure {
     	public volatile Pointer memory; // Pointer to GstMemory
     	public volatile int flags; // GstMapFlags
         public volatile Pointer data;
         public volatile NativeLong size;
         public volatile NativeLong maxSize;
+        
+        /*< protected >*/
+        public volatile Pointer[] user_data = new Pointer[4];
+        
+        /*< private >*/
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
         
         /**
          * Creates a new instance of MessageStruct
@@ -60,7 +81,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "memory", "flags", "data", "size", "maxSize"
+                "memory", "flags", "data", "size", "maxSize",
+                "user_data", "_gst_reserved"
             });
         }
     }
