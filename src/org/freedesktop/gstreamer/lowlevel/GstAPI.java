@@ -48,6 +48,25 @@ public interface GstAPI extends Library {
     void gst_segtrap_set_enabled(boolean enabled);
     void gst_deinit();
     
+    /**
+    * GstSegment:
+    * @flags: flags for this segment
+    * @rate: the playback rate of the segment
+    * @applied_rate: the already applied rate to the segment
+    * @format: the format of the segment values
+    * @base: the running time (plus elapsed time, see offset) of the segment start
+    * @offset: the amount (in buffer timestamps) that has already been elapsed in
+    *     the segment
+    * @start: the start of the segment in buffer timestamp time (PTS)
+    * @stop: the stop of the segment in buffer timestamp time (PTS)
+    * @time: the stream time of the segment start
+    * @position: the buffer timestamp position in the segment (used internally by
+    *     elements such as sources, demuxers or parsers to track progress)
+    * @duration: the duration of the segment
+    *
+    * A helper structure that holds the configured region of
+    * interest in a media file.
+    */
     public static final class GstSegmentStruct extends com.sun.jna.Structure {
 
         public GstSegmentStruct() {
@@ -88,7 +107,7 @@ public interface GstAPI extends Library {
         public long duration;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[(Native.POINTER_SIZE * GST_PADDING) - (Double.SIZE / 8)];
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
 
         @Override
         protected List<String> getFieldOrder() {
