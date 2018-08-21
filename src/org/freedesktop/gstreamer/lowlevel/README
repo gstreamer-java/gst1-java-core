@@ -1,0 +1,13 @@
+lowlevel cleanup log
+
+
+structures in the following classes were aligned to 1.8:
+(https://cgit.freedesktop.org/gstreamer/gstreamer/tree/?h=1.8)
+
+- BaseSinkAPI
+- BaseSrcAPI
+- BaseTransformAPI
+- GstAPI
+- GstBufferAPI
+- GstBufferPoolAPI
+- GstControlSourceAPI
