@@ -33,7 +33,6 @@ import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
@@ -42,7 +41,9 @@ import java.util.List;
 import org.freedesktop.gstreamer.Query;
 
 public interface BaseSrcAPI extends Library {
-	BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);
+    
+    BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
@@ -142,10 +143,10 @@ public interface BaseSrcAPI extends Library {
     }
     public static interface Create extends Callback {
         public FlowReturn callback(BaseSrc src, long offset, int size,
-                /* GstBuffer ** */ Pointer bufRef);
+                Pointer /* GstBuffer ** */ bufRef);
     }
     public static interface Fill extends Callback {
-        public FlowReturn callback(BaseSrc src, long offset, int size, 
+        public FlowReturn callback(BaseSrc src, long offset, int size,
                 Buffer buffer);
     }
     public static interface Seek extends Callback {

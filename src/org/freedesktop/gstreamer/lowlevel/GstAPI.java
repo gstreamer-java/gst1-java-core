@@ -23,7 +23,6 @@ import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -34,7 +33,9 @@ import java.util.List;
  *
  */
 public interface GstAPI extends Library {
+    
     GstAPI GST_API = GstNative.load(GstAPI.class);
+    
     int GST_PADDING = 4;
     int GST_PADDING_LARGE = 20;
         

@@ -36,7 +36,8 @@ import com.sun.jna.ptr.LongByReference;
  * @author wayne
  */
 public interface AppAPI extends com.sun.jna.Library {
-	AppAPI APP_API = GstNative.load("gstapp", AppAPI.class);
+    
+    AppAPI APP_API = GstNative.load("gstapp", AppAPI.class);
 
     // AppSrc functions
     GType gst_app_src_get_type();

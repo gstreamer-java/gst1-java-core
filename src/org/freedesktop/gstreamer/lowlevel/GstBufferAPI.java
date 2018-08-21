@@ -36,6 +36,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
  * GstBuffer functions
  */
 public interface GstBufferAPI extends com.sun.jna.Library {
+    
     GstBufferAPI GSTBUFFER_API = GstNative.load(GstBufferAPI.class);
 
     public static final int GST_LOCK_FLAG_READ = (1 << 0);

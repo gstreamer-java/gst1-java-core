@@ -32,7 +32,6 @@ import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.StateChangeReturn;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
@@ -43,7 +42,6 @@ import org.freedesktop.gstreamer.query.AllocationQuery;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -52,7 +50,9 @@ import com.sun.jna.Pointer;
  */
 
 public interface BaseSinkAPI extends Library {
-	BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
+    
+    BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     

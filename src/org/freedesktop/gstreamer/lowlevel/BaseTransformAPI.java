@@ -40,7 +40,9 @@ import java.util.List;
 import org.freedesktop.gstreamer.Query;
 
 public interface BaseTransformAPI extends Library {
-	BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);
+    
+    BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
