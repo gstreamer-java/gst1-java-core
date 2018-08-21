@@ -50,6 +50,8 @@ public interface GstAPI extends Library {
     void gst_deinit();
     
     /**
+    * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstsegment.h?h=1.8
+    *
     * GstSegment:
     * @flags: flags for this segment
     * @rate: the playback rate of the segment

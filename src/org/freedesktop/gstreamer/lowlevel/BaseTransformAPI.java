@@ -39,6 +39,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.freedesktop.gstreamer.Query;
 
+/**
+ * GstBaseTransform methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasetransform.h?h=1.8
+ */
 public interface BaseTransformAPI extends Library {
     
     BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);

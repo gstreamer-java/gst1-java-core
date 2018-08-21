@@ -33,7 +33,8 @@ import com.sun.jna.Pointer;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**
- * GstBuffer functions
+ * GstBuffer methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstbuffer.h?h=1.8
  */
 public interface GstBufferAPI extends com.sun.jna.Library {
     
@@ -45,6 +46,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final int GST_MAP_WRITE = GST_LOCK_FLAG_WRITE;
     
     /**
+    * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstmemory.h?h=1.8
+    * 
     * GstMapInfo:
     * @memory: a pointer to the mapped memory
     * @flags: flags used when mapping the memory

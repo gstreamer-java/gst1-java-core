@@ -40,6 +40,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.freedesktop.gstreamer.Query;
 
+/**
+ * GstBaseSrc methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesrc.h?h=1.8
+ */
 public interface BaseSrcAPI extends Library {
     
     BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);

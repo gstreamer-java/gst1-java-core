@@ -24,6 +24,10 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
 
+/**
+ * GstBufferPool methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstbufferpool.h?h=1.8
+ */
 public interface GstBufferPoolAPI extends com.sun.jna.Library {
     GstBufferPoolAPI GSTBUFFERPOOL_API = GstNative.load(GstBufferPoolAPI.class);
 

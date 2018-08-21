@@ -46,9 +46,8 @@ import com.sun.jna.Pointer;
 
 /**
  * GstBaseSink methods and structures
- * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesink.h?h=1.8
  */
-
 public interface BaseSinkAPI extends Library {
     
     BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
