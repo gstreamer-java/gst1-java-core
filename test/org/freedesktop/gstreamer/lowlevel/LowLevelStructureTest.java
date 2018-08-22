@@ -159,8 +159,6 @@ public class LowLevelStructureTest {
         structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
         structs.add(GstControlSourceAPI.GstControlSourceClass.class);
 
-
-        structs.add(GstElementAPI.GstElementDetails.class);
         structs.add(GstElementAPI.GstElementStruct.class);
         structs.add(GstElementAPI.GstElementClass.class);
 
