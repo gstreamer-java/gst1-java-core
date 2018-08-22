@@ -11,3 +11,4 @@ structures in the following classes were aligned to 1.8:
 - GstBufferAPI
 - GstBufferPoolAPI
 - GstControlSourceAPI
+- GstControllerAPI - removed
