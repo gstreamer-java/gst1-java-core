@@ -14,3 +14,4 @@ structures in the following classes were aligned to 1.8:
 - GstControllerAPI - removed
 - GstElementAPI
 - GstEvent
+- GstObject
