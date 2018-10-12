@@ -28,8 +28,6 @@ import com.sun.jna.Pointer;
 public class ControlSource extends GObject {
 	//private static Logger logger = Logger.getLogger(ControlSource.class.getName());
 	
-    //private static final GstControllerAPI gst = GstNative.load(GstControllerAPI.class);
-	
     /**
      * For internal gstreamer-java use only
      *

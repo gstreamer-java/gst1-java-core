@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.ActivateMode;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
@@ -34,16 +33,21 @@ import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
 import java.util.Arrays;
 import java.util.List;
-//import org.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+import org.freedesktop.gstreamer.Query;
 
+/**
+ * GstBaseSrc methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesrc.h?h=1.8
+ */
 public interface BaseSrcAPI extends Library {
-	BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);
+    
+    BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
@@ -63,37 +67,37 @@ public interface BaseSrcAPI extends Library {
         /* MT-protected (with LOCK) */
         public volatile int blocksize;	/* size of buffers when operating push based */
         public volatile boolean can_activate_push;	/* some scheduling properties */
-        public volatile ActivateMode pad_mode;
-        public volatile boolean seekable;
         public volatile boolean random_access;
 
         public volatile /* GstClockID */ Pointer clock_id;	/* for syncing */
-        public volatile /* GstClockTime */ long  end_time;
 
         /* MT-protected (with STREAM_LOCK) */
         public volatile GstSegmentStruct segment;
+        /* MT-protected (with STREAM_LOCK) */
         public volatile boolean	 need_newsegment;
-
-        public volatile /* guint64 */ long offset;	/* current offset in the resource, unused */
-        public volatile /* guint64 */ long size;        /* total size of the resource, unused */
 
         public volatile int num_buffers;
         public volatile int num_buffers_left;
 
-        /*< private >*/        
-        public volatile GstBaseSrcAbiData abidata;
+        public volatile boolean typefind;
+        public volatile boolean running;
+        public volatile Event pending_seek;
+        
         public volatile Pointer /* GstBaseSrcPrivate */ priv;
+        
+        /*< private >*/        
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
-                "element", "srcpad", "live_lock",
-                "live_cond", "is_live", "live_running",
-                "blocksize", "can_activate_push", "pad_mode",
-                "seekable", "random_access", "clock_id",
-                "end_time", "segment", "need_newsegment",
-                "offset", "size", "num_buffers",
-                "num_buffers_left", "abidata", "priv"
+                "element", "srcpad", 
+                "live_lock", "live_cond", "is_live", "live_running",
+                "blocksize", "can_activate_push", "random_access",
+                "clock_id", "segment", "need_newsegment",
+                "num_buffers", "num_buffers_left",
+                "typefind", "running", "pending_seek",
+                "priv", "_gst_reserved"
             });
         }
     }
@@ -118,7 +122,7 @@ public interface BaseSrcAPI extends Library {
     
     // -------------- Callbacks -----------------
     public static interface GetCaps extends Callback {
-        public Caps callback(BaseSrc src);
+        public Caps callback(BaseSrc src, Caps filter);
     }
     public static interface SetCaps extends Callback {
         public boolean callback(BaseSrc src, Caps caps);
@@ -126,10 +130,14 @@ public interface BaseSrcAPI extends Library {
     public static interface BooleanFunc1 extends Callback {
         public boolean callback(BaseSrc src);
     }
+    public static interface DecideAllocation extends Callback {
+        public boolean callback(BaseSrc src, Query query);
+    }
+    
 
     public static interface GetTimes extends Callback {
         public void callback(BaseSrc src, Buffer buffer, 
-                Pointer start, Pointer end);
+                Pointer /* GstClockTime */ start, Pointer /* GstClockTime */ end);
     }
     public static interface GetSize extends Callback {
         boolean callback(BaseSrc src, LongByReference size);
@@ -139,20 +147,25 @@ public interface BaseSrcAPI extends Library {
     }
     public static interface Create extends Callback {
         public FlowReturn callback(BaseSrc src, long offset, int size,
-                /* GstBuffer ** */ Pointer bufRef);
+                Pointer /* GstBuffer ** */ bufRef);
+    }
+    public static interface Fill extends Callback {
+        public FlowReturn callback(BaseSrc src, long offset, int size,
+                Buffer buffer);
     }
     public static interface Seek extends Callback {
         boolean callback(BaseSrc src, GstSegmentStruct segment);
     }
-    public static interface Query extends Callback {
+    public static interface QueryFunc extends Callback {
         boolean callback(BaseSrc src, Query query);            
     }
     public static interface Fixate extends Callback {
-        public void callback(BaseSrc src, Caps caps);
+        public Caps callback(BaseSrc src, Caps caps);
     }
     public static interface PrepareSeek extends Callback {
         boolean callback(BaseSrc src, Event seek, GstSegmentStruct segment);
     }
+    
     public static final class GstBaseSrcClass extends com.sun.jna.Structure {
         public GstBaseSrcClass() {}
         public GstBaseSrcClass(Pointer ptr) {
@@ -170,12 +183,15 @@ public interface BaseSrcAPI extends Library {
 
         /* get caps from subclass */
         public GetCaps get_caps;
-        /* notify the subclass of new caps */
-        public SetCaps set_caps;
         /* decide on caps */
         public BooleanFunc1 negotiate;
-        /* generate and send a newsegment (UNUSED) */
-        public BooleanFunc1 newsegment;
+        /* called if, in negotation, caps need fixating */
+        public Fixate fixate;   
+        /* notify the subclass of new caps */
+        public SetCaps set_caps;
+        
+        /* setup allocation query */
+        public DecideAllocation decide_allocation;       
   
   
         /* start and stop processing, ideal for opening/closing the resource */
@@ -194,54 +210,49 @@ public interface BaseSrcAPI extends Library {
         /* check if the resource is seekable */
         public BooleanFunc1 is_seekable;
 
+        /* Prepare the segment on which to perform do_seek(), converting to the
+        * current basesrc format. */
+        public PrepareSeek prepare_seek_segment;        
+        /* notify subclasses of a seek */
+        public Seek do_seek;
+        
         /* unlock any pending access to the resource. subclasses should unlock
         * any function ASAP. */
         public BooleanFunc1 unlock;
+        /* Clear any pending unlock request, as we succeeded in unlocking */
+        public BooleanFunc1 unlock_stop;
  
+        /* notify subclasses of a query */
+        public QueryFunc query;
         
         /* notify subclasses of an event */
         public EventNotify event;
 
-        /* ask the subclass to create a buffer with offset and size */
+        /* ask the subclass to create a buffer with offset and size, the default
+        * implementation will call alloc and fill. */
         public Create create;
   
-        /* additions that change padding... */
-        /* notify subclasses of a seek */
-        public Seek seek;
-        /* notify subclasses of a query */
-        public Query query;
+        /* ask the subclass to allocate an output buffer. The default implementation
+        * will use the negotiated allocator. */
+        public Create alloc;
         
-        /* check whether the source would support pull-based operation if
-        * it were to be opened now. This vfunc is optional, but should be
-        * implemented if possible to avoid unnecessary start/stop cycles.
-        * The default implementation will open and close the resource to
-        * find out whether get_range is supported and that is usually
-        * undesirable. */
-        public BooleanFunc1 check_get_range;        
-
-        /* called if, in negotation, caps need fixating */
-        public Fixate fixate;        
-
-        /* Clear any pending unlock request, as we succeeded in unlocking */
-        public BooleanFunc1 unlock_stop;
-        
-        /* Prepare the segment on which to perform do_seek(), converting to the
-         * current basesrc format. */
-        public PrepareSeek prepare_seek_segment;
+        public Fill fill;
         
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * (GST_PADDING_LARGE - 6)];
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
     
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
-                "parent_class", "get_caps", "set_caps",
-                "negotiate", "newsegment", "start",
-                "stop", "get_times", "get_size",
-                "is_seekable", "unlock", "event",
-                "create", "seek", "query",
-                "check_get_range", "fixate", "unlock_stop",
-                "prepare_seek_segment", "_gst_reserved"
+                "parent_class",
+                "get_caps", "negotiate", "fixate", "set_caps",
+                "decide_allocation",
+                "start", "stop",
+                "get_times", "get_size", "is_seekable",
+                "prepare_seek_segment", "do_seek",
+                "unlock", "unlock_stop",
+                "query", "event", "create", "alloc", "fill",
+                "_gst_reserved"
                 
             });
         }

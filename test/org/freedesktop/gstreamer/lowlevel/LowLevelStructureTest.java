@@ -156,15 +156,9 @@ public class LowLevelStructureTest {
         structs.add(GstColorBalanceAPI.ColorBalanceChannelStruct.class);
 
         structs.add(GstControlSourceAPI.TimedValue.class);
-        structs.add(GstControlSourceAPI.ValueArray.class);
         structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
         structs.add(GstControlSourceAPI.GstControlSourceClass.class);
 
-        // error loading native lib?
-        //structs.add(GstControllerAPI.GstControllerStruct.class);
-        //structs.add(GstControllerAPI.GstControllerClass.class);
-
-        structs.add(GstElementAPI.GstElementDetails.class);
         structs.add(GstElementAPI.GstElementStruct.class);
         structs.add(GstElementAPI.GstElementClass.class);
 

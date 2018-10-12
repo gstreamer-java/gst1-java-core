@@ -33,14 +33,20 @@ import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import java.util.Arrays;
 import java.util.List;
+import org.freedesktop.gstreamer.Query;
 
+/**
+ * GstBaseTransform methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasetransform.h?h=1.8
+ */
 public interface BaseTransformAPI extends Library {
-	BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);
+    
+    BaseTransformAPI BASETRANSFORM_API = GstNative.load("gstbase", BaseTransformAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
@@ -48,32 +54,19 @@ public interface BaseTransformAPI extends Library {
         public GstElementStruct element;
 
         /*< protected >*/
+        /* source and sink pads */
         public volatile Pad sinkpad;
         public volatile Pad srcpad;
 
-        /* Set by sub-class */
-        public volatile boolean passthrough;
-        public volatile boolean always_in_place;
-
-        public volatile Caps    cache_caps1;
-        public volatile int     cache_caps1_size;
-        public volatile Caps    cache_caps2;
-        public volatile int     cache_caps2_size;
-        public volatile boolean have_same_caps;
-
-        public volatile boolean delay_configure;
-        public volatile boolean pending_configure;
-        public volatile boolean negotiated;
-
-        public volatile boolean have_newsegment;
-
         /* MT-protected (with STREAM_LOCK) */
+        public volatile boolean have_segment;
         public volatile GstSegmentStruct segment;
-
-        public volatile /* GMutex */ Pointer transform_lock;
+        /* Default submit_input_buffer places the buffer here,
+        * for consumption by the generate_output method: */
+        public volatile Buffer queued_buf;
 
         /*< private >*/
-        public volatile /* GstBaseTransformPrivate */ Pointer priv;
+        public volatile Pointer /* GstBaseTransformPrivate */ priv;
 
         public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE - 1];
 
@@ -81,57 +74,77 @@ public interface BaseTransformAPI extends Library {
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "element", "sinkpad", "srcpad",
-                "passthrough", "always_in_place", "cache_caps1",
-                "cache_caps1_size", "cache_caps2", "cache_caps2_size",
-                "have_same_caps", "delay_configure", "pending_configure",
-                "negotiated", "have_newsegment", "segment",
-                "transform_lock", "priv", "_gst_reserved"
+                "have_segment", "segment", "queued_buf",
+                "priv", "_gst_reserved"
             });
         }
-    
-        
-    
     }
 
     
     public static interface TransformCaps extends Callback {
-        public Caps callback(BaseTransform trans, PadDirection direction, Caps caps);
+        public Caps callback(BaseTransform trans, PadDirection direction, Caps caps, Caps filter);
     }
     public static interface FixateCaps extends Callback {
-        public void callback(BaseTransform trans, PadDirection direction, Caps caps, Caps othercaps);
+        public Caps callback(BaseTransform trans, PadDirection direction, Caps caps, Caps othercaps);
     }
+    public static interface AcceptCaps extends Callback {
+        public boolean callback(BaseTransform trans, PadDirection direction, Caps caps);
+    }
+    public static interface SetCaps extends Callback {
+        public boolean callback(BaseTransform trans, Caps incaps, Caps outcaps);
+    }
+    public static interface QueryFunc extends Callback {
+        public boolean callback(BaseTransform trans, PadDirection direction, Query query);
+    }
+    public static interface DecideAllocation extends Callback {
+        public boolean callback(BaseTransform trans, Query query);
+    }
+    public static interface FilterMeta extends Callback {
+        public boolean callback(BaseTransform trans, Query query, GType api, Pointer /* GstStructure */ params);
+    }
+    public static interface ProposeAllocation extends Callback {
+        public boolean callback(BaseTransform trans, Query decide_query, Query query);
+    }    
     public static interface TransformSize extends Callback {
         public boolean callback(BaseTransform trans, PadDirection direction, Caps caps, 
         						int size, Caps othercaps, IntByReference othersize);
     }
     public static interface GetUnitSize extends Callback {
         public boolean callback(BaseTransform trans, Caps caps, IntByReference size);
-    }
-    public static interface SetCaps extends Callback {
-        public boolean callback(BaseTransform trans, Caps caps, Caps outcaps);
-    }
+    }    
     public static interface BooleanFunc1 extends Callback {
         public boolean callback(BaseTransform sink);
     }
     public static interface EventNotify extends Callback {
         public boolean callback(BaseTransform trans, Event event);
     }
+    public static interface PrepareOutput extends Callback {
+        public FlowReturn callback(BaseTransform trans, Buffer input, Pointer /*GstBuffer ** */ outbuf);
+    }
+    public static interface CopyMetadata extends Callback {
+        public boolean callback(BaseTransform trans, Buffer input, Buffer output);
+    }
+    public static interface TransformMeta extends Callback {
+        public boolean callback(BaseTransform trans, Buffer outbuf, Pointer /* GstMeta */ meta, Buffer output);
+    }
+    public static interface BeforeTransform extends Callback {
+        public void callback(BaseTransform trans, Buffer inbuf);
+    }    
     public static interface Transform extends Callback {
         public FlowReturn callback(BaseTransform trans, Buffer inbuf, Buffer outbuf);
     }
     public static interface TransformIp extends Callback {
-        public FlowReturn callback(BaseTransform trans, Buffer inbuf);
+        public FlowReturn callback(BaseTransform trans, Buffer buf);
     }
-    public static interface PrepareOutput extends Callback {
-        public FlowReturn callback(BaseTransform trans, Buffer input, int size, Caps caps, 
-        						/*GstBuffer ** */ Pointer buf);
+    public static interface SubmitInputBuffer extends Callback {
+        public FlowReturn callback(BaseTransform trans, boolean is_discont, Buffer input);
     }
-    public static interface BeforeTransform extends Callback {
-        public void callback(BaseTransform trans, Buffer inbuf);
+    public static interface GenerateOutput extends Callback {
+        public FlowReturn callback(BaseTransform trans, Pointer /* GstBuffer ** */ outbuf);
     }
-    public static interface AcceptCaps extends Callback {
-        public boolean callback(BaseTransform trans, PadDirection direction, Caps caps);
-    }
+    
+    
+    
     
     public static final class GstBaseTransformClass extends com.sun.jna.Structure {
         public GstBaseTransformClass() {}
@@ -142,51 +155,71 @@ public interface BaseTransformAPI extends Library {
         
         //
         // Actual data members
-        //
+        //        
         public GstElementClass parent_class;
         
         /*< public >*/
+        public volatile boolean passthrough_on_same_caps;
+        public volatile boolean transform_ip_on_passthrough;
+        
+        /* virtual methods for subclasses */
         public TransformCaps transform_caps;
 
         public FixateCaps fixate_caps;
         
-        public TransformSize transform_size;
+        public AcceptCaps accept_caps;
         
+        public SetCaps set_caps;
+        
+        public QueryFunc query;
+        
+        /* decide allocation query for output buffers */
+        public DecideAllocation decide_allocation;
+        public FilterMeta filter_meta;
+  
+        /* propose allocation query parameters for input buffers */
+        public ProposeAllocation propose_allocation;
+  
+        /* transform size */        
+        public TransformSize transform_size;        
         public GetUnitSize get_unit_size;
 
-        public SetCaps set_caps;
-
+        /* states */       
         public BooleanFunc1 start;
         public BooleanFunc1 stop;
         
-        public EventNotify event;
-        
-        public Transform transform;
-        
-        public TransformIp transform_ip;
-
-        public volatile boolean passthrough_on_same_caps;
-
-        public PrepareOutput prepare_output_buffer;
-
+        /* sink and src pad event handlers */
+        public EventNotify sink_event;
         public EventNotify src_event;
+        public PrepareOutput prepare_output_buffer;
+        
+        /* metadata */
+        public CopyMetadata copy_metadata;
+        public TransformMeta transform_meta;
         
         public BeforeTransform before_transform;
         
-        public AcceptCaps accept_caps;
+        /* transform */
+        public Transform transform;        
+        public TransformIp transform_ip;
+
+        public SubmitInputBuffer submit_input_buffer;
+        public GenerateOutput generate_output;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * (GST_PADDING_LARGE - 3)];
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE - 2];
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "parent_class", "transform_caps", "fixate_caps",
-                "transform_size", "get_unit_size", "set_caps",
-                "start", "stop", "event",
-                "transform", "transform_ip", "passthrough_on_same_caps",
-                "prepare_output_buffer", "src_event", "before_transform",
-                "accept_caps", "_gst_reserved"
+                "parent_class", "passthrough_on_same_caps", "transform_ip_on_passthrough",
+                "transform_caps", "fixate_caps", "accept_caps", "set_caps", "query", 
+                "decide_allocation", "filter_meta", "propose_allocation",
+                "transform_size", "get_unit_size",
+                "start", "stop", "sink_event", "src_event",
+                "prepare_output_buffer", "copy_metadata", "transform_meta",
+                "before_transform", "transform", "transform_ip",
+                "submit_input_buffer", "generate_output", "_gst_reserved"
             });            
         }
     }

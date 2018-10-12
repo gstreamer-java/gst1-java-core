@@ -38,10 +38,10 @@ import com.sun.jna.Pointer;
  */
 @SuppressWarnings("serial")
 public interface GSignalAPI extends Library {
-	GSignalAPI GSIGNAL_API = GNative.loadLibrary("gobject-2.0", GSignalAPI.class,
-			new HashMap<String, Object>() {{
-				put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
-			}});
+    GSignalAPI GSIGNAL_API = GNative.loadLibrary("gobject-2.0", GSignalAPI.class,
+            new HashMap<String, Object>() {{
+                put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
+            }});
 
     public static int G_CONNECT_AFTER = 1 << 0;
     public static int G_CONNECT_SWAPPED = 1 << 1;

@@ -48,12 +48,12 @@ public interface GValueAPI extends Library {
     }
 
     NoMapperAPI GVALUE_NOMAPPER_API = GNative.loadLibrary("gobject-2.0", NoMapperAPI.class,
-                    new HashMap<String, Object>() {});
+            new HashMap<String, Object>() {});
 
     GValueAPI GVALUE_API = GNative.loadLibrary("gobject-2.0", GValueAPI.class,
-    		new HashMap<String, Object>() {{
-    			put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
-    		}});
+            new HashMap<String, Object>() {{
+                put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
+            }});
 
     public static final class GValue extends com.sun.jna.Structure {
     	public static final String GTYPE_NAME = "GValue";

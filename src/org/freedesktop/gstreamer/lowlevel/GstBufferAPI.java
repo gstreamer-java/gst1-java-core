@@ -33,9 +33,11 @@ import com.sun.jna.Pointer;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**
- * GstBuffer functions
+ * GstBuffer methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstbuffer.h?h=1.8
  */
 public interface GstBufferAPI extends com.sun.jna.Library {
+    
     GstBufferAPI GSTBUFFER_API = GstNative.load(GstBufferAPI.class);
 
     public static final int GST_LOCK_FLAG_READ = (1 << 0);
@@ -44,6 +46,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final int GST_MAP_WRITE = GST_LOCK_FLAG_WRITE;
     
     /**
+    * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstmemory.h?h=1.8
+    * 
     * GstMapInfo:
     * @memory: a pointer to the mapped memory
     * @flags: flags used when mapping the memory
@@ -59,7 +63,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final class MapInfoStruct extends com.sun.jna.Structure {
     	public volatile Pointer memory; // Pointer to GstMemory
     	public volatile int flags; // GstMapFlags
-        public volatile Pointer data;
+        public volatile Pointer /* gunit8 */ data;
         public volatile NativeLong size;
         public volatile NativeLong maxSize;
         
@@ -88,18 +92,25 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     }
     
     GType gst_buffer_get_type();
+    
+    /* allocation */
     @CallerOwnsReturn Buffer gst_buffer_new();
     @CallerOwnsReturn Buffer gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
     @CallerOwnsReturn Pointer ptr_gst_buffer_new();
     @CallerOwnsReturn Pointer ptr_gst_buffer_new_allocate(Pointer allocator, int size, Pointer params);
+    
+    /* memory blocks */
     NativeLong gst_buffer_get_size(Buffer buffer);
     boolean gst_buffer_map(Buffer buffer, MapInfoStruct info, int flags);
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
+    
+    // re-introduces in gstreamer 1.9
     int gst_buffer_get_flags(Buffer buffer);
     boolean gst_buffer_set_flags(Buffer buffer, int flags);
     boolean gst_buffer_unset_flags(Buffer buffer, int flags);
+    
 //    boolean gst_buffer_is_metadata_writable(Buffer buf);
 //    Buffer gst_buffer_make_metadata_writable(@Invalidate Buffer buf);
 //    /* creating a subbuffer */
@@ -140,7 +151,8 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     public static final class BufferStruct extends com.sun.jna.Structure {
         volatile public MiniObjectStruct mini_object;
         
-        public Pointer pool;
+        /*< public >*/ /* with COW */
+        public Pointer /* BufferPool */ pool;
         
         /* timestamp */
         public ClockTime pts;

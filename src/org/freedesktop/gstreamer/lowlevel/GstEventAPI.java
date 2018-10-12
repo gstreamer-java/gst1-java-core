@@ -36,9 +36,11 @@ import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 
 /**
- * GstEvent functions
+ * GstEvent functions and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstevent.h?h=1.8
  */
 public interface GstEventAPI extends com.sun.jna.Library {
     GstEventAPI GSTEVENT_API = GstNative.load(GstEventAPI.class);
@@ -122,10 +124,23 @@ public interface GstEventAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Event gst_event_new_stream_start(final String stream_id);
     Pointer ptr_gst_event_new_stream_start(final String stream_id);
     
-    
+    /**
+    * GstEvent:
+    * @mini_object: the parent structure
+    * @type: the #GstEventType of the event
+    * @timestamp: the timestamp of the event
+    * @seqnum: the sequence number of the event
+    *
+    * A #GstEvent.
+    */
     public static final class EventStruct extends com.sun.jna.Structure {
-        public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;
+        public volatile MiniObjectStruct mini_object;
+        
+        /*< public >*/ /* with COW */
         public volatile int type;
+        public volatile long timestamp;
+        public volatile int seqnum;
+                
         public EventStruct(Pointer ptr) {
             useMemory(ptr);
         }
@@ -133,7 +148,8 @@ public interface GstEventAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", "type"
+                "mini_object",
+                "type", "timestamp", "seqnum"
             });
         }
     }

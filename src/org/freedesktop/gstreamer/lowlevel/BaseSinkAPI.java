@@ -32,7 +32,6 @@ import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.StateChangeReturn;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
@@ -43,16 +42,16 @@ import org.freedesktop.gstreamer.query.AllocationQuery;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
  * GstBaseSink methods and structures
- * @see https://github.com/GStreamer/gstreamer/blob/master/libs/gst/base/gstbasesink.h
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesink.h?h=1.8
  */
-
 public interface BaseSinkAPI extends Library {
-	BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
+    
+    BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
+    
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
     
@@ -86,7 +85,7 @@ public interface BaseSinkAPI extends Library {
         public volatile boolean flushing;
         public volatile boolean running;
 
-        public volatile boolean max_lateness;
+        public volatile long max_lateness;
 
         /*< private >*/
         public volatile Pointer /* GstBaseSinkPrivate */ priv;
@@ -121,18 +120,18 @@ public interface BaseSinkAPI extends Library {
         public boolean callback(BaseSink sink, Caps caps);
     }
     public static interface Fixate extends Callback {
-        public void callback(BaseSink sink, Caps caps);
+        public Caps callback(BaseSink sink, Caps caps);
     }
     public static interface ActivatePull extends Callback {
         public boolean callback(BaseSink sink, boolean active);
     }
     public static interface GetTimes extends Callback {
         public void callback(BaseSink sink, Buffer buffer,
-                Pointer start, Pointer end);
+                Pointer /* GstClockTime */ start, Pointer /* GstClockTime */ end);
     }
-	public static interface ProposeAllocation extends Callback {
-		public boolean callback(BaseSink sink, AllocationQuery query);
-	}
+    public static interface ProposeAllocation extends Callback {
+            public boolean callback(BaseSink sink, AllocationQuery query);
+    }
     public static interface BooleanFunc1 extends Callback {
         public boolean callback(BaseSink sink);
     }
@@ -147,9 +146,6 @@ public interface BaseSinkAPI extends Library {
     }
     public static interface Render extends Callback {
         public FlowReturn callback(BaseSink sink, Buffer buffer);
-    }
-    public static interface AsyncPlay extends Callback {
-        public StateChangeReturn callback(BaseSink sink);
     }
     public static interface RenderList extends Callback {
         public FlowReturn callback(BaseSink sink, GList bufferList);
@@ -221,7 +217,7 @@ public interface BaseSinkAPI extends Library {
         public RenderList render_list;
 
         /*< private >*/
-        public volatile byte[] _gst_reserved = new byte[Native.POINTER_SIZE * BaseSinkAPI.GST_PADDING_LARGE];
+        public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
         @Override
         protected List<String> getFieldOrder() {

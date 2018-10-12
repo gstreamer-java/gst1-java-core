@@ -35,14 +35,14 @@ import com.sun.jna.ptr.PointerByReference;
  */
 @SuppressWarnings("serial")
 public interface GlibAPI extends Library {
-	GlibAPI GLIB_API = GNative.loadLibrary("glib-2.0", GlibAPI.class,
-    		new HashMap<String, Object>() {{
-    			put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
-    		}});
+    GlibAPI GLIB_API = GNative.loadLibrary("glib-2.0", GlibAPI.class,
+            new HashMap<String, Object>() {{
+                put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
+            }});
 	
-	public static final int GLIB_SYSDEF_AF_UNIX  = 1;
-	public static final int GLIB_SYSDEF_AF_INET  = 2;
-	public static final int GLIB_SYSDEF_AF_INET6 = 23;
+    public static final int GLIB_SYSDEF_AF_UNIX  = 1;
+    public static final int GLIB_SYSDEF_AF_INET  = 2;
+    public static final int GLIB_SYSDEF_AF_INET6 = 23;
 
     Pointer g_main_loop_new(GMainContext context, boolean running);
     void g_main_loop_run(MainLoop loop);
