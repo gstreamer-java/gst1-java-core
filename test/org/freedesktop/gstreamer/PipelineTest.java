@@ -117,15 +117,24 @@ public class PipelineTest {
     @Test
     public void testParseLaunch() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch("fakesrc ! fakesink", errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch("fakesrc ! fakesink", errors);
         assertNotNull("Pipeline not created", pipeline);
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
     
     @Test
+    public void testParseLaunchSingleElement() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+        Element element = Gst.parseLaunch("fakesink", errors);
+        assertNotNull("Element not created", element);
+        assertFalse("Single element returned in Pipeline", element instanceof Pipeline);
+        assertEquals("parseLaunch with error!", errors.size(), 0);
+    }
+
+    @Test
     public void testParseLaunchElementCount() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch("fakesrc ! fakesink", errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch("fakesrc ! fakesink", errors);
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
@@ -133,7 +142,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchSrcElement() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch("fakesrc ! fakesink", errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch("fakesrc ! fakesink", errors);
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
@@ -141,7 +150,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchSinkElement() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch("fakesrc ! fakesink", errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch("fakesrc ! fakesink", errors);
         assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
@@ -149,7 +158,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchStringArr() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
         assertNotNull("Pipeline not created", pipeline);
         assertEquals("parseLaunch with error!", errors.size(), 0);
     } 
@@ -157,7 +166,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchStringArrElementCount() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
         assertEquals("Number of elements in pipeline incorrect", 2, pipeline.getElements().size());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
@@ -165,7 +174,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchStringArrSrcElement() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
         assertEquals("First element not a fakesrc", "fakesrc", pipeline.getSources().get(0).getFactory().getName());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
@@ -173,7 +182,7 @@ public class PipelineTest {
     @Test
     public void testParseLaunchStringArrSinkElement() {
         ArrayList<GError> errors = new ArrayList<GError>();
-        Pipeline pipeline = Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
+        Pipeline pipeline = (Pipeline) Gst.parseLaunch(new String[] {"fakesrc", "fakesink"}, errors);
         assertEquals("First element not a fakesink", "fakesink", pipeline.getSinks().get(0).getFactory().getName());
         assertEquals("parseLaunch with error!", errors.size(), 0);
     }
