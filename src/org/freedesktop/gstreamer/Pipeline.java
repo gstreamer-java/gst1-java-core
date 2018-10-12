@@ -133,7 +133,7 @@ public class Pipeline extends Bin {
      */
     public static Pipeline launch(String pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
+        Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -158,7 +158,7 @@ public class Pipeline extends Bin {
      */
     public static Pipeline launch(String... pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);
+        Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }

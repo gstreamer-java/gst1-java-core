@@ -218,9 +218,9 @@ public final class Gst {
      *         the pipeline_description , all elements are put into a GstPipeline, 
      *         which than is returned. 
      */
-    public static Pipeline parseLaunch(String pipelineDescription, List<GError> errors) {
+    public static Element parseLaunch(String pipelineDescription, List<GError> errors) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
+        Element pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -236,7 +236,7 @@ public final class Gst {
 
         return pipeline;
     }    
-    public static Pipeline parseLaunch(String pipelineDescription) {
+    public static Element parseLaunch(String pipelineDescription) {
         return parseLaunch(pipelineDescription, null);
     }
     
@@ -249,9 +249,9 @@ public final class Gst {
      * @param pipelineDescription An array of strings containing the command line describing the pipeline.
      * @return a new element on success. 
      */
-    public static Pipeline parseLaunch(String[] pipelineDescription, List<GError> errors) {
+    public static Element parseLaunch(String[] pipelineDescription, List<GError> errors) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDescription, err);
+        Element pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDescription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -267,7 +267,7 @@ public final class Gst {
 
         return pipeline;
     }
-    public static Pipeline parseLaunch(String[] pipelineDescription) {
+    public static Element parseLaunch(String[] pipelineDescription) {
         return parseLaunch(pipelineDescription, null);
     }
     
