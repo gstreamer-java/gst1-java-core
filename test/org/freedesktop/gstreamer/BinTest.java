@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer;
 
+import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -242,58 +243,80 @@ public class BinTest {
     }
     
     @Test
-    public void testLaunch() {
-        Bin bin = Bin.launch("fakesrc ! fakesink", false);
+    public void testParseBin() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+        Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", false, errors);
         assertNotNull("Bin not created", bin);
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }   
     @Test
-    public void testLaunchElementCount() {
-        Bin bin = Bin.launch("fakesrc ! fakesink", false);
+    public void testParseBinElementCount() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+        Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", false, errors);
         assertEquals("Number of elements in pipeline incorrect", 2, bin.getElements().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchSrcElement() {
-    	Bin bin = Bin.launch("fakesrc ! fakesink", false);
+    public void testParseBinSrcElement() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", false, errors);
         assertEquals("First element not a fakesrc", "fakesrc", bin.getSources().get(0).getFactory().getName());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchSinkElement() {
-    	Bin bin = Bin.launch("fakesrc ! fakesink", false);
+    public void testParseBinSinkElement() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", false, errors);
         assertEquals("First element not a fakesink", "fakesink", bin.getSinks().get(0).getFactory().getName());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchDisabledGhostPadsForSource() {
-    	Bin bin = Bin.launch("fakesrc", false);
+    public void testParseBinDisabledGhostPadsForSource() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc", false, errors);
     	assertEquals("Number of src pads incorrect", 0, bin.getSrcPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchDisabledGhostPadsForSink() {
-    	Bin bin = Bin.launch("fakesink", false);
+    public void testParseBinDisabledGhostPadsForSink() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesink", false, errors);
     	assertEquals("Number of sink pads incorrect", 0, bin.getSinkPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchEnabledGhostPadsForSource() {
-    	Bin bin = Bin.launch("fakesrc", true);
+    public void testParseBinEnabledGhostPadsForSource() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc", true, errors);
     	assertEquals("Number of src pads incorrect", 1, bin.getSrcPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchEnabledGhostPadsForSink() {
-    	Bin bin = Bin.launch("fakesink", true);
+    public void testParseBinEnabledGhostPadsForSink() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesink", true, errors);
     	assertEquals("Number of sink pads incorrect", 1, bin.getSinkPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchEnabledGhostPadsForSourceWithNoUsablePads() {
-    	Bin bin = Bin.launch("fakesrc ! fakesink", true);
+    public void testParseBinEnabledGhostPadsForSourceWithNoUsablePads() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", true, errors);
     	assertEquals("Number of src pads incorrect", 0, bin.getSrcPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchEnabledGhostPadsForSinkWithNoUsablePads() {
-    	Bin bin = Bin.launch("fakesrc ! fakesink", true);
+    public void testParseBinEnabledGhostPadsForSinkWithNoUsablePads() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", true, errors);
     	assertEquals("Number of sink pads incorrect", 0, bin.getSinkPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
     @Test
-    public void testLaunchEnabledGhostPadsWithNoUsablePads() {
-    	Bin bin = Bin.launch("fakesrc ! fakesink", true);
+    public void testParseBinEnabledGhostPadsWithNoUsablePads() {
+        ArrayList<GError> errors = new ArrayList<GError>();
+    	Bin bin = Gst.parseBinFromDescription("fakesrc ! fakesink", true, errors);
     	assertEquals("Number of pads incorrect", 0, bin.getPads().size());
+        assertEquals("parseBinFromDescription with error!", errors.size(), 0);
     }
 }
