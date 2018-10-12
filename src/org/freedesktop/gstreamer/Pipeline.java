@@ -1,8 +1,8 @@
 /* 
- * Copyright (c) 2015 Neil C Smith
- * Copyright (c) 2007,2008 Wayne Meissner
- * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
- *                    2004,2005 Wim Taymans <wim@fluendo.com>
+ * Copyright (c) 2018 Neil C Smith
+ * Copyright (c) 2008 Wayne Meissner
+ * Copyright (C) 2000 Erik Walthinsen <omega@cse.ogi.edu>
+ *               2005 Wim Taymans <wim@fluendo.com>
  * 
  * This file is part of gstreamer-java.
  *
@@ -131,6 +131,7 @@ public class Pipeline extends Bin {
      * @param pipelineDecription  the command line describing the pipeline
      * @return The new Pipeline.
      */
+    @Deprecated
     public static Pipeline launch(String pipelineDecription) {
         Pointer[] err = { null };
         Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
@@ -156,6 +157,7 @@ public class Pipeline extends Bin {
      * @param pipelineDecription An array of strings containing the command line describing the pipeline.
      * @return The new Pipeline.
      */
+    @Deprecated
     public static Pipeline launch(String... pipelineDecription) {
         Pointer[] err = { null };
         Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);

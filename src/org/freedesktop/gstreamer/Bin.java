@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2018 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
@@ -88,24 +89,26 @@ public class Bin extends Element {
         this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false));
     }
     
-	/**
-	 * Creates a bin from a text bin description. 
-	 * 
-	 * This function allows creation of a bin based on the syntax used in the
-	 * gst-launch utillity.
-	 * 
-	 * @param binDecription the command line describing the bin
-	 * @param ghostUnlinkedPads whether to create ghost pads for the bin from any unlinked pads
-	 * @return The new Bin.
-	 */
-	public static Bin launch(String binDecription, boolean ghostUnlinkedPads) {
-		Pointer[] err = { null };
-		Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDecription, ghostUnlinkedPads, err);
-		if (bin == null) {
-			throw new GstException(new GError(new GErrorStruct(err[0])));
-		}
-		return bin;
-	}
+    /**
+     * Creates a bin from a text bin description.
+     *
+     * This function allows creation of a bin based on the syntax used in the
+     * gst-launch utillity.
+     *
+     * @param binDecription the command line describing the bin
+     * @param ghostUnlinkedPads whether to create ghost pads for the bin from
+     * any unlinked pads
+     * @return The new Bin.
+     */
+    @Deprecated
+    public static Bin launch(String binDecription, boolean ghostUnlinkedPads) {
+        Pointer[] err = {null};
+        Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDecription, ghostUnlinkedPads, err);
+        if (bin == null) {
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+        return bin;
+    }
     
     /**
      * Adds an Element to this Bin.
