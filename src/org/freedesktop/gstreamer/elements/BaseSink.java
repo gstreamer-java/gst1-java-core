@@ -131,27 +131,18 @@ public class BaseSink extends Element {
          */
         public void handoff(BaseSink sink, Buffer buffer, Pad pad);
     }
-
-    private static class HANDOFFCallback implements GstAPI.GstCallback {
-    	final HANDOFF listener;
-    	public HANDOFFCallback(final HANDOFF listener) {
-    		this.listener = listener;
-    		//Native.setCallbackThreadInitializer(this, new CallbackThreadInitializer(true, false, "BaseSink Handoff"));
-    	}
-        @SuppressWarnings("unused")
-        public void callback(BaseSink sink, Buffer buffer, Pad pad) {
-            listener.handoff(sink, buffer, pad);
-//          if (last)
-//        	Native.detach(true);
-        }    	
-    }
     /**
      * Add a listener for the <code>handoff</code> signal on this sink
      * 
      * @param listener The listener to be called when a {@link Buffer} is ready.
      */
     public void connect(final HANDOFF listener) {
-        connect(HANDOFF.class, listener, new HANDOFFCallback(listener));
+        connect(HANDOFF.class, listener, new GstAPI.GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(BaseSink sink, Buffer buffer, Pad pad) {
+                listener.handoff(sink, buffer, pad);
+            }
+        });
     }
     /**
      * Remove a listener for the <code>handoff</code> signal
@@ -160,21 +151,8 @@ public class BaseSink extends Element {
      */
     public void disconnect(HANDOFF listener) {
         disconnect(HANDOFF.class, listener);
-    }   
-    
-    private static class PrerollHandoff implements GstAPI.GstCallback {
-    	final PREROLL_HANDOFF listener;
-    	public PrerollHandoff(final PREROLL_HANDOFF listener) {
-    		this.listener = listener;
-    		//Native.setCallbackThreadInitializer(this, new CallbackThreadInitializer(true, false, "BaseSink Preroll Handoff"));
-    	}
-        @SuppressWarnings("unused")
-        public void callback(BaseSink sink, Buffer buffer, Pad pad) {
-            listener.prerollHandoff(sink, buffer, pad);
-//          if (last)
-//        	Native.detach(true);
-        }
     }
+
     /**
      * Signal emitted when this {@link BaseSink} has a {@link Buffer} ready.
      *
@@ -197,7 +175,12 @@ public class BaseSink extends Element {
      * @param listener The listener to be called when a {@link Buffer} is ready.
      */
     public void connect(final PREROLL_HANDOFF listener) {
-        connect(PREROLL_HANDOFF.class, listener, new PrerollHandoff(listener));
+        connect(PREROLL_HANDOFF.class, listener, new GstAPI.GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(BaseSink sink, Buffer buffer, Pad pad) {
+                listener.prerollHandoff(sink, buffer, pad);
+            }
+        });
     }
     /**
      * Remove a listener for the <code>preroll-handoff</code> signal.
@@ -234,5 +217,4 @@ public class BaseSink extends Element {
         };
         basesinkClass.writeField("propose_allocation");
     }
-
 }

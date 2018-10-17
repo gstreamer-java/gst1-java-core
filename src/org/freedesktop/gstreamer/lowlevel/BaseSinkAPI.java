@@ -99,8 +99,7 @@ public interface BaseSinkAPI extends Library {
 
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[] {
-                "element", "sinkpad", "pad_mode",
+            return Arrays.asList("element", "sinkpad", "pad_mode",
                 "offset", "can_activate_pull", "can_activate_push",
                 "preroll_lock", "preroll_cond", 
                 "eos", "need_preroll", "have_preroll",
@@ -108,7 +107,7 @@ public interface BaseSinkAPI extends Library {
                 "clock_id", "sync",
                 "flushing", "running", "max_lateness", "priv",
                 "_gst_reserved"
-            });
+            );
         }
     }
     
@@ -147,8 +146,9 @@ public interface BaseSinkAPI extends Library {
     public static interface Render extends Callback {
         public FlowReturn callback(BaseSink sink, Buffer buffer);
     }
+    // it's a bug since BufferList is NOT a GList not even close to it
     public static interface RenderList extends Callback {
-        public FlowReturn callback(BaseSink sink, GList bufferList);
+        public FlowReturn callback(BaseSink sink, /*BufferList*/ GList bufferList);
     }
 
     public static final class GstBaseSinkClass extends com.sun.jna.Structure {
@@ -221,14 +221,13 @@ public interface BaseSinkAPI extends Library {
 
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[] {
-                "parent_class", "get_caps", "set_caps",
+            return Arrays.asList("parent_class", "get_caps", "set_caps",
                 "fixate", "activate_pull", "get_times",
                 "propose_allocation", "start", "stop",
                 "unlock", "unlock_stop", "query", "event",
                 "wait_event", "prepare", "prepare_list",
                 "preroll", "render", "render_list", "_gst_reserved"
-            });
+            );
         }
     }
     

@@ -26,6 +26,7 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
@@ -163,42 +164,7 @@ public class AppSink extends BaseSink {
     public void disconnect(EOS listener) {
         disconnect(EOS.class, listener);
     }
-    
-    /**
-     * Signal emitted when this {@link AppSink} when a new buffer is ready.
-     */
-    public static interface NEW_SAMPLE {
-        /**
-         *
-         * @param elem
-         */
-        public FlowReturn newSample(AppSink elem);
-    }
-    /**
-     * Adds a listener for the <code>new-sample</code> signal. If a blocking
-     * behaviour is not desirable, setting the "emit-signals" property to TRUE
-     * will make appsink emit the "new-sample" and "new-preroll" signals when a
-     * buffer can be pulled without blocking.
-     *
-     * @param listener
-     */
-    public void connect(final NEW_SAMPLE listener) {
-        connect(NEW_SAMPLE.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public FlowReturn callback(AppSink elem) {
-                return listener.newSample(elem);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>new-buffer</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(NEW_SAMPLE listener) {
-        disconnect(NEW_SAMPLE.class, listener);
-    }
-    
+
     /**
      * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
@@ -235,61 +201,59 @@ public class AppSink extends BaseSink {
     }
 
     /**
-     * This function blocks until a buffer or EOS becomes available or this 
-     * {@link AppSink} element is set to the READY/NULL state.
+     * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
-    public static interface PULL_BUFFER {
+    public static interface NEW_SAMPLE {
         /**
          *
          * @param elem
          */
-        public Buffer pullBuffer(AppSink elem);
+        public FlowReturn newSample(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>pull-buffer</code> signal. 
-     * Note that when the application does not pull buffers fast enough, the 
-     * queued buffers could consume a lot of memory, especially when dealing 
-     * with raw video frames. It's possible to control the behaviour of the 
-     * queue with the "drop" and "max-buffers" properties.
+     * Adds a listener for the <code>new-sample</code> signal. If a blocking
+     * behaviour is not desirable, setting the "emit-signals" property to TRUE
+     * will make appsink emit the "new-sample" and "new-preroll" signals when a
+     * buffer can be pulled without blocking.
      *
      * @param listener
      */
-    public void connect(final PULL_BUFFER listener) {
-        connect(PULL_BUFFER.class, listener, new GstCallback() {
+    public void connect(final NEW_SAMPLE listener) {
+        connect(NEW_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public Buffer callback(AppSink elem) {
-                return listener.pullBuffer(elem);
+            public FlowReturn callback(AppSink elem) {
+                return listener.newSample(elem);
             }
         });
     }
     /**
-     * Removes a listener for the <code>pull-buffer</code> signal
+     * Removes a listener for the <code>new-buffer</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(PULL_BUFFER listener) {
-        disconnect(PULL_BUFFER.class, listener);
+    public void disconnect(NEW_SAMPLE listener) {
+        disconnect(NEW_SAMPLE.class, listener);
     }
 
     /**
-     * Get the last preroll buffer in this {@link AppSink} element.  
+     * Get the last preroll sample in this {@link AppSink} element.
      */
     public static interface PULL_PREROLL {
         /**
          *
          * @param elem
          */
-        public Buffer pullPreroll(AppSink elem);
+        public Sample pullPreroll(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>pull-preroll</code> signal. 
+     * Adds a listener for the <code>pull-preroll</code> signal.
      *
      * @param listener
      */
     public void connect(final PULL_PREROLL listener) {
         connect(PULL_PREROLL.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public Buffer callback(AppSink elem) {
+            public Sample callback(AppSink elem) {
                 return listener.pullPreroll(elem);
             }
         });
@@ -304,67 +268,139 @@ public class AppSink extends BaseSink {
     }
 
     /**
-     * Signal emitted when this {@link AppSink} when a new buffer is ready.
+     * This function blocks until a sample or EOS becomes available or this
+     * {@link AppSink} element is set to the READY/NULL state.
      */
-    public static interface NEW_BUFFER_LIST {
+    public static interface PULL_SAMPLE {
         /**
          *
          * @param elem
          */
-        public void newBufferList(AppSink elem);
+        public Sample pullSample(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>new-buffer-list</code> signal.
+     * Adds a listener for the <code>pull-sample</code> signal.
+     * Note that when the application does not pull buffers fast enough, the 
+     * queued samples could consume a lot of memory, especially when dealing
+     * with raw video frames. It's possible to control the behaviour of the 
+     * queue with the "drop" and "max-buffers" properties.
      *
      * @param listener
      */
-    public void connect(final NEW_BUFFER_LIST listener) {
-        connect(NEW_BUFFER_LIST.class, listener, new GstCallback() {
+    public void connect(final PULL_SAMPLE listener) {
+        connect(PULL_SAMPLE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public void callback(AppSink elem) {
-                listener.newBufferList(elem);
+            public Sample callback(AppSink elem) {
+                return listener.pullSample(elem);
             }
         });
     }
     /**
-     * Removes a listener for the <code>new-buffer-list</code> signal
+     * Removes a listener for the <code>pull-sample</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(NEW_BUFFER_LIST listener) {
-        disconnect(NEW_BUFFER_LIST.class, listener);
+    public void disconnect(PULL_SAMPLE listener) {
+        disconnect(PULL_SAMPLE.class, listener);
     }
 
-//    /**
-//     * This function blocks until a buffer list or EOS becomes available or 
-//     * this {@link AppSink} element is set to the READY/NULL state.
-//     */
-//    public static interface PULL_BUFFER_LIST {
-//        /**
-//         *
-//         * @param elem
-//         */
-//        public BufferList pullBufferList(AppSink elem);
-//    }
-//    /**
-//     * Adds a listener for the <code>pull-buffer-list</code> signal. 
-//     *
-//     * @param listener
-//     */
-//    public void connect(final PULL_BUFFER_LIST listener) {
-//        connect(PULL_BUFFER_LIST.class, listener, new GstCallback() {
-//            @SuppressWarnings("unused")
-//            public BufferList callback(AppSink elem) {
-//                return listener.pullBufferList(elem);
-//            }
-//        });
-//    }
-//    /**
-//     * Removes a listener for the <code>pull-buffer-list</code> signal
-//     *
-//     * @param listener The listener that was previously added.
-//     */
-//    public void disconnect(PULL_BUFFER_LIST listener) {
-//        disconnect(PULL_BUFFER_LIST.class, listener);
-//    }
+    /**
+     * Get the last preroll sample in {@link AppSink}. This was the sample that caused the
+     * appsink to preroll in the PAUSED state.
+     * <p>
+     * This function is typically used when dealing with a pipeline in the PAUSED
+     * state. Calling this function after doing a seek will give the sample right
+     * after the seek position.
+     * <p>
+     * Calling this function will clear the internal reference to the preroll
+     * buffer.
+     * <p>
+     * Note that the preroll sample will also be returned as the first sample
+     * when calling gst_app_sink_pull_sample() or the "pull-sample" action signal.
+     * <p>
+     * If an EOS event was received before any buffers or the timeout expires,
+     * this function returns %NULL. Use gst_app_sink_is_eos () to check for the EOS
+     * condition.
+     * <p>
+     * This function blocks until a preroll sample or EOS is received, the appsink
+     * element is set to the READY/NULL state, or the timeout expires.
+     * <p>
+     * Returns: a {@link Sample} or NULL when the {@link AppSink} is stopped or EOS or the timeout expires.
+     */
+    public static interface TRY_PULL_PREROLL {
+        /**
+         *
+         * @param elem
+         */
+        public void tryPullPreroll(AppSink elem, ClockTime timeout);
+    }
+    /**
+     * Adds a listener for the <code>try-pull-preroll</code> signal.
+     *
+     * @param listener
+     */
+    public void connect(final AppSink.TRY_PULL_PREROLL listener) {
+        connect(AppSink.TRY_PULL_PREROLL.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(AppSink sink, ClockTime timeout) {
+                listener.tryPullPreroll(sink, timeout);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>try-pull-preroll</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(TRY_PULL_PREROLL listener) {
+        disconnect(TRY_PULL_PREROLL.class, listener);
+    }
+
+    /**
+     * This function blocks until a sample or EOS becomes available or the appsink
+     * element is set to the READY/NULL state or the timeout expires.
+     * <p>
+     * This function will only return samples when the appsink is in the PLAYING
+     * state. All rendered samples will be put in a queue so that the application
+     * can pull samples at its own rate.
+     * <p>
+     * Note that when the application does not pull samples fast enough, the
+     * queued samples could consume a lot of memory, especially when dealing with
+     * raw video frames. It's possible to control the behaviour of the queue with
+     * the "drop" and "max-buffers" properties.
+     * <p>
+     * If an EOS event was received before any buffers or the timeout expires,
+     * this function returns %NULL. Use gst_app_sink_is_eos () to check
+     * for the EOS condition.
+     * <p>
+     * Returns: a {@link Sample} or NULL when the {@link AppSink} is stopped or EOS or the timeout expires.
+     */
+    public static interface TRY_PULL_SAMPLE {
+        /**
+         *
+         * @param elem
+         */
+        public void tryPullSample(AppSink elem, ClockTime timeout);
+    }
+    /**
+     * Adds a listener for the <code>try-pull-sample</code> signal.
+     *
+     * @param listener
+     */
+    public void connect(final AppSink.TRY_PULL_SAMPLE listener) {
+        connect(AppSink.TRY_PULL_SAMPLE.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(AppSink sink, ClockTime timeout) {
+                listener.tryPullSample(sink, timeout);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>try-pull-sample</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(TRY_PULL_SAMPLE listener) {
+        disconnect(TRY_PULL_SAMPLE.class, listener);
+    }
 }

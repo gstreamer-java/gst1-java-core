@@ -24,6 +24,7 @@ package org.freedesktop.gstreamer.elements;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.FlowReturn;
+import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.AppAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
@@ -101,70 +102,6 @@ public class AppSrc extends BaseSrc {
     }
 
     /**
-     * Signal emitted when this {@link AppSrc} when no more buffer are available.
-     */
-    public static interface END_OF_STREAM {
-        /**
-         *
-         * @param elem
-         */
-        public FlowReturn endOfStream(AppSrc elem);
-    }
-    /**
-     * Adds a listener for the <code>end-of-stream</code> signal
-     *
-     * @param listener Listener to be called this when appsrc has no more buffer are available.
-     */
-    public void connect(final END_OF_STREAM listener) {
-        connect(END_OF_STREAM.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public FlowReturn callback(AppSrc elem) {
-                return listener.endOfStream(elem);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>end-of-stream</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(END_OF_STREAM listener) {
-        disconnect(END_OF_STREAM.class, listener);
-    }
-
-    /**
-     * Signal emitted when this {@link AppSrc} has enough data in the queue.
-     */
-    public static interface ENOUGH_DATA {
-        /**
-         *
-         * @param elem
-         */
-        public void enoughData(AppSrc elem);
-    }
-    /**
-     * Adds a listener for the <code>enough-data</code> signal
-     *
-     * @param listener Listener to be called this when appsrc fills its queue.
-     */
-    public void connect(final ENOUGH_DATA listener) {
-        connect(ENOUGH_DATA.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public void callback(AppSrc elem) {
-                listener.enoughData(elem);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>enough-data</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(ENOUGH_DATA listener) {
-        disconnect(ENOUGH_DATA.class, listener);
-    }
-
-    /**
      * Signal emitted when this {@link AppSrc} needs data.
      */
     public static interface NEED_DATA {
@@ -198,37 +135,35 @@ public class AppSrc extends BaseSrc {
     }
 
     /**
-     * Signal emitted when adds a buffer to the queue of buffers that 
-     * this {@link AppSrc} element will push to its source pad.
+     * Signal emitted when this {@link AppSrc} has enough data in the queue.
      */
-    public static interface PUSH_BUFFER {
+    public static interface ENOUGH_DATA {
         /**
          *
          * @param elem
-         * @param buffer
          */
-        public FlowReturn pushBuffer(AppSrc elem, Buffer buffer);
+        public void enoughData(AppSrc elem);
     }
     /**
-     * Adds a listener for the <code>push-buffer</code> signal
+     * Adds a listener for the <code>enough-data</code> signal
      *
-     * @param listener Listener to be called when appsrc push buffer.
+     * @param listener Listener to be called this when appsrc fills its queue.
      */
-    public void connect(final PUSH_BUFFER listener) {
-        connect(PUSH_BUFFER.class, listener, new GstCallback() {
+    public void connect(final ENOUGH_DATA listener) {
+        connect(ENOUGH_DATA.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public FlowReturn callback(AppSrc elem, Buffer buffer) {
-                return listener.pushBuffer(elem, buffer);
+            public void callback(AppSrc elem) {
+                listener.enoughData(elem);
             }
         });
     }
     /**
-     * Removes a listener for the <code>push-buffer</code> signal
+     * Removes a listener for the <code>enough-data</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(PUSH_BUFFER listener) {
-        disconnect(PUSH_BUFFER.class, listener);
+    public void disconnect(ENOUGH_DATA listener) {
+        disconnect(ENOUGH_DATA.class, listener);
     }
 
     /**
@@ -268,4 +203,153 @@ public class AppSrc extends BaseSrc {
     public void disconnect(SEEK_DATA listener) {
         disconnect(SEEK_DATA.class, listener);
     }
+
+    /**
+     * Signal emitted when adds a buffer to the queue of buffers that
+     * this {@link AppSrc} element will push to its source pad.
+     */
+    public static interface PUSH_BUFFER {
+        /**
+         *
+         * @param elem
+         * @param buffer
+         */
+        public FlowReturn pushBuffer(AppSrc elem, Buffer buffer);
+    }
+    /**
+     * Adds a listener for the <code>push-buffer</code> signal
+     *
+     * @param listener Listener to be called when appsrc push buffer.
+     */
+    public void connect(final PUSH_BUFFER listener) {
+        connect(PUSH_BUFFER.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public FlowReturn callback(AppSrc elem, Buffer buffer) {
+                return listener.pushBuffer(elem, buffer);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>push-buffer</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(PUSH_BUFFER listener) {
+        disconnect(PUSH_BUFFER.class, listener);
+    }
+
+    /**
+     * Signal emitted when this {@link AppSrc} when no more buffer are available.
+     */
+    public static interface END_OF_STREAM {
+        /**
+         *
+         * @param elem
+         */
+        public FlowReturn endOfStream(AppSrc elem);
+    }
+    /**
+     * Adds a listener for the <code>end-of-stream</code> signal
+     *
+     * @param listener Listener to be called this when appsrc has no more buffer are available.
+     */
+    public void connect(final END_OF_STREAM listener) {
+        connect(END_OF_STREAM.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public FlowReturn callback(AppSrc elem) {
+                return listener.endOfStream(elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>end-of-stream</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(END_OF_STREAM listener) {
+        disconnect(END_OF_STREAM.class, listener);
+    }
+
+    /**
+     * Extract a buffer from the provided sample and adds the extracted buffer
+     * to the queue of buffers that the {@link AppSrc} element will
+     * push to its source pad. This function set the appsrc caps based on the caps
+     * in the sample and reset the caps if they change.
+     * Only the caps and the buffer of the provided sample are used and not
+     * for example the segment in the sample.
+     * This function does not take ownership of the
+     * sample so the sample needs to be unreffed after calling this function.
+     * <p>
+     * When the block property is TRUE, this function can block until free space
+     * becomes available in the queue.
+     */
+    public static interface PUSH_SAMPLE {
+        /**
+         *
+         * @param elem
+         * @param sample
+         */
+        public FlowReturn pushSample(AppSrc elem, Sample sample);
+    }
+    /**
+     * Adds a listener for the <code>push-sample</code> signal
+     *
+     * @param listener Listener to be called when appsrc push sample.
+     */
+    public void connect(final PUSH_SAMPLE listener) {
+        connect(PUSH_SAMPLE.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public FlowReturn callback(AppSrc elem, Sample sample) {
+                return listener.pushSample(elem, sample);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>push-sample</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(PUSH_SAMPLE listener) {
+        disconnect(PUSH_SAMPLE.class, listener);
+    }
+
+// BufferList java implementation still missing
+//    /**
+//     * Adds a buffer list to the queue of buffers and buffer lists that the
+//     * {@link AppSrc} element will push to its source pad. This function does not take
+//     * ownership of the buffer list so the buffer list needs to be unreffed
+//     * after calling this function.
+//     * <p>
+//     * When the block property is TRUE, this function can block until free space
+//     * becomes available in the queue.
+//     */
+//    public static interface PUSH_BUFFER_LIST {
+//        /**
+//         *
+//         * @param elem
+//         * @param bufferList
+//         */
+//        public FlowReturn pushBufferList(AppSrc elem, BufferList bufferList);
+//    }
+//    /**
+//     * Adds a listener for the <code>push-buffer-list</code> signal
+//     *
+//     * @param listener Listener to be called when appsrc push buffer list.
+//     */
+//    public void connect(final PUSH_BUFFER_LIST listener) {
+//        connect(PUSH_BUFFER_LIST.class, listener, new GstCallback() {
+//            @SuppressWarnings("unused")
+//            public FlowReturn callback(AppSrc elem, BufferList bufferList) {
+//                return listener.pushBufferList(elem, bufferList);
+//            }
+//        });
+//    }
+//    /**
+//     * Removes a listener for the <code>push-buffer-list</code> signal
+//     *
+//     * @param listener The listener that was previously added.
+//     */
+//    public void disconnect(PUSH_BUFFER_LIST listener) {
+//        disconnect(PUSH_BUFFER_LIST.class, listener);
+//    }
 }
