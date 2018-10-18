@@ -102,6 +102,70 @@ public class AppSrc extends BaseSrc {
     }
 
     /**
+     * Signal emitted when this {@link AppSrc} when no more buffer are available.
+     */
+    public static interface END_OF_STREAM {
+        /**
+         *
+         * @param elem
+         */
+        public FlowReturn endOfStream(AppSrc elem);
+    }
+    /**
+     * Adds a listener for the <code>end-of-stream</code> signal
+     *
+     * @param listener Listener to be called this when appsrc has no more buffer are available.
+     */
+    public void connect(final END_OF_STREAM listener) {
+        connect(END_OF_STREAM.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public FlowReturn callback(AppSrc elem) {
+                return listener.endOfStream(elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>end-of-stream</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(END_OF_STREAM listener) {
+        disconnect(END_OF_STREAM.class, listener);
+    }
+
+    /**
+     * Signal emitted when this {@link AppSrc} has enough data in the queue.
+     */
+    public static interface ENOUGH_DATA {
+        /**
+         *
+         * @param elem
+         */
+        public void enoughData(AppSrc elem);
+    }
+    /**
+     * Adds a listener for the <code>enough-data</code> signal
+     *
+     * @param listener Listener to be called this when appsrc fills its queue.
+     */
+    public void connect(final ENOUGH_DATA listener) {
+        connect(ENOUGH_DATA.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(AppSrc elem) {
+                listener.enoughData(elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>enough-data</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(ENOUGH_DATA listener) {
+        disconnect(ENOUGH_DATA.class, listener);
+    }
+
+    /**
      * Signal emitted when this {@link AppSrc} needs data.
      */
     public static interface NEED_DATA {
@@ -135,35 +199,37 @@ public class AppSrc extends BaseSrc {
     }
 
     /**
-     * Signal emitted when this {@link AppSrc} has enough data in the queue.
+     * Signal emitted when adds a buffer to the queue of buffers that
+     * this {@link AppSrc} element will push to its source pad.
      */
-    public static interface ENOUGH_DATA {
+    public static interface PUSH_BUFFER {
         /**
          *
          * @param elem
+         * @param buffer
          */
-        public void enoughData(AppSrc elem);
+        public FlowReturn pushBuffer(AppSrc elem, Buffer buffer);
     }
     /**
-     * Adds a listener for the <code>enough-data</code> signal
+     * Adds a listener for the <code>push-buffer</code> signal
      *
-     * @param listener Listener to be called this when appsrc fills its queue.
+     * @param listener Listener to be called when appsrc push buffer.
      */
-    public void connect(final ENOUGH_DATA listener) {
-        connect(ENOUGH_DATA.class, listener, new GstCallback() {
+    public void connect(final PUSH_BUFFER listener) {
+        connect(PUSH_BUFFER.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public void callback(AppSrc elem) {
-                listener.enoughData(elem);
+            public FlowReturn callback(AppSrc elem, Buffer buffer) {
+                return listener.pushBuffer(elem, buffer);
             }
         });
     }
     /**
-     * Removes a listener for the <code>enough-data</code> signal
+     * Removes a listener for the <code>push-buffer</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(ENOUGH_DATA listener) {
-        disconnect(ENOUGH_DATA.class, listener);
+    public void disconnect(PUSH_BUFFER listener) {
+        disconnect(PUSH_BUFFER.class, listener);
     }
 
     /**
@@ -202,72 +268,6 @@ public class AppSrc extends BaseSrc {
      */
     public void disconnect(SEEK_DATA listener) {
         disconnect(SEEK_DATA.class, listener);
-    }
-
-    /**
-     * Signal emitted when adds a buffer to the queue of buffers that
-     * this {@link AppSrc} element will push to its source pad.
-     */
-    public static interface PUSH_BUFFER {
-        /**
-         *
-         * @param elem
-         * @param buffer
-         */
-        public FlowReturn pushBuffer(AppSrc elem, Buffer buffer);
-    }
-    /**
-     * Adds a listener for the <code>push-buffer</code> signal
-     *
-     * @param listener Listener to be called when appsrc push buffer.
-     */
-    public void connect(final PUSH_BUFFER listener) {
-        connect(PUSH_BUFFER.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public FlowReturn callback(AppSrc elem, Buffer buffer) {
-                return listener.pushBuffer(elem, buffer);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>push-buffer</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(PUSH_BUFFER listener) {
-        disconnect(PUSH_BUFFER.class, listener);
-    }
-
-    /**
-     * Signal emitted when this {@link AppSrc} when no more buffer are available.
-     */
-    public static interface END_OF_STREAM {
-        /**
-         *
-         * @param elem
-         */
-        public FlowReturn endOfStream(AppSrc elem);
-    }
-    /**
-     * Adds a listener for the <code>end-of-stream</code> signal
-     *
-     * @param listener Listener to be called this when appsrc has no more buffer are available.
-     */
-    public void connect(final END_OF_STREAM listener) {
-        connect(END_OF_STREAM.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public FlowReturn callback(AppSrc elem) {
-                return listener.endOfStream(elem);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>end-of-stream</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(END_OF_STREAM listener) {
-        disconnect(END_OF_STREAM.class, listener);
     }
 
     /**

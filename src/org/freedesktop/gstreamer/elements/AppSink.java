@@ -168,41 +168,6 @@ public class AppSink extends BaseSink {
     /**
      * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
-    public static interface NEW_PREROLL {
-        /**
-         *
-         * @param elem
-         */
-        public FlowReturn newPreroll(AppSink elem);
-    }
-    /**
-     * Adds a listener for the <code>new-preroll</code> signal. If a blocking
-     * behaviour is not desirable, setting the "emit-signals" property to TRUE
-     * will make appsink emit the "new-buffer" and "new-preroll" signals when a
-     * buffer can be pulled without blocking.
-     *
-     * @param listener
-     */
-    public void connect(final NEW_PREROLL listener) {
-        connect(NEW_PREROLL.class, listener, new GstCallback() {
-            @SuppressWarnings("unused")
-            public FlowReturn callback(AppSink elem) {
-                return listener.newPreroll(elem);
-            }
-        });
-    }
-    /**
-     * Removes a listener for the <code>new-preroll</code> signal
-     *
-     * @param listener The listener that was previously added.
-     */
-    public void disconnect(NEW_PREROLL listener) {
-        disconnect(NEW_PREROLL.class, listener);
-    }
-
-    /**
-     * Signal emitted when this {@link AppSink} when a new buffer is ready.
-     */
     public static interface NEW_SAMPLE {
         /**
          *
@@ -236,35 +201,38 @@ public class AppSink extends BaseSink {
     }
 
     /**
-     * Get the last preroll sample in this {@link AppSink} element.
+     * Signal emitted when this {@link AppSink} when a new buffer is ready.
      */
-    public static interface PULL_PREROLL {
+    public static interface NEW_PREROLL {
         /**
          *
          * @param elem
          */
-        public Sample pullPreroll(AppSink elem);
+        public FlowReturn newPreroll(AppSink elem);
     }
     /**
-     * Adds a listener for the <code>pull-preroll</code> signal.
+     * Adds a listener for the <code>new-preroll</code> signal. If a blocking
+     * behaviour is not desirable, setting the "emit-signals" property to TRUE
+     * will make appsink emit the "new-buffer" and "new-preroll" signals when a
+     * buffer can be pulled without blocking.
      *
      * @param listener
      */
-    public void connect(final PULL_PREROLL listener) {
-        connect(PULL_PREROLL.class, listener, new GstCallback() {
+    public void connect(final NEW_PREROLL listener) {
+        connect(NEW_PREROLL.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public Sample callback(AppSink elem) {
-                return listener.pullPreroll(elem);
+            public FlowReturn callback(AppSink elem) {
+                return listener.newPreroll(elem);
             }
         });
     }
     /**
-     * Removes a listener for the <code>pull-preroll</code> signal
+     * Removes a listener for the <code>new-preroll</code> signal
      *
      * @param listener The listener that was previously added.
      */
-    public void disconnect(PULL_PREROLL listener) {
-        disconnect(PULL_PREROLL.class, listener);
+    public void disconnect(NEW_PREROLL listener) {
+        disconnect(NEW_PREROLL.class, listener);
     }
 
     /**
@@ -302,6 +270,38 @@ public class AppSink extends BaseSink {
      */
     public void disconnect(PULL_SAMPLE listener) {
         disconnect(PULL_SAMPLE.class, listener);
+    }
+
+    /**
+     * Get the last preroll sample in this {@link AppSink} element.
+     */
+    public static interface PULL_PREROLL {
+        /**
+         *
+         * @param elem
+         */
+        public Sample pullPreroll(AppSink elem);
+    }
+    /**
+     * Adds a listener for the <code>pull-preroll</code> signal.
+     *
+     * @param listener
+     */
+    public void connect(final PULL_PREROLL listener) {
+        connect(PULL_PREROLL.class, listener, new GstCallback() {
+            @SuppressWarnings("unused")
+            public Sample callback(AppSink elem) {
+                return listener.pullPreroll(elem);
+            }
+        });
+    }
+    /**
+     * Removes a listener for the <code>pull-preroll</code> signal
+     *
+     * @param listener The listener that was previously added.
+     */
+    public void disconnect(PULL_PREROLL listener) {
+        disconnect(PULL_PREROLL.class, listener);
     }
 
     /**
