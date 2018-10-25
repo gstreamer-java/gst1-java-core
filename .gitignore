@@ -14,3 +14,7 @@
 # NetBeans Files #
 /nbproject/
 nb-configuration.xml
+
+# InteliJ Files #
+gst1-java-core.iml
+.idea
