@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.freedesktop.gstreamer.WebRTCSessionDescription;
+import org.freedesktop.gstreamer.WebRTCSDPType;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 
 import com.sun.jna.Pointer;
 
@@ -30,44 +32,30 @@ import com.sun.jna.Pointer;
  * @see https://github.com/GStreamer/gst-plugins-bad/blob/master/gst-libs/gst/webrtc/rtcsessiondescription.h
  */
 
-public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library
-{
+public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
   GstWebRTCSessionDescriptionAPI GSTWEBRTCSESSIONDESCRIPTION_API =
       GstNative.load("gstwebrtc", GstWebRTCSessionDescriptionAPI.class);
 
-  public static final class WebRTCSessionDescriptionStruct extends com.sun.jna.Structure
-  {
-    public volatile Pointer type;
+  public static final class WebRTCSessionDescriptionStruct extends com.sun.jna.Structure {
+    public volatile WebRTCSDPType type;
     public volatile Pointer sdp;
 
-    public WebRTCSessionDescriptionStruct()
-    {
-    }
-
-    public WebRTCSessionDescriptionStruct(final Pointer ptr)
-    {
+    public WebRTCSessionDescriptionStruct(final Pointer ptr) {
       useMemory(ptr);
     }
 
     @Override
-    protected List<String> getFieldOrder()
-    {
+    protected List<String> getFieldOrder() {
       return Arrays.asList(new String[] { "type", "sdp" });
     }
   }
 
   GType gst_webrtc_session_description_get_type();
+  @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_new(WebRTCSDPType type, Pointer sdp);
+  @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_new(WebRTCSDPType type, Pointer sdp);
 
-  @CallerOwnsReturn
-  WebRTCSessionDescription gst_webrtc_session_description_new(Pointer type, Pointer sdp);
+  @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_copy(WebRTCSessionDescription src);
+  @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_copy(WebRTCSessionDescription src);
 
-  @CallerOwnsReturn
-  Pointer ptr_gst_webrtc_session_description_new(Pointer type, Pointer sdp);
-
-  String gst_webrtc_sdp_type_to_string(Pointer type);
-
-  @CallerOwnsReturn
-  WebRTCSessionDescription gst_webrtc_session_description_copy(WebRTCSessionDescription src);
-
-  void gst_webrtc_session_description_free(WebRTCSessionDescription desc);
+  void gst_webrtc_session_description_free(Pointer desc);
 }

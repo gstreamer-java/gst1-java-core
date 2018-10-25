@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Promise;
+import org.freedesktop.gstreamer.PromiseResult;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
@@ -45,7 +46,7 @@ public interface GstPromiseAPI extends com.sun.jna.Library
     {
     }
 
-    public PromiseStruct(final Pointer ptr)
+    public PromiseStruct(Pointer ptr)
     {
       useMemory(ptr);
     }
@@ -59,13 +60,17 @@ public interface GstPromiseAPI extends com.sun.jna.Library
 
   GType gst_promise_get_type();
 
+  @CallerOwnsReturn Promise gst_promise_new();
+
+  @CallerOwnsReturn Pointer ptr_gst_promise_new();
+
   @CallerOwnsReturn
   Promise gst_promise_new_with_change_func(GstCallback callback);
 
   @CallerOwnsReturn
   Pointer ptr_gst_promise_new_with_change_func(GstCallback callback);
 
-  void gst_promise_wait(Promise promise);
+  PromiseResult gst_promise_wait(Promise promise);
 
   void gst_promise_reply(Promise promise, Structure s);
 
@@ -73,7 +78,8 @@ public interface GstPromiseAPI extends com.sun.jna.Library
 
   void gst_promise_expire(Promise promise);
 
-  Structure gst_promise_get_reply(Promise promise);
+  @CallerOwnsReturn Structure gst_promise_get_reply(Promise promise);
+  @CallerOwnsReturn Pointer ptr_gst_promise_get_reply(Promise promise);
 
   GType gst_static_promise_get_type();
 }
