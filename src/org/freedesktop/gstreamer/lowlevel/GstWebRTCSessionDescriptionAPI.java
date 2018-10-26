@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.WebRTCSessionDescription;
 import org.freedesktop.gstreamer.WebRTCSDPType;
+import org.freedesktop.gstreamer.SDPMessage;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 
@@ -38,7 +39,7 @@ public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
 
   public static final class WebRTCSessionDescriptionStruct extends com.sun.jna.Structure {
     public volatile WebRTCSDPType type;
-    public volatile Pointer sdp;
+    public volatile SDPMessage sdp;
 
     public WebRTCSessionDescriptionStruct(final Pointer ptr) {
       useMemory(ptr);

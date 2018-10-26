@@ -2,6 +2,7 @@ package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI.GSTWEBRTCSESSIONDESCRIPTION_API;
 
+import org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.GType;
 
@@ -11,6 +12,8 @@ public class WebRTCSessionDescription extends NativeObject {
   public static final String GTYPE_NAME = "GstWebRTCSessionDescription";
   public static final GType GTYPE = GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_get_type();
 
+  protected GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct sessionDescriptionStruct;
+
   /**
    * Internally used constructor.  Do not use.
    * 
@@ -18,10 +21,17 @@ public class WebRTCSessionDescription extends NativeObject {
    */
   public WebRTCSessionDescription(Initializer init) {
     super(init);
+    sessionDescriptionStruct = new GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct(handle());
   }
 
   @Override
   protected void disposeNativeHandle(Pointer ptr) {
     GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
   }
+
+  public SDPMessage getSDP() {
+    SDPMessage sdp = (SDPMessage)sessionDescriptionStruct.readField("sdp");
+    return sdp;
+  }
+
 }
