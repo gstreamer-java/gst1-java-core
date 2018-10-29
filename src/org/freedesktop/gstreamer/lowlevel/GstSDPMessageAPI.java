@@ -109,4 +109,10 @@ public interface GstSDPMessageAPI extends com.sun.jna.Library {
     SDPResult gst_sdp_message_free(Pointer msg);
     SDPResult ptr_gst_sdp_message_free(Pointer msg);
 
+    SDPResult gst_sdp_message_new(Pointer[] msg);
+
+    SDPResult gst_sdp_message_parse_buffer(byte[] data, int size, Pointer[] msg);
+    SDPResult gst_sdp_message_parse_buffer(byte[] data, int size, SDPMessage msg);
+
+    String gst_sdp_message_as_text(SDPMessage msg);
 }

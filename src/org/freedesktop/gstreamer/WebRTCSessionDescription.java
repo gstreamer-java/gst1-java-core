@@ -29,7 +29,7 @@ public class WebRTCSessionDescription extends NativeObject {
     GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
   }
 
-  public SDPMessage getSDP() {
+  public SDPMessage getSDPMessage() {
     SDPMessage sdp = (SDPMessage)sessionDescriptionStruct.readField("sdp");
     return sdp;
   }
