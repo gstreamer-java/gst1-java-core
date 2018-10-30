@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015 Neil C Smith Copyright (c) 2007,2008 Wayne Meissner Copyright (C) 1999,2000
- * Erik Walthinsen <omega@cse.ogi.edu> 2004,2005 Wim Taymans <wim@fluendo.com>
+ * Copyright (c) 2018 Vinicius Tona
+ * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
  *
@@ -17,62 +17,107 @@
 
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.*;
+import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.GSTPROMISE_API;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 import com.sun.jna.Pointer;
 
-/**
-
- */
-public class Promise extends MiniObject
-{
+public class Promise extends MiniObject {
   public static final String GTYPE_NAME = "GstPromise";
 
-  public Promise(final Initializer init)
-  {
+  public static interface PROMISE_CHANGE {
+    /**
+     * Called whenever the state of the promise is changed from PENDING to any other {@link PromiseResult}
+     * 
+     * @param promise the original promise that had the callback attached to
+     */
+    public void onChange(Promise promise);
+  }
+
+  /**
+   * Creates a new instance of Promise. This constructor is used internally.
+   *
+   * @param init internal initialization data.
+   */
+  public Promise(final Initializer init) {
     super(init);
   }
 
-  public Promise() 
-  {
+  /**
+   * Creates a new instance of promise
+   */
+  public Promise() {
     this(initializer(GSTPROMISE_API.ptr_gst_promise_new()));
   }
 
-  public Promise(final GstCallback callback)
-  {
-    this(initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(callback)));
+  /**
+   * Creates a new instance of promise with a callback attached.
+   *
+   * @param listerner Listener to be called whenever the state of a {@link Promise} is changed
+   */
+  public Promise(final PROMISE_CHANGE listener) {
+    this(initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
+      @SuppressWarnings("unused")
+      public void callback(Promise promise, Pointer userData) {
+        listener.onChange(promise);
+      }
+    })));
   }
 
-  protected static Initializer initializer(final Pointer ptr)
-  {
+  protected static Initializer initializer(final Pointer ptr) {
     return new Initializer(ptr, false, true);
   }
 
-  public PromiseResult waitResult()
-  {
+  /**
+   * Wait for the promise to move out of the PENDING {@link PromiseResult} state.
+   * If the promise is not in PENDING then it will immediately return.
+   *
+   * @return the {@link PromiseResult} of the promise.
+   */
+  public PromiseResult waitResult() {
     return GSTPROMISE_API.gst_promise_wait(this);
   }
 
-  public void reply(final Structure s)
-  {
-    GSTPROMISE_API.gst_promise_reply(this, s);
+  /**
+   * Set a reply on the promise. 
+   *
+   * Will wake up any waiters on the promise with the REPLIED {@link PromiseResult} state. 
+   * If the promise has already been interrupted than the replied will not be visible to any waiters
+   *
+   * @param structure the {@link Structure} to reply the promise with
+   */
+  public void reply(final Structure structure) {
+    GSTPROMISE_API.gst_promise_reply(this, structure);
   }
 
-  public void interrupt()
-  {
+  /**
+   * Interrupt waiting for the result of the prommise. 
+   *
+   * Any waiters on the promise will receive the INTERRUPTED {@link PromiseResult} state.
+   */
+  public void interrupt() {
     GSTPROMISE_API.gst_promise_interrupt(this);
   }
 
-  public void expire()
-  {
+  /**
+   * Expire a promise.
+   *
+   * Any waiters on the promise will recieved the EXPIRED {@link PromiseResult} state.
+   */
+  public void expire() {
     GSTPROMISE_API.gst_promise_expire(this);
   }
 
-  public Structure getReply()
-  {
+  /**
+   * Retrieve the reply set on the promise.
+   *
+   * The state of the promise must be in the REPLIED {@link PromiseResult} state.
+   * The return structure is owned by the promise and thus cannot be modified.
+   *
+   * @return the {@link Structure} set on the promise reply.
+   */
+  public Structure getReply() {
     return GSTPROMISE_API.gst_promise_get_reply(this);
   }
-
 }
