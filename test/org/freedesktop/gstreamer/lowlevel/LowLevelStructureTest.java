@@ -185,7 +185,8 @@ public class LowLevelStructureTest {
 
         structs.add(GstQueryAPI.QueryStruct.class);
 
-
+        structs.add(GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct.class);
+        structs.add(GstSDPMessageAPI.SDPMessageStruct.class);
 
     }
 }
