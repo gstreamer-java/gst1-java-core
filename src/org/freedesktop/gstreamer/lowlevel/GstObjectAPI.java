@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Callback;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
@@ -27,12 +28,17 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 import java.util.List;
+import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.elements.BaseSrc;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 /**
- * GstObject functions
+ * GstObject method and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstobject.h?h=1.8
  */
 public interface GstObjectAPI extends com.sun.jna.Library {
-	GstObjectAPI GSTOBJECT_API = GstNative.load(GstObjectAPI.class);
+    
+    GstObjectAPI GSTOBJECT_API = GstNative.load(GstObjectAPI.class);
 
     GType gst_object_get_type();
     void gst_object_ref(GstObject ptr);
@@ -53,47 +59,71 @@ public interface GstObjectAPI extends com.sun.jna.Library {
     Pointer gst_implements_interface_cast(GstObject obj, NativeLong gtype);    
     boolean gst_implements_interface_check(GstObject from, NativeLong type);
     
+    /**
+    * GstObject:
+    * @lock: object LOCK
+    * @name: The name of the object
+    * @parent: this object's parent, weak ref
+    * @flags: flags for this object
+    *
+    * GStreamer base object class.
+    */
     public static final class GstObjectStruct extends com.sun.jna.Structure {        
         public GObjectAPI.GObjectStruct object;
-        public volatile int refcount;
-        public volatile Pointer lock;
-        public volatile String name;
-        public volatile String name_prefix;
-        public volatile Pointer parent;
+        
+        /*< public >*/ /* with LOCK */        
+        public volatile Pointer /* GMutex */ lock;  /* object LOCK */
+        public volatile String name;                /* object name */
+        public volatile Pointer /* GstObject */ parent; /* this object's parent, weak ref */
         public volatile int flags;
+        
+        /*< private >*/
+        public volatile GList control_bindings;
+        public volatile long control_rate;
+        public volatile long last_sync;
+        
         public volatile Pointer _gst_reserved;
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "object", "refcount", "lock",
-                "name", "name_prefix", "parent",
-                "flags", "_gst_reserved"
+                "object",
+                "lock", "name", "parent", "flags",
+                "control_bindings", "control_rate", "last_sync",
+                "_gst_reserved"
             });
         }
     }
     
+    // -------------- Callbacks -----------------
+    public static interface DeepNotify extends Callback {
+        public void callback(GstObject object, GstObject orig, GObjectAPI.GParamSpec pspec);
+    }
+    
+    /**
+    * GstObjectClass:
+    * @parent_class: parent
+    * @path_string_separator: separator used by gst_object_get_path_string()
+    * @deep_notify: default signal handler
+    *
+    * GStreamer base object class.
+    */
     public static final class GstObjectClass extends com.sun.jna.Structure {
         public GObjectAPI.GObjectClass parent_class;
-        public volatile Pointer path_string_separator;
-        public volatile Pointer signal_object;
-        public volatile Pointer lock;
-        // These are really Callbacks, but we don't need them yet
-        public volatile Pointer parent_set;
-        public volatile Pointer parent_unset;
-        public volatile Pointer object_saved;
-        public volatile Pointer deep_notify;
-        public volatile Pointer save_thyself;
-        public volatile Pointer restore_thyself;
+        
+        public volatile String path_string_separator;
+        
+        /* signals */
+        public DeepNotify deep_notify;
+        
         public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_class", "path_string_separator",
-                "signal_object", "lock", "parent_set",
-                "parent_unset", "object_saved", "deep_notify",
-                "save_thyself", "restore_thyself", "_gst_reserved"
+                "deep_notify", 
+                "_gst_reserved"
             });
         }
     }

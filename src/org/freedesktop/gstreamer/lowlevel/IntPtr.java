@@ -17,13 +17,13 @@
  */
 package org.freedesktop.gstreamer.lowlevel;
 
-import com.sun.jna.Pointer;
+import com.sun.jna.Native;
 
 @SuppressWarnings("serial")
 public class IntPtr extends Number {
     public final Number value;
     public IntPtr(int value) {
-        this.value = Pointer.SIZE == 8 ? new Long(value) : new Integer(value);
+        this.value = Native.POINTER_SIZE == 8 ? new Long(value) : new Integer(value);
     }
     
     public String toString() {        

@@ -265,7 +265,7 @@ public class TagList extends MiniObject {
                     if (value[0] == null) {
                         return null;
                     }
-                    String ret = value[0].getString(0, false);
+                    String ret = value[0].getString(0);
                     GLIB_API.g_free(value[0]);
                     return ret;
                 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2017 Neil C Smith
+ * Copyright (c) 2018 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -54,10 +54,13 @@ import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
+import java.util.logging.Level;
+import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -84,18 +87,18 @@ public final class Gst {
             // Allocate some native memory to pass the args down to the native layer
             //
             argsCopy = new Memory[args.length + 2];
-            argvMemory = new Memory(argsCopy.length * Pointer.SIZE);
+            argvMemory = new Memory(argsCopy.length * Native.POINTER_SIZE);
             
             //
             // Insert the program name as argv[0]
             //
             Memory arg = new Memory(progname.getBytes().length + 4);
-            arg.setString(0, progname, false);
+            arg.setString(0, progname);
             argsCopy[0] = arg;
             
             for (int i = 0; i < args.length; i++) {
                 arg = new Memory(args[i].getBytes().length + 1);
-                arg.setString(0, args[i], false);
+                arg.setString(0, args[i]);
                 argsCopy[i + 1] = arg;
             }
             argvMemory.write(0, argsCopy, 0, argsCopy.length);
@@ -109,9 +112,9 @@ public final class Gst {
             List<String> args = new ArrayList<String>();
             Pointer argv = argvRef.getValue();
             for (int i = 1; i < argcRef.getValue(); i++) {
-                Pointer arg = argv.getPointer(i * Pointer.SIZE);
+                Pointer arg = argv.getPointer(i * Native.POINTER_SIZE);
                 if (arg != null) {
-                    args.add(arg.getString(0, false));
+                    args.add(arg.getString(0));
                 }
             }
             return args.toArray(new String[args.size()]);
@@ -199,6 +202,154 @@ public final class Gst {
     public static void quit() {
         quit.countDown();
     }
+    
+    
+    /**
+     * Create a new pipeline based on command line syntax.
+     * 
+     * Please note that you might get a return value that is not NULL even 
+     * though the error is set. 
+     * In this case there was a recoverable parsing error and you can try 
+     * to play the pipeline.
+     * 
+     * @param pipelineDescription  the command line describing the pipeline
+     * @param errors a list that any errors will be added to
+     * @return a new element on success. 
+     *         If more than one top-level element is specified by 
+     *         the pipeline_description , all elements are put into a Pipeline, 
+     *         which then is returned.
+     * @throws GstException if the pipeline / element could not be created
+     */
+    public static Element parseLaunch(String pipelineDescription, List<GError> errors) {
+        Pointer[] err = { null };
+        Element pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
+        if (pipeline == null) {
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+        
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+
+        return pipeline;
+    }
+    
+    /**
+     * Create a new pipeline based on command line syntax.
+     * 
+     * Please note that you might get a return value that is not NULL even 
+     * though the error is set. 
+     * In this case there was a recoverable parsing error and you can try 
+     * to play the pipeline.
+     * 
+     * @param pipelineDescription  the command line describing the pipeline
+     * @return a new element on success. 
+     *         If more than one top-level element is specified by 
+     *         the pipeline_description , all elements are put into a Pipeline, 
+     *         which then is returned.
+     * @throws GstException if the pipeline / element could not be created
+     */
+    public static Element parseLaunch(String pipelineDescription) {
+        return parseLaunch(pipelineDescription, null);
+    }
+    
+    /**
+     * Create a new element based on command line syntax. 
+     * 
+     * error will contain an error message if an erroneous pipeline is specified. 
+     * An error does not mean that the pipeline could not be constructed.
+     * 
+     * @param pipelineDescription An array of strings containing the command line describing the pipeline.
+     * @param errors a list that any errors will be added to
+     * @return a new element on success. 
+     * @throws GstException if the pipeline / element could not be created
+     */
+    public static Element parseLaunch(String[] pipelineDescription, List<GError> errors) {
+        Pointer[] err = { null };
+        Element pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDescription, err);
+        if (pipeline == null) {
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+        
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+
+        return pipeline;
+    }
+    
+    /**
+     * Create a new element based on command line syntax. 
+     * 
+     * error will contain an error message if an erroneous pipeline is specified. 
+     * An error does not mean that the pipeline could not be constructed.
+     * 
+     * @param pipelineDescription An array of strings containing the command line describing the pipeline.
+     * @return a new element on success. 
+     * @throws GstException if the pipeline / element could not be created
+     */
+    public static Element parseLaunch(String[] pipelineDescription) {
+        return parseLaunch(pipelineDescription, null);
+    }
+    
+    /**
+    * Creates a bin from a text bin description. 
+    * 
+    * This function allows creation of a bin based on the syntax used in the
+    * gst-launch utillity.
+    * 
+    * @param binDescription the command line describing the bin
+    * @param ghostUnlinkedPads whether to create ghost pads for the bin from any unlinked pads
+    * @param errors list that any errors will be added to
+    * @return The new Bin.
+    * @throws GstException if the bin could not be created
+    */
+   public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads, List<GError> errors) {
+        
+        Pointer[] err = { null };
+        Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
+
+        if (bin == null) {       
+            throw new GstException(new GError(new GErrorStruct(err[0])));
+        }
+
+        // check for error
+        if (err[0] != null) { 
+            if (errors != null) {
+                errors.add(new GError(new GErrorStruct(err[0])));
+            } else {
+                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+            }
+        }
+        
+        return bin;
+   }
+   
+   /**
+    * Creates a bin from a text bin description. 
+    * 
+    * This function allows creation of a bin based on the syntax used in the
+    * gst-launch utillity.
+    * 
+    * @param binDescription the command line describing the bin
+    * @param ghostUnlinkedPads whether to create ghost pads for the bin from any unlinked pads
+    * @return The new Bin.
+    * @throws GstException if the bin could not be created
+    */
+   public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads) {
+       return parseBinFromDescription(binDescription, ghostUnlinkedPads, null);
+   }
+    
     
     /**
      * Waits for the gstreamer system to shutdown via a call to {@link #quit}.

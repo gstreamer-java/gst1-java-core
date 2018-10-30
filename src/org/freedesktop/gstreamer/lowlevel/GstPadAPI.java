@@ -159,6 +159,8 @@ public interface GstPadAPI extends com.sun.jna.Library {
     
     Event gst_pad_probe_info_get_event(GstPadProbeInfo probeInfo);
 
+    Buffer gst_pad_probe_info_get_buffer(GstPadProbeInfo probeInfo);
+
 //    NativeLong /* gulong */ gst_pad_add_data_probe(Pad pad, PadDataProbe handler, Pointer data);
 //
 //    void gst_pad_remove_data_probe(Pad pad, NativeLong handler_id);

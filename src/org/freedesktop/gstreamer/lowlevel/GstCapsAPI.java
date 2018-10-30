@@ -27,9 +27,6 @@ import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 import com.sun.jna.Pointer;
-import com.sun.jna.PointerType;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * GstCaps functions

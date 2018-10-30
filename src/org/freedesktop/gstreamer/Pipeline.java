@@ -1,8 +1,8 @@
 /* 
- * Copyright (c) 2015 Neil C Smith
- * Copyright (c) 2007,2008 Wayne Meissner
- * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
- *                    2004,2005 Wim Taymans <wim@fluendo.com>
+ * Copyright (c) 2018 Neil C Smith
+ * Copyright (c) 2008 Wayne Meissner
+ * Copyright (C) 2000 Erik Walthinsen <omega@cse.ogi.edu>
+ *               2005 Wim Taymans <wim@fluendo.com>
  * 
  * This file is part of gstreamer-java.
  *
@@ -23,6 +23,8 @@ package org.freedesktop.gstreamer;
 import java.util.concurrent.TimeUnit;
 
 import com.sun.jna.Pointer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
@@ -89,6 +91,8 @@ public class Pipeline extends Bin {
     public static final String GST_NAME = "pipeline";
     public static final String GTYPE_NAME = "GstPipeline";
 
+    private static Logger logger = Logger.getLogger(Pipeline.class.getName());
+        
     public Pipeline(Initializer init) { 
         super(init);
     }
@@ -117,39 +121,56 @@ public class Pipeline extends Bin {
 	}
     
     /**
-     * Creates a pipeline from a text pipeline description.
+     * Create a new pipeline based on command line syntax.
      * 
-     * This function allows creation of a pipeline based on the syntax used in the
-     * gst-launch utillity.
+     * Please note that you might get a return value that is not NULL even 
+     * though the error is set. 
+     * In this case there was a recoverable parsing error and you can try 
+     * to play the pipeline.
      * 
      * @param pipelineDecription  the command line describing the pipeline
      * @return The new Pipeline.
      */
+    @Deprecated
     public static Pipeline launch(String pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
+        Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launch(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
+        
+        // check for error
+        if (err[0] != null) { 
+            logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+        }
+
         pipeline.initBus();
         return pipeline;
     }
     
     /**
-     * Creates a pipeline from a text pipeline description.
+     * Create a new element based on command line syntax.
      * 
-     * This function allows creation of a pipeline based on the syntax used in the
-     * gst-launch utillity.
+     * error will contain an error message if an erroneous pipeline is specified. 
+     * An error does not mean that the pipeline could not be constructed.
      * 
      * @param pipelineDecription An array of strings containing the command line describing the pipeline.
      * @return The new Pipeline.
      */
+    @Deprecated
     public static Pipeline launch(String... pipelineDecription) {
         Pointer[] err = { null };
-        Pipeline pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);
+        Pipeline pipeline = (Pipeline) GSTPARSE_API.gst_parse_launchv(pipelineDecription, err);
         if (pipeline == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
+        
+        // check for error
+        if (err[0] != null) {
+            // log error!            
+            logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+        }
+
         pipeline.initBus();
         return pipeline;
     }

@@ -48,10 +48,11 @@ import com.sun.jna.Pointer;
 
 /**
  * GstElement methods and structures
- * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstelement.h?h=1.8
  */
 
 public interface GstElementAPI extends com.sun.jna.Library {
+    
     GstElementAPI GSTELEMENT_API = GstNative.load(GstElementAPI.class);
 
     GType gst_element_get_type();
@@ -100,48 +101,73 @@ public interface GstElementAPI extends com.sun.jna.Library {
     void gst_element_set_start_time(Element element, ClockTime time);
     ClockTime gst_element_get_start_time(Element element);
     
-    public static final class GstElementDetails extends com.sun.jna.Structure {
-         /*< public > */
-        public volatile String longname;
-        public volatile String klass;
-        public volatile String description;
-        public volatile String author;
-        /*< private > */
-        public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING];        
-
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{
-                "longname", "klass", "description",
-                "author", "_gst_reserved"
-            });
-        }
-    }
-    
+    /**
+    * GstElement:
+    * @state_lock: Used to serialize execution of gst_element_set_state()
+    * @state_cond: Used to signal completion of a state change
+    * @state_cookie: Used to detect concurrent execution of
+    * gst_element_set_state() and gst_element_get_state()
+    * @target_state: the target state of an element as set by the application
+    * @current_state: the current state of an element
+    * @next_state: the next state of an element, can be #GST_STATE_VOID_PENDING if
+    * the element is in the correct state.
+    * @pending_state: the final state the element should go to, can be
+    * #GST_STATE_VOID_PENDING if the element is in the correct state
+    * @last_return: the last return value of an element state change
+    * @bus: the bus of the element. This bus is provided to the element by the
+    * parent element or the application. A #GstPipeline has a bus of its own.
+    * @clock: the clock of the element. This clock is usually provided to the
+    * element by the toplevel #GstPipeline.
+    * @base_time: the time of the clock right before the element is set to
+    * PLAYING. Subtracting @base_time from the current clock time in the PLAYING
+    * state will yield the running_time against the clock.
+    * @start_time: the running_time of the last PAUSED state
+    * @numpads: number of pads of the element, includes both source and sink pads.
+    * @pads: (element-type Gst.Pad): list of pads
+    * @numsrcpads: number of source pads of the element.
+    * @srcpads: (element-type Gst.Pad): list of source pads
+    * @numsinkpads: number of sink pads of the element.
+    * @sinkpads: (element-type Gst.Pad): list of sink pads
+    * @pads_cookie: updated whenever the a pad is added or removed
+    *
+    * GStreamer element abstract base class.
+    */
     public static final class GstElementStruct extends com.sun.jna.Structure {
         public GstObjectStruct object;
-        public volatile Pointer state_lock;
-        public volatile Pointer state_cond;
+        
+        /*< public >*/ /* with LOCK */
+        public volatile Pointer /* GRecMutex */ state_lock;
+        
+        /* element state */
+        public volatile Pointer /* GCond */ state_cond;
         public volatile int state_cookie;
         public volatile State target_state;
         public volatile State current_state;
         public volatile State next_state; 
         public volatile State pending_state;         
         public volatile StateChangeReturn last_return;
-        public volatile Pointer bus;
-        public volatile Pointer clock;
+        
+        public volatile Pointer /* GstBus */ bus;
+        
+        /* allocated clock */
+        public volatile Pointer /* GstClock */ clock;
         public volatile long base_time;
         public volatile long start_time;
-        public volatile short numpads;
-        public volatile Pointer pads;
-        public volatile short numsrcpads;
-        public volatile Pointer srcpads;
-        public volatile short numsinkpads;
-        public volatile Pointer sinkpads;
-        public volatile int pads_cookie;
-        public volatile Pointer contexts;
         
-        // Use an array of byte as arrays of Pointer don't work
+        /* element pads, these lists can only be iterated while holding
+        * the LOCK or checking the cookie after each LOCK. */
+        public volatile short numpads;
+        public volatile Pointer /* GList */pads;
+        public volatile short numsrcpads;
+        public volatile Pointer /* GList */ srcpads;
+        public volatile short numsinkpads;
+        public volatile Pointer /* GList */sinkpads;
+        public volatile int pads_cookie;
+        
+        /* with object LOCK */
+        public volatile Pointer /* GList */contexts;
+        
+        /*< private >*/
         public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING-1];
 
         public GstElementStruct(Pointer handle) {
@@ -162,22 +188,56 @@ public interface GstElementAPI extends com.sun.jna.Library {
         }
     }
     
+    
     /**
-     * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstelement.h
-     */
+    * GstElementClass:
+    * @parent_class: the parent class structure
+    * @metadata: metadata for elements of this class
+    * @elementfactory: the #GstElementFactory that creates these elements
+    * @padtemplates: a #GList of #GstPadTemplate
+    * @numpadtemplates: the number of padtemplates
+    * @pad_templ_cookie: changed whenever the padtemplates change
+    * @request_new_pad: called when a new pad is requested
+    * @release_pad: called when a request pad is to be released
+    * @get_state: get the state of the element
+    * @set_state: set a new state on the element
+    * @change_state: called by @set_state to perform an incremental state change
+    * @set_bus: set a #GstBus on the element
+    * @provide_clock: gets the #GstClock provided by the element
+    * @set_clock: set the #GstClock on the element
+    * @send_event: send a #GstEvent to the element
+    * @query: perform a #GstQuery on the element
+    * @state_changed: called immediately after a new state was set.
+    * @post_message: called when a message is posted on the element. Chain up to
+    *                the parent class' handler to have it posted on the bus.
+    * @set_context: set a #GstContext on the element
+    *
+    * GStreamer element class. Override the vmethods to implement the element
+    * functionality.
+    */
     public static final class GstElementClass extends com.sun.jna.Structure {
         //
         // Callbacks for this class
         //
+        public static interface PadAdded extends GstCallback {
+            public void callback(Element element, Pad pad);
+        }
+        public static interface PadRemoved extends GstCallback {
+            public void callback(Element element, Pad pad);
+        }
+        public static interface NoMorePads extends GstCallback {
+            public void callback(Element element);
+        }
         public static interface RequestNewPad extends GstCallback {
-            public Pad callback(Element element, /* PadTemplate */ Pointer templ, String name);
+            public Pad callback(Element element, /* PadTemplate */ Pointer templ, 
+                    String name, Caps caps);
         }
         public static interface ReleasePad extends GstCallback {
             public void callback(Element element, Pad pad);
         }
         public static interface GetState extends GstCallback {
-            public StateChangeReturn callback(Element element, Pointer p_state,
-                    Pointer p_pending, long timeout);
+            public StateChangeReturn callback(Element element, Pointer /* GstState */ state,
+                    Pointer /* GstState */ pending, long timeout);
         }
         public static interface SetState extends GstCallback {
             public StateChangeReturn callback(Element element, State state);
@@ -188,8 +248,23 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public static interface StateChanged extends GstCallback {
             public StateChangeReturn callback(Element element, State oldState, State newState, State pending);
         }
+        public static interface SetBus extends GstCallback {
+            public void callback(Element element, Bus bus);
+        }
+        public static interface ProvideClock extends GstCallback {
+            public void callback(Element element);
+        }
+        public static interface SetClock extends GstCallback {
+            public void callback(Element element, Clock clock);
+        }
+        public static interface SendEvent extends GstCallback {
+            boolean callback(Element element, Event event);
+        }
         public static interface QueryNotify extends GstCallback {
             boolean callback(Element element, Query query);
+        }
+        public static interface PostMessage extends GstCallback {
+            boolean callback(Element element, Message message);
         }
 
 
@@ -197,37 +272,46 @@ public interface GstElementAPI extends com.sun.jna.Library {
         // Actual data members
         //
         public GstObjectClass parent_class;
+        
+        /*< public >*/
         /* the element metadata */
         public volatile Pointer metadata;
+        
         /* factory that the element was created from */
         public volatile ElementFactory elementfactory;
+        
         /* templates for our pads */
-        public volatile Pointer padtemplates;
+        public volatile Pointer /* GList */ padtemplates;
         public volatile int numpadtemplates;
         public volatile int pad_templ_cookie;
+        
         /*< private >*/
         /* signal callbacks */
-        public volatile Pointer pad_added;
-        public volatile Pointer pad_removed;
-        public volatile Pointer no_more_pads;
+        public PadAdded pad_added;
+        public PadRemoved pad_removed;
+        public NoMorePads no_more_pads;
+        
         /* request/release pads */
         public RequestNewPad request_new_pad;
         public ReleasePad release_pad;
+        
         /* state changes */
         public GetState get_state;
         public SetState set_state;
         public ChangeState change_state;
         public StateChanged state_changed;
+        
         /* bus */
-        public volatile Pointer set_bus;
+        public volatile SetBus set_bus;
+        
         /* set/get clocks */
-        public volatile Pointer provide_clock;
-        public volatile Pointer set_clock;
+        public volatile ProvideClock provide_clock;
+        public volatile SetClock set_clock;
 
         /* query functions */
-        public volatile Pointer send_event;
+        public volatile SendEvent send_event;
         public volatile QueryNotify query;
-        public volatile Pointer post_message;
+        public volatile PostMessage post_message;
 
         public volatile Pointer set_context;
 

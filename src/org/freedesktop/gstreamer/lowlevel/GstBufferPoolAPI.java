@@ -24,15 +24,24 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
 
+/**
+ * GstBufferPool methods and structures
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstbufferpool.h?h=1.8
+ */
 public interface GstBufferPoolAPI extends com.sun.jna.Library {
-	GstBufferPoolAPI GSTBUFFERPOOL_API = GstNative.load(GstBufferPoolAPI.class);
+    GstBufferPoolAPI GSTBUFFERPOOL_API = GstNative.load(GstBufferPoolAPI.class);
 
-	GType gst_buffer_pool_get_type();
+    GType gst_buffer_pool_get_type();
 
-    @CallerOwnsReturn BufferPool gst_buffer_pool_new();
+    /* allocation */
+    @CallerOwnsReturn BufferPool gst_buffer_pool_new();    
     Pointer ptr_gst_buffer_pool_new();
+    
+    /* state management */
     Structure gst_buffer_pool_get_config(BufferPool pool);
+    
+    /* helpers for configuring the config structure */
     boolean gst_buffer_pool_config_get_params(Structure config, /* Caps ** */ Pointer[] caps, /* guint * */ int[] size, /* guint * */ int[] min_buffers, /* guint * */ int[] max_buffers);
     void gst_buffer_pool_config_set_params(Structure config, Caps caps, int size, int min_buffers, int max_buffers);
-
+    
 }
