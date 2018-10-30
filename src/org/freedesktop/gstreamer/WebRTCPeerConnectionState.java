@@ -16,32 +16,25 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
- * The possible results for {@link SDPMessage} functions
+ * The state of a WebRTC peer connection
+ * Available since GStreamer 1.14
  */
-public enum SDPResult implements IntegerEnum {
-    /** A successful return value*/
-    OK(0),
-    /** A function to SDPMessage was given invalid paramters */
-    EINVAL(-1),
-    /** An unknown result */
-    @DefaultEnumValue
-    __UNKNWOND_NATIVE_VALUE(~0);
-
-    SDPResult(int value) {
-        this.value = value;
-    }
-
-    /**
-     * Gets the integer value of the enum
-     * @return the integer value for this enum.
-     */
-    public int intValue() {
-        return value;
-    }
-
-    private int value;
+public enum WebRTCPeerConnectionState {
+    /** New WebRTC connection */
+    NEW,
+    /** A WebRTC connection is being made */
+    CONNECTING,
+    /** A WebRTC connection has been made */
+    CONNECTED,
+    /** A WebRTC connection has been disconnected */
+    DISCONNECTED,
+    /** Attempt to make a WebRTC connection failed */
+    FAILED,
+    /** A WebRTC connection has been closed */
+    CLOSED,
+    /** Unknown result */
+    @DefaultEnumValue UNKNOWN;
 }

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2009 Levente Farkas Copyright (c) 2007, 2008 Wayne Meissner
+ * Copyright (c) 2018 Vinicius Tona
+ * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
  *
@@ -33,7 +34,6 @@ import com.sun.jna.Pointer;
  * @see https://github.com/GStreamer/gst-plugins-bad/blob/master/gst-libs/gst/webrtc/rtcsessiondescription.h
  * Available since GStreamer 1.14
  */
-
 public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
   GstWebRTCSessionDescriptionAPI GSTWEBRTCSESSIONDESCRIPTION_API =
       GstNative.load("gstwebrtc", GstWebRTCSessionDescriptionAPI.class);
@@ -53,6 +53,7 @@ public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
   }
 
   GType gst_webrtc_session_description_get_type();
+
   @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_new(WebRTCSDPType type, SDPMessage sdp);
   @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_new(WebRTCSDPType type, SDPMessage sdp);
 
