@@ -32,6 +32,7 @@ import com.sun.jna.Pointer;
  * GstPromise methods and structures
  * 
  * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstpromise.h
+ * available since GStreamer 1.14
  */
 
 public interface GstPromiseAPI extends com.sun.jna.Library

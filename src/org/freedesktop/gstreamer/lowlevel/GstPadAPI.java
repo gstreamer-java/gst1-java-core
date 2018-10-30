@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
@@ -99,6 +100,7 @@ public interface GstPadAPI extends com.sun.jna.Library {
     boolean gst_pad_activate_push(Pad pad, boolean active);
     boolean gst_pad_is_blocked(Pad pad);
     boolean gst_pad_is_blocking(Pad pad);
+    boolean gst_pad_has_current_caps(Pad pad);
     /* get_pad_template returns a non-refcounted PadTemplate */
     PadTemplate gst_pad_get_pad_template(Pad pad);
     
