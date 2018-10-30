@@ -612,4 +612,13 @@ public class Pad extends GstObject {
     public FlowReturn pullRange(long offset, int size, Buffer[] buffer) {
     	return GSTPAD_API.gst_pad_pull_range(this, offset, size, buffer);
     }
+
+    /**
+     * Check if the pad has caps set on it with a GST_EVENT_CAPS events
+     *
+     * @return true if the pad has caps set
+     */
+    public boolean hasCurrentCaps() {
+        return GSTPAD_API.gst_pad_has_current_caps(this);
+    }
 }
