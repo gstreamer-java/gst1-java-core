@@ -471,8 +471,8 @@ public final class Gst {
                     Promise.class,
                     Query.class,
                     Registry.class,
-                    Sample.class,
                     SDPMessage.class,
+                    Sample.class,
                     WebRTCSessionDescription.class,
                     // ----------- Elements -------------
                     AppSink.class,
