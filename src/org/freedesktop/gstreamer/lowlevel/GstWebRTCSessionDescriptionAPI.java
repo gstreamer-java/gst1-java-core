@@ -52,8 +52,8 @@ public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
   }
 
   GType gst_webrtc_session_description_get_type();
-  @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_new(WebRTCSDPType type, Pointer sdp);
-  @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_new(WebRTCSDPType type, Pointer sdp);
+  @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_new(WebRTCSDPType type, SDPMessage sdp);
+  @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_new(WebRTCSDPType type, SDPMessage sdp);
 
   @CallerOwnsReturn WebRTCSessionDescription gst_webrtc_session_description_copy(WebRTCSessionDescription src);
   @CallerOwnsReturn Pointer ptr_gst_webrtc_session_description_copy(WebRTCSessionDescription src);

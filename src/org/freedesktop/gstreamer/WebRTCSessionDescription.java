@@ -24,6 +24,10 @@ public class WebRTCSessionDescription extends NativeObject {
     sessionDescriptionStruct = new GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct(handle());
   }
 
+  public WebRTCSessionDescription(WebRTCSDPType type, SDPMessage sdpMessage) {
+    this(initializer(GSTWEBRTCSESSIONDESCRIPTION_API.ptr_gst_webrtc_session_description_new(type, sdpMessage)));
+  }
+
   @Override
   protected void disposeNativeHandle(Pointer ptr) {
     GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
