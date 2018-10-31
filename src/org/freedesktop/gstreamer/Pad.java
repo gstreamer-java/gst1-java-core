@@ -1,10 +1,11 @@
 /* 
+ * Copyright (C) 2018 Antonio Morales
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under 

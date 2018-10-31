@@ -32,6 +32,7 @@ import com.sun.jna.Pointer;
  * GstWebRTCSessionDescription methods and structures
  * 
  * @see https://github.com/GStreamer/gst-plugins-bad/blob/master/gst-libs/gst/webrtc/rtcsessiondescription.h
+ * Available since GStreamer 1.14
  */
 public interface GstWebRTCSessionDescriptionAPI extends com.sun.jna.Library {
   GstWebRTCSessionDescriptionAPI GSTWEBRTCSESSIONDESCRIPTION_API =

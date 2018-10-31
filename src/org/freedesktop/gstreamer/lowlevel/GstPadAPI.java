@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner

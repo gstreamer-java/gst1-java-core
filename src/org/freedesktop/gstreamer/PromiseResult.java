@@ -20,6 +20,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
  * The result of a {@link Promise}
+ * Available since GStreamer 1.14
  */
 public enum PromiseResult {
     /** The initial state of a promise */

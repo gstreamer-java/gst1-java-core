@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007 Wayne Meissner
+ * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
  *
@@ -23,6 +23,7 @@ import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
  * The type of a {@link WebRTCSessionDescription}
  *
  * @see https://w3c.github.io/webrtc-pc/#rtcsdptype
+ * Available since GStreamer 1.12
  */
 public enum WebRTCSDPType implements IntegerEnum {
     OFFER(1),
