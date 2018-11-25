@@ -36,14 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.elements.AppSrc;
-import org.freedesktop.gstreamer.elements.BaseSink;
-import org.freedesktop.gstreamer.elements.BaseSrc;
-import org.freedesktop.gstreamer.elements.BaseTransform;
-import org.freedesktop.gstreamer.elements.DecodeBin;
-import org.freedesktop.gstreamer.elements.PlayBin;
-import org.freedesktop.gstreamer.elements.URIDecodeBin;
+import org.freedesktop.gstreamer.elements.*;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
@@ -630,8 +623,22 @@ public final class Gst {
                     BaseTransform.class,
                     Bin.class,
                     DecodeBin.class,
+                    FakeSink.class,
+                    FakeSrc.class,
+                    FileSink.class,
+                    FileSrc.class,
+                    Identity.class,
+                    InputSelector.class,
+                    MultiFdSink.class,
+                    MultiQueue.class,
                     Pipeline.class,
                     PlayBin.class,
+                    Queue.class,
+                    ShmSink.class,
+                    ShmSrc.class,
+                    TCPServerSink.class,
+                    Tee.class,
+                    TypeFind.class,
                     URIDecodeBin.class
             );
 }
