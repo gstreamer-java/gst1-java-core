@@ -45,6 +45,7 @@ import org.freedesktop.gstreamer.elements.BaseTransform;
 import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
+import org.freedesktop.gstreamer.elements.WebRTCBin;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
@@ -636,6 +637,7 @@ public final class Gst {
                     DecodeBin.class,
                     Pipeline.class,
                     PlayBin.class,
-                    URIDecodeBin.class
+                    URIDecodeBin.class,
+                    WebRTCBin.class
             );
 }
