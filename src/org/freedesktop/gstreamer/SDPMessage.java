@@ -62,9 +62,11 @@ public class SDPMessage extends NativeObject {
      * @param sdpString the sdp string
      */
     public void parseBuffer(String sdpString) {
-        byte[] data = sdpString.getBytes(StandardCharsets.US_ASCII);
-        int length = sdpString.length();
-        GSTSDPMESSAGE_API.gst_sdp_message_parse_buffer(data, length, this);
+        if (sdpString != null && sdpString.length() != 0) {
+            byte[] data = sdpString.getBytes(StandardCharsets.US_ASCII);
+            int length = sdpString.length();
+            GSTSDPMESSAGE_API.gst_sdp_message_parse_buffer(data, length, this);
+        }
     }
 
     protected static Initializer initializer(final Pointer ptr) {
@@ -77,7 +79,6 @@ public class SDPMessage extends NativeObject {
         return initializer(ptr[0], false, true);
     }
 
-    @Override
     protected void disposeNativeHandle(Pointer ptr) {
         GSTSDPMESSAGE_API.gst_sdp_message_free(ptr);
     }
