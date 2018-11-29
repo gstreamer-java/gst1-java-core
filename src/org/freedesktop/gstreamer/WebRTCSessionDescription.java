@@ -15,7 +15,7 @@ public class WebRTCSessionDescription extends NativeObject {
   protected GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct sessionDescriptionStruct;
 
   /**
-   * Internally used constructor.  Do not use.
+   * Internally used constructor. Do not use.
    * 
    * @param init internal initialization data.
    */
@@ -28,7 +28,6 @@ public class WebRTCSessionDescription extends NativeObject {
     this(initializer(GSTWEBRTCSESSIONDESCRIPTION_API.ptr_gst_webrtc_session_description_new(type, sdpMessage)));
   }
 
-  @Override
   protected void disposeNativeHandle(Pointer ptr) {
     GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
   }
