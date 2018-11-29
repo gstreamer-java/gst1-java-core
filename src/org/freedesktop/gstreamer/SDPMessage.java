@@ -67,14 +67,24 @@ public class SDPMessage extends NativeObject {
         GSTSDPMESSAGE_API.gst_sdp_message_parse_buffer(data, length, this);
     }
 
-    protected static Initializer initializer(final Pointer ptr) {
-        return new Initializer(ptr, false, true);
+    /**
+     * Creates a copy of this SDPMessage.
+     *
+     * @return a copy of SDPMessage.
+     */
+    public SDPMessage copy(boolean shouldInvalidateOriginal) {
+        Pointer[] ptr = new Pointer[1];
+        GSTSDPMESSAGE_API.gst_sdp_message_copy(this, ptr);
+        if (shouldInvalidateOriginal) {
+            this.invalidate();
+        }
+        return new SDPMessage(initializer(ptr[0]));
     }
 
     private static Initializer initializer() {
         Pointer[] ptr = new Pointer[1];
         GSTSDPMESSAGE_API.gst_sdp_message_new(ptr);
-        return initializer(ptr[0], false, true);
+        return initializer(ptr[0]);
     }
 
     protected void disposeNativeHandle(Pointer ptr) {
