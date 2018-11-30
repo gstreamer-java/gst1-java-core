@@ -114,7 +114,7 @@ public class WebRTCBin extends Bin {
     public void connect(final ON_ICE_CANDIDATE listener) {
         connect(ON_ICE_CANDIDATE.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
-            public void callback(int sdpMLineIndex, String candidate) {
+            public void callback(Element elem, int sdpMLineIndex, String candidate) {
                 listener.onIceCandidate(sdpMLineIndex, candidate);
             }
         });
