@@ -70,13 +70,13 @@ public class SDPMessage extends NativeObject {
     }
 
     protected static Initializer initializer(final Pointer ptr) {
-        return new Initializer(ptr, false, true);
+        return new Initializer(ptr, false, false);
     }
 
     private static Initializer initializer() {
         Pointer[] ptr = new Pointer[1];
         GSTSDPMESSAGE_API.gst_sdp_message_new(ptr);
-        return initializer(ptr[0], false, true);
+        return initializer(ptr[0]);
     }
 
     protected void disposeNativeHandle(Pointer ptr) {

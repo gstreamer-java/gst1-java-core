@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Antoni Morales
+ * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
  *
