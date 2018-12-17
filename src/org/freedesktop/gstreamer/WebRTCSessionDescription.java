@@ -52,13 +52,16 @@ public class WebRTCSessionDescription extends NativeObject {
   }
 
   /**
-   * Get the SDPMessage from the WebRTCSessionDescription.
+   * Gets the SDPMessage from the WebRTCSessionDescription.
    *
    * @return the {@link SDPMessage} for the WebRTCSessionDescription
    */
   public SDPMessage getSDPMessage() {
-    SDPMessage sdp = (SDPMessage)sessionDescriptionStruct.readField("sdp");
-    return sdp;
+    SDPMessage originalSDP = (SDPMessage)sessionDescriptionStruct.readField("sdp");
+    // making a copy of the SDPMessage since the original SDPMessage in the struct belongs to WebRTCSessionDescription.
+    // Once WebRTCSessionDescription is disposed it would also dispose of SDPMessage leading to any objects with a reference
+    // to the original SDPMessage to be invalid and potentially lead to runtime errors.
+    return originalSDP.copy(true);
   }
 
   @Override

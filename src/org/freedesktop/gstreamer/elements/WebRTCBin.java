@@ -180,6 +180,8 @@ public class WebRTCBin extends Bin {
      */
     public void setLocalDescription(WebRTCSessionDescription description) {
         Promise promise = new Promise();
+        // the raw WebRTCBin element gets ownership of the description so it must be disown in order to prevent it from being deallocated
+        description.disown();
         emit("set-local-description", description, promise);
         promise.interrupt();
         promise.dispose();
@@ -193,6 +195,8 @@ public class WebRTCBin extends Bin {
      */
     public void setRemoteDescription(WebRTCSessionDescription description) {
         Promise promise = new Promise();
+        // the raw WebRTCBin element gets ownership of the description so it must be disown in order to prevent it from being deallocated
+        description.disown();
         emit("set-remote-description", description, promise);
         promise.interrupt();
         promise.dispose();
@@ -249,7 +253,9 @@ public class WebRTCBin extends Bin {
      * @return the local {@link WebRTCSessionDescription}
      */
     public WebRTCSessionDescription getLocalDescription() {
-        return (WebRTCSessionDescription)get("local-description");
+        WebRTCSessionDescription description = (WebRTCSessionDescription)get("local-description");
+        description.disown();
+        return description;
     }
 
     /**
@@ -258,6 +264,8 @@ public class WebRTCBin extends Bin {
      * @return the remote {@link WebRTCSessionDescription}
      */
     public WebRTCSessionDescription getRemoteDescription() {
-        return (WebRTCSessionDescription)get("remote-description");
+        WebRTCSessionDescription description = (WebRTCSessionDescription)get("remote-description");
+        description.disown();
+        return description;
     }
 }
