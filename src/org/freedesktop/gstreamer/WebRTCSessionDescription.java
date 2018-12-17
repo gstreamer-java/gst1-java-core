@@ -64,7 +64,6 @@ public class WebRTCSessionDescription extends NativeObject {
     return originalSDP.copy(true);
   }
 
-  @Override
   protected void disposeNativeHandle(Pointer ptr) {
     GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
   }

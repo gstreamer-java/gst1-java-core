@@ -29,7 +29,7 @@ public enum SDPResult implements IntegerEnum {
     EINVAL(-1),
     /** An unknown result */
     @DefaultEnumValue
-    __UNKNWOND_NATIVE_VALUE(~0);
+    __UNKNWON_NATIVE_VALUE(~0);
 
     SDPResult(int value) {
         this.value = value;
