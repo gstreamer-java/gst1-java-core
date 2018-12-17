@@ -57,12 +57,12 @@ public class Promise extends MiniObject {
    * @param listerner Listener to be called whenever the state of a {@link Promise} is changed
    */
   public Promise(final PROMISE_CHANGE listener) {
-    this(initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
+    this(new Initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
       @SuppressWarnings("unused")
       public void callback(Promise promise, Pointer userData) {
         listener.onChange(promise);
       }
-    })));
+    }), false, false));
   }
 
   protected static Initializer initializer(final Pointer ptr) {
@@ -118,6 +118,6 @@ public class Promise extends MiniObject {
    * @return the {@link Structure} set on the promise reply.
    */
   public Structure getReply() {
-    return GSTPROMISE_API.gst_promise_get_reply(this);
+    return Structure.objectFor(GSTPROMISE_API.gst_promise_get_reply(this), false, false);
   }
 }
