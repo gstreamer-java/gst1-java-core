@@ -118,6 +118,6 @@ public class Promise extends MiniObject {
    * @return the {@link Structure} set on the promise reply.
    */
   public Structure getReply() {
-    return Structure.objectFor(GSTPROMISE_API.gst_promise_get_reply(this), false, false);
+    return Structure.objectFor(GSTPROMISE_API.ptr_gst_promise_get_reply(this), false, false);
   }
 }
