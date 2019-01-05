@@ -35,7 +35,8 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import com.sun.jna.Pointer;
 
 /**
- * GstQuery functions
+ * GstQueryAPI functions and structure
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstquery.h?h=1.8
  */
 public interface GstQueryAPI extends com.sun.jna.Library {
     GstQueryAPI GSTQUERY_API = GstNative.load(GstQueryAPI.class);
@@ -106,9 +107,10 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     
     public static final class QueryStruct extends com.sun.jna.Structure {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;
+        
+        /*< public > *//* with COW */
         public volatile int type;
-        public volatile Pointer structure;
-        public volatile Pointer _gst_reserved;
+        
         public QueryStruct(Pointer ptr) {
             useMemory(ptr);
         }
@@ -116,8 +118,7 @@ public interface GstQueryAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", "type", "structure",
-                "_gst_reserved"
+                "mini_object", "type"
             });
         }
     }

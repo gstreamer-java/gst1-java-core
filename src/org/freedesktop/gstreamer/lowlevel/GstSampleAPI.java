@@ -29,20 +29,23 @@ import java.util.Arrays;
 import java.util.List;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 
 /**
- * GstSample functions
+ * GstSampleAPI functions and structure
+ * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstsample.c?h=1.8
  */
 public interface GstSampleAPI extends com.sun.jna.Library {
     GstSampleAPI GSTMESSAGE_API = GstNative.load(GstSampleAPI.class);
 
     public static final class SampleStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
-        public volatile Pointer buffer; // to Buffer
-        public volatile Pointer caps; // to Caps
-        public volatile Pointer segment; // to Segment
-        public volatile Pointer info; // to Strucutre
+        
+        public volatile Pointer /* GstBuffer* */buffer;             // to Buffer
+        public volatile Pointer /* GstCaps* */ caps;                // to Caps
+        public volatile GstSegmentStruct segment;                   // Segment
+        public volatile Pointer /* GstStructure* */ info;           // to Strucutre
+        public volatile Pointer /* GstBufferList* */ buffer_list;   // to buffer_list
         
         /**
          * Creates a new instance of MessageStruct
@@ -56,7 +59,7 @@ public interface GstSampleAPI extends com.sun.jna.Library {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
-                "mini_object", "buffer", "caps", "segment", "info"
+                "mini_object", "buffer", "caps", "segment", "info", "buffer_list"
             });
         }
     }
