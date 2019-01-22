@@ -1,0 +1,7 @@
+dist: xenial
+language: java
+jdk: openjdk8
+addons:
+    apt:
+        packages:
+            - gstreamer1.0-plugins-good
