@@ -1,10 +1,11 @@
 /* 
+ * Copyright (C) 2018 Antonio Morales
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under 
@@ -689,4 +690,13 @@ public class Pad extends GstObject {
         return GSTPAD_API.gst_pad_get_pad_template(this);
     }
 
+
+    /**
+     * Check if the pad has caps set on it with a GST_EVENT_CAPS events
+     *
+     * @return true if the pad has caps set
+     */
+    public boolean hasCurrentCaps() {
+        return GSTPAD_API.gst_pad_has_current_caps(this);
+    }
 }
