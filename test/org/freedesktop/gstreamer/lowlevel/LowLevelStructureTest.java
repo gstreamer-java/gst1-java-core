@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sun.jna.Structure;
+import org.freedesktop.gstreamer.Gst;
 
 /**
  *
@@ -179,9 +180,11 @@ public class LowLevelStructureTest {
 
         structs.add(GstQueryAPI.QueryStruct.class);
 
-        structs.add(GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct.class);
-        structs.add(GstSDPMessageAPI.SDPMessageStruct.class);
-        structs.add(GstPromiseAPI.PromiseStruct.class);
+        if (Gst.getVersion().getMinor() >= 14) {
+            structs.add(GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct.class);
+            structs.add(GstSDPMessageAPI.SDPMessageStruct.class);
+            structs.add(GstPromiseAPI.PromiseStruct.class);
+        }
 
     }
 }

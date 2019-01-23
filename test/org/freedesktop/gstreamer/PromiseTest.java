@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.junit.BeforeClass;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 public class PromiseTest {
@@ -40,9 +41,12 @@ public class PromiseTest {
     public static void tearDownClass() throws Exception {
         Gst.deinit();
     }
-
+    
     @Test
     public void testReply() {
+        if (Gst.getVersion().getMinor() < 14) {
+            return;
+        }
         Promise promise = new Promise();
 
         promise.reply(null);
@@ -54,6 +58,9 @@ public class PromiseTest {
 
     @Test
     public void testInterrupt() {
+        if (Gst.getVersion().getMinor() < 14) {
+            return;
+        }
         Promise promise = new Promise();
         promise.interrupt();
 
@@ -64,6 +71,9 @@ public class PromiseTest {
 
     @Test
     public void testExpire() {
+        if (Gst.getVersion().getMinor() < 14) {
+            return;
+        }
         Promise promise = new Promise();
         promise.expire();
 
@@ -74,6 +84,9 @@ public class PromiseTest {
 
     @Test
     public void testReplyData() {
+        if (Gst.getVersion().getMinor() < 14) {
+            return;
+        }
         Promise promise = new Promise();
         Structure data = new Structure("data", "test", GType.UINT, 1);
 
