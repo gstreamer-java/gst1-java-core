@@ -21,13 +21,11 @@ import static org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI.
 
 import org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI;
 import org.freedesktop.gstreamer.lowlevel.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GType;
 
 import com.sun.jna.Pointer;
 
 public class WebRTCSessionDescription extends NativeObject {
   public static final String GTYPE_NAME = "GstWebRTCSessionDescription";
-  public static final GType GTYPE = GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_get_type();
 
   protected GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct sessionDescriptionStruct;
 
