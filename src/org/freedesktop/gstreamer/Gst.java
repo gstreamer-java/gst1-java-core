@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2018 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
@@ -44,6 +45,7 @@ import org.freedesktop.gstreamer.elements.BaseTransform;
 import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
+import org.freedesktop.gstreamer.elements.WebRTCBin;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
@@ -619,9 +621,12 @@ public final class Gst {
                     PadTemplate.class,
                     Plugin.class,
                     PluginFeature.class,
+                    Promise.class,
                     Query.class,
                     Registry.class,
+                    SDPMessage.class,
                     Sample.class,
+                    WebRTCSessionDescription.class,
                     // ----------- Elements -------------
                     AppSink.class,
                     AppSrc.class,
@@ -632,6 +637,7 @@ public final class Gst {
                     DecodeBin.class,
                     Pipeline.class,
                     PlayBin.class,
-                    URIDecodeBin.class
+                    URIDecodeBin.class,
+                    WebRTCBin.class
             );
 }

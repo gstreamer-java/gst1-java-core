@@ -623,6 +623,15 @@ public class Structure extends NativeObject {
         return GSTSTRUCTURE_API.gst_structure_nth_field_name(this, i);
     }
     
+    /**
+     * Checks that two structures are equal
+     * @param structure the stucture to check if it's equal to this structure
+     * @return true if both structures are equal
+     */
+    public boolean isEqual(Structure structure) {
+        return GSTSTRUCTURE_API.gst_structure_is_equal(this, structure);
+    }
+    
     @Override
     public String toString() {
         return GSTSTRUCTURE_API.gst_structure_to_string(this);
