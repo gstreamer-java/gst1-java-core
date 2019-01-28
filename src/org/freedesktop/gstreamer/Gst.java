@@ -60,6 +60,9 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.logging.Level;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
@@ -745,4 +748,18 @@ public final class Gst {
                     URIDecodeBin.class,
                     WebRTCBin.class
             );
+    
+    /**
+     * Annotation on classes, methods or fields to show the required GStreamer
+     * version. This should particularly be used where the version required is higher
+     * than the current baseline supported version (GStreamer 1.8)
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public static @interface Since {
+        public int major() default 1;
+        public int minor();
+    }
+    
+    
 }
