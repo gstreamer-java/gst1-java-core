@@ -1,6 +1,6 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
- * Copyright (c) 2018 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -70,14 +70,18 @@ import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
  */
 @SuppressWarnings("deprecation")
 public final class Gst {
-	private static Logger logger = Logger.getLogger(Gst.class.getName());
+    
+    private final static Logger LOG = Logger.getLogger(Gst.class.getName());
+    private final static AtomicInteger INIT_COUNT = new AtomicInteger(0);
+    private final static boolean CHECK_VERSIONS = !Boolean.getBoolean("gstreamer.suppressVersionChecks");
+    
     
     private static ScheduledExecutorService executorService;
     private static volatile CountDownLatch quit = new CountDownLatch(1);
     private static GMainContext mainContext;
     private static boolean useDefaultContext = false;
-    private static final AtomicInteger initCount = new AtomicInteger(0);
-    private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());  
+    private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
+    private static int minorVersion = Integer.MAX_VALUE;
     
     public static class NativeArgs {
         public IntByReference argcRef;
@@ -135,7 +139,7 @@ public final class Gst {
     public static Version getVersion() {
         long[] major = { 0 }, minor = { 0 }, micro = { 0 }, nano = { 0 };
         GST_API.gst_version(major, minor, micro, nano);
-        return new Version(major[0], minor[0], micro[0], nano[0]);
+        return new Version((int) major[0], (int) minor[0], (int) micro[0], (int) nano[0]);
     }
     
     /**
@@ -167,7 +171,7 @@ public final class Gst {
      * @return true if the GStreamer library already initialized.
      */
     public static synchronized final boolean isInitialized() {
-    	return initCount.get() > 0;
+    	return INIT_COUNT.get() > 0;
     }
     
     /**
@@ -234,7 +238,7 @@ public final class Gst {
             if (errors != null) {
                 errors.add(new GError(new GErrorStruct(err[0])));
             } else {
-                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
 
@@ -283,7 +287,7 @@ public final class Gst {
             if (errors != null) {
                 errors.add(new GError(new GErrorStruct(err[0])));
             } else {
-                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
 
@@ -330,7 +334,7 @@ public final class Gst {
             if (errors != null) {
                 errors.add(new GError(new GErrorStruct(err[0])));
             } else {
-                logger.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
         
@@ -411,9 +415,22 @@ public final class Gst {
      *
      * @throws org.freedesktop.gstreamer.GstException
      */
+    @Deprecated
     public static final void init() throws GstException {
-        init("unknown", new String[] {});
+        init(new Version(1, 8), "gst1-java-core");
     }
+    
+    /**
+     * Initializes the GStreamer library.
+     * <p> This is a shortcut if no arguments are to be passed to gstreamer.
+     *
+     * @param requiredVersion 
+     * @throws org.freedesktop.gstreamer.GstException
+     */
+    public static final void init(Version requiredVersion) throws GstException {
+        init(requiredVersion, "gst1-java-core");
+    }
+    
     
     /**
      * Initializes the GStreamer library.
@@ -435,23 +452,76 @@ public final class Gst {
      * out.
      * @throws org.freedesktop.gstreamer.GstException
      */
-    public static synchronized final String[] init(String progname, String[] args) throws GstException {
+    @Deprecated
+    public static synchronized final String[] init(String progname, String ... args) throws GstException {
+        return init(new Version(1, 8), progname, args);
+    }
+    
+    /**
+     * Initializes the GStreamer library.
+     * <p> This sets up internal path lists, registers built-in elements, and 
+     * loads standard plugins.
+     *
+     * <p>
+     * This method should be called before calling any other GLib functions. If
+     * this is not an option, your program must initialise the GLib thread system
+     * using g_thread_init() before any other GLib functions are called.
+     *
+     * <p>
+     * <b>Note:</b><p>
+     * This method will throw a GstException if it fails.
+     * 
+     * @param requestedVersion the minimum requested GStreamer version.
+     * @param progname the java program name.
+     * @param args the java argument list.
+     * @return the list of arguments with any gstreamer specific options stripped 
+     * out.
+     * @throws org.freedesktop.gstreamer.GstException
+     */
+    public static synchronized final String[] init(Version requestedVersion,
+            String progname, String ... args) throws GstException {
+                  
+        if (CHECK_VERSIONS) {
+            Version availableVersion = getVersion();
+            if (requestedVersion.getMajor() != 1 || availableVersion.getMajor() != 1) {
+                throw new GstException("gst1-java-core only supports GStreamer 1.x");
+            }
+            if (requestedVersion.getMinor() < 8) {
+                requestedVersion = new Version(1, 8);
+            }
+            if (!availableVersion.checkSatisfies(requestedVersion)) {
+                throw new GstException("The requested version of GStreamer is not available\n"
+                        + "Requested : " + requestedVersion + "\nAvailable : " + availableVersion);
+            }
+        }
+        
         //
         // Only do real init the first time through
         //
-        if (initCount.getAndIncrement() > 0) {
+        if (INIT_COUNT.getAndIncrement() > 0) {
+            if (CHECK_VERSIONS) {
+                if (requestedVersion.getMinor() > minorVersion) {
+                    minorVersion = (int) requestedVersion.getMinor();
+                }
+            }
             return args;
         }
+        
         NativeArgs argv = new NativeArgs(progname, args);
         
         Pointer[] error = { null };
         if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
-            initCount.decrementAndGet();
+            INIT_COUNT.decrementAndGet();
             throw new GstException(new GError(new GErrorStruct(error[0])));
         }
         
-        logger.fine("after gst_init, argc=" + argv.argcRef.getValue());
-
+        LOG.fine("after gst_init, argc=" + argv.argcRef.getValue());
+        
+        Version runningVersion = getVersion();
+        if (runningVersion.getMajor() != 1) {
+            LOG.warning("gst1-java-core only supports GStreamer 1.x");
+        }
+        
         if (useDefaultContext) {
             mainContext = GMainContext.getDefaultContext();
             executorService = new MainContextExecutorService(mainContext);
@@ -461,6 +531,11 @@ public final class Gst {
         }
         quit = new CountDownLatch(1);
         loadAllClasses();
+        
+        if (CHECK_VERSIONS) {
+            minorVersion = requestedVersion.getMinor();
+        }
+        
         return argv.toStringArray();
     }
     
@@ -473,7 +548,7 @@ public final class Gst {
         //
         // Only perform real shutdown if called as many times as Gst.init() is
         //
-        if (initCount.decrementAndGet() > 0) {
+        if (INIT_COUNT.decrementAndGet() > 0) {
             return;
         }
         // Perform any cleanup tasks
@@ -526,6 +601,36 @@ public final class Gst {
     public static void setUseDefaultContext(boolean useDefault) {
         useDefaultContext = useDefault;
     }
+    
+    /**
+     * Checks that the version of GStreamer requested in init() satisfies the
+     * given version or throws an exception.
+     * 
+     * @param major major version, only 1 is supported
+     * @param minor minor version required
+     * @throws GstException if the requested version support was not requested
+     */
+    public static void checkVersion(int major, int minor) {
+        if (CHECK_VERSIONS && (major != 1 || minor > minorVersion)) {
+            throw new GstException("Not supported by requested GStreamer version");
+        }
+    }
+    
+    /**
+     * Tests that the version of GStreamer requested in init() satisfies the
+     * given version.
+     * 
+     * @param major major version, only 1 is supported
+     * @param minor minor version required
+     * @return boolean whether the version requirement can be satisfied
+     */
+    public static boolean testVersion(int major, int minor) {
+        if (CHECK_VERSIONS && (major != 1 || minor > minorVersion)) {
+            return false;
+        }
+        return true;
+    }
+
     
     // Make the gstreamer executor threads daemon, so they don't stop the main 
     // program from exiting
