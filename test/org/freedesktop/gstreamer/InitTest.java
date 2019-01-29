@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -37,8 +38,22 @@ public class InitTest {
     }
     @Test
     public void testInit() {
-        String[] args = Gst.init("InitTest", new String[] { "--gst-plugin-spew" });
+        Version available = Gst.getVersion();
+        Version notAvailable = new Version(available.getMajor(), available.getMinor() + 2);
+        try {
+            Gst.init(notAvailable);
+            assertTrue("Version check exception not thrown!", false);
+        } catch (GstException ex) {
+            System.out.println("Expected init failure");
+            System.out.println(ex);
+        }
+        String[] args = Gst.init(available, "InitTest", "--gst-plugin-spew");
         assertTrue(args.length == 0);
+        
+        assertTrue(Gst.testVersion(available.getMajor(), available.getMinor()));
+        assertTrue(Gst.testVersion(available.getMajor(), available.getMinor() - 2));
+        assertTrue(!Gst.testVersion(notAvailable.getMajor(), notAvailable.getMinor()));
+        
         Gst.deinit();
     }
     @BeforeClass

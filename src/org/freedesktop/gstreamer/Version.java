@@ -1,5 +1,6 @@
 /* 
- * Copyright (c) 2007, 2008 Wayne Meissner
+ * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
  *
@@ -19,10 +20,17 @@
 package org.freedesktop.gstreamer;
 
 /**
- * Describes the version of gstreamer currently in use.
+ * Describes a GStreamer version.
  */
 public class Version {
-    public Version(long major, long minor, long micro, long nano) {
+    
+    private final int major, minor, micro, nano;
+    
+    public Version(int major, int minor) {
+        this(major, minor, 0, 0);
+    }
+    
+    public Version(int major, int minor, int micro, int nano) {
         this.major = major;
         this.minor = minor;
         this.micro = micro;
@@ -42,35 +50,46 @@ public class Version {
     }
     
     /**
-     * Gets the major version of GStreamer at compile time.
+     * Gets the major version of GStreamer.
      * @return the major version.
      */
-    public long getMajor() {
+    public int getMajor() {
         return major;
     }
     
     /**
-     * Gets the minor version of GStreamer at compile time.
+     * Gets the minor version of GStreamer.
      * @return the minor version.
      */
-    public long getMinor() {
+    public int getMinor() {
         return minor;
     }
     
     /**
-     * Gets the micro version of GStreamer at compile time.
+     * Gets the micro version of GStreamer.
      * @return the micro version.
      */
-    public long getMicro() {
+    public int getMicro() {
         return micro;
     }
     
     /**
-     * Gets the nano version of GStreamer at compile time.
+     * Gets the nano version of GStreamer.
      * @return the nano version.
      */
-    public long getNano() {
+    public int getNano() {
         return nano;
     }
-    private final long major, minor, micro, nano;
+    
+    /**
+     * Check whether this version is equal to or greater than the passed in 
+     * version. Roughly comparable to GST_CHECK_VERSION
+     * @param required version to check against
+     * @return true if this version satisfies the required version
+     */
+    public boolean checkSatisfies(Version required) {
+        return (major == required.major && minor > required.minor) ||
+                (major == required.major && minor == required.minor && micro >= required.micro);
+    }
+    
 }
