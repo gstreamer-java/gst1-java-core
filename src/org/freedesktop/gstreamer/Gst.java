@@ -84,6 +84,7 @@ public final class Gst {
     private static GMainContext mainContext;
     private static boolean useDefaultContext = false;
     private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
+    // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
     
     public static class NativeArgs {
@@ -493,8 +494,9 @@ public final class Gst {
                 requestedVersion = new Version(1, 8);
             }
             if (!availableVersion.checkSatisfies(requestedVersion)) {
-                throw new GstException("The requested version of GStreamer is not available\n"
-                        + "Requested : " + requestedVersion + "\nAvailable : " + availableVersion);
+                throw new GstException(String.format(
+                        "The requested version of GStreamer is not available\nRequested : %s\nAvailable : %s\n",
+                        requestedVersion, availableVersion));
             }
         }
         
