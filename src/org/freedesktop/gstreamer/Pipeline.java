@@ -20,6 +20,7 @@
  */
 
 package org.freedesktop.gstreamer;
+import org.freedesktop.gstreamer.glib.GError;
 import java.util.concurrent.TimeUnit;
 
 import com.sun.jna.Pointer;

@@ -1,6 +1,5 @@
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.GObject;
 import org.freedesktop.gstreamer.lowlevel.GioAPI;
 
 public class GInetAddress extends GObject{

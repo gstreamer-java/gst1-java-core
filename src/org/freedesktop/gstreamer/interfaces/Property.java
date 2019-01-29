@@ -19,7 +19,7 @@
 
 package org.freedesktop.gstreamer.interfaces;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
 
 import com.sun.jna.Pointer;

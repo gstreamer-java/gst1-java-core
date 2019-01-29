@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GObject;
 import com.sun.jna.Pointer;
 
 /**

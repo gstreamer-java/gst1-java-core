@@ -16,7 +16,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.glib;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
@@ -32,7 +32,9 @@ public class GError {
      * <b> Note: </b> This takes ownership of the passed in GErrorStruct.
      * @param error 
      */
-    GError(GErrorStruct error) {
+    // rewrite to accept code and message - handle struct elsewhere
+    @Deprecated
+    public GError(GErrorStruct error) {
         code = error.getCode();
         message = error.getMessage();
         GLIB_API.g_error_free(error);

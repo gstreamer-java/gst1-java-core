@@ -1,10 +1,11 @@
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.glib;
 
 import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
 import org.freedesktop.gstreamer.lowlevel.GioAPI;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.GstException;
 
 public class GInetSocketAddress extends GSocketAddress{
 

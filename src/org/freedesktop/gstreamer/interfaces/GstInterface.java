@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 import com.sun.jna.Pointer;

@@ -16,7 +16,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.glib;
 
 /**
  * A signal callback.

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GClosureNotify;
 

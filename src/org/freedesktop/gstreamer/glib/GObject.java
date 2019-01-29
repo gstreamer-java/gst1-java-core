@@ -21,7 +21,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.glib;
 
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
 import static org.freedesktop.gstreamer.lowlevel.GSignalAPI.GSIGNAL_API;
@@ -59,6 +59,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
+import org.freedesktop.gstreamer.ClockTime;
 
 /**
  * This is an abstract class providing some GObject-like facilities in a common 

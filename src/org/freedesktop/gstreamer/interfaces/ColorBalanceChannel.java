@@ -21,7 +21,7 @@ package org.freedesktop.gstreamer.interfaces;
 
 import static org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI.GSTCOLORBALANCE_API;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI;
 
 import com.sun.jna.Pointer;

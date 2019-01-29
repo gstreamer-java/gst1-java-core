@@ -19,6 +19,8 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GError;
+
 /**
  * Thrown when a gstreamer error occurs.
  */

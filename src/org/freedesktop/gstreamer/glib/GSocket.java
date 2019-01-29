@@ -1,5 +1,7 @@
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.glib;
 
+import org.freedesktop.gstreamer.glib.GError;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.GCancellable;
 import org.freedesktop.gstreamer.glib.GSocketFamily;
 import org.freedesktop.gstreamer.glib.GSocketProtocol;
@@ -8,6 +10,7 @@ import org.freedesktop.gstreamer.lowlevel.GioAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.GstException;
 
 public class GSocket extends GObject{
 

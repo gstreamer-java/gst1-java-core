@@ -21,6 +21,7 @@
  */
 
 package org.freedesktop.gstreamer;
+import org.freedesktop.gstreamer.glib.GObject;
 import java.util.EventListener;
 import java.util.EventListenerProxy;
 import java.util.HashMap;

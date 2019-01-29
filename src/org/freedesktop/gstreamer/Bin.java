@@ -23,6 +23,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GError;
 import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 

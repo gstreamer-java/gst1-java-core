@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;

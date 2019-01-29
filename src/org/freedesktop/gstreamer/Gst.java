@@ -20,6 +20,9 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GSocket;
+import org.freedesktop.gstreamer.glib.GInetSocketAddress;
+import org.freedesktop.gstreamer.glib.GError;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
 
 import java.lang.reflect.Field;
