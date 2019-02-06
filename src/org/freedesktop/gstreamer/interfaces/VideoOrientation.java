@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil c Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
  * 
@@ -45,21 +46,21 @@ public class VideoOrientation extends GstInterface {
 		super(element, GSTVIDEOORIENTATION_API.gst_video_orientation_get_type());
 	}
 
-	public boolean getHflip(boolean flip) {
-		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_hflip(this, flip);
-	}
-
-	public boolean getVflip(boolean flip) {
-		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_vflip(this, flip);
-	}
-
-	public boolean getHcenter(int center) {
-		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_hcenter(this, center);
-	}
-
-	public boolean getVcenter(int center) {
-		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_vcenter(this, center);
-	}
+//	public boolean getHflip(boolean flip) {
+//		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_hflip(this, flip);
+//	}
+//
+//	public boolean getVflip(boolean flip) {
+//		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_vflip(this, flip);
+//	}
+//
+//	public boolean getHcenter(int center) {
+//		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_hcenter(this, center);
+//	}
+//
+//	public boolean getVcenter(int center) {
+//		return GSTVIDEOORIENTATION_API.gst_video_orientation_get_vcenter(this, center);
+//	}
 
 	public boolean setHflip(boolean flip) {
 		return GSTVIDEOORIENTATION_API.gst_video_orientation_set_hflip(this, flip);

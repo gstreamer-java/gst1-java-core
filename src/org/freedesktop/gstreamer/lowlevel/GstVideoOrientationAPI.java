@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
  * 
@@ -24,18 +25,18 @@ import org.freedesktop.gstreamer.interfaces.VideoOrientation;
 import com.sun.jna.Library;
 
 public interface GstVideoOrientationAPI extends Library {
-	GstVideoOrientationAPI GSTVIDEOORIENTATION_API = GstNative.load("gstinterfaces", GstVideoOrientationAPI.class);
+	GstVideoOrientationAPI GSTVIDEOORIENTATION_API = GstNative.load("gstvideo", GstVideoOrientationAPI.class);
 
 	GType gst_video_orientation_get_type();
 
-	/* vitrual class functions */
-	boolean gst_video_orientation_get_hflip(VideoOrientation video_orientation, boolean flip);
-
-	boolean gst_video_orientation_get_vflip(VideoOrientation video_orientation, boolean flip);
-
-	boolean gst_video_orientation_get_hcenter(VideoOrientation video_orientation, int center);
-
-	boolean gst_video_orientation_get_vcenter(VideoOrientation video_orientation, int center);
+	// @TODO need implementing to use pointers
+//	boolean gst_video_orientation_get_hflip(VideoOrientation video_orientation, boolean flip);
+//
+//	boolean gst_video_orientation_get_vflip(VideoOrientation video_orientation, boolean flip);
+//
+//	boolean gst_video_orientation_get_hcenter(VideoOrientation video_orientation, int center);
+//
+//	boolean gst_video_orientation_get_vcenter(VideoOrientation video_orientation, int center);
 
 	boolean gst_video_orientation_set_hflip(VideoOrientation video_orientation, boolean flip);
 
