@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
  * 
@@ -30,9 +31,6 @@ public interface GstVideoOverlayAPI extends Library {
 	GstVideoOverlayAPI GSTVIDEOOVERLAY_API = GstNative.load("gstvideo", GstVideoOverlayAPI.class);
 
 	GType gst_video_overlay_get_type();
-
-	/* virtual class function wrappers */
-	void gst_video_overlay_set_window_handle(VideoOverlay overlay, NativeLong xwindow_id);
 
 	void gst_video_overlay_set_window_handle(VideoOverlay overlay, Pointer xwindow_id);
 
