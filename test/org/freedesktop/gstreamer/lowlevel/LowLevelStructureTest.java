@@ -156,20 +156,20 @@ public class LowLevelStructureTest {
 
         structs.add(GstColorBalanceAPI.ColorBalanceChannelStruct.class);
 
-        structs.add(GstControlSourceAPI.TimedValue.class);
-        structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
-        structs.add(GstControlSourceAPI.GstControlSourceClass.class);
+//        structs.add(GstControlSourceAPI.TimedValue.class);
+//        structs.add(GstControlSourceAPI.GstControlSourceStruct.class);
+//        structs.add(GstControlSourceAPI.GstControlSourceClass.class);
 
         structs.add(GstElementAPI.GstElementStruct.class);
         structs.add(GstElementAPI.GstElementClass.class);
 
         structs.add(GstEventAPI.EventStruct.class);
 
-        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
-        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);
-
-        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceStruct.class);
-        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceClass.class);
+//        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
+//        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);
+//
+//        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceStruct.class);
+//        structs.add(GstLFOControlSourceAPI.GstLFOControlSourceClass.class);
 
         structs.add(GstMessageAPI.MessageStruct.class);
 
