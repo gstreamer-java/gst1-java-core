@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -39,14 +40,8 @@ import org.freedesktop.gstreamer.lowlevel.GSource;
  * Wraps the glib main loop/main context in a ScheduledExecutor interface.
  */
 public class MainContextExecutorService extends AbstractExecutorService implements ScheduledExecutorService {
-    private final GMainContext context;
-    private GSource idleSource = null;
     private final List<Runnable> bgTasks = new LinkedList<Runnable>();
-    private volatile boolean running = true;
-    
-    public MainContextExecutorService(GMainContext context) {
-        this.context = context;
-    }
+    private final GMainContext context;
     private final Callable<Boolean> idleCallback = new Callable<Boolean>() {
 
         public Boolean call() throws Exception {
@@ -62,6 +57,56 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
             return false;
         }
     };
+    private GSource idleSource = null;
+    private volatile boolean running = true;
+    
+    public MainContextExecutorService(GMainContext context) {
+        this.context = context;
+    }
+    public boolean awaitTermination(long timeout, TimeUnit units) throws InterruptedException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    public void execute(Runnable runnable) {
+        invokeLater(runnable);
+    }
+
+
+    public boolean isShutdown() {
+        return !running;
+    }
+
+    public boolean isTerminated() {
+        synchronized (bgTasks) {
+            return !isShutdown() && bgTasks.isEmpty();
+        }
+    }
+
+    public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit units) {
+        return new ScheduledTimeout<Object>(Executors.callable(runnable), delay, units);
+    }
+
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit units) {
+        return new ScheduledTimeout<V>(callable, delay, units);
+    }
+
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialiDelay, long period, TimeUnit units) {
+        return new ScheduledTimeout<Object>(Executors.callable(runnable), initialiDelay, period, units);
+    }
+
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialiDelay, long delay, TimeUnit units) {
+        return new ScheduledTimeout<Object>(Executors.callable(runnable), initialiDelay, delay, units);
+    }
+    public void shutdown() {
+        shutdownNow();
+    }
+    public List<Runnable> shutdownNow() {
+        List<Runnable> tasks = new ArrayList<Runnable>();
+        synchronized (bgTasks) {
+            tasks.addAll(bgTasks);
+            bgTasks.clear();
+        }
+        return tasks;
+    }
     private void invokeLater(final Runnable r) {
         //        System.out.println("Scheduling idle callbacks");
         synchronized (bgTasks) {
@@ -75,36 +120,6 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
                 idleSource.attach(context);
             }
         }
-    }
-    public void shutdown() {
-        shutdownNow();
-    }
-
-    public List<Runnable> shutdownNow() {
-        List<Runnable> tasks = new ArrayList<Runnable>();
-        synchronized (bgTasks) {
-            tasks.addAll(bgTasks);
-            bgTasks.clear();
-        }
-        return tasks;
-    }
-
-    public boolean isShutdown() {
-        return !running;
-    }
-
-    public boolean isTerminated() {
-        synchronized (bgTasks) {
-            return !isShutdown() && bgTasks.isEmpty();
-        }
-    }
-
-    public boolean awaitTermination(long timeout, TimeUnit units) throws InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void execute(Runnable runnable) {
-        invokeLater(runnable);
     }
     private class ScheduledTimeout<V> extends FutureTask<V> implements ScheduledFuture<V> {
         private volatile GSource source;
@@ -150,9 +165,9 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
         private void start(long timeout, Callable<Boolean> callback) {
             int milliseconds = getMilliseconds(timeout);
             /*
-             * If the timeout is a multiple of seconds, use the more efficient
-             * g_timeout_add_seconds, if it is available.
-             */
+            * If the timeout is a multiple of seconds, use the more efficient
+            * g_timeout_add_seconds, if it is available.
+            */
             if ((milliseconds % 1000) == 0) {
                 try {
                     source = GLIB_API.g_timeout_source_new_seconds(milliseconds / 1000);
@@ -173,20 +188,5 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
             //return delayed.getDelay(TimeUnit.MILLISECONDS)
             throw new UnsupportedOperationException("Not supported yet.");
         }
-    }
-    public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit units) {
-        return new ScheduledTimeout<Object>(Executors.callable(runnable), delay, units);
-    }
-
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit units) {
-        return new ScheduledTimeout<V>(callable, delay, units);
-    }
-
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialiDelay, long period, TimeUnit units) {
-        return new ScheduledTimeout<Object>(Executors.callable(runnable), initialiDelay, period, units);
-    }
-
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialiDelay, long delay, TimeUnit units) {
-        return new ScheduledTimeout<Object>(Executors.callable(runnable), initialiDelay, delay, units);
     }
 }

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,35 +19,36 @@
 
 package org.freedesktop.gstreamer.glib;
 
+import java.util.Objects;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
- * Base gstreamer error type.
+ * Base GLib error type.
  */
 public class GError {
-    /** 
+    
+    private final int code;
+    private final String message;
+    
+    /**
      * Creates a new instance of GError
-     * <p>
-     * <b> Note: </b> This takes ownership of the passed in GErrorStruct.
-     * @param error 
+     * 
+     * @param code native int error code
+     * @param message error message text
      */
+    public GError(int code, String message) {
+        this.code = code;
+        this.message = Objects.requireNonNull(message);
+    }
+    
     // rewrite to accept code and message - handle struct elsewhere
     @Deprecated
     public GError(GErrorStruct error) {
         code = error.getCode();
         message = error.getMessage();
         GLIB_API.g_error_free(error);
-    }
-    
-    /**
-     * Gets a string representation of this error.
-     * 
-     * @return a string representing the error.
-     */
-    public String getMessage() {
-        return message;
     }
     /**
      * Gets a numeric code representing this error.
@@ -56,7 +58,12 @@ public class GError {
     public final int getCode() {
         return code;
     }
-    
-    private final int code;
-    private final String message;
+    /**
+     * Gets a string representation of this error.
+     *
+     * @return a string representing the error.
+     */
+    public String getMessage() {
+        return message;
+    }
 }

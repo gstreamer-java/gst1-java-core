@@ -1,6 +1,6 @@
 /* 
- * Copyright (c) 2008 Wayne Meissner
- * 
+ * Copyright (c) 2019 Neil C Smith
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under 
@@ -19,16 +19,25 @@
 package org.freedesktop.gstreamer.glib;
 
 /**
- * A signal callback.
- * <p>
- * Each closure should have exactly one method named 'invoke' which will be invoked
- * when the signal is triggered from gstreamer
- * </p>
+ * Thrown when a gstreamer error occurs.
  */
-public interface Closure {
+public class GLibException extends RuntimeException {
+
     /**
-     * The name of the method to invoke.
+     * Creates a new instance of <code>GLibException</code> without detail message.
      */
-    public static final String METHOD_NAME = "invoke";
-    
+    public GLibException() {
+    }
+
+    /**
+     * Constructs an instance of <code>GLibException</code> with the specified detail message.
+     * 
+     * @param msg the detail message.
+     */
+    public GLibException(String msg) {
+        super(msg);
+    }
+    public GLibException(GError error) {
+        super(error.getMessage());
+    }
 }
