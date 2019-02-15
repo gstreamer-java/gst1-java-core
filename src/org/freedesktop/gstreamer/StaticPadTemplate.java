@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -15,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 public class StaticPadTemplate {
@@ -35,6 +35,7 @@ public class StaticPadTemplate {
 
     /**
      * Get the name of the template.
+     *
      * @return The name of the template.
      */
     public String getName() {
@@ -43,6 +44,7 @@ public class StaticPadTemplate {
 
     /**
      * Get the direction (SINK, SRC) of the template.
+     *
      * @return The {@link PadDirection} of the template.
      */
     public PadDirection getDirection() {
@@ -51,13 +53,16 @@ public class StaticPadTemplate {
 
     /**
      * Get the presence (ALWAYS, SOMETIMES, REQUEST) of the template.
+     *
      * @return The {@link PadPresence} of this template.
      */
     public PadPresence getPresence() {
         return presence;
     }
+
     /**
      * Get the {@link Caps} of the template.
+     *
      * @return The {@link Caps} for this template.
      */
     public Caps getCaps() {

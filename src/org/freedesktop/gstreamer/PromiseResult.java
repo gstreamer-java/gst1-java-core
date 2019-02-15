@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
@@ -22,15 +23,16 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
  * The result of a {@link Promise}
  * Available since GStreamer 1.14
  */
+@Gst.Since(minor = 14)
 public enum PromiseResult {
-    /** The initial state of a promise */
+    /** Initial state. Waiting for transition to any other state. */
+    @DefaultEnumValue
     PENDING,
-    /** The promise was interrupted */
+    /** Interrupted by the consumer as it doesn't want the value anymore. */
     INTERRUPTED,
-    /** The promise has been resolved and it has a value */
+    /** A producer marked a reply. */
     REPLIED,
-    /** The promise is expired and won't return a result */
-    EXPIRED,
-    /** Unknown result */
-    @DefaultEnumValue UNKNOWN;
+    /** The promise expired (the carrying object lost all refs) and the promise
+     * will never be fulfilled. */
+    EXPIRED
 }

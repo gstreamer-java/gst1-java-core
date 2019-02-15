@@ -18,13 +18,13 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * Result values from {@link Pad#link(Pad)} and friends.
  */
-public enum PadLinkReturn implements IntegerEnum {
+public enum PadLinkReturn implements NativeFlags {
     /** Link succeeded. */
     OK(0),
     /** Pads have no common grandparent. */

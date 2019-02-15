@@ -24,7 +24,7 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.QueryType;
+import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.ConstField;

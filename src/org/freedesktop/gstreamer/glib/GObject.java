@@ -56,7 +56,7 @@ import java.util.Arrays;
 /**
  * GObject is the fundamental type providing the common attributes and methods
  * for all object types in libraries based on the GObject system.
- *
+ * <p>
  * See upstream documentation at <a href="https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html"
  * >https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html</a>
  *
@@ -406,7 +406,7 @@ public abstract class GObject extends RefCountedObject {
     }
 
     @Override
-    protected void invalidate() {
+    public void invalidate() {
         try {
             // Need to increase the ref count before removing the toggle ref, so
             // ensure the native object is not destroyed.

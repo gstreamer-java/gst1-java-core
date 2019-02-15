@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Keeps track of GObject derived objects.
  */
-class GCTracker {
+public class GCTracker {
 
     private static Map<Integer,WeakReference<GCTracker>> objectMap =
             Collections.synchronizedMap(new HashMap<Integer,WeakReference<GCTracker>>());

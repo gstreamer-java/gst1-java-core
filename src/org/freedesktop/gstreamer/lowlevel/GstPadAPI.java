@@ -24,7 +24,7 @@ package org.freedesktop.gstreamer.lowlevel;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Event;
+import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
@@ -108,9 +108,9 @@ public interface GstPadAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Caps gst_pad_query_caps(Pad pad, Caps caps);
     void gst_pad_fixate_caps(Pad pad, Caps caps);
     boolean gst_pad_query_accept_caps(Pad pad, Caps caps);
-    boolean gst_pad_set_caps(Pad pad, Caps caps);
-    @CallerOwnsReturn Caps gst_pad_peer_get_caps(Pad pad);
-    boolean gst_pad_peer_accept_caps(Pad pad, Caps caps);
+//    boolean gst_pad_set_caps(Pad pad, Caps caps);
+    @CallerOwnsReturn Caps gst_pad_peer_query_caps(Pad pad, Caps caps);
+    boolean gst_pad_peer_query_accept_caps(Pad pad, Caps caps);
     
     /* capsnego for connected pads */
     @CallerOwnsReturn Caps gst_pad_get_allowed_caps(Pad pad);

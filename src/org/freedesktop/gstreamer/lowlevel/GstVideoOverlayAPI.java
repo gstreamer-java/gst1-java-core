@@ -20,7 +20,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Message;
+import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.interfaces.VideoOverlay;
 
 import com.sun.jna.Library;

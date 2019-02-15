@@ -19,7 +19,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.BusSyncReply;
-import org.freedesktop.gstreamer.Message;
+import org.freedesktop.gstreamer.message.Message;
 
 public interface BusSyncHandler {
     public BusSyncReply syncMessage(Message message);

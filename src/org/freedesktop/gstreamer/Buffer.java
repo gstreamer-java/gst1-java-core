@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Neil C Smith
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
@@ -31,88 +30,36 @@ import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
 import com.sun.jna.Pointer;
+import java.util.EnumSet;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
- * Data-passing buffer type, supporting sub-buffers.
- * Ssee {@link Pad}, {@link MiniObject}
+ * Buffers are the basic unit of data transfer in GStreamer. They contain the
+ * timing and offset along with other arbitrary metadata that is associated with
+ * the GstMemory blocks that the buffer contains.
  * <p>
- * Buffers are the basic unit of data transfer in GStreamer.  The Buffer
- * type provides all the state necessary to define a region of memory as part
- * of a stream.  Sub-buffers are also supported, allowing a smaller region of a
- * buffer to become its own buffer, with mechanisms in place to ensure that
- * neither memory space goes away prematurely.
- * <p>
- * Non-plugins will usually not need to allocate buffers, but they can be allocated
- * using new {@link #Buffer(int)} to create a buffer with preallocated data of a given size.
- * <p>
- * The data pointed to by the buffer can be accessed with the {@link #getByteBuffer}
- * method.  For buffers of size 0, the data pointer is undefined (usually NULL) 
- * and should never be used.
- * <p>
- * If an element knows what pad you will push the buffer out on, it should use
- * gst_pad_alloc_buffer() instead to create a buffer.  This allows downstream
- * elements to provide special buffers to write in, like hardware buffers.
- * <p>
- * A buffer has a pointer to a {@link Caps} describing the media type of the data
- * in the buffer. Attach caps to the buffer with {@link #setCaps}; this
- * is typically done before pushing out a buffer using gst_pad_push() so that
- * the downstream element knows the type of the buffer.
- * <p>
- * A buffer will usually have a timestamp, and a duration, but neither of these
- * are guaranteed (they may be set to -1). Whenever a
- * meaningful value can be given for these, they should be set. The timestamp
- * and duration are measured in nanoseconds (they are long values).
- * <p>
- * A buffer can also have one or both of a start and an end offset. These are
- * media-type specific. For video buffers, the start offset will generally be
- * the frame number. For audio buffers, it will be the number of samples
- * produced so far. For compressed data, it could be the byte offset in a
- * source or destination file. Likewise, the end offset will be the offset of
- * the end of the buffer. These can only be meaningfully interpreted if you
- * know the media type of the buffer (the #GstCaps set on it). Either or both
- * can be set to -1.
- * <p>
- * To efficiently create a smaller buffer out of an existing one, you can
- * use {@link #createSubBuffer}.
- * <p>
- * If a plug-in wants to modify the buffer data in-place, it should first obtain
- * a buffer that is safe to modify by using {@link #makeWritable}.  This
- * function is optimized so that a copy will only be made when it is necessary.
- * <p>
- * A plugin that only wishes to modify the metadata of a buffer, such as the
- * offset, timestamp or caps, should use gst_buffer_make_metadata_writable(),
- * which will create a subbuffer of the original buffer to ensure the caller
- * has sole ownership, and not copy the buffer data.
- * <p>
- * Buffers can be efficiently merged into a larger buffer with
- * gst_buffer_merge() and gst_buffer_span() if the gst_buffer_is_span_fast()
- * function returns TRUE.
- * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBuffer.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBuffer.html</a>
  */
 public class Buffer extends MiniObject {
+
     public static final String GTYPE_NAME = "GstBuffer";
 
     private final MapInfoStruct mapInfo;
     private final BufferStruct struct;
 
-    
-    public Buffer(Initializer init) {
-        super(init);
-        mapInfo = new MapInfoStruct();
-        struct = new BufferStruct(handle());
-    }
-    
     /**
      * Creates a newly allocated buffer without any data.
      */
     public Buffer() {
         this(initializer(GSTBUFFER_API.ptr_gst_buffer_new()));
     }
-    
+
     /**
-     * Creates a newly allocated buffer with data of the given size.
-     * The buffer memory is not cleared. If the requested amount of
-     * memory cannot be allocated, an exception will be thrown.
+     * Creates a newly allocated buffer with data of the given size. The buffer
+     * memory is not cleared. If the requested amount of memory cannot be
+     * allocated, an exception will be thrown.
      *
      * Note that when size == 0, the buffer data pointer will be NULL.
      *
@@ -121,173 +68,213 @@ public class Buffer extends MiniObject {
     public Buffer(int size) {
         this(initializer(allocBuffer(size)));
     }
-    
+
+    Buffer(Initializer init) {
+        super(init);
+        mapInfo = new MapInfoStruct();
+        struct = new BufferStruct(handle());
+    }
+
     private static Pointer allocBuffer(int size) {
         Pointer ptr = GSTBUFFER_API.ptr_gst_buffer_new_allocate(null, size, null);
         if (ptr == null) {
-            throw new OutOfMemoryError("Could not allocate Buffer of size "+ size);
+            throw new OutOfMemoryError("Could not allocate Buffer of size " + size);
         }
         return ptr;
     }
-    
-//    /**
-//     * Gets the size of the buffer data
-//     * 
-//     * @return the size of the buffer data in bytes.
-//     */
-//    public int getSize() {
-//    	return GstBufferAPI.GSTBUFFER_API.gst_buffer_get_size(this).intValue();
-//    }
-    
+
     /**
      * Gets a {@link java.nio.ByteBuffer} that can access the native memory
-     * associated with this Buffer.
-     * 
+     * associated with this Buffer, with the option of ensuring the memory is
+     * writable.
+     * <p>
+     * When requesting a writable buffer, if the buffer is writable but the
+     * underlying memory isn't, a writable copy will automatically be created
+     * and returned. The readonly copy of the buffer memory will then also be
+     * replaced with this writable copy.
+     * <p>
+     * <b>The Buffer should be unmapped with {@link #unmap()} after usage.</b>
+     *
+     * @param writable
      * @return A {@link java.nio.ByteBuffer} that can access this Buffer's data.
      */
-    public ByteBuffer map(boolean writeable) {
+    public ByteBuffer map(boolean writable) {
         final boolean ok = GSTBUFFER_API.gst_buffer_map(this, mapInfo,
-                writeable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
+                writable ? GstBufferAPI.GST_MAP_WRITE : GstBufferAPI.GST_MAP_READ);
         if (ok && mapInfo.data != null) {
             return mapInfo.data.getByteBuffer(0, mapInfo.size.intValue());
         }
         return null;
     }
-    
+
+    /**
+     * Release the memory previously mapped with {@link #map(boolean)}
+     */
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
     }
-    
+
     /**
-     * Gets the timestamps of this buffer.
-     * The buffer DTS refers to the timestamp when the buffer should be decoded and is usually monotonically increasing.
+     * Gets the timestamps of this buffer. The buffer DTS refers to the
+     * timestamp when the buffer should be decoded and is usually monotonically
+     * increasing.
      *
-     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
+     * when the timestamp is not known or relevant.
      */
+    @Deprecated
     public ClockTime getDecodeTimestamp() {
-		return (ClockTime)this.struct.readField("dts");
+        return (ClockTime) this.struct.readField("dts");
     }
 
     /**
      * Set the decode timestamp of the Buffer
-     * @param val a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *
+     * @param val a ClockTime representing the timestamp or
+     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    public void setDecodeTimestamp(ClockTime val)
-    {
+    @Deprecated
+    public void setDecodeTimestamp(ClockTime val) {
         this.struct.writeField("dts", val);
     }
 
     /**
-     * Gets the timestamps of this buffer.
-     * The buffer PTS refers to the timestamp when the buffer content should be presented to the user and is not always monotonically increasing.
+     * Gets the timestamps of this buffer. The buffer PTS refers to the
+     * timestamp when the buffer content should be presented to the user and is
+     * not always monotonically increasing.
      *
-     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
+     * when the timestamp is not known or relevant.
      */
+    @Deprecated
     public ClockTime getPresentationTimestamp() {
-		return (ClockTime)this.struct.readField("pts");
+        return (ClockTime) this.struct.readField("pts");
     }
 
     /**
      * Set the presentation timestamp of the Buffer
-     * @param val a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *
+     * @param val a ClockTime representing the timestamp or
+     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    public void setPresentationTimestamp(ClockTime val)
-    {
+    @Deprecated
+    public void setPresentationTimestamp(ClockTime val) {
         this.struct.writeField("pts", val);
     }
 
     /**
      * Gets the duration of this buffer.
      *
-     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
+     * when the timestamp is not known or relevant.
      */
+    @Deprecated
     public ClockTime getDuration() {
-        return (ClockTime)this.struct.readField("duration");
+        return (ClockTime) this.struct.readField("duration");
     }
 
     /**
      * Set the duration of this buffer.
-     * @param val a ClockTime representing the duration or {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *
+     * @param val a ClockTime representing the duration or
+     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    public void setDuration(ClockTime val)
-    {
+    @Deprecated
+    public void setDuration(ClockTime val) {
         this.struct.writeField("duration", val);
     }
 
     /**
      * Get the offset (media-specific) of this buffer
-     * @return a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     *
+     * @return a media specific offset for the buffer data. For video frames,
+     * this is the frame number of this buffer. For audio samples, this is the
+     * offset of the first sample in this buffer. For file data or compressed
+     * data this is the byte offset of the first byte in this buffer.
      */
-    public long getOffset()
-    {
-        return (Long)this.struct.readField("offset");
+    public long getOffset() {
+        return (Long) this.struct.readField("offset");
     }
 
     /**
      * Set the offset (media-specific) of this buffer
-     * @param val a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     *
+     * @param val a media specific offset for the buffer data. For video frames,
+     * this is the frame number of this buffer. For audio samples, this is the
+     * offset of the first sample in this buffer. For file data or compressed
+     * data this is the byte offset of the first byte in this buffer.
      */
-    public void setOffset(long val)
-    {
+    public void setOffset(long val) {
         this.struct.writeField("offset", val);
     }
 
     /**
      * Get the offset (media-specific) of this buffer
-     * @return a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     *
+     * @return a media specific offset for the buffer data. For video frames,
+     * this is the frame number of this buffer. For audio samples, this is the
+     * offset of the first sample in this buffer. For file data or compressed
+     * data this is the byte offset of the first byte in this buffer.
      */
-    public long getOffsetEnd()
-    {
-        return (Long)this.struct.readField("offset_end");
+    public long getOffsetEnd() {
+        return (Long) this.struct.readField("offset_end");
     }
 
     /**
      * Set the offset (media-specific) of this buffer
-     * @param val a media specific offset for the buffer data. For video frames, this is the frame number of this buffer. For audio samples, this is the offset of the first sample in this buffer. For file data or compressed data this is the byte offset of the first byte in this buffer.
+     *
+     * @param val a media specific offset for the buffer data. For video frames,
+     * this is the frame number of this buffer. For audio samples, this is the
+     * offset of the first sample in this buffer. For file data or compressed
+     * data this is the byte offset of the first byte in this buffer.
      */
-    public void setOffsetEnd(long val)
-    {
+    public void setOffsetEnd(long val) {
         this.struct.writeField("offset_end", val);
     }
 
     /**
-     * get the GstBufferFlags describing this buffer.
-     * 
-     * Since GStreamer 1.10 
-     * 
-     * @return a bit mask whose values can be interpreted by comparing them with {@link BufferFlag}
+     * Get the GstBufferFlags describing this buffer.
+     *
+     * Since GStreamer 1.10
+     *
+     * @return an EnumSet of {@link BufferFlag}
      */
-    public int getFlags()
-    {
-        return GstBufferAPI.GSTBUFFER_API.gst_buffer_get_flags(this);
+    @Gst.Since(minor = 10)
+    public EnumSet<BufferFlag> getFlags() {
+        Gst.checkVersion(1, 10);
+        int nativeInt = GstBufferAPI.GSTBUFFER_API.gst_buffer_get_flags(this);
+        return NativeFlags.fromInt(BufferFlag.class, nativeInt);
     }
 
     /**
-     * set some of the GstBufferFlags describing this buffer.  This is a union operation and does not clear flags that are not mentioned in val
-     * 
+     * Set some of the GstBufferFlags describing this buffer. This is a union
+     * operation and does not clear flags that are not mentioned.
+     *
      * Since GStreamer 1.10
-     * 
-     * @param val a bit mask of flags to be set on the buffer.  bits which are zero in val do not get cleared in this buffer.
+     *
+     * @param flags an EnumSet of {@link BufferFlag} to be set on the buffer.
      * @return true if flags were successfully set on this buffer
-     * @see BufferFlag
      */
-    public boolean setFlags(int val)
-    {
-        return GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, val);
+    @Gst.Since(minor = 10)
+    public boolean setFlags(EnumSet<BufferFlag> flags) {
+        Gst.checkVersion(1, 10);
+        return GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, NativeFlags.toInt(flags));
     }
 
     /**
-     * unset the GstBufferFlags describing this buffer.  This is a difference operation and does not clear flags that are not mentioned in val
-     * 
+     * unset the GstBufferFlags describing this buffer. This is a difference
+     * operation and does not clear flags that are not mentioned.
+     *
      * Since GStreamer 1.10
-     * 
-     * @param val a bit mask of flags to be cleared on the buffer.  bits which are zero in val do not get cleared in this buffer.
+     *
+     * @param flags an EnumSet of {@link BufferFlag} to be cleared on the buffer.
      * @return true if flags were successfully cleared on this buffer
-     * @see BufferFlag
-     * */
-    public boolean unsetFlags(int val)
-    {
-        return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, val);
+     *
+     */
+    @Gst.Since(minor = 10)
+    public boolean unsetFlags(EnumSet<BufferFlag> flags) {
+        Gst.checkVersion(1, 10);
+        return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, NativeFlags.toInt(flags));
     }
 
 }

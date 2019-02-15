@@ -21,9 +21,7 @@
 
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.SeekType;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
@@ -121,7 +119,7 @@ public class SeekEvent extends Event {
     }
     
     /**
-     * Gets the {@link org.freedesktop.gstreamer.SeekFlags} of this seek event.
+     * Gets the {@link org.freedesktop.gstreamer.event.SeekFlags} of this seek event.
      * 
      * @return the seek flags.
      */

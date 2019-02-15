@@ -21,7 +21,6 @@
 
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**

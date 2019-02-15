@@ -25,7 +25,6 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**

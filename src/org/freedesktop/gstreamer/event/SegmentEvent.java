@@ -18,27 +18,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.Event;
-
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.Segment;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 
 /**
- * 
- * The newsegment event marks the range of buffers to be processed. All
- * data not within the segment range is not to be processed. This can be
- * used intelligently by plugins to apply more efficient methods of skipping
- * unneeded data.
+ *
+ * The newsegment event marks the range of buffers to be processed. All data not
+ * within the segment range is not to be processed. This can be used
+ * intelligently by plugins to apply more efficient methods of skipping unneeded
+ * data.
  * <p>
- * The position value of the segment is used in conjunction with the start
- * value to convertTo the buffer timestamps into the stream time. This is 
- * usually done in sinks to report the current stream_time. 
+ * The position value of the segment is used in conjunction with the start value
+ * to convertTo the buffer timestamps into the stream time. This is usually done
+ * in sinks to report the current stream_time.
  *
  *
  * @author wayne
@@ -46,19 +42,20 @@ import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
 public class SegmentEvent extends Event {
 
     private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
-    
+
     /**
      * This constructor is for internal use only.
+     *
      * @param init initialization data.
      */
-    public SegmentEvent(Initializer init) {
+    SegmentEvent(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Allocates a new segment event with the given segment.
      */
-    public SegmentEvent(GstSegmentStruct segment) {
+    SegmentEvent(GstSegmentStruct segment) {
         this(initializer(gst.ptr_gst_event_new_segment(segment)));
     }
 
@@ -70,7 +67,7 @@ public class SegmentEvent extends Event {
      *
      * @return the Segment stored in this event.
      */
-    public GstAPI.GstSegmentStruct getSegment() {
+    GstAPI.GstSegmentStruct getSegment() {
         Pointer[] segmentPointer = new Pointer[1];
         gst.gst_event_parse_segment(this, segmentPointer);
         GstSegmentStruct result = new GstAPI.GstSegmentStruct(segmentPointer[0]);

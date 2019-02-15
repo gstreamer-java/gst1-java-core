@@ -19,7 +19,6 @@
 
 package org.freedesktop.gstreamer.message;
 
-import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;

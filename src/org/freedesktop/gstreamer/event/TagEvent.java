@@ -21,12 +21,12 @@
 
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.Event;
 import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 /**
  * A new set of metadata tags has been found in the stream.
@@ -63,14 +63,15 @@ public class TagEvent extends Event {
     public TagList getTagList() {
         Pointer[] taglist = new Pointer[1];
         gst.gst_event_parse_tag(this, taglist);
-        TagList tl = new TagList(taglistInitializer(taglist[0], false, false));
+//        TagList tl = new TagList(taglistInitializer(taglist[0], false, false));
+        TagList tl = NativeObject.objectFor(taglist[0], TagList.class, false, false);
         ReferenceManager.addKeepAliveReference(tl, this);
         return tl;
     }
-    private static Initializer taglistInitializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        if (ptr == null) {
-            throw new IllegalArgumentException("Invalid native pointer");
-        }
-        return new Initializer(ptr, needRef, ownsHandle);
-    }
+//    private static Initializer taglistInitializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
+//        if (ptr == null) {
+//            throw new IllegalArgumentException("Invalid native pointer");
+//        }
+//        return new Initializer(ptr, needRef, ownsHandle);
+//    }
 }

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -15,47 +16,66 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeEnum;
+//import org.freedesktop.gstreamer.lowlevel.EnumMapper;
 
 /**
- * The posible states an element can be in.
+ * The possible states an element can be in.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html#GstState"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html#GstState</a>
+ * <p>
  */
-public enum State implements IntegerEnum {
-    /** No pending state. */
+public enum State implements NativeEnum<State> {
+    /**
+     * No pending state.
+     */
     VOID_PENDING(0),
-    /** The initial state of an {@link Element}. */
+    /**
+     * The initial state of an {@link Element}.
+     */
     NULL(1),
-    /** The {@link Element} is ready to go to PAUSED. */
+    /**
+     * The {@link Element} is ready to go to PAUSED.
+     */
     READY(2),
-    /** The {@link Element} is PAUSED */
+    /**
+     * The {@link Element} is PAUSED
+     */
     PAUSED(3),
-    /** The {@link Element} is PLAYING */
+    /**
+     * The {@link Element} is PLAYING
+     */
     PLAYING(4);
+
+    private final int value;
     
-    State(int value) {
+    private State(int value) {
         this.value = value;
     }
-    
+
     /**
      * Gets the integer value of the enum.
+     *
      * @return The integer value for this enum.
      */
+    @Override
     public int intValue() {
         return value;
     }
-    private final int value;
-    
-    /**
-     * Returns the enum constant of this type with the specified integer value.
-     * @param state integer value.
-     * @return Enum constant.
-     * @throws java.lang.IllegalArgumentException if the enum type has no constant with the specified value.
-     */
-    public static final State valueOf(int state) {
-        return EnumMapper.getInstance().valueOf(state, State.class);
-    }
+
+//    /**
+//     * Returns the enum constant of this type with the specified integer value.
+//     *
+//     * @param state integer value.
+//     * @return Enum constant.
+//     * @throws java.lang.IllegalArgumentException if the enum type has no
+//     * constant with the specified value.
+//     */
+//    public static final State valueOf(int state) {
+//        return EnumMapper.getInstance().valueOf(state, State.class);
+//    }
 }

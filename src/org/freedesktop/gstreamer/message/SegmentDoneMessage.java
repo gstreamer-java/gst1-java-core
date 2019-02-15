@@ -21,7 +21,6 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Message;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**

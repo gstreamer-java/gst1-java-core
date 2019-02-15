@@ -18,20 +18,20 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.message;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * The different message types that are available.
  */
-public enum MessageType implements IntegerEnum {
+public enum MessageType implements NativeFlags {
     /**
      * An undefined message
      */

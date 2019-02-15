@@ -20,6 +20,8 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.query.QueryType;
 import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

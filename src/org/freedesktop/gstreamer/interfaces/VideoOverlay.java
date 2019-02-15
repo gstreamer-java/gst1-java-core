@@ -28,7 +28,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstVideoOverlayAPI.GSTVIDEOOVER
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.BusSyncReply;
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Message;
+import org.freedesktop.gstreamer.message.Message;
 
 
 /**

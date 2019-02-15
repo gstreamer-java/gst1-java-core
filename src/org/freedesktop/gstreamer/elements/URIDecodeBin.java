@@ -22,10 +22,10 @@ import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.ElementFactory;
 import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.Query;
+import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * Java representation of gstreamer uridecodebin
@@ -188,7 +188,7 @@ public class URIDecodeBin extends Bin {
         disconnect(AUTOPLUG_SORT.class, listener);
     }
 
-    public enum GstAutoplugSelectResult implements IntegerEnum {
+    public enum GstAutoplugSelectResult implements NativeFlags {
     	GST_AUTOPLUG_SELECT_TRY(0),
     	GST_AUTOPLUG_SELECT_EXPOSE(1),
     	GST_AUTOPLUG_SELECT_SKIP(2);

@@ -20,6 +20,8 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.message.MessageType;
+import org.freedesktop.gstreamer.message.Message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

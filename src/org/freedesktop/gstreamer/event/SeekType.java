@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2015 Neil C Smith
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -17,7 +17,9 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
+
+import org.freedesktop.gstreamer.glib.NativeEnum;
 
 /**
  * The different types of seek events. 
@@ -27,11 +29,22 @@ package org.freedesktop.gstreamer;
  * be provided. The seek event is then inserted into the graph with
  * gst_pad_send_event() or gst_element_send_event().
  */
-public enum SeekType {
+public enum SeekType implements NativeEnum<SeekType>{
     /** No change in position is required. */
-    NONE,
+    NONE(0),
     /** Absolute position is requested. */
-    SET,
+    SET(1),
     /** Relative position to duration is requested. */
-    END;
+    END(2);
+    
+    private final int value;
+    
+    private SeekType(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public int intValue() {
+        return value;
+    }
 }

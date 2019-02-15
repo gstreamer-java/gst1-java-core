@@ -17,13 +17,13 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * The standard event types that can be sent in a pipeline.
@@ -34,7 +34,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
  * Custom events carry an arbitrary {@link Structure}.  Specific custom events 
  * are distinguished by the name of the structure.
  */
-public enum EventType implements IntegerEnum {
+public enum EventType implements NativeFlags {
     /** Unknown event */
     @DefaultEnumValue UNKNOWN(0, 0),
 

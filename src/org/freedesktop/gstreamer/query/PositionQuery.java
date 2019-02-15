@@ -22,7 +22,6 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**

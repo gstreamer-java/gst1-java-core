@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -19,7 +20,7 @@
 package org.freedesktop.gstreamer;
 
 /**
- * Indicates when a {@link Pad} will become available.
+ * Indicates when a {@link Pad} will become available, for use in {@link PadTemplate}
  */
 public enum PadPresence {
     /**
@@ -27,11 +28,11 @@ public enum PadPresence {
      */
     ALWAYS,
     /**
-     * The pad will become available depending on the media stream
+     * The pad will become available depending on the media stream.
      */
     SOMETIMES,
     /**
-     * The pad is only available on request.
+     * The pad is only available on request with {@link Element#getRequestPad(java.lang.String) }
      */
     REQUEST;
 }

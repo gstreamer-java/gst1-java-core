@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -17,35 +18,49 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.event.SeekFlags;
+import org.freedesktop.gstreamer.glib.NativeFlags;
+
 /**
  * GstSegmentFlags
  */
-public final class SegmentFlags {
+enum SegmentFlags implements NativeFlags<SegmentFlags> {
 
-    /**
-     * no flags
-     */
-    public static final int NONE = SeekFlags.NONE;
+//    /**
+//     * no flags
+//     */
+//    public static final int NONE = SeekFlags.NONE;
     /**
      * reset the pipeline running_time to the segment running_time
      */
-    public static final int RESET = SeekFlags.FLUSH;
+    RESET(SeekFlags.FLUSH),
+    
     /**
-     * perform skip playback (Since 1.6)
+     * perform skip playback
      */
-    public static final int TRICKMODE = SeekFlags.TRICKMODE;
-    @Deprecated
-    public static final int SKIP = SeekFlags.TRICKMODE;
+    TRICKMODE(SeekFlags.TRICKMODE),
     /**
      * send SEGMENT_DONE instead of EOS
      */
-    public static final int SEGMENT = SeekFlags.SEGMENT;
+    SEGMENT(SeekFlags.SEGMENT),
     /**
-     * Decode only keyframes, where possible (Since 1.6)
+     * Decode only keyframes, where possible
      */
-    public static final int TRICKMODE_KEY_UNITS = SeekFlags.TRICKMODE_KEY_UNITS;
+    TRICKMODE_KEY_UNITS(SeekFlags.TRICKMODE_KEY_UNITS),
     /**
      * Do not decode any audio, where possible (Since 1.6)
      */
-    public static final int TRICKMODE_NO_AUDIO = SeekFlags.TRICKMODE_NO_AUDIO;
+    TRICKMODE_NO_AUDIO(SeekFlags.TRICKMODE_NO_AUDIO);
+
+    private final SeekFlags seekFlags;
+    
+    private SegmentFlags(SeekFlags seekFlags) {
+        this.seekFlags = seekFlags;
+    }
+
+    @Override
+    public int intValue() {
+        return seekFlags.intValue();
+    }
+
 }

@@ -21,15 +21,41 @@ package org.freedesktop.gstreamer;
 
 /**
  * Describes a GStreamer version.
+ * <p>
+ * Also upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstVersion.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstVersion.html</a>
+ * <p>
  */
 public class Version {
     
     private final int major, minor, micro, nano;
     
+    /**
+     * Constructor for creating a Version with micro and nano set to zero - most
+     * useful for requesting version in {@link Gst#init(org.freedesktop.gstreamer.Version) }
+     * <p>
+     * <b>The library only supports major version 1</b>
+     * 
+     * @param major Major version of GStreamer
+     * @param minor Minor version of GStreamer
+     */
     public Version(int major, int minor) {
         this(major, minor, 0, 0);
     }
     
+    /**
+     * Constructor for creating a Version reflecting all aspects of the native
+     * GStreamer version.
+     * <p>
+     * <b>The library only supports major version 1</b>
+     * 
+     * @param major Major version of GStreamer
+     * @param minor Minor version of GStreamer
+     * @param micro Micro (patch) version of GStreamer
+     * @param nano Nano The nano version of GStreamer : Actual
+     * releases have 0, GIT versions have 1, prerelease versions have 2
+     */
     public Version(int major, int minor, int micro, int nano) {
         this.major = major;
         this.minor = minor;
@@ -74,7 +100,9 @@ public class Version {
     }
     
     /**
-     * Gets the nano version of GStreamer.
+     * Gets the nano version of GStreamer. Actual releases have 0, GIT versions
+     * have 1, prerelease versions have 2
+     * 
      * @return the nano version.
      */
     public int getNano() {

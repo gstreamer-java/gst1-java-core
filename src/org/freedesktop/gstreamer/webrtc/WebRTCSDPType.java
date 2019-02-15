@@ -15,23 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.webrtc;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 
 /**
  * The type of a {@link WebRTCSessionDescription}
- *
+ * <p>
  * @see https://w3c.github.io/webrtc-pc/#rtcsdptype
  * Available since GStreamer 1.12
  */
-public enum WebRTCSDPType implements IntegerEnum {
+@Gst.Since(minor = 12)
+public enum WebRTCSDPType implements NativeEnum<WebRTCSDPType> {
     OFFER(1),
     PRANSWER(2),
     ANSWER(3),
     ROLLBACK(4);
+    
+    private final int value;
 
-    WebRTCSDPType(int value) {
+    private WebRTCSDPType(int value) {
         this.value = value;
     }
 
@@ -39,8 +43,8 @@ public enum WebRTCSDPType implements IntegerEnum {
      * Gets the integer value of the enum
      * @return the integer value for this enum.
      */
+    @Override
     public int intValue() {
         return value;
     }
-    private final int value;
 }

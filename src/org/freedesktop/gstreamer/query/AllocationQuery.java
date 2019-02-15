@@ -19,12 +19,12 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.BufferPool;
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.Query;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 public class AllocationQuery extends Query {
     /**
@@ -51,7 +51,8 @@ public class AllocationQuery extends Query {
     public Caps getCaps() {
     	Pointer[] ptr = new Pointer[1];
     	GstQueryAPI.GSTQUERY_API.gst_query_parse_allocation(this, ptr, null);
-    	return new Caps(new Initializer(ptr[0], false, true));
+//    	return new Caps(new Initializer(ptr[0], false, true));
+        return NativeObject.objectFor(ptr[0], Caps.class, false, true);
     }
 
     public void addAllocationMeta(GType api, Structure params) {

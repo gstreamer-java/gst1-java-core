@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  *
  * This file is part of gstreamer-java.
@@ -15,36 +16,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.freedesktop.gstreamer.elements;
+package org.freedesktop.gstreamer.webrtc;
 
 import org.freedesktop.gstreamer.Bin;
 import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.Promise;
-import org.freedesktop.gstreamer.State;
 import org.freedesktop.gstreamer.Structure;
-import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.WebRTCSessionDescription;
-import org.freedesktop.gstreamer.WebRTCPeerConnectionState;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
-
 /**
- * WebRTCBin is an abstraction over gstreamers webrtcbin element
- * It is structured to mimic the RTCPeerConnection API that is available in web browsers
+ * WebRTCBin is an abstraction over gstreamers webrtcbin element It is
+ * structured to mimic the RTCPeerConnection API that is available in web
+ * browsers
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
  *
- * @see https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/blob/master/ext/webrtc/gstwebrtcbin.c
+ * @see
+ * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/blob/master/ext/webrtc/gstwebrtcbin.c
  * available since Gstreamer 1.14
  */
+@Gst.Since(minor = 14)
 public class WebRTCBin extends Bin {
-    public static final String GST_NAME = "webrtcbin";
-    public static final String GTYPE_NAME = "GstWebrtcBin";
 
-    public WebRTCBin(Initializer init) {
+    public static final String GST_NAME = "webrtcbin";
+    public static final String GTYPE_NAME = "GstWebRTCBin";
+
+    WebRTCBin(Initializer init) {
         super(init);
     }
 
@@ -53,13 +52,15 @@ public class WebRTCBin extends Bin {
     }
 
     /**
-     * Signal emitted when this {@link WebRTCBin} is ready to do negotiation to setup a WebRTC connection
-     * Good starting point to have the WebRTCBin send an offer to potential clients
+     * Signal emitted when this {@link WebRTCBin} is ready to do negotiation to
+     * setup a WebRTC connection Good starting point to have the WebRTCBin send
+     * an offer to potential clients
      */
     public static interface ON_NEGOTIATION_NEEDED {
+
         /**
-        * @param elem the original webrtc bin that had the callback attached to
-        */
+         * @param elem the original webrtc bin that had the callback attached to
+         */
         public void onNegotiationNeeded(Element elem);
     }
 
@@ -67,9 +68,11 @@ public class WebRTCBin extends Bin {
      * Signal emmited when this {@link WebRTCBin} gets a new ice candidate
      */
     public static interface ON_ICE_CANDIDATE {
+
         /**
-         * @param sdpMLineIndex the zero-based index of the m-line attribute within the SDP to which the candidate should be associated to
-         * @param candidate the ICE candidate 
+         * @param sdpMLineIndex the zero-based index of the m-line attribute
+         * within the SDP to which the candidate should be associated to
+         * @param candidate the ICE candidate
          */
         public void onIceCandidate(int sdpMLineIndex, String candidate);
     }
@@ -78,6 +81,7 @@ public class WebRTCBin extends Bin {
      * Signal emitted when this {@link WebRTCBin} creates an offer
      */
     public static interface CREATE_OFFER {
+
         /**
          * @param a @WebRTCSessionDescription of the offer
          */
@@ -88,6 +92,7 @@ public class WebRTCBin extends Bin {
      * Signal emitted when this {@link WebRTCBin} creates an answer
      */
     public static interface CREATE_ANSWER {
+
         /**
          * @param a @WebRTCSessionDescription of the answer
          */
@@ -96,6 +101,7 @@ public class WebRTCBin extends Bin {
 
     /**
      * Adds a listener for the <code>on-negotiation-needed</code> signal.
+     *
      * @param listener
      */
     public void connect(final ON_NEGOTIATION_NEEDED listener) {
@@ -109,6 +115,7 @@ public class WebRTCBin extends Bin {
 
     /**
      * Adds a listener for the <code>on-ice-candidate</code> signal.
+     *
      * @param listener
      */
     public void connect(final ON_ICE_CANDIDATE listener) {
@@ -121,9 +128,11 @@ public class WebRTCBin extends Bin {
     }
 
     /**
-     * Create an offer that can be sent to other clients to setup a WebRTC connection.
+     * Create an offer that can be sent to other clients to setup a WebRTC
+     * connection.
      * <p>
-     * In most cases {@link #setLocalDescription} should be called after an answer is created
+     * In most cases {@link #setLocalDescription} should be called after an
+     * answer is created
      *
      * @param listener callback that is called when a offer is created
      */
@@ -132,7 +141,7 @@ public class WebRTCBin extends Bin {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
-                WebRTCSessionDescription description = (WebRTCSessionDescription)reply.getValue("offer");
+                WebRTCSessionDescription description = (WebRTCSessionDescription) reply.getValue("offer");
                 listener.onOfferCreated(description);
                 promise.dispose();
             }
@@ -141,11 +150,13 @@ public class WebRTCBin extends Bin {
     }
 
     /**
-     * Create an answer in response to an offer received in order for the WebRTC signaling protocol to start.
+     * Create an answer in response to an offer received in order for the WebRTC
+     * signaling protocol to start.
      * <p>
      * Should be called after {@link #setRemoteDescription} is called
      * <p>
-     * In most cases {@link #setLocalDescription} should be called after an answer is created
+     * In most cases {@link #setLocalDescription} should be called after an
+     * answer is created
      *
      * @param listener callback that is called when an answer is created.
      */
@@ -154,7 +165,7 @@ public class WebRTCBin extends Bin {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
-                WebRTCSessionDescription description = (WebRTCSessionDescription)reply.getValue("answer");
+                WebRTCSessionDescription description = (WebRTCSessionDescription) reply.getValue("answer");
                 listener.onAnswerCreated(description);
                 promise.dispose();
             }
@@ -165,18 +176,20 @@ public class WebRTCBin extends Bin {
     /**
      * Adds a remote ice candidate to the bin
      *
-     * @param sdpMLineIndex the zero-based index of the m-line attribute within the SDP to which the candidate should be associated to
-     * @param candidate the ICE candidate 
+     * @param sdpMLineIndex the zero-based index of the m-line attribute within
+     * the SDP to which the candidate should be associated to
+     * @param candidate the ICE candidate
      */
     public void addIceCandidate(int sdpMLineIndex, String candidate) {
         emit("add-ice-candidate", sdpMLineIndex, candidate);
     }
 
     /**
-     * Sets the local description for the WebRTC connection.
-     * Should be called after {@link #createOffer} or {@link #createAnser} is called.
+     * Sets the local description for the WebRTC connection. Should be called
+     * after {@link #createOffer} or {@link #createAnser} is called.
      *
-     * @param description the {@link WebRTCSessionDescription} to set for the local description
+     * @param description the {@link WebRTCSessionDescription} to set for the
+     * local description
      */
     public void setLocalDescription(WebRTCSessionDescription description) {
         Promise promise = new Promise();
@@ -188,10 +201,11 @@ public class WebRTCBin extends Bin {
     }
 
     /**
-     * Sets the remote description for the WebRTC connection.
-     * Shoud be called after receiving an offer or answer from other clients.
-     * 
-     * @param description the {@link WebRTCSessionDescription} to set for the remote description
+     * Sets the remote description for the WebRTC connection. Shoud be called
+     * after receiving an offer or answer from other clients.
+     *
+     * @param description the {@link WebRTCSessionDescription} to set for the
+     * remote description
      */
     public void setRemoteDescription(WebRTCSessionDescription description) {
         Promise promise = new Promise();
@@ -203,7 +217,8 @@ public class WebRTCBin extends Bin {
     }
 
     /**
-     * Sets the <code>stun-server</code> property for this {@link WebRTCBin} which is use to gather ICE data
+     * Sets the <code>stun-server</code> property for this {@link WebRTCBin}
+     * which is use to gather ICE data
      *
      * @param server STUN server url
      */
@@ -217,11 +232,13 @@ public class WebRTCBin extends Bin {
      * @return the url for the STUN server
      */
     public String getStunServer() {
-        return (String)get("stun-server");
+        return (String) get("stun-server");
     }
 
     /**
-     * Sets the <code>turn-server</code> property for this {@link WebRTCBin} which is used whenever a direct peer-to-peer connection can be established
+     * Sets the <code>turn-server</code> property for this {@link WebRTCBin}
+     * which is used whenever a direct peer-to-peer connection can be
+     * established
      *
      * @param server TURN server url
      */
@@ -235,16 +252,17 @@ public class WebRTCBin extends Bin {
      * @return the url for the TURN server
      */
     public String getTurnServer() {
-        return (String)get("turn-server");
+        return (String) get("turn-server");
     }
 
     /**
      * Retrieve the connection state this {@link WebRTCBin} is currently in
      *
-     * @return a {@link WebRTCPeerConnectionState} describing the connection state
+     * @return a {@link WebRTCPeerConnectionState} describing the connection
+     * state
      */
     public WebRTCPeerConnectionState getConnectionState() {
-        return (WebRTCPeerConnectionState)get("connection-state");
+        return (WebRTCPeerConnectionState) get("connection-state");
     }
 
     /**
@@ -253,7 +271,7 @@ public class WebRTCBin extends Bin {
      * @return the local {@link WebRTCSessionDescription}
      */
     public WebRTCSessionDescription getLocalDescription() {
-        WebRTCSessionDescription description = (WebRTCSessionDescription)get("local-description");
+        WebRTCSessionDescription description = (WebRTCSessionDescription) get("local-description");
         description.disown();
         return description;
     }
@@ -264,7 +282,7 @@ public class WebRTCBin extends Bin {
      * @return the remote {@link WebRTCSessionDescription}
      */
     public WebRTCSessionDescription getRemoteDescription() {
-        WebRTCSessionDescription description = (WebRTCSessionDescription)get("remote-description");
+        WebRTCSessionDescription description = (WebRTCSessionDescription) get("remote-description");
         description.disown();
         return description;
     }

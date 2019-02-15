@@ -28,7 +28,7 @@ public class PluginTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         Gst.init("PluginTest", new String[] {});
-        playbackPlugin = Plugin.load("playback");
+        playbackPlugin = Plugin.loadByName("playback");
     }
     
     @AfterClass

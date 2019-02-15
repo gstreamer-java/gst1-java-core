@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
@@ -20,24 +21,30 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
  * The result of passing data to a pad.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstPad.html#GstFlowReturn"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstPad.html#GstFlowReturn</a>
+ * <p>
  */
-public enum FlowReturn implements IntegerEnum {
-    /** Resend buffer, possibly with new caps (not send yet). */
-    RESEND(1),
+public enum FlowReturn implements NativeEnum<FlowReturn> {
+
     /** Data passing was ok. */
+    // @TODO need to map custom success and custom error OK and ERROR?
+    @DefaultEnumValue
     OK(0),
 
     /** {@link Pad} is not linked. */
     NOT_LINKED(-1),
     /** {@link Pad} is in wrong state. */
-    WRONG_STATE(-2),
+    FLUSHING(-2),
     /** Did not expect anything, like after EOS. */
-    UNEXPECTED(-3),
+    EOS(-3),
     /** {@link Pad} is in not negotiated. */
     NOT_NEGOTIATED(-4),
     
@@ -48,12 +55,10 @@ public enum FlowReturn implements IntegerEnum {
     ERROR(-5),
     
     /** This operation is not supported. */
-    NOT_SUPPORTED(-6),
+    NOT_SUPPORTED(-6);
     
-    /** The default enum value used when no other value matches the native value */
-    @DefaultEnumValue
-    __UNKNOWN_NATIVE_VALUE(~0);
-
+    private final int value;
+    
     FlowReturn(int value) {
         this.value = value;
     }
@@ -62,8 +67,8 @@ public enum FlowReturn implements IntegerEnum {
      * Gets the integer value of the enum.
      * @return The integer value for this enum.
      */
+    @Override
     public int intValue() {
         return value;
     }
-    private int value;
 }

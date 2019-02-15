@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
@@ -24,6 +25,13 @@ import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Pointer;
 
+/**
+ * Wrapping type and helper methods for dealing with SDP messages.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-libs/html/gst-plugins-base-libs-GstSDPMessage.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-libs/html/gst-plugins-base-libs-GstSDPMessage.html</a>
+ */
 public class SDPMessage extends NativeObject {
     public static final String GTYPE_NAME = "GstSDPMessage";
 
@@ -32,7 +40,7 @@ public class SDPMessage extends NativeObject {
      *
      * @param init internal initialization data
      */
-    public SDPMessage(Initializer init) {
+    SDPMessage(Initializer init) {
         super(init);
     }
 
@@ -67,19 +75,19 @@ public class SDPMessage extends NativeObject {
         GSTSDPMESSAGE_API.gst_sdp_message_parse_buffer(data, length, this);
     }
 
-    /**
-     * Creates a copy of this SDPMessage.
-     *
-     * @return a copy of SDPMessage.
-     */
-    public SDPMessage copy(boolean shouldInvalidateOriginal) {
-        Pointer[] ptr = new Pointer[1];
-        GSTSDPMESSAGE_API.gst_sdp_message_copy(this, ptr);
-        if (shouldInvalidateOriginal) {
-            this.invalidate();
-        }
-        return new SDPMessage(initializer(ptr[0]));
-    }
+//    /**
+//     * Creates a copy of this SDPMessage.
+//     *
+//     * @return a copy of SDPMessage.
+//     */
+//    SDPMessage copy(boolean shouldInvalidateOriginal) {
+//        Pointer[] ptr = new Pointer[1];
+//        GSTSDPMESSAGE_API.gst_sdp_message_copy(this, ptr);
+//        if (shouldInvalidateOriginal) {
+//            this.invalidate();
+//        }
+//        return new SDPMessage(initializer(ptr[0]));
+//    }
 
     private static Initializer initializer() {
         Pointer[] ptr = new Pointer[1];

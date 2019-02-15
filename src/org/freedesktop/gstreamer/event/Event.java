@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -16,8 +17,10 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
 
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 
@@ -25,15 +28,19 @@ import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
  * Base type of all events.
- * 
- * <p> Events are passed between elements in parallel to the data stream. Some events
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html</a>
+ * <p>
+ * Events are passed between elements in parallel to the data stream. Some events
  * are serialized with buffers, others are not. Some events only travel downstream,
  * others only upstream. Some events can travel both upstream and downstream. 
- * 
- * <p> The events are used to signal special conditions in the datastream such as
+ * <p>
+ * The events are used to signal special conditions in the datastream such as
  * EOS (end of stream) or the start of a new stream-segment.
- * 
- * <p> Events are also used to flush the pipeline of any pending data.
+ * <p>
+ * Events are also used to flush the pipeline of any pending data.
  * 
  * @see Pad#pushEvent
  * @see Pad#sendEvent
@@ -47,7 +54,7 @@ public class Event extends MiniObject {
      * This constructor is for internal use only.
      * @param init initialization data.
      */
-    public Event(Initializer init) { 
+    Event(Initializer init) { 
         super(init); 
     }
     

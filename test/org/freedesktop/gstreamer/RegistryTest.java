@@ -81,7 +81,7 @@ public class RegistryTest {
                 filterCalled[0] = true;
                 return plugin.getName().equals(PLUGIN);
             }
-        }, true);
+        });
         assertFalse("No plugins found", plugins.isEmpty());
         assertTrue("PluginFilter not called", filterCalled[0]);
         assertEquals("Plugin list should contain 1 item", 1, plugins.size());
@@ -106,7 +106,7 @@ public class RegistryTest {
     
     @Test
     public void testFindPluginFeature() {
-        PluginFeature f = Registry.get().findPluginFeature("decodebin");
+        PluginFeature f = Registry.get().lookupFeature("decodebin");
         assertNotNull(f);
     }
     

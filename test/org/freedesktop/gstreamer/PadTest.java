@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.event.Event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 David Hoyt <dhoyt@hoytsoft.org>
+ * Copyright (c) 2010 David Hoyt <dhoyt@hoytsoft.org>
  *
  * This file is part of gstreamer-java.
  *

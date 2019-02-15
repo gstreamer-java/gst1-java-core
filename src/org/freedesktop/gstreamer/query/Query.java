@@ -16,8 +16,10 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.query;
 
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 

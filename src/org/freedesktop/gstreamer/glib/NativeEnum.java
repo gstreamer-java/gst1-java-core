@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007 Wayne Meissner
+ * Copyright (c) 2019 Neil C Smith
  * 
  * This file is part of gstreamer-java.
  *
@@ -16,12 +16,14 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel;
+package org.freedesktop.gstreamer.glib;
 
 /**
- * Interface for int enums that are non-contiguous (i.e. can't just use Enum.ordinal())
- * to find the native value.
+ * Interface for enums that wrap a native int-based enum.
+ * @param <T> Java enum type
  */
-public interface IntegerEnum {
+public interface NativeEnum<T extends Enum<T>> {
+    
     public int intValue();
+
 }

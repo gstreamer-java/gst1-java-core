@@ -20,7 +20,6 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.TagList;
 import com.sun.jna.ptr.PointerByReference;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;

@@ -20,23 +20,16 @@
 
 package org.freedesktop.gstreamer.elements;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.ByReference;
-import com.sun.jna.ptr.PointerByReference;
-import java.awt.Dimension;
 import java.io.File;
 import java.net.URI;
 
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Fraction;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.Video;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 
 /**
@@ -269,42 +262,6 @@ public class PlayBin extends Pipeline {
         return ((Number) get("volume")).doubleValue();
     }
     
-    /**
-     * Retrieves the framerate from the caps of the video sink's pad.
-     * 
-     * @return frame rate (frames per second), or 0 if the framerate is not
-     *         available
-     */
-    public double getVideoSinkFrameRate() {
-      for (Element sink : getSinks()) {
-        for (Pad pad : sink.getPads()) {
-          Fraction frameRate = Video.getVideoFrameRate(pad);
-          if (frameRate != null) {
-            return frameRate.toDouble();
-          }
-        }
-      }
-      return 0;
-    }
-
-    /**
-     * Retrieves the width and height of the video frames configured in the caps
-     * of the video sink's pad.
-     * 
-     * @return dimensions of the video frames, or null if the video frame size is
-     *         not available
-     */
-    public Dimension getVideoSize() {
-      for (Element sink : getSinks()) {
-        for (Pad pad : sink.getPads()) {
-          Dimension size = Video.getVideoSize(pad);
-          if (size != null) {
-            return size;
-          }
-        }
-      }
-      return null;
-    }
 
     /**
      * Get the currently playing audio stream. By default the first audio stream with data is played.

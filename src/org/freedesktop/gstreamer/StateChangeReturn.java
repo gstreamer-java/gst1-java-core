@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,21 +19,39 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.NativeEnum;
+
 /**
  * The possible return values from a state change function. 
  * <p>
  * Only {@link StateChangeReturn#FAILURE} is a real failure.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html#GstStateChangeReturn"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html#GstStateChangeReturn</a>
+ * <p>
  */
-public enum StateChangeReturn {
+public enum StateChangeReturn implements NativeEnum<StateChangeReturn> {
     /** The state change failed. */
-    FAILURE,
+    FAILURE(0),
     /** The state change succeeded. */
-    SUCCESS,
+    SUCCESS(1),
     /** The state change will happen asynchronously. */
-    ASYNC,
+    ASYNC(2),
     /**
      * The state change succeeded but the {@link Element} cannot produce data in 
      * {@link State#PAUSED}. This typically happens with live sources.
      */
-    NO_PREROLL;
+    NO_PREROLL(3);
+    
+    private final int value;
+    
+    private StateChangeReturn(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public int intValue() {
+        return value;
+    }
 }

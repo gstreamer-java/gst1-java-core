@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -23,9 +24,9 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 /**
  * The status of a {@link Pad}. After activating a pad, which usually happens when 
  * the parent element goes from {@link State#READY} to {@link State#PAUSED}, the 
- * ActivateMode defines if the {@link Pad} operates in push or pull mode.
+ * PadMode defines if the {@link Pad} operates in push or pull mode.
  */
-public enum ActivateMode {
+public enum PadMode {
     /** 
      * Pad will not handle dataflow
      */

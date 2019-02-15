@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -15,11 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
+
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * Flags to be used with {@link Pipeline#seek seek} or
- * {@link org.gstreamer.event.SeekEvent#SeekEvent SeekEvent}
+ * {@link org.freedesktop.gstreamer.event.SeekEvent#SeekEvent SeekEvent}
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#GstSeekFlags"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#GstSeekFlags</a>
  * <p>
  * All flags can be used together.
  * <p>
@@ -37,72 +44,72 @@ package org.freedesktop.gstreamer;
  * continue playback. With this seek method it is possible to perform seamless
  * looping or simple linear editing.
  */
-public final class SeekFlags {
+public enum SeekFlags implements NativeFlags<SeekFlags> {
 
-    /**
-     * No flag.
-     */
-    public final static int NONE = 0;
+//    /**
+//     * No flag.
+//     */
+//    NONE(0),
     /**
      * Flush pipeline.
      */
-    public final static int FLUSH = 1 << 0;
+    FLUSH(1 << 0),
     /**
      * Accurate position is requested, this might be considerably slower for
      * some formats.
      */
-    public final static int ACCURATE = 1 << 1;
-
+    ACCURATE(1 << 1),
     /**
      * Seek to the nearest keyframe. This might be faster but less accurate.
      */
-    public final static int KEY_UNIT = 1 << 2;
-
+    KEY_UNIT(1 << 2),
     /**
      * Perform a segment seek.
      */
-    public final static int SEGMENT = 1 << 3;
-
-    /**
-     * when doing fast forward or fast reverse playback, allow elements to skip
-     * frames instead of generating all frames. Since 0.10.22.
-     */
-    @Deprecated
-    public final static int SKIP = 1 << 4;
-
+    SEGMENT(1 << 3),
     /**
      * when doing fast forward or fast reverse playback, allow elements to skip
      * frames instead of generating all frames. (Since 1.6)
      */
-    public final static int TRICKMODE = (1 << 4);
+    TRICKMODE(1 << 4),
     /**
      * go to a location before the requested position, if
      * %GST_SEEK_FLAG_KEY_UNIT this means the keyframe at or before the
      * requested position the one at or before the seek target.
      */
-    public final static int SNAP_BEFORE = (1 << 5);
+    SNAP_BEFORE(1 << 5),
     /**
      * go to a location after the requested position, if %GST_SEEK_FLAG_KEY_UNIT
      * this means the keyframe at of after the requested position.
      */
-    public final static int SNAP_AFTER = (1 << 6);
-    /**
-     * go to a position near the requested position, if %GST_SEEK_FLAG_KEY_UNIT
-     * this means the keyframe closest to the requested position, if both
-     * keyframes are at an equal distance, behaves like
-     * %GST_SEEK_FLAG_SNAP_BEFORE.
-     */
-    public final static int SNAP_NEAREST = SNAP_BEFORE | SNAP_AFTER;
+    SNAP_AFTER(1 << 6),
+    //    /**
+    //     * go to a position near the requested position, if %GST_SEEK_FLAG_KEY_UNIT
+    //     * this means the keyframe closest to the requested position, if both
+    //     * keyframes are at an equal distance, behaves like
+    //     * %GST_SEEK_FLAG_SNAP_BEFORE.
+    //     */
+    //    public final static int SNAP_NEAREST = SNAP_BEFORE | SNAP_AFTER;
     /**
      * when doing fast forward or fast reverse playback, request that elements
      * only decode keyframes and skip all other content, for formats that have
-     * keyframes. (Since 1.6)
+     * keyframes.
      */
-    public final static int TRICKMODE_KEY_UNITS = (1 << 7);
+    TRICKMODE_KEY_UNITS(1 << 7),
     /**
      * when doing fast forward or fast reverse playback, request that audio
      * decoder elements skip decoding and output only gap events or silence.
-     * (Since 1.6)
      */
-    public final static int TRICKMODE_NO_AUDIO = (1 << 8);
+    TRICKMODE_NO_AUDIO(1 << 8);
+
+    private final int value;
+
+    private SeekFlags(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public int intValue() {
+        return value;
+    }
 }

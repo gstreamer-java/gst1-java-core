@@ -17,8 +17,11 @@
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer;
+package org.freedesktop.gstreamer.event;
 
+import org.freedesktop.gstreamer.event.QOSType;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.event.EventType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +30,13 @@ import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
+import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.ClockTime;
+import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.GCTracker;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.Structure;
+import org.freedesktop.gstreamer.TagList;
 
 import org.freedesktop.gstreamer.event.BufferSizeEvent;
 import org.freedesktop.gstreamer.event.CapsEvent;
@@ -87,7 +97,7 @@ public class EventTest {
     }
     @Test public void createSegmentEvent() throws Exception {
         GstAPI.GstSegmentStruct struct = new GstAPI.GstSegmentStruct();
-        struct.flags = SegmentFlags.NONE;
+        struct.flags = 0;
         struct.rate = 1.0;
         struct.applied_rate = 1.0;
         struct.format = Format.TIME;
@@ -127,7 +137,7 @@ public class EventTest {
     }
     @Test public void gst_event_new_new_segment() {
         GstAPI.GstSegmentStruct struct = new GstAPI.GstSegmentStruct();
-        struct.flags = SegmentFlags.NONE;
+        struct.flags = 0;
         struct.rate = 1.0;
         struct.applied_rate = 1.0;
         struct.format = Format.TIME;
@@ -142,17 +152,17 @@ public class EventTest {
     }
     @Test public void NewSegment_getRate() {
         final double RATE = (double) 0xdeadbeef;
-        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, RATE, RATE, Format.TIME, 0, 0, 0, 0, 0, 0, 0));
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(0, RATE, RATE, Format.TIME, 0, 0, 0, 0, 0, 0, 0));
         assertEquals("Incorrect rate returned from getRate", RATE, ev.getSegment().rate, 0.0);
     }
     @Test public void NewSegment_getStart() {
         final long START = 0xdeadbeefL;
-        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, 0.1, 0.1, Format.TIME, 0, 0, START, -1L, 0, 0, 0));
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(0, 0.1, 0.1, Format.TIME, 0, 0, START, -1L, 0, 0, 0));
         assertEquals("Incorrect rate returned from getStart", START, ev.getSegment().start);
     }
     @Test public void NewSegment_getStop() {
         final long STOP = 0xdeadbeefL;
-        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(SegmentFlags.NONE, 0.1, 0.1, Format.TIME, 0, 0, 0L, STOP, 0, 0, 0));
+        SegmentEvent ev = new SegmentEvent(new GstAPI.GstSegmentStruct(0, 0.1, 0.1, Format.TIME, 0, 0, 0L, STOP, 0, 0, 0));
         assertEquals("Incorrect rate returned from getRate", STOP, ev.getSegment().stop);
     }
     @Test public void gst_event_new_tag() {

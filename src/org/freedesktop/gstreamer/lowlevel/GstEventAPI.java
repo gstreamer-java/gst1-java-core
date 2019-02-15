@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.EventType;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.event.EventType;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.QOSType;
-import org.freedesktop.gstreamer.SeekType;
+import org.freedesktop.gstreamer.event.QOSType;
+import org.freedesktop.gstreamer.event.SeekType;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
@@ -20,13 +21,12 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
-import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * A set of buffer flags used to describe properties of a {@link Buffer}.
  */
-public enum BufferFlag implements IntegerEnum {
+public enum BufferFlag implements NativeFlags<BufferFlag> {
 
     /**  
      * the {@link Buffer} is live data and should be discarded in the PAUSED state.
@@ -93,12 +93,21 @@ public enum BufferFlag implements IntegerEnum {
      */
     SYNC_AFTER(MiniObjectFlags.LAST.intValue() << 11),
     
-    /* padding */
-    LAST(MiniObjectFlags.LAST.intValue() << 16),
+    /**
+     * This buffer is important and should not be dropped. This can be used to
+     * mark important buffers, e.g. to flag RTP packets carrying keyframes or
+     * codec setup data for RTP Forward Error Correction purposes, or to prevent
+     * still video frames from being dropped by elements due to QoS. (Since
+     * 1.14)
+
+     */
+    @Gst.Since(minor = 14)
+    NON_DROPPABLE(MiniObjectFlags.LAST.intValue() << 12),
     
-    /** The value used for unknown native values */
-    @DefaultEnumValue
-    UNKNOWN(~0);
+    /* padding */
+    LAST(MiniObjectFlags.LAST.intValue() << 16);
+    
+    private final int value;
     
     private BufferFlag(int value) {
         this.value = value;
@@ -111,5 +120,4 @@ public enum BufferFlag implements IntegerEnum {
         return value;
     }
     
-    private final int value;
 }

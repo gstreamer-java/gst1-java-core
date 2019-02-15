@@ -20,6 +20,10 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.glib.GSocket;
 import org.freedesktop.gstreamer.glib.GInetSocketAddress;
 import org.freedesktop.gstreamer.glib.GError;
@@ -48,7 +52,7 @@ import org.freedesktop.gstreamer.elements.BaseTransform;
 import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
 import org.freedesktop.gstreamer.elements.URIDecodeBin;
-import org.freedesktop.gstreamer.elements.WebRTCBin;
+import org.freedesktop.gstreamer.webrtc.WebRTCBin;
 import org.freedesktop.gstreamer.glib.GDate;
 import org.freedesktop.gstreamer.glib.GInetAddress;
 import org.freedesktop.gstreamer.glib.GSocketAddress;
@@ -89,7 +93,7 @@ public final class Gst {
     private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
     // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
-    
+
     public static class NativeArgs {
         public IntByReference argcRef;
         public PointerByReference argvRef;
