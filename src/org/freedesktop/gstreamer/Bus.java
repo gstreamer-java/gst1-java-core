@@ -36,7 +36,6 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 
-import org.freedesktop.gstreamer.event.BusSyncHandler;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
