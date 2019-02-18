@@ -106,7 +106,7 @@ class SubtypeMapper {
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstEventAPI.EventStruct struct = new GstEventAPI.EventStruct(ptr);
-                EventType type = EventType.valueOf((Integer) struct.readField("type"));
+                EventType type = (EventType) struct.readField("type");
                 Class<? extends Event> eventClass = MapHolder.typeMap.get(type);
                 return eventClass != null ? eventClass : Event.class;
             }

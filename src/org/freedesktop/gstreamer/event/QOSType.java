@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2015 Neil C Smith
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,26 +18,41 @@
  */
 package org.freedesktop.gstreamer.event;
 
+import org.freedesktop.gstreamer.glib.NativeEnum;
+
 /**
  * The different types of QoS events that can be given to the
  * gst_event_new_qos() method.
  */
-public enum QOSType {
+public enum QOSType implements NativeEnum<QOSType> {
     /**
      * The QoS event type that is produced when downstream elements are
      * producing data too quickly and the element can't keep up processing the
      * data. Upstream should reduce their processing rate. This type is also
      * used when buffers arrive early or in time.
      */
-    OVERFLOW,
+    OVERFLOW(0),
     /**
      * The QoS event type that is produced when downstream elements are
      * producing data too slowly and need to speed up their processing rate.
      */
-    UNDERFLOW,
+    UNDERFLOW(1),
     /**
      * The QoS event type that is produced when the application enabled
      * throttling to limit the datarate.
      */
-    THROTTLE;
+    THROTTLE(2);
+    
+    private final int value;
+    
+    private QOSType(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public int intValue() {
+        return value;
+    }
+    
+    
 }

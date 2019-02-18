@@ -19,14 +19,16 @@
 
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.lowlevel.EnumMapper;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
-
-import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
-import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * The standard event types that can be sent in a pipeline.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#GstEventType"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#GstEventType</a>
  * <p>
  * The custom event types can be used for private messages between elements
  * that can't be expressed using normal GStreamer buffer passing semantics. 
@@ -34,7 +36,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  * Custom events carry an arbitrary {@link Structure}.  Specific custom events 
  * are distinguished by the name of the structure.
  */
-public enum EventType implements NativeFlags {
+public enum EventType implements NativeEnum<EventType> {
     /** Unknown event */
     @DefaultEnumValue UNKNOWN(0, 0),
 
@@ -68,6 +70,11 @@ public enum EventType implements NativeFlags {
      */
     SEGMENT(70, Flags.DOWNSTREAM | Flags.SERIALIZED | Flags.STICKY),
     /**
+     * A new #GstStreamCollection is available (Since 1.10)
+     */
+    @Gst.Since(minor = 10)
+    STREAM_COLLECTION(75, Flags.DOWNSTREAM | Flags.SERIALIZED | Flags.STICKY | Flags.STICKY_MULTI),
+    /**
      * A new set of metadata tags has been found in the stream.
      */
     TAG(80, Flags.DOWNSTREAM | Flags.SERIALIZED | Flags.STICKY | Flags.STICKY_MULTI),
@@ -80,6 +87,13 @@ public enum EventType implements NativeFlags {
      * should be emitted in sync with rendering.
      */
     SINK_MESSAGE(100, Flags.DOWNSTREAM | Flags.SERIALIZED | Flags.STICKY | Flags.STICKY_MULTI),
+    /**
+     * Indicates that there is no more data for the stream group ID in the
+     * message. Sent before EOS in some instances and should be handled mostly
+     * the same. (Since 1.10)
+     */
+    @Gst.Since(minor = 10)
+    STREAM_GROUP_DONE(105, Flags.DOWNSTREAM | Flags.SERIALIZED | Flags.STICKY),
     /**
      * End-Of-Stream. No more data is to be expected to follow without a SEGMENT
      * event.
@@ -139,7 +153,11 @@ public enum EventType implements NativeFlags {
      * A request for a new playback position based on TOC entry's UID.
      */
     TOC_SELECT(250, Flags.UPSTREAM),
-
+    /**
+     * A request to select one or more streams (Since 1.10)
+     */
+    @Gst.Since(minor = 10)
+    SELECT_STREAMS(260, Flags.UPSTREAM),
     /* custom events start here */
     /**
      * Upstream custom event
@@ -167,25 +185,19 @@ public enum EventType implements NativeFlags {
     CUSTOM_BOTH_OOB(320, Flags.BOTH)
     ;
     
-    EventType(int num, int flags) {
+    private static final int SHIFT = 8;
+    
+    private final int value;
+    
+    private EventType(int num, int flags) {
         this.value = (num << SHIFT) | flags;
     }
     
-    /** Gets the native value of this enum */
+    @Override
     public int intValue() {
         return value;
     }
-    /** Gets a human-readable name for this value */
-    public String getName() {
-        return GSTEVENT_API.gst_event_type_get_name(this);
-    }
     
-    /** Gets the Enum for a native value */
-    public static final EventType valueOf(int type) {
-        return EnumMapper.getInstance().valueOf(type, EventType.class);
-    }
-    
-    private static final int SHIFT = 8;
     private static final class Flags {
         public static final int UPSTREAM       = 1 << 0;
         public static final int DOWNSTREAM     = 1 << 1;
@@ -194,5 +206,4 @@ public enum EventType implements NativeFlags {
         public static final int STICKY_MULTI   = 1 << 4;
         public static final int BOTH = UPSTREAM | DOWNSTREAM;
     }
-    private final int value;
 }

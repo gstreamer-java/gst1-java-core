@@ -252,8 +252,12 @@ public interface GValueAPI extends Library {
         }
         
         public GValueArray(int n_prealloced) {
+            this(n_prealloced, true);
+        }
+        
+        public GValueArray(int n_prealloced, boolean ownsMemory) {
             this(GVALUE_API.g_value_array_new(n_prealloced));
-            ownsMemory = true;
+            this.ownsMemory = ownsMemory;
         }
         
         public GValueArray(Pointer pointer) {

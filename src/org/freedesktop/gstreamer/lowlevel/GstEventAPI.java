@@ -137,7 +137,7 @@ public interface GstEventAPI extends com.sun.jna.Library {
         public volatile MiniObjectStruct mini_object;
         
         /*< public >*/ /* with COW */
-        public volatile int type;
+        public volatile EventType type;
         public volatile long timestamp;
         public volatile int seqnum;
                 

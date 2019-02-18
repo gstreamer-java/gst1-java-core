@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
@@ -21,11 +22,17 @@
 
 package org.freedesktop.gstreamer.event;
 
+import java.util.EnumSet;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
+import org.freedesktop.gstreamer.glib.NativeFlags;
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
  * A request for a new playback position and rate.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-seek"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-seek</a>
  * <p>
  * The seek event configures playback of the pipeline between <tt>start</tt> to <tt>stop</tt>
  * at the speed given in <tt>rate</tt>, also called a playback segment.
@@ -41,7 +48,7 @@ import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
  * position of 0, a stop position of -1 and a rate of 1.0. The currently
  * configured playback segment can be queried with #GST_QUERY_SEGMENT. 
  * <p>
- * <ttstartType</tt> and <tt>stopType</tt> specify how to adjust the currently configured 
+ * <tt>startType</tt> and <tt>stopType</tt> specify how to adjust the currently configured 
  * start and stop fields in <tt>segment</tt>. Adjustments can be made relative or
  * absolute to the last configured values. A type of {@link SeekType#NONE} means
  * that the position should not be updated.
@@ -59,13 +66,12 @@ import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
  * current position with a {@link SeekType#SET} to the desired position.
  */
 public class SeekEvent extends Event {
-    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
     
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
      */
-    public SeekEvent(Initializer init) {
+    SeekEvent(Initializer init) {
         super(init);
     }
     
@@ -80,11 +86,12 @@ public class SeekEvent extends Event {
      * @param stopType the type and flags for the new stop position
      * @param stop the value of the new stop position
      */
-    public SeekEvent(double rate, Format format, int flags, 
+    public SeekEvent(double rate, Format format, EnumSet<SeekFlags> flags, 
             SeekType startType, long start, SeekType stopType, long stop) {
-        super(initializer(gst.ptr_gst_event_new_seek(sanitizeRate(rate), format, 
-                flags, startType, start, stopType, stop)));
+        super(initializer(GSTEVENT_API.ptr_gst_event_new_seek(sanitizeRate(rate), format, 
+                NativeFlags.toInt(flags), startType, start, stopType, stop)));
     }
+    
     private static double sanitizeRate(double rate) {
         if (rate == 0d) {
             throw new IllegalArgumentException("Cannot have rate == 0.0");
@@ -94,7 +101,7 @@ public class SeekEvent extends Event {
     /**
      * Gets the playback rate.
      * 
-     *  A <tt>rate</tt> of 1.0 means normal playback rate, 2.0 means double speed.
+     * A <tt>rate</tt> of 1.0 means normal playback rate, 2.0 means double speed.
      * Negative values means backwards playback. A value of 0.0 for the
      * rate is not allowed and should be accomplished instead by PAUSING the
      * pipeline.
@@ -103,7 +110,7 @@ public class SeekEvent extends Event {
      */
     public double getRate() {
         double[] rate = { 0d };
-        gst.gst_event_parse_seek(this, rate, null, null, null, null, null, null);
+        GSTEVENT_API.gst_event_parse_seek(this, rate, null, null, null, null, null, null);
         return rate[0];
     }
     
@@ -114,19 +121,19 @@ public class SeekEvent extends Event {
      */
     public Format getFormat() {
         Format[] format = new Format[1];
-        gst.gst_event_parse_seek(this, null, format, null, null, null, null, null);
+        GSTEVENT_API.gst_event_parse_seek(this, null, format, null, null, null, null, null);
         return format[0];
     }
     
     /**
-     * Gets the {@link org.freedesktop.gstreamer.event.SeekFlags} of this seek event.
+     * Gets the {@link SeekFlags} of this seek event.
      * 
      * @return the seek flags.
      */
-    public int getFlags() {
+    public EnumSet<SeekFlags> getFlags() {
         int[] flags = { 0 };
-        gst.gst_event_parse_seek(this, null, null, flags, null, null, null, null);
-        return flags[0];
+        GSTEVENT_API.gst_event_parse_seek(this, null, null, flags, null, null, null, null);
+        return NativeFlags.fromInt(SeekFlags.class, flags[0]);
     }
     
     /**
@@ -136,7 +143,7 @@ public class SeekEvent extends Event {
      */
     public SeekType getStartType() {
         SeekType[] type = new SeekType[1];
-        gst.gst_event_parse_seek(this, null, null, null, type, null, null, null);
+        GSTEVENT_API.gst_event_parse_seek(this, null, null, null, type, null, null, null);
         return type[0];
     }
     
@@ -147,7 +154,7 @@ public class SeekEvent extends Event {
      */
     public long getStart() {
         long[] value = { 0 };
-        gst.gst_event_parse_seek(this, null, null, null, null, value, null, null);
+        GSTEVENT_API.gst_event_parse_seek(this, null, null, null, null, value, null, null);
         return value[0];
     }
     
@@ -158,7 +165,7 @@ public class SeekEvent extends Event {
      */
     public SeekType getStopType() {
         SeekType[] type = new SeekType[1];
-        gst.gst_event_parse_seek(this, null, null, null, null, null, type, null);
+        GSTEVENT_API.gst_event_parse_seek(this, null, null, null, null, null, type, null);
         return type[0];
     }
     
@@ -169,7 +176,7 @@ public class SeekEvent extends Event {
      */
     public long getStop() {
         long[] value = { 0 };
-        gst.gst_event_parse_seek(this, null, null, null, null, null, null, value);
+        GSTEVENT_API.gst_event_parse_seek(this, null, null, null, null, null, null, value);
         return value[0];
     }
 }

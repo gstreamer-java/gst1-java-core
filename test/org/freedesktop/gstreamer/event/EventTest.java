@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
+import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
@@ -255,40 +256,40 @@ public class EventTest {
     }
     @Test public void Seek_getFormat() {
         for (Format FORMAT : new Format[] { Format.TIME, Format.BYTES }) {
-            SeekEvent ev = new SeekEvent(1.0, FORMAT, 0, 
+            SeekEvent ev = new SeekEvent(1.0, FORMAT, EnumSet.noneOf(SeekFlags.class), 
                     SeekType.SET, 0, SeekType.SET, 0);
             assertEquals("Wrong format in SeekEvent", FORMAT, ev.getFormat());
         }
     }
     @Test public void Seek_getStartType() {
         for (SeekType TYPE : new SeekType[] { SeekType.SET, SeekType.END }) {
-            SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
+            SeekEvent ev = new SeekEvent(1.0, Format.TIME, EnumSet.noneOf(SeekFlags.class), 
                     TYPE, 0, SeekType.NONE, 0);
             assertEquals("Wrong startType in SeekEvent", TYPE, ev.getStartType());
         }
     }
     @Test public void Seek_getStopType() {
         for (SeekType TYPE : new SeekType[] { SeekType.SET, SeekType.END }) {
-            SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
+            SeekEvent ev = new SeekEvent(1.0, Format.TIME, EnumSet.noneOf(SeekFlags.class), 
                     SeekType.NONE, 0, TYPE, 0);
             assertEquals("Wrong stopType in SeekEvent", TYPE, ev.getStopType());
         }
     }
     @Test public void Seek_getStart() {
         final long START = 0xdeadbeef;
-        SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
+        SeekEvent ev = new SeekEvent(1.0, Format.TIME, EnumSet.noneOf(SeekFlags.class), 
                     SeekType.SET, START, SeekType.SET, -1);
             assertEquals("Wrong start in SeekEvent", START, ev.getStart());
     }
     @Test public void Seek_getStop() {
         final long STOP = 0xdeadbeef;
-        SeekEvent ev = new SeekEvent(1.0, Format.TIME, 0, 
+        SeekEvent ev = new SeekEvent(1.0, Format.TIME, EnumSet.noneOf(SeekFlags.class), 
                     SeekType.SET, 0, SeekType.SET, STOP);
             assertEquals("Wrong stop in SeekEvent", STOP, ev.getStop());
     }
     @Test public void Seek_rateZero() {
         try {
-            new SeekEvent(0.0, Format.TIME, 0, 
+            new SeekEvent(0.0, Format.TIME, EnumSet.noneOf(SeekFlags.class), 
                     SeekType.SET, 0, SeekType.SET, -1);
             fail("A rate of 0.0 should throw an exception");
         } catch (IllegalArgumentException ex) {

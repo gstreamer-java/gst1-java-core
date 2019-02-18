@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  *
  * This file is part of gstreamer-java.
@@ -19,25 +20,31 @@
 package org.freedesktop.gstreamer.event;
 
 
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
-
+/**
+ * Stream Start event.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-stream-start"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-stream-start</a>
+ * <p>
+ */
 public class StreamStartEvent extends Event {
 	
-    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
-
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
      */
-    public StreamStartEvent(Initializer init) {
+    StreamStartEvent(Initializer init) {
         super(init);
     }
 
     /**
      * Creates a new EOS event.
+     * @param stream_id identifier for this stream
      */
     public StreamStartEvent(final String stream_id) {
-        super(initializer(gst.ptr_gst_event_new_stream_start(stream_id)));
+        super(initializer(GSTEVENT_API.ptr_gst_event_new_stream_start(stream_id)));
     }
 }
