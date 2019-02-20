@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007, 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  * 
@@ -16,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
@@ -30,22 +30,26 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * Lightweight objects to signal the occurrence of pipeline events.
- * 
- * <p> Messages are implemented as a subclass of {@link MiniObject} with a generic
- * {@link Structure} as the content. This allows for writing custom messages without
- * requiring an API change while allowing a wide range of different types
- * of messages.
- *
- * <p> Messages are posted by objects in the pipeline and are passed to the
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html</a>
+ * <p>
+ * Messages are implemented as a subclass of {@link MiniObject} with a generic
+ * {@link Structure} as the content. This allows for writing custom messages
+ * without requiring an API change while allowing a wide range of different
+ * types of messages.
+ * <p>
+ * Messages are posted by objects in the pipeline and are passed to the
  * application using the {@link Bus}.
-
+ *
  * The basic use pattern of posting a message on a Bus is as follows:
  *
  * <example>
  * <title>Posting a Message</title>
- *   <code>
+ * <code>
  *    bus.post(new EOSMessage(source));
- *   </code>
+ * </code>
  * </example>
  *
  * An {@link Element} usually posts messages on the bus provided by the parent
@@ -53,46 +57,47 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
  */
 @HasSubtype
 public class Message extends MiniObject {
+
     public static final String GTYPE_NAME = "GstMessage";
 
-    protected GstMessageAPI.MessageStruct messageStruct;
-    
+    private final GstMessageAPI.MessageStruct messageStruct;
+
     /**
      * Creates a new instance of Message.
-     * 
+     *
      * @param init internal initialization data.
      */
-    public Message(Initializer init) {
+    Message(Initializer init) {
         super(init);
-        messageStruct = new GstMessageAPI.MessageStruct(handle());
+        messageStruct = new GstMessageAPI.MessageStruct(init.ptr);
     }
-    
+
     /**
      * Gets the Element that posted this message.
-     * 
+     *
      * @return the element that posted the message.
      */
     public GstObject getSource() {
-        return (GstObject)messageStruct.readField("src");
+        return (GstObject) messageStruct.readField("src");
     }
-    
+
     /**
      * Gets the structure containing the data in this message.
-     * 
+     *
      * @return a structure.
      */
     public Structure getStructure() {
         return ReferenceManager.addKeepAliveReference(GSTMESSAGE_API.gst_message_get_structure(this), this);
     }
-    
+
     /**
      * Gets the type of this message.
-     * 
+     *
      * @return the message type.
      */
     public MessageType getType() {
-        MessageType type = (MessageType)messageStruct.readField("type");
-		return type;
+        MessageType type = (MessageType) messageStruct.readField("type");
+        return type;
     }
-    
+
 }

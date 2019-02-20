@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2009 Levente Farkas
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -17,21 +18,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.message;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 
-import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-
-import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
-import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * The different message types that are available.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#GstMessageType"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#GstMessageType</a>
+ * <p>
  */
-public enum MessageType implements NativeFlags {
+
+// use NativeEnum not NativeFlags - from upstream definition
+// FIXME: 2.0: Make it NOT flags, just a regular 1,2,3,4.. enumeration
+public enum MessageType implements NativeEnum<MessageType> {
     /**
      * An undefined message
      */
@@ -74,7 +77,8 @@ public enum MessageType implements NativeFlags {
      */
     STATE_CHANGED(1 << 6),
     /**
-     * an element changed state in a streaming thread. This message is deprecated.
+     * an element changed state in a streaming thread. This message is
+     * deprecated.
      */
     STATE_DIRTY(1 << 7),
     /**
@@ -213,75 +217,39 @@ public enum MessageType implements NativeFlags {
      */
     PROPERTY_NOTIFY(EXTENDED.intValue() + 3),
     /**
-     * Message indicating a new {@link GstStreamCollection} is available (Since 1.10)
+     * Message indicating a new {@link GstStreamCollection} is available (Since
+     * 1.10)
      */
-    STREAM_COLLECTION(EXTENDED.intValue()+4),
+    STREAM_COLLECTION(EXTENDED.intValue() + 4),
     /**
-     * Message indicating the active selection of {@link GstStreams} has changed (Since 1.10)
+     * Message indicating the active selection of {@link GstStreams} has changed
+     * (Since 1.10)
      */
     STREAMS_SELECTED(EXTENDED.intValue() + 5),
     /**
-     * Message indicating to request the application to try to play the given URL(s). Useful if for example a HTTP 302/303 response is received with a non-HTTP URL inside. (Since 1.10)
+     * Message indicating to request the application to try to play the given
+     * URL(s). Useful if for example a HTTP 302/303 response is received with a
+     * non-HTTP URL inside. (Since 1.10)
      */
     REDIRECT(EXTENDED.intValue() + 6),
     /**
      * mask for all of the above messages.
      */
     ANY(~0);
+
+    private final int type;
     
-    MessageType(int type) {
+    private MessageType(int type) {
         this.type = type;
     }
-    
+
     /**
      * Gets the native integer value for this type.
-     * 
+     *
      * @return the native gstreamer value.
      */
+    @Override
     public int intValue() {
         return type;
-    }
-    
-    /**
-     * Gets the name of this message type.
-     * 
-     * @return the name of the message type.
-     */
-    public String getName() {
-        if(name == null) {
-            name = GSTMESSAGE_API.gst_message_type_get_name(this);
-        }
-        return name;
-    }
-    
-    /**
-     * Gets a MessageType that corresponds to the native integer value.
-     * 
-     * @param type the native value of the type.
-     * @return a MessageType.
-     */
-    public static final MessageType valueOf(int type) {
-        return EnumMapper.getInstance().valueOf(type, MessageType.class);
-    }
-    
-    /**
-     * Gets a MessageType that corresponds to the name
-     * 
-     * @param name the gstreamer name of the type.
-     * @return a MessageType.
-     */
-    public static final MessageType forName(String name) {
-        MessageType type = MapHolder.typeMap.get(name);
-        return type != null ? type : UNKNOWN;
-    }
-    private final int type;
-    private String name;
-    private static final class MapHolder {
-        private static final Map<String, MessageType> typeMap = new HashMap<String, MessageType>();
-        static {
-            for (MessageType t : MessageType.values()) {
-                typeMap.put(t.getName(), t);
-            }
-        }
     }
 }

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -25,6 +26,10 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 /**
  * This message is posted by element when a fatal event occurs.  
  * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-error"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-error</a>
+ * <p>
  * The pipeline will probably (partially) stop. The application
  * receiving this message should stop the pipeline.
  */
@@ -35,7 +40,7 @@ public class ErrorMessage extends GErrorMessage {
      * 
      * @param init internal initialization data.
      */
-    public ErrorMessage(Initializer init) {
+    ErrorMessage(Initializer init) {
         super(init);
     }
     

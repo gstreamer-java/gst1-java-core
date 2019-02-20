@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -27,6 +28,10 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
  * This message is posted by elements that finish playback of a segment as a 
  * result of a segment seek. 
  * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-segment-done"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-segment-done</a>
+ * <p>
  * This message is received by the application after all elements that posted a segment_start
  * have posted the segment_done.
  */
@@ -37,7 +42,7 @@ public class SegmentDoneMessage extends Message {
      * 
      * @param init internal initialization data.
      */
-    public SegmentDoneMessage(Initializer init) {
+    SegmentDoneMessage(Initializer init) {
         super(init);
     }
     

@@ -35,6 +35,7 @@ import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import java.util.Locale;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
@@ -755,7 +756,7 @@ public class Bus extends GstObject {
      * @param callback The callback to call when the signal is emitted.
      */
     private <T> void connect(Class<T> listenerClass, T listener, BusCallback callback) {
-        final String signal = listenerClass.getSimpleName().toLowerCase().replaceAll("_", "-");
+        final String signal = listenerClass.getSimpleName().toLowerCase(Locale.ROOT).replace('_', '-');
         connect(signal, listenerClass, listener, callback);
     }
 
@@ -777,15 +778,17 @@ public class Bus extends GstObject {
             super.connect(signal, listenerClass, listener, callback);
             return;
         }
-        MessageType type = MessageType.forName(signal);
-        if (type == MessageType.UNKNOWN && "message".equals(signal)) {
+        MessageType type;
+        if ("message".equals(signal)) {
             type = MessageType.ANY;
-        }
-        if (type == MessageType.UNKNOWN) {
-            throw new IllegalArgumentException("Illegal signal: " + signal);
+        } else {
+            //@TODO refactor to stop unnecessary String operations
+            type = MessageType.valueOf(signal.toUpperCase(Locale.ROOT).replace('-', '_'));
         }
         final Map<Class<?>, Map<Object, MessageProxy>> signals = getListenerMap();
-        Map<Object, MessageProxy> m = signals.get(type);
+        // @TODO this was using type so doubtful ever worked
+        // these maps needs relooking at!
+        Map<Object, MessageProxy> m = signals.get(listenerClass);
         if (m == null) {
             m = new HashMap<Object, MessageProxy>();
             signals.put(listenerClass, m);
