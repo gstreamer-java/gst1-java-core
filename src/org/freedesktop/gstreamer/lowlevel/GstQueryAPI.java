@@ -109,7 +109,7 @@ public interface GstQueryAPI extends com.sun.jna.Library {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;
         
         /*< public > *//* with COW */
-        public volatile int type;
+        public volatile QueryType type;
         
         public QueryStruct(Pointer ptr) {
             useMemory(ptr);

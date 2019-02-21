@@ -211,9 +211,9 @@ public class QueryTest {
         assertTrue("Query not writable after makeWritable", query.isWritable());
     }
     
-    @Test public void testQueryTypeGetName() {
-        assertEquals(QueryType.JITTER.getName(), "jitter");
-    }
+//    @Test public void testQueryTypeGetName() {
+//        assertEquals(QueryType.JITTER.getName(), "jitter");
+//    }
     
     @Test
     public void gst_query_new_allocation() {

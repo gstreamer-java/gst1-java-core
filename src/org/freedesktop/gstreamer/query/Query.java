@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  *
  * This file is part of gstreamer-java.
@@ -18,7 +19,9 @@
 
 package org.freedesktop.gstreamer.query;
 
+import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
@@ -26,7 +29,12 @@ import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 
 /**
- * Base query type
+ * Base query type. Queries can be performed on {@link Pad} and {@link Element}.
+ * Some queries might need a running pipeline to work.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstQuery.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstQuery.html</a>
  */
 @HasSubtype
 public class Query extends MiniObject {
@@ -37,7 +45,7 @@ public class Query extends MiniObject {
      * 
      * @param init internal initialization data.
      */
-    public Query(Initializer init) {
+    Query(Initializer init) {
         super(init);
     }
     
