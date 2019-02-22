@@ -19,14 +19,27 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.NativeEnum;
+
 /**
  * The direction of a {@link Pad}.
  */
-public enum PadDirection {
+public enum PadDirection implements NativeEnum<PadDirection> {
     /** The direction is unknown. */
-    UNKNOWN,
+    UNKNOWN(0),
     /** The {@link Pad} is a source pad. */
-    SRC,
+    SRC(1),
     /** The {@link Pad} is a sink pad. */
-    SINK;
+    SINK(2);
+
+    private final int value;
+    
+    private PadDirection(int value) {
+        this.value = value;
+    }
+    
+    @Override
+    public int intValue() {
+        return value;
+    }
 }

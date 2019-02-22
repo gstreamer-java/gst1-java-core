@@ -237,13 +237,13 @@ public class Buffer extends MiniObject {
      *
      * Since GStreamer 1.10
      *
-     * @return an EnumSet of {@link BufferFlag}
+     * @return an EnumSet of {@link BufferFlags}
      */
     @Gst.Since(minor = 10)
-    public EnumSet<BufferFlag> getFlags() {
+    public EnumSet<BufferFlags> getFlags() {
         Gst.checkVersion(1, 10);
         int nativeInt = GstBufferAPI.GSTBUFFER_API.gst_buffer_get_flags(this);
-        return NativeFlags.fromInt(BufferFlag.class, nativeInt);
+        return NativeFlags.fromInt(BufferFlags.class, nativeInt);
     }
 
     /**
@@ -252,11 +252,11 @@ public class Buffer extends MiniObject {
      *
      * Since GStreamer 1.10
      *
-     * @param flags an EnumSet of {@link BufferFlag} to be set on the buffer.
+     * @param flags an EnumSet of {@link BufferFlags} to be set on the buffer.
      * @return true if flags were successfully set on this buffer
      */
     @Gst.Since(minor = 10)
-    public boolean setFlags(EnumSet<BufferFlag> flags) {
+    public boolean setFlags(EnumSet<BufferFlags> flags) {
         Gst.checkVersion(1, 10);
         return GstBufferAPI.GSTBUFFER_API.gst_buffer_set_flags(this, NativeFlags.toInt(flags));
     }
@@ -267,12 +267,12 @@ public class Buffer extends MiniObject {
      *
      * Since GStreamer 1.10
      *
-     * @param flags an EnumSet of {@link BufferFlag} to be cleared on the buffer.
+     * @param flags an EnumSet of {@link BufferFlags} to be cleared on the buffer.
      * @return true if flags were successfully cleared on this buffer
      *
      */
     @Gst.Since(minor = 10)
-    public boolean unsetFlags(EnumSet<BufferFlag> flags) {
+    public boolean unsetFlags(EnumSet<BufferFlags> flags) {
         Gst.checkVersion(1, 10);
         return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, NativeFlags.toInt(flags));
     }

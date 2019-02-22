@@ -26,7 +26,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
 /**
  * A set of buffer flags used to describe properties of a {@link Buffer}.
  */
-public enum BufferFlag implements NativeFlags<BufferFlag> {
+public enum BufferFlags implements NativeFlags<BufferFlags> {
 
     /**  
      * the {@link Buffer} is live data and should be discarded in the PAUSED state.
@@ -109,7 +109,7 @@ public enum BufferFlag implements NativeFlags<BufferFlag> {
     
     private final int value;
     
-    private BufferFlag(int value) {
+    private BufferFlags(int value) {
         this.value = value;
     }
     /**
