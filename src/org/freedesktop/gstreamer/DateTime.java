@@ -36,11 +36,11 @@ public class DateTime extends NativeObject {
     	return new DateTime(GSTDATETIME_API.gst_date_time_new_from_unix_epoch_local_time(secs), false, true);
     }
 
-    public DateTime(Initializer init) {
+    DateTime(Initializer init) {
         super(init); 
     }
     
-    public DateTime(Pointer ptr, boolean needRef, boolean ownsHandle) {
+    DateTime(Pointer ptr, boolean needRef, boolean ownsHandle) {
         this(initializer(ptr, needRef, ownsHandle));
     }
 

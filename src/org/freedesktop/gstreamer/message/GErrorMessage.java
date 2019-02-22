@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  *
  * This file is part of gstreamer-java.
@@ -19,15 +20,14 @@
 
 package org.freedesktop.gstreamer.message;
 
-import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
- * Base class for ERROR, WARNING and INFO messages.
+ * Package private base class for ERROR, WARNING and INFO messages.
  */
-abstract public class GErrorMessage extends Message {
+abstract class GErrorMessage extends Message {
     
     /**
      * Creates a new GError message.
@@ -36,6 +36,7 @@ abstract public class GErrorMessage extends Message {
     GErrorMessage(Initializer init) {
         super(init);
     }
+    
     abstract GstAPI.GErrorStruct parseMessage();
     
     /**

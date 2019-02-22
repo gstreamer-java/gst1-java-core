@@ -20,8 +20,8 @@ package org.freedesktop.gstreamer.lowlevel;
 import java.util.Arrays;
 import java.util.List;
 
-import org.freedesktop.gstreamer.WebRTCSessionDescription;
-import org.freedesktop.gstreamer.WebRTCSDPType;
+import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
+import org.freedesktop.gstreamer.webrtc.WebRTCSDPType;
 import org.freedesktop.gstreamer.SDPMessage;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;

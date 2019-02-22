@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -20,12 +21,15 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Message;
 import org.freedesktop.gstreamer.State;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * A state change message. 
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-state-changed"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-state-changed</a>
  * <p>
  * This message is posted whenever an element changes its state.
  */
@@ -35,7 +39,7 @@ public class StateChangedMessage extends Message {
      * Creates a new Buffering message.
      * @param init internal initialization data.
      */
-    public StateChangedMessage(Initializer init) {
+    StateChangedMessage(Initializer init) {
         super(init);
     }
     

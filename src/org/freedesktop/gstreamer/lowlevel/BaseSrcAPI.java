@@ -22,7 +22,7 @@ package org.freedesktop.gstreamer.lowlevel;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.Event;
+import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Pad;
@@ -38,7 +38,7 @@ import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
 import java.util.Arrays;
 import java.util.List;
-import org.freedesktop.gstreamer.Query;
+import org.freedesktop.gstreamer.query.Query;
 
 /**
  * GstBaseSrc methods and structures

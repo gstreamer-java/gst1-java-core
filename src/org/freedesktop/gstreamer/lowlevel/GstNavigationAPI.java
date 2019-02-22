@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
  * 
@@ -25,7 +26,7 @@ import org.freedesktop.gstreamer.interfaces.Navigation;
 import com.sun.jna.Library;
 
 public interface GstNavigationAPI extends Library {
-	GstNavigationAPI GSTNAVIGATION_API = GstNative.load("gstinterfaces", GstNavigationAPI.class);
+	GstNavigationAPI GSTNAVIGATION_API = GstNative.load("gstvideo", GstNavigationAPI.class);
 
 	GType gst_navigation_get_type();
 

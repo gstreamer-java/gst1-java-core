@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 2003 Benjamin Otte
  * 
@@ -19,9 +20,16 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.NativeEnum;
+import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
+
 /**
  * The different tag merging modes are basically replace, overwrite and append,
  * but they can be seen from two directions.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstTagList.html#GstTagMergeMode"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstTagList.html#GstTagMergeMode</a>
  * <p>
  * Given two taglists: A - the one that are supplied to
  * gst_tag_setter_merge_tags() or gst_tag_setter_add_tags() and B - the tags
@@ -29,19 +37,31 @@ package org.freedesktop.gstreamer;
  * shown for the cases that a tag exists in the list (A) or does not exists (!A)
  * and combination thereof.
  */
-public enum TagMergeMode {
+public enum TagMergeMode implements NativeEnum<TagMergeMode> {
     /** Undefined merge mode. */
-    UNDEFINED,
+    @DefaultEnumValue
+    UNDEFINED(0),
     /** Replace all tags (clear list and append). */
-    REPLACE_ALL,
+    REPLACE_ALL(1),
     /** Replace tags */
-    REPLACE,
+    REPLACE(2),
     /** Append tags */
-    APPEND,
+    APPEND(3),
     /** Prepend tags */
-    PREPEND,
+    PREPEND(4),
     /** Keep existing tags */
-    KEEP,
+    KEEP(5),
     /** Keep all existing tags */
-    KEEP_ALL;
+    KEEP_ALL(6);
+
+    private final int value;
+    
+    private TagMergeMode(int value) {
+        this.value = value;
+    }
+    
+    @Override
+    public int intValue() {
+        return value;
+    }
 }

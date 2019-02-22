@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
  * 
@@ -29,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public interface GstColorBalanceAPI extends Library {
-	GstColorBalanceAPI GSTCOLORBALANCE_API = GstNative.load("gstinterfaces", GstColorBalanceAPI.class);
+	GstColorBalanceAPI GSTCOLORBALANCE_API = GstNative.load("gstvideo", GstColorBalanceAPI.class);
 
 	GType gst_color_balance_channel_get_type();
 	GType gst_color_balance_get_type();

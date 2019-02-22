@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Neil C Smith
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
@@ -20,113 +20,101 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
-import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 
+import com.sun.jna.Pointer;
 import java.util.List;
-
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
-import com.sun.jna.Pointer;
-
 /**
  * Base class and element that can contain other elements.
- * 
- * Bin is an element that can contain other {@link Element}s, allowing them to be
- * managed as a group.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBin.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBin.html</a>
+ * <p>
+ * Bin is an element that can contain other {@link Element}s, allowing them to
+ * be managed as a group.
  * <p>
  * Pads from the child elements can be ghosted to the bin, see {@link GhostPad}.
  * This makes the bin look like any other elements and enables creation of
  * higher-level abstraction elements.
  * <p>
- * A new {@link Bin} is created with {@link Bin#Bin(String)}. Use a {@link Pipeline} instead if you
- * want to create a toplevel bin because a normal bin doesn't have a bus or
- * handle clock distribution of its own.
+ * A new {@link Bin} is created with {@link Bin#Bin(String)}. Use a
+ * {@link Pipeline} instead if you want to create a toplevel bin because a
+ * normal bin doesn't have a bus or handle clock distribution of its own.
  * <p>
  * After the bin has been created you will typically add elements to it with
- * {@link Bin#add(Element)}. Elements can be removed with {@link Bin#remove(Element)}
+ * {@link Bin#add(Element)}. Elements can be removed with
+ * {@link Bin#remove(Element)}
  * <p>
- * An element can be retrieved from a bin with {@link Bin#getElementByName(String)}.
+ * An element can be retrieved from a bin with
+ * {@link Bin#getElementByName(String)}.
  * <p>
- * A list of elements contained in a bin can be retrieved with {@link Bin#getElements}
+ * A list of elements contained in a bin can be retrieved with
+ * {@link Bin#getElements}
  *
- * The {@link ELEMENT_ADDED} signal is fired whenever a new element is added
- * to the bin. Likewise the {@link ELEMENT_REMOVED} signal is fired
- * whenever an element is removed from the bin.
+ * The {@link ELEMENT_ADDED} signal is fired whenever a new element is added to
+ * the bin. Likewise the {@link ELEMENT_REMOVED} signal is fired whenever an
+ * element is removed from the bin.
  *
  */
 public class Bin extends Element {
+
     public static final String GST_NAME = "bin";
     public static final String GTYPE_NAME = "GstBin";
-    
-    public static final int DEBUG_GRAPH_SHOW_MEDIA_TYPE         = (1<<0);
-    public static final int DEBUG_GRAPH_SHOW_CAPS_DETAILS       = (1<<1);
-    public static final int DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS = (1<<2);
-    public static final int DEBUG_GRAPH_SHOW_STATES             = (1<<3);
-    public static final int DEBUG_GRAPH_SHOW_ALL                = ((1<<4)-1);
-    
-    public Bin(Initializer init) {
+
+    @Deprecated
+    public static final int DEBUG_GRAPH_SHOW_MEDIA_TYPE = (1 << 0);
+    @Deprecated
+    public static final int DEBUG_GRAPH_SHOW_CAPS_DETAILS = (1 << 1);
+    @Deprecated
+    public static final int DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS = (1 << 2);
+    @Deprecated
+    public static final int DEBUG_GRAPH_SHOW_STATES = (1 << 3);
+    @Deprecated
+    public static final int DEBUG_GRAPH_SHOW_ALL = ((1 << 4) - 1);
+
+    protected Bin(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new Bin with a unique name.
      */
     public Bin() {
         this(initializer(GSTBIN_API.ptr_gst_bin_new(null), false));
     }
-    
+
     /**
      * Creates a new Bin with the given name.
+     *
      * @param name The Name to assign to the new Bin
      */
     public Bin(String name) {
         this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false));
     }
-    
-    /**
-     * Creates a bin from a text bin description.
-     *
-     * This function allows creation of a bin based on the syntax used in the
-     * gst-launch utillity.
-     *
-     * @param binDecription the command line describing the bin
-     * @param ghostUnlinkedPads whether to create ghost pads for the bin from
-     * any unlinked pads
-     * @return The new Bin.
-     */
-    @Deprecated
-    public static Bin launch(String binDecription, boolean ghostUnlinkedPads) {
-        Pointer[] err = {null};
-        Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDecription, ghostUnlinkedPads, err);
-        if (bin == null) {
-            throw new GstException(new GError(new GErrorStruct(err[0])));
-        }
-        return bin;
-    }
-    
+
     /**
      * Adds an Element to this Bin.
      * <p>
-     * Sets the element's parent, and thus takes ownership of the element. 
-     * An element can only be added to one bin.
+     * Sets the element's parent, and thus takes ownership of the element. An
+     * element can only be added to one bin.
      * <p>
      * If the element's pads are linked to other pads, the pads will be unlinked
      * before the element is added to the bin.
      *
      * @param element The {@link Element} to add to this Bin.
-     * @return true if the element was successfully added, false if the Bin 
-     * will not accept the element.
+     * @return true if the element was successfully added, false if the Bin will
+     * not accept the element.
      */
     public boolean add(Element element) {
         return GSTBIN_API.gst_bin_add(this, element);
     }
-    
+
     /**
      * Adds an array of Element objects to this Bin
      *
@@ -136,7 +124,7 @@ public class Bin extends Element {
     public void addMany(Element... elements) {
         GSTBIN_API.gst_bin_add_many(this, elements);
     }
-    
+
     /**
      * Removes a Element from this Bin
      * <p>
@@ -151,7 +139,7 @@ public class Bin extends Element {
     public boolean remove(Element element) {
         return GSTBIN_API.gst_bin_remove(this, element);
     }
-    
+
     /**
      * Removes an array of {@link Element} objects from this Bin
      *
@@ -160,59 +148,66 @@ public class Bin extends Element {
     public void removeMany(Element... elements) {
         GSTBIN_API.gst_bin_remove_many(this, elements);
     }
-    
+
     private List<Element> elementList(Pointer iter) {
         return new GstIterator<Element>(iter, Element.class).asList();
     }
+
     /**
      * Retrieve a list of the {@link Element}s contained in the Bin.
-     * 
+     *
      * @return The List of {@link Element}s.
      */
     public List<Element> getElements() {
         return elementList(GSTBIN_API.gst_bin_iterate_elements(this));
     }
+
     /**
-     * Gets an a list of the elements in this bin in topologically
-     * sorted order. This means that the elements are returned from
-     * the most downstream elements (sinks) to the sources.
+     * Gets an a list of the elements in this bin in topologically sorted order.
+     * This means that the elements are returned from the most downstream
+     * elements (sinks) to the sources.
+     *
      * @return The List of {@link Element}s.
      */
     public List<Element> getElementsSorted() {
         return elementList(GSTBIN_API.gst_bin_iterate_sorted(this));
     }
-    
+
     /**
-     * Retrieve a list of the {@link Element}s contained in the Bin and its Bin children.
-     * 
-     * This differs from {@link #getElements()} as it will also return {@link Element}s 
-     * that are in any Bin elements contained in this Bin, also recursing down those Bins.
-     * 
+     * Retrieve a list of the {@link Element}s contained in the Bin and its Bin
+     * children.
+     *
+     * This differs from {@link #getElements()} as it will also return
+     * {@link Element}s that are in any Bin elements contained in this Bin, also
+     * recursing down those Bins.
+     *
      * @return The List of {@link Element}s.
      */
     public List<Element> getElementsRecursive() {
         return elementList(GSTBIN_API.gst_bin_iterate_recurse(this));
     }
-    
+
     /**
      * Retrieve a list of the sink {@link Element}s contained in the Bin.
+     *
      * @return The List of sink {@link Element}s.
      */
     public List<Element> getSinks() {
         return elementList(GSTBIN_API.gst_bin_iterate_sinks(this));
     }
-    
+
     /**
      * Retrieve a list of the source {@link Element}s contained in the Bin.
+     *
      * @return The List of source {@link Element}s.
      */
     public List<Element> getSources() {
         return elementList(GSTBIN_API.gst_bin_iterate_sources(this));
     }
-    
+
     /**
-     * Gets the {@link Element} with the given name from the bin. This
-     * function recurses into child bins.
+     * Gets the {@link Element} with the given name from the bin. This function
+     * recurses into child bins.
      *
      * @param name The name of the {@link Element} to find.
      * @return The {@link Element} if found, else null.
@@ -220,75 +215,83 @@ public class Bin extends Element {
     public Element getElementByName(String name) {
         return GSTBIN_API.gst_bin_get_by_name(this, name);
     }
-    
+
     /**
-     * Gets the element with the given name from this bin. If the
-     * element is not found, a recursion is performed on the parent bin.
+     * Gets the element with the given name from this bin. If the element is not
+     * found, a recursion is performed on the parent bin.
+     *
      * @param name The name of the {@link Element} to find.
      * @return The {@link Element} if found, else null.
      */
     public Element getElementByNameRecurseUp(String name) {
         return GSTBIN_API.gst_bin_get_by_name_recurse_up(this, name);
     }
-    
+
     /**
-     * Looks for an element inside the bin that implements the given
-     * interface. If such an element is found, it returns the element.
+     * Looks for an element inside the bin that implements the given interface.
+     * If such an element is found, it returns the element.
+     *
      * @param iface The class of the {@link Element} to search for.
      * @return The {@link Element} that implements the interface.
      */
     public <T extends Element> T getElementByInterface(Class<T> iface) {
         return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
     }
-    
+
     /**
      * Calls {@link #debugToDotFile(int, String, boolean)} without timestamping
      */
+    @Deprecated
     public void debugToDotFile(int details, String fileName) {
-    	debugToDotFile(details, fileName, false);
+        debugToDotFile(details, fileName, false);
     }
-    
+
     /**
-     * To aid debugging applications one can use this method to write out the whole
-     * network of gstreamer elements that form the pipeline into an dot file.
-     * This file can be processed with graphviz to get an image.
-     * e.g. dot -Tpng -oimage.png graph_lowlevel.dot
-     * 
+     * To aid debugging applications one can use this method to write out the
+     * whole network of gstreamer elements that form the pipeline into an dot
+     * file. This file can be processed with graphviz to get an image. e.g. dot
+     * -Tpng -oimage.png graph_lowlevel.dot
+     *
      * The function is only active if gstreamer is configured with
      * "--gst-enable-gst-debug" and the environment variable
      * GST_DEBUG_DUMP_DOT_DIR is set to a basepath (e.g. /tmp).
      *
      * @param details to show in the graph, e.g. DEBUG_GRAPH_SHOW_ALL
      * @param fileName output base filename (e.g. "myplayer")
-     * @param timestampFileName if true it adds the current timestamp
-     * 		  to the filename, so that it can be used to take multiple snapshots.
+     * @param timestampFileName if true it adds the current timestamp to the
+     * filename, so that it can be used to take multiple snapshots.
      */
+    @Deprecated
     public void debugToDotFile(int details, String fileName, boolean timestampFileName) {
-    	if (timestampFileName)
-    		GSTBIN_API.gst_debug_bin_to_dot_file_with_ts(this, details, fileName);
-    	else 
-    		GSTBIN_API.gst_debug_bin_to_dot_file(this, details, fileName);	
+        if (timestampFileName) {
+            GSTBIN_API.gst_debug_bin_to_dot_file_with_ts(this, details, fileName);
+        } else {
+            GSTBIN_API.gst_debug_bin_to_dot_file(this, details, fileName);
+        }
     }
-    
+
     /**
      * Signal emitted when an {@link Element} is added to this Bin
-     * 
+     *
      * @see #connect(ELEMENT_ADDED)
      * @see #disconnect(ELEMENT_ADDED)
      */
     public static interface ELEMENT_ADDED {
+
         /**
          * Called when an {@link Element} is added to a {@link Bin}
-         * 
+         *
          * @param bin the Bin the element was added to.
          * @param element the {@link Element} that was added.
          */
         public void elementAdded(Bin bin, Element element);
     }
+
     /**
      * Add a listener for the <code>element-added</code> signal on this Bin
-     * 
-     * @param listener The listener to be called when an {@link Element} is added.
+     *
+     * @param listener The listener to be called when an {@link Element} is
+     * added.
      */
     public void connect(final ELEMENT_ADDED listener) {
         connect(ELEMENT_ADDED.class, listener, new GstCallback() {
@@ -298,35 +301,38 @@ public class Bin extends Element {
             }
         });
     }
-    
+
     /**
      * Disconnect the listener for the <code>element-added</code> signal
-     * 
+     *
      * @param listener The listener that was registered to receive the signal.
      */
     public void disconnect(ELEMENT_ADDED listener) {
         disconnect(ELEMENT_ADDED.class, listener);
     }
-    
+
     /**
      * Signal emitted when an {@link Element} is removed from this Bin
-     * 
+     *
      * @see #connect(ELEMENT_REMOVED)
      * @see #disconnect(ELEMENT_REMOVED)
      */
     public static interface ELEMENT_REMOVED {
+
         /**
          * Called when an {@link Element} is removed from a {@link Bin}
-         * 
+         *
          * @param bin the Bin the element was removed from.
          * @param element the {@link Element} that was removed.
          */
         public void elementRemoved(Bin bin, Element element);
     }
+
     /**
      * Add a listener for the <code>element-removed</code> signal on this Bin
-     * 
-     * @param listener The listener to be called when an {@link Element} is removed.
+     *
+     * @param listener The listener to be called when an {@link Element} is
+     * removed.
      */
     public void connect(final ELEMENT_REMOVED listener) {
         connect(ELEMENT_REMOVED.class, listener, new GstCallback() {
@@ -336,39 +342,47 @@ public class Bin extends Element {
             }
         });
     }
+
     /**
      * Disconnect the listener for the <code>element-removed</code> signal
-     * 
+     *
      * @param listener The listener that was registered to receive the signal.
      */
     public void disconnect(ELEMENT_REMOVED listener) {
         disconnect(ELEMENT_REMOVED.class, listener);
     }
-    
+
     /**
-     * Signal emitted when an {@link Element} is added to sub-bin of this {@link Bin}
-     * 
+     * Signal emitted when an {@link Element} is added to sub-bin of this
+     * {@link Bin}
+     *
      * @see #connect(DEEP_ELEMENT_ADDED)
      * @see #disconnect(DEEP_ELEMENT_ADDED)
      */
+    @Gst.Since(minor = 10)
     public static interface DEEP_ELEMENT_ADDED {
+
         /**
          * Called when an {@link Element} is added to a {@link Bin}
-         * 
+         *
          * Since GStreamer 1.10
-         * 
-         * @param bin the Bin 
-         * @param sub_bin the Bin the element was added to. 
+         *
+         * @param bin the Bin
+         * @param sub_bin the Bin the element was added to.
          * @param element the {@link Element} that was added.
          */
         public void elementAdded(Bin bin, Bin sub_bin, Element element);
     }
+
     /**
      * Add a listener for the <code>deep-element-added</code> signal on this Bin
-     * 
-     * @param listener The listener to be called when an {@link Element} is added.
+     *
+     * @param listener The listener to be called when an {@link Element} is
+     * added.
      */
+    @Gst.Since(minor = 10)
     public void connect(final DEEP_ELEMENT_ADDED listener) {
+        Gst.checkVersion(1, 10);
         connect(DEEP_ELEMENT_ADDED.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(Bin bin, Bin sub_bin, Element elem) {
@@ -376,40 +390,49 @@ public class Bin extends Element {
             }
         });
     }
-    
+
     /**
      * Disconnect the listener for the <code>deep-element-added</code> signal
-     * 
+     *
      * @param listener The listener that was registered to receive the signal.
      */
+    @Gst.Since(minor = 10)
     public void disconnect(DEEP_ELEMENT_ADDED listener) {
         disconnect(DEEP_ELEMENT_ADDED.class, listener);
     }
 
     /**
-     * Signal emitted when an {@link Element} is removed from sub-bin of this {@link Bin}
-     * 
+     * Signal emitted when an {@link Element} is removed from sub-bin of this
+     * {@link Bin}
+     *
      * @see #connect(ELEMENT_REMOVED)
      * @see #disconnect(ELEMENT_REMOVED)
      */
+    @Gst.Since(minor = 10)
     public static interface DEEP_ELEMENT_REMOVED {
+
         /**
          * Called when an {@link Element} is removed from a {@link Bin}
-         * 
+         *
          * Since GStreamer 1.10
-         * 
-         * @param bin the Bin 
+         *
+         * @param bin the Bin
          * @param sub_bin the Bin the element was removed from.
          * @param element the {@link Element} that was removed.
          */
         public void elementRemoved(Bin bin, Bin sub_bin, Element element);
     }
+
     /**
-     * Add a listener for the <code>deep-element-removed</code> signal on this Bin
-     * 
-     * @param listener The listener to be called when an {@link Element} is removed.
+     * Add a listener for the <code>deep-element-removed</code> signal on this
+     * Bin
+     *
+     * @param listener The listener to be called when an {@link Element} is
+     * removed.
      */
+    @Gst.Since(minor = 10)
     public void connect(final DEEP_ELEMENT_REMOVED listener) {
+        Gst.checkVersion(1, 10);
         connect(DEEP_ELEMENT_REMOVED.class, listener, new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(Bin bin, Bin sub_bin, Element elem) {
@@ -417,33 +440,38 @@ public class Bin extends Element {
             }
         });
     }
+
     /**
      * Disconnect the listener for the <code>deep-element-removed</code> signal
-     * 
+     *
      * @param listener The listener that was registered to receive the signal.
      */
+    @Gst.Since(minor = 10)
     public void disconnect(DEEP_ELEMENT_REMOVED listener) {
         disconnect(DEEP_ELEMENT_REMOVED.class, listener);
     }
 
     /**
      * Signal emitted when an {@link Element} has latency
-     * 
+     *
      * @see #connect(DO_LATENCY)
      * @see #disconnect(DO_LATENCY)
      */
     public static interface DO_LATENCY {
+
         /**
          * Called when an {@link Element} is removed from a {@link Bin}
-         * 
+         *
          * @param bin the Bin the element was removed from.
          */
         public void doLatency(Bin bin);
     }
+
     /**
      * Add a listener for the <code>do-latency</code> signal on this Bin
-     * 
-     * @param listener The listener to be called when an {@link Element} is removed.
+     *
+     * @param listener The listener to be called when an {@link Element} is
+     * removed.
      */
     public void connect(final DO_LATENCY listener) {
         connect(DO_LATENCY.class, listener, new GstCallback() {
@@ -453,9 +481,10 @@ public class Bin extends Element {
             }
         });
     }
+
     /**
      * Disconnect the listener for the <code>do-latency</code> signal
-     * 
+     *
      * @param listener The listener that was registered to receive the signal.
      */
     public void disconnect(DO_LATENCY listener) {

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -16,29 +17,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Message;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * Message posted by elements when their latency requirements have changed.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-latency"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-latency</a>
+ * <p>
  */
 public class LatencyMessage extends Message {
+
     /**
      * Creates a new Latency message.
-     * 
+     *
      * @param init internal initialization data.
      */
-    public LatencyMessage(Initializer init) {
+    LatencyMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new Latency message.
-     * 
+     *
      * @param source the object originating the message.
      */
     public LatencyMessage(GstObject source) {

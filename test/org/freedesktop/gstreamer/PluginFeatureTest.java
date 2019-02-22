@@ -27,7 +27,7 @@ public class PluginFeatureTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         Gst.init("PluginTest", new String[] {});
-        decodebinFeature = Registry.get().findPluginFeature("decodebin");
+        decodebinFeature = Registry.get().lookupFeature("decodebin");
     }
     
     @AfterClass

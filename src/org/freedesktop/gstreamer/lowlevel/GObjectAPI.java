@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
@@ -102,6 +102,7 @@ public interface GObjectAPI extends Library {
     int g_type_depth(GType type);
     Pointer g_type_create_instance(GType type);
     void g_type_free_instance(Pointer instance);
+    boolean g_type_is_a(GType type, GType is_a_type);
     
     GType g_type_register_static(GType parent_type, String type_name,
         GTypeInfo info, /* GTypeFlags */ int flags);

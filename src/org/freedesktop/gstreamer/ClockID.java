@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -64,6 +65,7 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * 
      * @return The time of this clock id.
      */
+    @Deprecated
     public ClockTime getTime() {
         return GSTCLOCK_API.gst_clock_id_get_time(this);
     }

@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.message.Message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -30,6 +31,7 @@ import com.sun.jna.Platform;
 
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
 import org.junit.After;
@@ -39,6 +41,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
+import org.freedesktop.gstreamer.message.DurationChangedMessage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BusTest {    
     public BusTest() {
@@ -240,6 +246,28 @@ public class BusTest {
         assertTrue("TAG signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
+    
+    @Test public void durationChanged() {
+        final TestPipe pipe = new TestPipe("testDurationChanged");
+        final AtomicBoolean signalFired = new AtomicBoolean(false);
+        final AtomicReference<GstObject> signalSource = new AtomicReference<>(null);
+        Bus.DURATION_CHANGED signal = new Bus.DURATION_CHANGED() {
+            @Override
+            public void durationChanged(GstObject source) {
+                signalFired.set(true);
+                signalSource.set(source);
+                pipe.quit();
+            }
+        };
+        pipe.getBus().connect(signal);
+        GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_duration_changed(pipe.src));
+        pipe.play().run();
+        pipe.getBus().disconnect(signal);
+        pipe.dispose();
+        assertTrue("DURATION signal not received", signalFired.get());
+        assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
+    }
+    
     @Test public void anyMessage() {
         final TestPipe pipe = new TestPipe("anyMessage");
        

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Andres Colubri
  * Copyright (c) 2007 Wayne Meissner
@@ -17,52 +18,41 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.elements;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.ByReference;
-import com.sun.jna.ptr.PointerByReference;
-import java.awt.Dimension;
 import java.io.File;
 import java.net.URI;
+import org.freedesktop.gstreamer.Bus;
 
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Fraction;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.Video;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
-
 
 /**
  * <p>
- * Playbin provides a stand-alone everything-in-one abstraction for an
- * audio and/or video player.
- * </p>
+ * Playbin provides a stand-alone everything-in-one abstraction for an audio
+ * and/or video player.
  * <p>
- * At this stage, playbin is considered UNSTABLE. The API provided in the
- * signals and properties may yet change in the near future. When playbin
- * is stable, it will probably replace <span class="type">playbin</span>
- * </p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-plugins/html/gst-plugins-base-plugins-playbin.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-plugins/html/gst-plugins-base-plugins-playbin.html</a>
+ * <p>
  * <p>
  * It can handle both audio and video files and features
  * </p>
  * <ul>
  * <li>
- * automatic file type recognition and based on that automatic
- * selection and usage of the right audio/video/subtitle demuxers/decoders
+ * automatic file type recognition and based on that automatic selection and
+ * usage of the right audio/video/subtitle demuxers/decoders
  * </li>
  * <li>
  * visualisations for audio files
  * </li>
  * <li>
- * subtitle support for video files. Subtitles can be store in external
- * files.
+ * subtitle support for video files. Subtitles can be store in external files.
  * </li>
  * <li>
  * stream selection between different video/audio/subtitles streams
@@ -81,46 +71,37 @@ import org.freedesktop.gstreamer.lowlevel.NativeObject;
  * </li>
  * </ul>
  * <p>
- * playbin is a {@link org.freedesktop.gstreamer.Pipeline}. It will notify the application of everything
- * that's happening (errors, end of stream, tags found, state changes, etc.)
- * by posting messages on its {@link org.freedesktop.gstreamer.Bus}. The application needs to watch the
- * bus.
- *
+ * playbin is a {@link Pipeline}. It will notify the application of everything
+ * that's happening (errors, end of stream, tags found, state changes, etc.) by
+ * posting messages on its {@link Bus}. The application needs to watch the bus.
  * <p>
  * Playback can be initiated by setting the playbin to PLAYING state using
- * {@link #setState setState} or {@link #play play}. Note that the state change will take place in
- * the background in a separate thread, when the function returns playback
- * is probably not happening yet and any errors might not have occured yet.
- * Applications using playbin should ideally be written to deal with things
- * completely asynchroneous.
- * </p>
- *
+ * {@link #setState setState} or {@link #play play}. Note that the state change
+ * will take place in the background in a separate thread, when the function
+ * returns playback is probably not happening yet and any errors might not have
+ * occured yet. Applications using playbin should ideally be written to deal
+ * with things completely asynchroneous.
  * <p>
- * When playback has finished (an EOS message has been received on the bus)
- * or an error has occured (an ERROR message has been received on the bus) or
- * the user wants to play a different track, playbin should be set back to
- * READY or NULL state, then the input file/URI should be set to the new
- * location and then playbin be set to PLAYING state again.
- * </p>
- *
+ * When playback has finished (an EOS message has been received on the bus) or
+ * an error has occured (an ERROR message has been received on the bus) or the
+ * user wants to play a different track, playbin should be set back to READY or
+ * NULL state, then the input file/URI should be set to the new location and
+ * then playbin be set to PLAYING state again.
  * <p>
- * Seeking can be done using {@link #seek seek} on the playbin element.
- * Again, the seek will not be executed instantaneously, but will be done in a
+ * Seeking can be done using {@link #seek seek} on the playbin element. Again,
+ * the seek will not be executed instantaneously, but will be done in a
  * background thread. When the seek call returns the seek will most likely still
  * be in process. An application may wait for the seek to finish (or fail) using
  * {@link #getState(long)} with -1 as the timeout, but this will block the user
  * interface and is not recommended at all.
- *
  * <p>
- * Applications may query the current position and duration of the stream
- * via {@link #queryPosition} and {@link #queryDuration} and
- * setting the format passed to {@link Format#TIME}. If the query was successful,
- * the duration or position will have been returned in units of nanoseconds.
- * </p>
- * 
- * Was playbin2
+ * Applications may query the current position and duration of the stream via
+ * {@link #queryPosition} and {@link #queryDuration} and setting the format
+ * passed to {@link Format#TIME}. If the query was successful, the duration or
+ * position will have been returned in units of nanoseconds.
  */
 public class PlayBin extends Pipeline {
+
     public static final String GST_NAME = "playbin";
     public static final String GTYPE_NAME = "GstPlayBin";
 
@@ -150,21 +131,9 @@ public class PlayBin extends Pipeline {
      * @param init proxy initialization args
      *
      */
-    public PlayBin(Initializer init) {
+    PlayBin(Initializer init) {
         super(init);
     }
-
-
-	/*private static String slashify(String path, boolean isDirectory) {
-		String p = path;
-		if (File.separatorChar != '/')
-			p = p.replace(File.separatorChar, '/');
-		if (!p.startsWith("/"))
-			p = "/" + p;
-		if (!p.endsWith("/") && isDirectory)
-			p = p + "/";
-		return p;
-	}*/
 
     /**
      * Sets the media file to play.
@@ -186,7 +155,8 @@ public class PlayBin extends Pipeline {
 
     /**
      * Sets the audio output Element.
-     * <p> To disable audio output, call this method with a <tt>null</tt> argument.
+     * <p>
+     * To disable audio output, call this method with a <tt>null</tt> argument.
      *
      * @param element The element to use for audio output.
      */
@@ -196,7 +166,8 @@ public class PlayBin extends Pipeline {
 
     /**
      * Sets the video output Element.
-     * <p> To disable video output, call this method with a <tt>null</tt> argument.
+     * <p>
+     * To disable video output, call this method with a <tt>null</tt> argument.
      *
      * @param element The element to use for video output.
      */
@@ -206,7 +177,8 @@ public class PlayBin extends Pipeline {
 
     /**
      * Sets the text output Element.
-     * <p> To disable text output, call this method with a <tt>null</tt> argument.
+     * <p>
+     * To disable text output, call this method with a <tt>null</tt> argument.
      *
      * @param element The element to use for text output.
      */
@@ -230,28 +202,9 @@ public class PlayBin extends Pipeline {
      * @param element The Element to set as the output.
      */
     private void setElement(String key, Element element) {
-        if (element == null) {
-            element = ElementFactory.make("fakesink", "fake-" + key);
-        }
         set(key, element);
     }
 
-    /**
-     * Set the volume for the PlayBin.
-     *
-     * @param percent Percentage (between 0 and 100) to set the volume to.
-     */
-    public void setVolumePercent(int percent) {
-        setVolume(Math.max(Math.min((double) percent, 100d), 0d) / 100d);
-    }
-
-    /**
-     * Get the current volume.
-     * @return The current volume as a percentage between 0 and 100 of the max volume.
-     */
-    public int getVolumePercent() {
-        return (int) ((getVolume() * 100d) + 0.5);
-    }
     /**
      * Sets the audio playback volume.
      *
@@ -263,60 +216,28 @@ public class PlayBin extends Pipeline {
 
     /**
      * Gets the current volume.
-     * @return The current volume as a percentage between 0 and 100 of the max volume.
+     *
+     * @return The current volume as a percentage between 0 and 100 of the max
+     * volume.
      */
     public double getVolume() {
         return ((Number) get("volume")).doubleValue();
     }
-    
-    /**
-     * Retrieves the framerate from the caps of the video sink's pad.
-     * 
-     * @return frame rate (frames per second), or 0 if the framerate is not
-     *         available
-     */
-    public double getVideoSinkFrameRate() {
-      for (Element sink : getSinks()) {
-        for (Pad pad : sink.getPads()) {
-          Fraction frameRate = Video.getVideoFrameRate(pad);
-          if (frameRate != null) {
-            return frameRate.toDouble();
-          }
-        }
-      }
-      return 0;
-    }
 
     /**
-     * Retrieves the width and height of the video frames configured in the caps
-     * of the video sink's pad.
-     * 
-     * @return dimensions of the video frames, or null if the video frame size is
-     *         not available
-     */
-    public Dimension getVideoSize() {
-      for (Element sink : getSinks()) {
-        for (Pad pad : sink.getPads()) {
-          Dimension size = Video.getVideoSize(pad);
-          if (size != null) {
-            return size;
-          }
-        }
-      }
-      return null;
-    }
-
-    /**
-     * Get the currently playing audio stream. By default the first audio stream with data is played.
-     * Default value: -1
+     * Get the currently playing audio stream. By default the first audio stream
+     * with data is played. Default value: -1
+     *
      * @return the currently playing audio stream index (index is zero based).
      */
     public int getCurrentAudio() {
-        return (Integer)get("current-audio");
+        return (Integer) get("current-audio");
     }
 
     /**
-     * Set the currently playing audio stream. By default the first audio stream with data is played.
+     * Set the currently playing audio stream. By default the first audio stream
+     * with data is played.
+     *
      * @param n audio stream index to switch to (index is zero based).
      */
     public void setCurrentAudio(int n) {
@@ -325,16 +246,17 @@ public class PlayBin extends Pipeline {
 
     /**
      * Get the total number of available audio streams.
+     *
      * @return total number of available audio streams
      */
     public int getNAudio() {
-        return (Integer)get("n-audio");
+        return (Integer) get("n-audio");
     }
 
     /**
-     * Retrieve the stream-combiner sinkpad for a specific text stream.
-     * This pad can be used for notifications of caps changes,
-     * stream-specific queries, etc.
+     * Retrieve the stream-combiner sinkpad for a specific text stream. This pad
+     * can be used for notifications of caps changes, stream-specific queries,
+     * etc.
      *
      * @param audioStreamIndex a text stream number
      * @return a GstPad, or NULL when the stream number does not exist.
@@ -344,27 +266,31 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Retrieve the tags of a specific audio stream number.
-     * This information can be used to select a stream.
+     * Retrieve the tags of a specific audio stream number. This information can
+     * be used to select a stream.
      *
      * @param audioStreamIndex an audio stream number
-     * @return a GstTagList with tags or {@code null} when the stream number does not exist.
+     * @return a GstTagList with tags or {@code null} when the stream number
+     * does not exist.
      */
     public TagList getAudioTags(int audioStreamIndex) {
         return emit(TagList.class, "get-audio-tags", audioStreamIndex);
     }
 
     /**
-     * Get the currently playing text stream. By default the first text stream with data is played.
-     * Default value: -1
+     * Get the currently playing text stream. By default the first text stream
+     * with data is played. Default value: -1
+     *
      * @return the currently playing text stream index (index is zero based).
      */
     public int getCurrentText() {
-        return (Integer)get("current-text");
+        return (Integer) get("current-text");
     }
 
     /**
-     * Set the currently playing text stream. By default the first text stream with data is played.
+     * Set the currently playing text stream. By default the first text stream
+     * with data is played.
+     *
      * @param n text stream index to switch to (index is zero based).
      */
     public void setCurrentText(int n) {
@@ -373,16 +299,17 @@ public class PlayBin extends Pipeline {
 
     /**
      * Get the total number of available text streams.
+     *
      * @return total number of available text streams
      */
     public int getNText() {
-        return (Integer)get("n-text");
+        return (Integer) get("n-text");
     }
 
     /**
-     * Retrieve the stream-combiner sinkpad for a specific text stream.
-     * This pad can be used for notifications of caps changes,
-     * stream-specific queries, etc.
+     * Retrieve the stream-combiner sinkpad for a specific text stream. This pad
+     * can be used for notifications of caps changes, stream-specific queries,
+     * etc.
      *
      * @param textStreamIndex a text stream number
      * @return a GstPad, or {@code null} when the stream number does not exist.
@@ -392,25 +319,28 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Retrieve the tags of a specific text stream number.
-     * This information can be used to select a stream.
+     * Retrieve the tags of a specific text stream number. This information can
+     * be used to select a stream.
      *
      * @param textStreamIndex a text stream number
-     * @return a GstTagList with tags or {@code null} when the stream number does not exist.
+     * @return a GstTagList with tags or {@code null} when the stream number
+     * does not exist.
      */
     public TagList getTextTags(int textStreamIndex) {
         return emit(TagList.class, "get-text-tags", textStreamIndex);
     }
 
     /**
-     * Signal emitted when the current uri is about to finish. You can set 
-     * the uri and suburi to make sure that playback continues.
+     * Signal emitted when the current uri is about to finish. You can set the
+     * uri and suburi to make sure that playback continues.
      */
     public static interface ABOUT_TO_FINISH {
+
         /**
          */
         public void aboutToFinish(PlayBin element);
     }
+
     /**
      * Adds a listener for the <code>about-to-finish</code> signal
      */
@@ -422,9 +352,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>about-to-finish</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(ABOUT_TO_FINISH listener) {
@@ -432,14 +363,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the number or order of the video streams has changed. 
-     * The application will most likely want to select a new video stream.
+     * Signal is emitted whenever the number or order of the video streams has
+     * changed. The application will most likely want to select a new video
+     * stream.
      */
     public static interface VIDEO_CHANGED {
+
         /**
          */
         public void videoChanged(PlayBin element);
     }
+
     /**
      * Adds a listener for the <code>video-changed</code> signal
      */
@@ -451,9 +385,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>video-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(VIDEO_CHANGED listener) {
@@ -461,14 +396,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the number or order of the audio streams has changed. 
-     * The application will most likely want to select a new audio stream.
+     * Signal is emitted whenever the number or order of the audio streams has
+     * changed. The application will most likely want to select a new audio
+     * stream.
      */
     public static interface AUDIO_CHANGED {
+
         /**
          */
         public void audioChanged(PlayBin element);
     }
+
     /**
      * Adds a listener for the <code>audio-changed</code> signal
      */
@@ -480,9 +418,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>audio-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(AUDIO_CHANGED listener) {
@@ -490,14 +429,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the number or order of the audio streams has changed. 
-     * The application will most likely want to select a new audio stream.
+     * Signal is emitted whenever the number or order of the audio streams has
+     * changed. The application will most likely want to select a new audio
+     * stream.
      */
     public static interface TEXT_CHANGED {
+
         /**
          */
         public void textChanged(PlayBin element);
     }
+
     /**
      * Adds a listener for the <code>audio-changed</code> signal
      */
@@ -509,9 +451,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>text-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(TEXT_CHANGED listener) {
@@ -519,15 +462,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the tags of a video stream have changed. 
-     * The application will most likely want to get the new tags.
+     * Signal is emitted whenever the tags of a video stream have changed. The
+     * application will most likely want to get the new tags.
      */
     public static interface VIDEO_TAGS_CHANGED {
+
         /**
          * @param stream stream index with changed tags
          */
         public void videoTagsChanged(PlayBin element, int stream);
     }
+
     /**
      * Adds a listener for the <code>video-tags-changed</code> signal
      */
@@ -539,9 +484,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>video-tags-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(VIDEO_TAGS_CHANGED listener) {
@@ -549,15 +495,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the tags of an audio stream have changed. 
-     * The application will most likely want to get the new tags.
+     * Signal is emitted whenever the tags of an audio stream have changed. The
+     * application will most likely want to get the new tags.
      */
     public static interface AUDIO_TAGS_CHANGED {
+
         /**
          * @param stream stream index with changed tags
          */
         public void audioTagsChanged(PlayBin element, int stream);
     }
+
     /**
      * Adds a listener for the <code>audio-tags-changed</code> signal
      */
@@ -569,9 +517,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>audio-tags-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(AUDIO_TAGS_CHANGED listener) {
@@ -579,15 +528,17 @@ public class PlayBin extends Pipeline {
     }
 
     /**
-     * Signal is emitted whenever the tags of a text stream have changed. 
-     * The application will most likely want to get the new tags.
+     * Signal is emitted whenever the tags of a text stream have changed. The
+     * application will most likely want to get the new tags.
      */
     public static interface TEXT_TAGS_CHANGED {
+
         /**
          * @param stream stream index with changed tags
          */
         public void textTagsChanged(PlayBin element, int stream);
     }
+
     /**
      * Adds a listener for the <code>audio-tags-changed</code> signal
      */
@@ -599,9 +550,10 @@ public class PlayBin extends Pipeline {
             }
         });
     }
+
     /**
      * Removes a listener for the <code>text-tags-changed</code> signal
-     * 
+     *
      * @param listener The listener that was previously added.
      */
     public void disconnect(TEXT_TAGS_CHANGED listener) {

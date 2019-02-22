@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -19,10 +20,13 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GError;
+import org.freedesktop.gstreamer.glib.GLibException;
+
 /**
- * Thrown when a gstreamer error occurs.
+ * Thrown when a GStreamer error occurs.
  */
-public class GstException extends RuntimeException {
+public class GstException extends GLibException {
 
     private static final long serialVersionUID = -7413580400835548033L;
 
@@ -41,7 +45,8 @@ public class GstException extends RuntimeException {
     public GstException(String msg) {
         super(msg);
     }
+    
     public GstException(GError error) {
-        super(error.getMessage());
+        super(error);
     }
 }

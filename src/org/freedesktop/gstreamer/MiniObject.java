@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
@@ -32,23 +33,26 @@ import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_
 
 /**
  * Lightweight base class for the GStreamer object hierarchy
- *
- * MiniObject is a baseclass like {@link GObject}, but has been stripped down of
- * features to be fast and small.
- * It offers sub-classing and ref-counting in the same way as GObject does.
- * It has no properties and no signal-support though.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstMiniObject.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstMiniObject.html</a>
+ * <p>
+ * MiniObject is a simple structure that can be used to implement refcounted
+ * types.
  */
-public class MiniObject extends RefCountedObject {
+public abstract class MiniObject extends RefCountedObject {
     /**
      * Creates a new instance of MiniObject
      */
-    public MiniObject(Initializer init) {
+    protected MiniObject(Initializer init) {
         super(init);
     }
 
     /**
      * Gives the type value.
      */
+    @Deprecated
     public static GType getType(Pointer ptr) {
         // Quick getter for GType without allocation
         // same as : new MiniObjectStruct(ptr).type
@@ -70,6 +74,7 @@ public class MiniObject extends RefCountedObject {
      *
      * @return true if the object is writable.
      */
+    @Deprecated
     public boolean isWritable() {
         return GSTMINIOBJECT_API.gst_mini_object_is_writable(this);
     }
@@ -80,6 +85,7 @@ public class MiniObject extends RefCountedObject {
      *
      * @return a writable version (possibly a duplicate) of this MiniObject.
      */
+    @Deprecated
     protected <T extends MiniObject> T makeWritable() {
         MiniObject result = GSTMINIOBJECT_API.gst_mini_object_make_writable(this);
         if (result == null) {
@@ -93,6 +99,7 @@ public class MiniObject extends RefCountedObject {
      *
      * @return the new MiniObject.
      */
+    @Deprecated
     public <T extends MiniObject> T copy() {
         MiniObject result = GSTMINIOBJECT_API.gst_mini_object_copy(this);
         if (result == null) {
@@ -101,11 +108,13 @@ public class MiniObject extends RefCountedObject {
         return (T)result;
     }
 
+    @Deprecated
     @Override
     protected void ref() {
         GSTMINIOBJECT_API.gst_mini_object_ref(this);
     }
 
+    @Deprecated
     @Override
     protected void unref() {
         GSTMINIOBJECT_API.gst_mini_object_unref(this);
@@ -116,6 +125,7 @@ public class MiniObject extends RefCountedObject {
         return (Integer) struct.readField("refcount");
     }
 
+    @Deprecated
     @Override
     protected void disposeNativeHandle(Pointer ptr) {
         if (ownsHandle.get()) {

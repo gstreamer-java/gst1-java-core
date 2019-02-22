@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * 
  * This file is part of gstreamer-java.
@@ -19,12 +20,19 @@ package org.freedesktop.gstreamer.elements;
 
 import org.freedesktop.gstreamer.Element;
 
+/**
+ * A base class for simple transform filters.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer-libs/html/GstBaseTransform.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer-libs/html/GstBaseTransform.html</a>
+ * <p>
+ */
 public class BaseTransform extends Element {
+    
     public static final String GTYPE_NAME = "GstBaseTransform";
 
-    //private static final BaseTransformAPI gst() { return BaseTransformAPI.BASETRANSFORM_API; }
-
-    public BaseTransform(Initializer init) {
+    protected BaseTransform(Initializer init) {
         super(init);
     }
 }

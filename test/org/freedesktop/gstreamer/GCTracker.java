@@ -19,6 +19,7 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GObject;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +34,7 @@ import java.util.Map;
 /**
  * Keeps track of GObject derived objects.
  */
-class GCTracker {
+public class GCTracker {
 
     private static Map<Integer,WeakReference<GCTracker>> objectMap =
             Collections.synchronizedMap(new HashMap<Integer,WeakReference<GCTracker>>());

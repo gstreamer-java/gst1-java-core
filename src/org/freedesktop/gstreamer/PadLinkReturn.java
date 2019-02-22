@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,13 +19,13 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
  * Result values from {@link Pad#link(Pad)} and friends.
  */
-public enum PadLinkReturn implements IntegerEnum {
+public enum PadLinkReturn implements NativeEnum<PadLinkReturn> {
     /** Link succeeded. */
     OK(0),
     /** Pads have no common grandparent. */
@@ -38,10 +39,11 @@ public enum PadLinkReturn implements IntegerEnum {
     /** Pads cannot cooperate in scheduling. */
     NOSCHED(-5),
     /** Refused for some reason. */
-    REFUSED(-6),
+    @DefaultEnumValue
+    REFUSED(-6);
     
-    /** The default enum value used when no other value matches the native value */
-    @DefaultEnumValue __UNKNOWN_NATIVE_VALUE(~0);
+    private final int value;
+    
     PadLinkReturn(int value) {
         this.value = value;
     }
@@ -49,9 +51,9 @@ public enum PadLinkReturn implements IntegerEnum {
      * Gets the integer value of the enum.
      * @return The integer value for this enum.
      */
+    @Override
     public int intValue() {
         return value;
     }
     
-    private final int value;
 }

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A representation of time in the gstreamer framework.
  */
+@Deprecated
 public final class ClockTime implements Comparable<ClockTime> {
     //--------------------------------------------------------------------------
     // Static variables

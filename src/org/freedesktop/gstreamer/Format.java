@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -18,52 +19,47 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.EnumMapper;
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
  * Standard predefined formats.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstFormat.html#GstFormat"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstFormat.html#GstFormat</a>
+ * <p>
  */
-public enum Format implements IntegerEnum {
+// @TODO this won't handle custom registered formats - do we need to?
+public enum Format implements NativeEnum<Format> {
     /** Undefined format */
+    @DefaultEnumValue
     UNDEFINED(0),
     /**
      * The default format of the pad/element. This can be samples for raw audio,
-     * frames/fields for raw video.
+     * frames/fields for raw video (some, but not all, elements support this;
+     * use {@link #TIME } if you don't have a good reason to query for
+     * samples/frames)
      */
     DEFAULT(1),
-    /** bytes */
+    /** Bytes */
     BYTES(2),
     /** Time in nanoseconds */
     TIME(3),
     
-    /** {@link Buffer}s */
+    /** {@link Buffer}s (few, if any, elements implement this as of May 2009) */
     BUFFERS(4),
-    /** Percentage of stream */
-    PERCENT(5),
+    /** Percentage of stream (few, if any, elements implement this as of May 2009) */
+    PERCENT(5);
+
+    private final int value;
     
-    /** The default enum value used when no other value matches the native value */
-    @DefaultEnumValue
-    __UNKNOWN_NATIVE_VALUE(~0);
     Format(int value) {
         this.value = value;
     }
-    /**
-     * Gets the integer value of the enum.
-     * @return The integer value for this enum.
-     */
-    public final int intValue() {
+    
+    @Override
+    public int intValue() {
         return value;
     }
-    
-    /**
-     * Returns the enum constant of this type with the specified integer value.
-     * @param format integer value.
-     * @return Enum constant.
-     */
-    public final static Format valueOf(int format) {
-        return EnumMapper.getInstance().valueOf(format, Format.class);
-    }
-    public final int value;
 }

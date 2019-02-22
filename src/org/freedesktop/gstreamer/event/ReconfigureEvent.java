@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  *
  * This file is part of gstreamer-java.
@@ -15,23 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.event;
 
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
-import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
-
-
+/**
+ * A reconfigure event. The purpose of the reconfigure event is to travel
+ * upstream and make elements renegotiate their caps or reconfigure their buffer
+ * pools. This is useful when changing properties on elements or changing the
+ * topology of the pipeline.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-reconfigure"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-reconfigure</a>
+ * <p>
+ */
 public class ReconfigureEvent extends Event {
-	
-    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
 
     /**
      * This constructor is for internal use only.
+     *
      * @param init initialization data.
      */
-    public ReconfigureEvent(Initializer init) {
+    ReconfigureEvent(Initializer init) {
         super(init);
     }
 
@@ -39,7 +46,7 @@ public class ReconfigureEvent extends Event {
      * Creates a new reconfigure event.
      */
     public ReconfigureEvent() {
-        super(initializer(gst.ptr_gst_event_new_reconfigure()));
+        super(initializer(GSTEVENT_API.ptr_gst_event_new_reconfigure()));
     }
 
 }

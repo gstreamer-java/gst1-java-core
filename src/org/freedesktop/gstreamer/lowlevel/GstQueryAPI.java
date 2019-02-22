@@ -26,8 +26,8 @@ import org.freedesktop.gstreamer.BufferPool;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Query;
-import org.freedesktop.gstreamer.QueryType;
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
@@ -109,7 +109,7 @@ public interface GstQueryAPI extends com.sun.jna.Library {
         public volatile GstMiniObjectAPI.MiniObjectStruct mini_object;
         
         /*< public > *//* with COW */
-        public volatile int type;
+        public volatile QueryType type;
         
         public QueryStruct(Pointer ptr) {
             useMemory(ptr);

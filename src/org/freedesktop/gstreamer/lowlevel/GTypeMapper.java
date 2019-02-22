@@ -24,7 +24,7 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.QueryType;
+import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.ConstField;
@@ -51,7 +51,7 @@ import com.sun.jna.TypeConverter;
 public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 
     public GTypeMapper() {
-        addTypeConverter(QueryType.class, querytypeConverter);
+//        addTypeConverter(QueryType.class, querytypeConverter);
         addToNativeConverter(URI.class, uriConverter);
         addTypeConverter(ClockTime.class, clocktimeConverter);
     }
@@ -234,20 +234,20 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             return Native.POINTER_SIZE == 8 ? Long.class : Integer.class;
         }
     };
-    private TypeConverter querytypeConverter = new TypeConverter() {
-        
-        public Object toNative(Object arg, ToNativeContext context) {
-            return ((QueryType)arg).intValue();
-        }
-
-        public Object fromNative(Object arg0, FromNativeContext arg1) {
-            return QueryType.valueOf(((Number) arg0).intValue());            
-        }
-
-        public Class<?> nativeType() {
-            return Integer.class;
-        }
-    };
+//    private TypeConverter querytypeConverter = new TypeConverter() {
+//        
+//        public Object toNative(Object arg, ToNativeContext context) {
+//            return ((QueryType)arg).intValue();
+//        }
+//
+//        public Object fromNative(Object arg0, FromNativeContext arg1) {
+//            return QueryType.valueOf(((Number) arg0).intValue());            
+//        }
+//
+//        public Class<?> nativeType() {
+//            return Integer.class;
+//        }
+//    };
     private static ToNativeConverter uriConverter = new ToNativeConverter() {
 
         public Object toNative(Object arg0, ToNativeContext arg1) {

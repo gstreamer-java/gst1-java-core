@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wim.taymans@chello.be>
@@ -18,43 +19,47 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
+import org.freedesktop.gstreamer.Bus;
+import org.freedesktop.gstreamer.FlowReturn;
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
- * End-Of-Stream. No more data is to be expected to follow without a {@link NewSegmentEvent}.
+ * End-Of-Stream event.
  * <p>
- * The eos event can only travel downstream
- * synchronized with the buffer flow. Elements that receive the EOS
- * event on a pad can return {@link org.gstreamer.FlowReturn#UNEXPECTED} when data after 
- * the EOS event arrives.
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-eos"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-eos</a>
  * <p>
- * The EOS event will travel down to the sink elements in the pipeline
- * which will then post the {@link org.gstreamer.Bus.EOS} message on the bus after they have
+ * The eos event can only travel downstream synchronized with the buffer flow.
+ * Elements that receive the EOS event on a pad can return
+ * {@link FlowReturn#EOS} when data after the EOS event arrives.
+ * <p>
+ * The EOS event will travel down to the sink elements in the pipeline which
+ * will then post the {@link Bus.EOS } message on the bus after they have
  * finished playing any buffered data.
  * <p>
- * When all sinks have posted an EOS message, an EOS message is
- * forwarded to the application.
+ * When all sinks have posted an EOS message, an EOS message is forwarded to the
+ * application.
+ * <p>
+ * The EOS event itself will not cause any state transitions of the pipeline.
  */
 public class EOSEvent extends Event {
 
-    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
-    
     /**
      * This constructor is for internal use only.
+     *
      * @param init initialization data.
      */
-    public EOSEvent(Initializer init) {
+    EOSEvent(Initializer init) {
         super(init);
     }
-    
+
     /**
-     * Creates a new EOS event. 
+     * Creates a new EOS event.
      */
     public EOSEvent() {
-        super(initializer(gst.ptr_gst_event_new_eos()));
+        super(initializer(GSTEVENT_API.ptr_gst_event_new_eos()));
     }
 }

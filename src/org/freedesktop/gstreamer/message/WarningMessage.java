@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  *
@@ -16,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
@@ -24,25 +24,31 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
  * This message is posted by element when a warning notice is required.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-warning"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-warning</a>
+ * <p>
  */
 public class WarningMessage extends GErrorMessage {
+
     /**
      * Creates a new warning message.
-     * 
+     *
      * @param init internal initialization data.
      */
-    public WarningMessage(Initializer init) {
+    WarningMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Retrieves the GError structure contained in this message.
-     * 
+     *
      * @return the GError contained in this message.
      */
     @Override
     GErrorStruct parseMessage() {
-        GErrorStruct[] err = { null };
+        GErrorStruct[] err = {null};
         GSTMESSAGE_API.gst_message_parse_warning(this, err, null);
         return err[0];
     }

@@ -22,16 +22,16 @@ package org.freedesktop.gstreamer.lowlevel;
 import java.util.Arrays;
 import java.util.List;
 
-import org.freedesktop.gstreamer.ActivateMode;
+import org.freedesktop.gstreamer.PadMode;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.ClockReturn;
 import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.Event;
+import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.Query;
+import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.elements.BaseSink;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
@@ -60,7 +60,7 @@ public interface BaseSinkAPI extends Library {
 
         /*< protected >*/
         public volatile Pad sinkpad;
-        public volatile ActivateMode pad_mode;
+        public volatile PadMode pad_mode;
 
         /*< protected >*/ /* with LOCK */
         public volatile long offset;

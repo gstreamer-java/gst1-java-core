@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007,2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -17,9 +18,6 @@
  */
 
 package org.freedesktop.gstreamer;
-
-import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 /**
  * Represents a fraction value.
@@ -65,10 +63,4 @@ public class Fraction {
     	return denominator != 0 ? ((double) numerator / denominator) : Double.NaN;
     }
     
-    public static Fraction objectFor(GValue value) {
-    	if (GSTVALUE_API.gst_fraction_get_type().equals(value.getType())) {
-    		return new Fraction(GSTVALUE_API.gst_value_get_fraction_numerator(value), GSTVALUE_API.gst_value_get_fraction_denominator(value));
-    	}
-    	return null;
-    }
 }

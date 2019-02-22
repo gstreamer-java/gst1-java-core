@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  *
  * This file is part of gstreamer-java.
@@ -15,24 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.event;
 
-
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.Event;
-import org.freedesktop.gstreamer.lowlevel.GstEventAPI;
+import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
-
+/**
+ * A CAPS event for {@link Caps}. The caps event can only travel downstream
+ * synchronized with the buffer flow and contains the format of the buffers that
+ * will follow after the event.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-caps"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstEvent.html#gst-event-new-caps</a>
+ * <p>
+ */
 public class CapsEvent extends Event {
-	
-    private static final GstEventAPI gst = GstEventAPI.GSTEVENT_API;
 
     /**
      * This constructor is for internal use only.
+     *
      * @param init initialization data.
      */
-    public CapsEvent(Initializer init) {
+    CapsEvent(Initializer init) {
         super(init);
     }
 
@@ -40,6 +46,6 @@ public class CapsEvent extends Event {
      * Creates a new caps event.
      */
     public CapsEvent(final Caps caps) {
-        super(initializer(gst.ptr_gst_event_new_caps(caps)));
+        super(initializer(GSTEVENT_API.ptr_gst_event_new_caps(caps)));
     }
 }

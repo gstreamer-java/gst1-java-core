@@ -34,7 +34,7 @@ public class PromiseTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("PromiseTest", new String[] {});
+        Gst.init(Gst.getVersion(), "PromiseTest", new String[] {});
     }
 
     @AfterClass
@@ -44,7 +44,7 @@ public class PromiseTest {
     
     @Test
     public void testReply() {
-        if (Gst.getVersion().getMinor() < 14) {
+        if (!Gst.testVersion(1, 14)) {
             return;
         }
         Promise promise = new Promise();
@@ -58,7 +58,7 @@ public class PromiseTest {
 
     @Test
     public void testInterrupt() {
-        if (Gst.getVersion().getMinor() < 14) {
+        if (!Gst.testVersion(1, 14)) {
             return;
         }
         Promise promise = new Promise();
@@ -71,7 +71,7 @@ public class PromiseTest {
 
     @Test
     public void testExpire() {
-        if (Gst.getVersion().getMinor() < 14) {
+        if (!Gst.testVersion(1, 14)) {
             return;
         }
         Promise promise = new Promise();
@@ -84,7 +84,7 @@ public class PromiseTest {
 
     @Test
     public void testReplyData() {
-        if (Gst.getVersion().getMinor() < 14) {
+        if (!Gst.testVersion(1, 14)) {
             return;
         }
         Promise promise = new Promise();

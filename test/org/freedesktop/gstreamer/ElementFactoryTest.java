@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import org.freedesktop.gstreamer.ElementFactory.ElementFactoryListType;
+import org.freedesktop.gstreamer.ElementFactory.ListType;
 import org.freedesktop.gstreamer.PluginFeature.Rank;
 import org.freedesktop.gstreamer.elements.DecodeBin;
 import org.freedesktop.gstreamer.elements.PlayBin;
@@ -193,8 +193,8 @@ public class ElementFactoryTest {
 
     @Test
     public void listGetElement() {
-        List<ElementFactory> list = ElementFactory.listGetElement(ElementFactoryListType.ANY,
-                Rank.GST_RANK_NONE);
+        List<ElementFactory> list = ElementFactory.listGetElements(ListType.ANY,
+                Rank.NONE);
         assertNotNull("List of factories is null", list);
         assertTrue("No factories found", !list.isEmpty());
 //        System.out.println("Factories >>>");
@@ -204,28 +204,27 @@ public class ElementFactoryTest {
 //        System.out.println("<<<");
     }
 
-    @Test
-    public void filterList() {
-        List<ElementFactory> list = ElementFactory.listGetElement(ElementFactoryListType.ENCODER,
-                Rank.GST_RANK_NONE);
-        assertNotNull("List of factories is null", list);
-        assertTrue("No factories found", !list.isEmpty());
-        List<ElementFactory> filterList = ElementFactory.listFilter(list, new Caps("video/x-h263"),
-                PadDirection.SRC, false);
-
-        assertNotNull("List of factories is null", filterList);
-        assertTrue("No factories found", !filterList.isEmpty());
-//        System.out.println("Filtered factories >>>");
-//        for (ElementFactory fact : filterList) {
-//            System.out.println(fact.getName());
-//        }
-//        System.out.println("<<<");
-    }
+//    @Test
+//    public void filterList() {
+//        List<ElementFactory> list = ElementFactory.listGetElements(ListType.ENCODER,
+//                Rank.NONE);
+//        assertNotNull("List of factories is null", list);
+//        assertTrue("No factories found", !list.isEmpty());
+//        List<ElementFactory> filterList = ElementFactory.listFilter(list, new Caps("video/x-h263"),
+//                PadDirection.SRC, false);
+//
+//        assertNotNull("List of factories is null", filterList);
+//        assertTrue("No factories found", !filterList.isEmpty());
+////        System.out.println("Filtered factories >>>");
+////        for (ElementFactory fact : filterList) {
+////            System.out.println(fact.getName());
+////        }
+////        System.out.println("<<<");
+//    }
 
     @Test
     public void filterList2() {
-        List<ElementFactory> list = ElementFactory.listGetElementFilter(
-                ElementFactoryListType.ENCODER, Rank.GST_RANK_NONE, new Caps("video/x-h263"),
+        List<ElementFactory> list = ElementFactory.listGetElementsFilter(ListType.ENCODER, Rank.NONE, new Caps("video/x-h263"),
                 PadDirection.SRC, false);
         assertNotNull("List of factories is null", list);
         assertTrue("No factories found", !list.isEmpty());
@@ -235,5 +234,23 @@ public class ElementFactoryTest {
 //            System.out.println(fact.getName());
 //        }
 //        System.out.println("<<<");
+    }
+    
+    @Test
+    public void testMetaData() {
+        ElementFactory f = ElementFactory.find("fakesink");
+        String klass = f.getKlass();
+        String longName = f.getLongName();
+        String description = f.getDescription();
+        String author = f.getAuthor();
+        assertNotNull("Klass is null", klass);
+        assertNotNull("Long name is null", longName);
+        assertNotNull("Description is null", description);
+        assertNotNull("Author is null", author);
+        System.out.println("FakeSink MetaData");
+        System.out.println("Klass : " + f.getKlass());
+        System.out.println("Long Name : " + f.getLongName());
+        System.out.println("Description : " + f.getDescription());
+        System.out.println("Author : " + f.getAuthor());
     }
 }

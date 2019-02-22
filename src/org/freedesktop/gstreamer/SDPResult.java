@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
@@ -16,21 +17,27 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.IntegerEnum;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
 
 /**
- * The possible results for {@link SDPMessage} functions
+ * Return values for SDP functions
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-libs/html/gst-plugins-base-libs-GstSDPMessage.html#GstSDPResult"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gst-plugins-base-libs/html/gst-plugins-base-libs-GstSDPMessage.html#GstSDPResult</a>
+ * 
+ * @see SDPMessage
  */
-public enum SDPResult implements IntegerEnum {
+public enum SDPResult implements NativeEnum<SDPResult> {
     /** A successful return value*/
     OK(0),
-    /** A function to SDPMessage was given invalid paramters */
-    EINVAL(-1),
-    /** An unknown result */
+    /** A function to SDPMessage was given invalid parameters */
     @DefaultEnumValue
-    __UNKNWON_NATIVE_VALUE(~0);
+    EINVAL(-1);
 
+    private final int value;
+    
     SDPResult(int value) {
         this.value = value;
     }
@@ -39,9 +46,9 @@ public enum SDPResult implements IntegerEnum {
      * Gets the integer value of the enum
      * @return the integer value for this enum.
      */
+    @Override
     public int intValue() {
         return value;
     }
 
-    private int value;
 }

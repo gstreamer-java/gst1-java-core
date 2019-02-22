@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
@@ -252,8 +252,12 @@ public interface GValueAPI extends Library {
         }
         
         public GValueArray(int n_prealloced) {
+            this(n_prealloced, true);
+        }
+        
+        public GValueArray(int n_prealloced, boolean ownsMemory) {
             this(GVALUE_API.g_value_array_new(n_prealloced));
-            ownsMemory = true;
+            this.ownsMemory = ownsMemory;
         }
         
         public GValueArray(Pointer pointer) {

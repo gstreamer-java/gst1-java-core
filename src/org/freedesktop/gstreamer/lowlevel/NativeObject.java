@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.GObject;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
@@ -110,7 +110,7 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
     }
     
     @Override
-    protected void invalidate() {
+    public void invalidate() {
         logger.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
         getInstanceMap().remove(handle(), nativeRef);
         disposed.set(true);
@@ -195,6 +195,7 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
 
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
+            constructor.setAccessible(true);
             T retVal = constructor.newInstance(initializer(ptr, refAdjust > 0, ownsHandle));
             //retVal.initNativeHandle(ptr, refAdjust > 0, ownsHandle);
             return retVal;

@@ -20,6 +20,8 @@
 
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.query.QueryType;
 import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -209,9 +211,9 @@ public class QueryTest {
         assertTrue("Query not writable after makeWritable", query.isWritable());
     }
     
-    @Test public void testQueryTypeGetName() {
-        assertEquals(QueryType.JITTER.getName(), "jitter");
-    }
+//    @Test public void testQueryTypeGetName() {
+//        assertEquals(QueryType.JITTER.getName(), "jitter");
+//    }
     
     @Test
     public void gst_query_new_allocation() {

@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Wayne Meissner
  * 
@@ -21,12 +22,8 @@ package org.freedesktop.gstreamer.interfaces;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.NativeValue;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.GObject;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 import com.sun.jna.Pointer;
 
@@ -46,26 +43,5 @@ public class GstInterface extends NativeValue {
     public Element getElement() {
     	return element;
     }
-    
-    protected interface ListElementCreator<E> {
-        E create(Pointer pointer);
-    }
-    
-    /**
-     * Build a {@link java.util.List} of {@link Object} from the native GList.
-     * @param glist The native list to get the objects from.
-     * @param creator The proxy class to wrap the list elements in.
-     * @return The converted list.
-     */
-    protected <T extends GObject> List<T> objectList(GList glist, ListElementCreator<T> creator) {
-        List<T> list = new ArrayList<T>();
-        GList next = glist;
-        while (next != null) {
-            if (next.data != null) {
-                list.add(creator.create(next.data));
-            }
-            next = next.next();   
-        }
-        return list;
-    }
+
 }

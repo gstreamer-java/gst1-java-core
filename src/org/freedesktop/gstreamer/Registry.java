@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
@@ -22,10 +23,9 @@
 package org.freedesktop.gstreamer;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
 import static org.freedesktop.gstreamer.lowlevel.GstRegistryAPI.GSTREGISTRY_API;
@@ -33,6 +33,10 @@ import static org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI.GSTPLUGINFE
 
 /**
  * Abstract base class for management of {@link Plugin} objects.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstRegistry.html"
+ * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstRegistry.html</a>
  * <p>
  * One registry holds the metadata of a set of plugins.
  * All registries build the RegistryPool.
@@ -97,27 +101,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstPluginFeatureAPI.GSTPLUGINFE
 public class Registry extends GstObject {
     public static final String GTYPE_NAME = "GstRegistry";
 
-    public static interface PluginFilter {
-        public boolean accept(Plugin plugin);
-    }
-    
-    public static interface PluginFeatureFilter {
-        public boolean accept(PluginFeature feature);
-    }
-    
-    /**
-     * Retrieves the default registry. 
-     * 
-     * @return The default Registry.
-     */
-    public static Registry get() {
-        // Need to handle the return value here, as it is a persistent object
-        // i.e. the java proxy should not dispose of the underlying object when finalized
-        return GstObject.objectFor(GSTREGISTRY_API.gst_registry_get(), Registry.class,
-                false, false);
-    }
     /** Creates a new instance of Registry */
-    public Registry(Initializer init) {
+    Registry(Initializer init) {
         super(init);
     }
     
@@ -149,17 +134,17 @@ public class Registry extends GstObject {
         GSTREGISTRY_API.gst_registry_remove_plugin(this, plugin);
     }
     
-    /**
-     * Find the {@link PluginFeature} with the given name and type in the registry.
-     * 
-     * @param name The name of the plugin feature to find.
-     * @param type The type of the plugin feature to find.
-     * @return The pluginfeature with the given name and type or null
-     * if the plugin was not found.
-     */
-    public PluginFeature findPluginFeature(String name, GType type) {
-        return GSTREGISTRY_API.gst_registry_find_feature(this, name, type);
-    }
+//    /**
+//     * Find the {@link PluginFeature} with the given name and type in the registry.
+//     * 
+//     * @param name The name of the plugin feature to find.
+//     * @param type The type of the plugin feature to find.
+//     * @return The pluginfeature with the given name and type or null
+//     * if the plugin was not found.
+//     */
+//    public PluginFeature findPluginFeature(String name, GType type) {
+//        return GSTREGISTRY_API.gst_registry_find_feature(this, name, type);
+//    }
     
     /**
      * Find a {@link PluginFeature} by name in the registry.
@@ -167,7 +152,7 @@ public class Registry extends GstObject {
      * @param name The name of the plugin feature to find.
      * @return The {@link PluginFeature} or null if not found.
      */
-    public PluginFeature findPluginFeature(String name) {
+    public PluginFeature lookupFeature(String name) {
         return GSTREGISTRY_API.gst_registry_lookup_feature(this, name);
     }
     
@@ -188,31 +173,24 @@ public class Registry extends GstObject {
      * Get a subset of the Plugins in the registry, filtered by filter.
      * 
      * @param filter the filter to use
-     * @param onlyReturnFirstMatch If true, only return the first plugin that matches the filter.
      * @return A List of {@link Plugin} objects that match the filter.
      */
-    public List<Plugin> getPluginList(final PluginFilter filter, boolean onlyReturnFirstMatch) {
-        List<Plugin> list = new LinkedList<Plugin>();
-        for (Plugin plugin : getPluginList()) {
-            if (filter.accept(plugin)) {
-                list.add(plugin);
-            }
-        }
-        return list;
+    public List<Plugin> getPluginList(final PluginFilter filter) {
+        return getPluginList().stream().filter(filter::accept).collect(Collectors.toList());
     }
     
-    /**
-     * Retrieves a list of {@link PluginFeature} of the {@link Plugin} type.
-     * 
-     * @param type The plugin type.
-     * @return a List of {@link PluginFeature} for the plugin type.
-     */
-    public List<PluginFeature> getPluginFeatureListByType(GType type) {
-        GList glist = GSTREGISTRY_API.gst_registry_get_feature_list(this, type);
-        List<PluginFeature> list = objectList(glist, PluginFeature.class);
-        GSTPLUGINFEATURE_API.gst_plugin_feature_list_free(glist);
-        return list;
-    }
+//    /**
+//     * Retrieves a list of {@link PluginFeature} of the {@link Plugin} type.
+//     * 
+//     * @param type The plugin type.
+//     * @return a List of {@link PluginFeature} for the plugin type.
+//     */
+//    public List<PluginFeature> getPluginFeatureListByType(GType type) {
+//        GList glist = GSTREGISTRY_API.gst_registry_get_feature_list(this, type);
+//        List<PluginFeature> list = objectList(glist, PluginFeature.class);
+//        GSTPLUGINFEATURE_API.gst_plugin_feature_list_free(glist);
+//        return list;
+//    }
     
     /**
      * Retrieves a list of {@link PluginFeature} of the named {@link Plugin}.
@@ -256,4 +234,25 @@ public class Registry extends GstObject {
         }
         return list;
     }
+    
+    public static interface PluginFilter {
+        public boolean accept(Plugin plugin);
+    }
+    
+//    public static interface PluginFeatureFilter {
+//        public boolean accept(PluginFeature feature);
+//    }
+//    
+    /**
+     * Retrieves the default registry. 
+     * 
+     * @return The default Registry.
+     */
+    public static Registry get() {
+        // Need to handle the return value here, as it is a persistent object
+        // i.e. the java proxy should not dispose of the underlying object when finalized
+        return GstObject.objectFor(GSTREGISTRY_API.gst_registry_get(), Registry.class,
+                false, false);
+    }
+    
 }

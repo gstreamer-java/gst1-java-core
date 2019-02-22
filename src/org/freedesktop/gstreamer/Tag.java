@@ -22,7 +22,7 @@ package org.freedesktop.gstreamer;
 /**
  * GStreamer core tags
  */
-public enum Tag {
+enum Tag {
     /** 
      * The artist name as it should be displayed, e.g. 'Jimi Hendrix' or
      * 'The Guitar Heroes'

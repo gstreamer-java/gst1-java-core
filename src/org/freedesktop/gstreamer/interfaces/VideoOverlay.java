@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2009 Levente Farkas <lfarkas@lfarkas.org>
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
  * Copyright (C) 2008 Wayne Meissner
@@ -24,16 +25,15 @@ package org.freedesktop.gstreamer.interfaces;
 
 import static org.freedesktop.gstreamer.lowlevel.GstVideoOverlayAPI.GSTVIDEOOVERLAY_API;
 
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.BusSyncReply;
 import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Message;
+import org.freedesktop.gstreamer.message.Message;
 
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Platform;
 
 /**
- * Interface for elements providing tuner operations
+ * Interface for setting/getting a window system resource on elements
+ * supporting it to configure a window into which to render a video.
  */
 public class VideoOverlay extends GstInterface {
     /**
@@ -48,21 +48,21 @@ public class VideoOverlay extends GstInterface {
 
     /**
      * Convenience function to check if the given message is a "prepare-window-handle".
-     * This usefull for setup native window handles with {@link BusSyncReply}.
+     * This useful for setup native window handles with {@link BusSyncReply}.
      * 
      * @param message
      * @return
      */
-    public static boolean isVideoOverlayPrepareWindowHandleMessage(Message message) {
+    public static boolean isPrepareWindowHandleMessage(Message message) {
         return GSTVIDEOOVERLAY_API.gst_is_video_overlay_prepare_window_handle_message(message);
     }
 
     /**
-     * Creates a new <tt>XOverlay</tt> instance
+     * Creates a new <tt>VideoOverlay</tt> instance
      * 
-     * @param element the element that implements the tuner interface
+     * @param element the element that implements the overlay interface
      */
-    protected VideoOverlay(Element element) {
+    private VideoOverlay(Element element) {
         super(element, GSTVIDEOOVERLAY_API.gst_video_overlay_get_type());
     }
     
@@ -72,25 +72,7 @@ public class VideoOverlay extends GstInterface {
      * @param handle A native handle to use to display video.
      */
     public void setWindowHandle(long handle) {
-      GSTVIDEOOVERLAY_API.gst_video_overlay_set_window_handle(this, new NativeLong(handle));
-    }
-    /**
-     * Sets the native window for the {@link Element} to use to display video.
-     *
-     * @param window A native window to use to display video, or <tt>null</tt> to
-     * stop using the previously set window.
-     */
-    public void setWindowHandle(java.awt.Component window) {
-        if (window == null) {
-            setWindowHandle(0);
-            return;
-        }
-        if (window.isLightweight())
-            throw new IllegalArgumentException("Component must be a native window");
-        if (Platform.isWindows())
-            GSTVIDEOOVERLAY_API.gst_video_overlay_set_window_handle(this, Native.getComponentPointer(window));
-        else
-            setWindowHandle(Native.getComponentID(window));
+      GSTVIDEOOVERLAY_API.gst_video_overlay_set_window_handle(this, new Pointer(handle));
     }
        
     /**
@@ -116,7 +98,7 @@ public class VideoOverlay extends GstInterface {
      * Configure a subregion as a video target within the window set by 
      * {@link #setWindowHandle(long)}. If this is not used or not supported 
      * the video will fill the area of the window set as the overlay to 100%. 
-     * By specifying the rectangle, the video can be overlayed to a specific 
+     * By specifying the rectangle, the video can be overlaid to a specific 
      * region of that window only. After setting the new rectangle one should 
      * call {@link #expose()} to force a redraw. To unset the region pass -1 
      * for the width and height parameters.
@@ -130,29 +112,6 @@ public class VideoOverlay extends GstInterface {
      * @param height
      */
     public boolean setRenderRectangle(int x, int y, int width, int height) {
-    	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
-    }
-    
-    /**
-     * Configure a subregion as a video target within the window set by 
-     * {@link #setWindowHandle(long)}. If this is not used or not supported 
-     * the video will fill the area of the window set as the overlay to 100%. 
-     * By specifying the rectangle, the video can be overlayed to a specific 
-     * region of that window only. After setting the new rectangle one should 
-     * call {@link #expose()} to force a redraw. To unset the region pass -1 
-     * for the width and height parameters.
-     * 
-     * This method is needed for non fullscreen video overlay in UI toolkits 
-     * that do not support subwindows.
-     * 
-     * @param overlay
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     */
-    @Deprecated
-    public boolean setRenderRectangle(VideoOverlay overlay, int x, int y, int width, int height) {
     	return GSTVIDEOOVERLAY_API.gst_video_overlay_set_render_rectangle(this, x, y, width, height);
     }
 

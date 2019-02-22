@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
@@ -27,7 +28,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.DefaultEnumValue;
  * The return value of a clock operation.
  */
 public enum ClockReturn {
-    /** The operation succeded. */
+    /** The operation succeeded. */
     OK,
     /** The operation was scheduled too late. */
     EARLY,
@@ -41,5 +42,7 @@ public enum ClockReturn {
     ERROR,
     /** Operation is not supported */
     @DefaultEnumValue
-    UNSUPPORTED
+    UNSUPPORTED,
+    /** The ClockID is done waiting */
+    DONE
 }
