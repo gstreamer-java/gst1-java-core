@@ -18,7 +18,6 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.ClockTime;
 //import org.freedesktop.gstreamer.controller.ControlSource;
 //import org.freedesktop.gstreamer.controller.InterpolationControlSource;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
@@ -82,9 +81,9 @@ public interface GstInterpolationControlSourceAPI extends Library {
 //	/* Functions */
 //	InterpolationControlSource gst_interpolation_control_source_new();
 //	boolean gst_interpolation_control_source_set_interpolation_mode(InterpolationControlSource self, InterpolateMode mode);
-//	boolean gst_interpolation_control_source_set(InterpolationControlSource self, ClockTime timestamp, GValue value);
+//	boolean gst_interpolation_control_source_set(InterpolationControlSource self, long timestamp, GValue value);
 //	boolean gst_interpolation_control_source_set_from_list(InterpolationControlSource self, GSList timedvalues);
-//	boolean gst_interpolation_control_source_unset(InterpolationControlSource self, ClockTime timestamp);
+//	boolean gst_interpolation_control_source_unset(InterpolationControlSource self, long timestamp);
 //	void gst_interpolation_control_source_unset_all(InterpolationControlSource self);
 //	GList gst_interpolation_control_source_get_all(InterpolationControlSource self);
 //	int gst_interpolation_control_source_get_count(InterpolationControlSource self);

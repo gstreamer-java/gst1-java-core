@@ -109,8 +109,7 @@ public class Clock extends GstObject {
      * @param resolution the new resolution of the clock.
      * @return the new resolution of the clock.
      */
-    @Deprecated
-    public ClockTime setResolution(ClockTime resolution) {
+    public long setResolution(long resolution) {
         return GSTCLOCK_API.gst_clock_set_resolution(this, resolution);
     }
     
@@ -120,8 +119,7 @@ public class Clock extends GstObject {
      *
      * @return the resolution of the clock in nanoseconds.
      */
-    @Deprecated
-    public ClockTime getResolution() {
+    public long getResolution() {
         return GSTCLOCK_API.gst_clock_get_resolution(this);
     }
     
@@ -135,8 +133,7 @@ public class Clock extends GstObject {
      * @return the time of the clock. Or {@link ClockTime#NONE} when
      * given incorrect input.
      */
-    @Deprecated
-    public ClockTime getTime() {
+    public long getTime() {
         return GSTCLOCK_API.gst_clock_get_time(this);
     }
     /**
@@ -147,8 +144,7 @@ public class Clock extends GstObject {
      * 
      * @return the internal time of the clock. Or {@link ClockTime#NONE} when given wrong input.
      */
-    @Deprecated
-    public ClockTime getInternalTime() {
+    public long getInternalTime() {
         return GSTCLOCK_API.gst_clock_get_internal_time(this);
     }
     
@@ -195,8 +191,7 @@ public class Clock extends GstObject {
      * @param rateNumerator the numerator of the rate of the clock relative to its internal time
      * @param rateDenominator the denominator of the rate of the clock
      */
-    @Deprecated
-    public void getCalibration(ClockTime internal, ClockTime external, ClockTime rateNumerator, ClockTime rateDenominator) {
+    public void getCalibration(long internal, long external, long rateNumerator, long rateDenominator) {
         GSTCLOCK_API.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
     }
     
@@ -229,8 +224,7 @@ public class Clock extends GstObject {
      * @param rateNumerator the numerator of the rate of the clock relative to its internal time
      * @param rateDenominator the denominator of the rate of the clock
      */
-    @Deprecated
-    public void setCalibration(ClockTime internal, ClockTime external, ClockTime rateNumerator, ClockTime rateDenominator) {
+    public void setCalibration(long internal, long external, long rateNumerator, long rateDenominator) {
         GSTCLOCK_API.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
     }
     
@@ -243,8 +237,7 @@ public class Clock extends GstObject {
      * @param time The requested time
      * @return A {@link ClockID} that can be used to request the time notification.
      */
-    @Deprecated
-    public ClockID newSingleShotID(ClockTime time) {
+    public ClockID newSingleShotID(long time) {
         return GSTCLOCK_API.gst_clock_new_single_shot_id(this, time);
     }
     
@@ -259,8 +252,7 @@ public class Clock extends GstObject {
      * @param interval The requested interval.
      * @return A {@link ClockID} that can be used to request the time notification.
      */
-    @Deprecated
-    public ClockID newPeriodicID(ClockTime startTime, ClockTime interval) {
+    public ClockID newPeriodicID(long startTime, long interval) {
         return GSTCLOCK_API.gst_clock_new_periodic_id(this, startTime, interval);
     }
 }

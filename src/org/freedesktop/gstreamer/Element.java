@@ -656,8 +656,7 @@ public class Element extends GstObject {
      *
      * @return the base time of the element
      */
-    @Deprecated
-    public ClockTime getBaseTime() {
+    public long getBaseTime() {
         return GSTELEMENT_API.gst_element_get_base_time(this);
     }
 
@@ -667,8 +666,7 @@ public class Element extends GstObject {
      * @param time the base time to set
      * @see #getBaseTime()
      */
-    @Deprecated
-    public void setBaseTime(ClockTime time) {
+    public void setBaseTime(long time) {
         GSTELEMENT_API.gst_element_set_base_time(this, time);
     }
 
@@ -683,8 +681,7 @@ public class Element extends GstObject {
      *
      * @return the start time of this element.
      */
-    @Deprecated
-    public ClockTime getStartTime() {
+    public long getStartTime() {
         return GSTELEMENT_API.gst_element_get_start_time(this);
     }
 
@@ -695,7 +692,7 @@ public class Element extends GstObject {
      *
      * Toplevel elements like GstPipeline will manage the start_time and
      * base_time on its children. Setting the start_time to
-     * {@link ClockTime#NONE} on such a toplevel element will disable the
+     * {@link long#NONE} on such a toplevel element will disable the
      * distribution of the base_time to the children and can be useful if the
      * application manages the base_time itself, for example if you want to
      * synchronize capture from multiple pipelines, and you can also ensure that
@@ -706,8 +703,7 @@ public class Element extends GstObject {
      * @param time the start time to set
      * @see #getStartTime()
      */
-    @Deprecated
-    public void setStartTime(ClockTime time) {
+    public void setStartTime(long time) {
         GSTELEMENT_API.gst_element_set_start_time(this, time);
     }
 

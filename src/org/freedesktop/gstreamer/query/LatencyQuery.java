@@ -21,7 +21,6 @@
  */
 package org.freedesktop.gstreamer.query;
 
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -54,7 +53,7 @@ public class LatencyQuery extends Query {
      * @param minLatency the minimal latency of the live element
      * @param maxLatency the maximal latency of the live element
      */
-    public void setLatency(boolean live, ClockTime minLatency, ClockTime maxLatency) {
+    public void setLatency(boolean live, long minLatency, long maxLatency) {
         GstQueryAPI.GSTQUERY_API.gst_query_set_latency(this, live, minLatency, maxLatency);
     }
 
@@ -74,8 +73,8 @@ public class LatencyQuery extends Query {
      *
      * @return The minimum latency of the live element.
      */
-    public ClockTime getMinimumLatency() {
-        ClockTime[] latency = new ClockTime[1];
+    public long getMinimumLatency() {
+        long[] latency = new long[1];
         GstQueryAPI.GSTQUERY_API.gst_query_parse_latency(this, null, latency, null);
         return latency[0];
     }
@@ -85,8 +84,8 @@ public class LatencyQuery extends Query {
      *
      * @return The maximum latency of the live element.
      */
-    public ClockTime getMaximumLatency() {
-        ClockTime[] latency = new ClockTime[1];
+    public long getMaximumLatency() {
+        long[] latency = new long[1];
         GstQueryAPI.GSTQUERY_API.gst_query_parse_latency(this, null, null, latency);
         return latency[0];
     }

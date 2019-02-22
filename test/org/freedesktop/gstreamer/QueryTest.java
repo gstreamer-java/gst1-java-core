@@ -131,31 +131,33 @@ public class QueryTest {
     @Test
     public void latencyIsLive() {
         LatencyQuery query = new LatencyQuery();
-        query.setLatency(true, ClockTime.ZERO, ClockTime.ZERO);
+        query.setLatency(true, 0, 0);
         assertTrue("isLive not set to true", query.isLive());
-        query.setLatency(false, ClockTime.ZERO, ClockTime.ZERO);
+        query.setLatency(false, 0, 0);
         assertFalse("isLive not set to true", query.isLive());
     }
     @Test 
     public void getMinimumLatency() {
         LatencyQuery query = new LatencyQuery();
-        final ClockTime MIN = ClockTime.fromMillis(13000);
-        query.setLatency(false, MIN, ClockTime.valueOf(~0L, TimeUnit.SECONDS));
+//        final ClockTime MIN = ClockTime.fromMillis(13000);
+        final long MIN = TimeUnit.MILLISECONDS.toNanos(13000);
+        query.setLatency(false, MIN, ~0);
         assertEquals("Min latency not set", MIN, query.getMinimumLatency());
     }
     @Test 
     public void getMaximumLatency() {
         LatencyQuery query = new LatencyQuery();
-        final ClockTime MAX = ClockTime.fromMillis(123000);
-        query.setLatency(false, ClockTime.ZERO, MAX);
+//        final ClockTime MAX = ClockTime.fromMillis(123000);
+        final long MAX = TimeUnit.MILLISECONDS.toNanos(123000);
+        query.setLatency(false, 0, MAX);
         assertEquals("Min latency not set", MAX, query.getMaximumLatency());
     }
      
     @Test 
     public void latencyQueryToString() {
         LatencyQuery query = new LatencyQuery();
-        ClockTime minLatency = ClockTime.fromMillis(13000);
-        ClockTime maxLatency = ClockTime.fromMillis(200000);
+        long minLatency = TimeUnit.MILLISECONDS.toNanos(13000); //ClockTime.fromMillis(13000);
+        long maxLatency = TimeUnit.MILLISECONDS.toNanos(200000);//ClockTime.fromMillis(200000);
         query.setLatency(true, minLatency, maxLatency);
         String s = query.toString();
         assertTrue("toString() did not return isLive", s.contains("live=true"));
@@ -165,20 +167,21 @@ public class QueryTest {
     
     @Test public void segmentQuery() {
         SegmentQuery query = new SegmentQuery(Format.TIME);
-        ClockTime end = ClockTime.fromMillis(1000);
-        query.setSegment(1.0, Format.TIME, 0, end.toNanos());
+//        ClockTime end = ClockTime.fromMillis(1000);
+        long end = TimeUnit.MILLISECONDS.toNanos(1000);
+        query.setSegment(1.0, Format.TIME, 0, end);
         assertEquals("Format not set correctly", Format.TIME, query.getFormat());
         assertEquals("Start time not set correctly", 0, query.getStart());
-        assertEquals("End time not set correctly", end.toNanos(), query.getEnd());
+        assertEquals("End time not set correctly", end, query.getEnd());
     }
     @Test public void seekingQuery() {
         SeekingQuery query = new SeekingQuery(Format.TIME);
-        ClockTime start = ClockTime.ZERO;
-        ClockTime end = ClockTime.fromMillis(1000);
-        query.setSeeking(Format.TIME, true, start.toNanos(), end.toNanos());
+        long start = 0;
+        long end = TimeUnit.MILLISECONDS.toNanos(1000);
+        query.setSeeking(Format.TIME, true, start, end);
         assertEquals("Format not set", Format.TIME, query.getFormat());
-        assertEquals("Start time not set", start.toNanos(), query.getStart());
-        assertEquals("End time not set", end.toNanos(), query.getEnd());
+        assertEquals("Start time not set", start, query.getStart());
+        assertEquals("End time not set", end, query.getEnd());
     }
     @Test public void formatsQuery() {
         Query query = GstQueryAPI.GSTQUERY_API.gst_query_new_formats();

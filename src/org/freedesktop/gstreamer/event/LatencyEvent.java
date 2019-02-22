@@ -21,7 +21,6 @@
  */
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.ClockTime;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -54,7 +53,7 @@ public class LatencyEvent extends Event {
      *
      * @param latency the new latency value to add to timestamps.
      */
-    public LatencyEvent(ClockTime latency) {
+    public LatencyEvent(long latency) {
         super(initializer(GSTEVENT_API.ptr_gst_event_new_latency(latency)));
     }
 
@@ -63,8 +62,8 @@ public class LatencyEvent extends Event {
      *
      * @return the latency.
      */
-    public ClockTime getLatency() {
-        ClockTime[] latency = new ClockTime[1];
+    public long getLatency() {
+        long[] latency = new long[1];
         GSTEVENT_API.gst_event_parse_latency(this, latency);
         return latency[0];
     }

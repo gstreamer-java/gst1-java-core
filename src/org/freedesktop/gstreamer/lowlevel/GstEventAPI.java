@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.event.EventType;
 import org.freedesktop.gstreamer.Format;
@@ -83,10 +82,8 @@ public interface GstEventAPI extends com.sun.jna.Library {
 						 long[] maxsize, boolean[] async);
     
     /* QOS events */
-    @CallerOwnsReturn Event gst_event_new_qos(QOSType type, double proportion, long diff, ClockTime timestamp);
     @CallerOwnsReturn Event gst_event_new_qos(QOSType type, double proportion, long diff, long timestamp);
-    Pointer ptr_gst_event_new_qos(QOSType type, double proportion, long diff, ClockTime timestamp);
-    void gst_event_parse_qos(Event event, QOSType[] type, double[] proportion, long[] diff, ClockTime[] timestamp);
+    Pointer ptr_gst_event_new_qos(QOSType type, double proportion, long diff, long timestamp);
     void gst_event_parse_qos(Event event, QOSType[] type, double[] proportion, long[] diff, long[] timestamp);
     
     /* seek event */
@@ -104,9 +101,9 @@ public interface GstEventAPI extends com.sun.jna.Library {
     Pointer ptr_gst_event_new_navigation(@Invalidate Structure structure);
 
     /* latency event */
-    @CallerOwnsReturn Event gst_event_new_latency(ClockTime latency);
-    Pointer ptr_gst_event_new_latency(ClockTime latency);
-    void gst_event_parse_latency(Event event, ClockTime[] latency);
+    @CallerOwnsReturn Event gst_event_new_latency(long latency);
+    Pointer ptr_gst_event_new_latency(long latency);
+    void gst_event_parse_latency(Event event, long[] latency);
     
     /* step event */
     @CallerOwnsReturn Event gst_event_new_step(Format format, long amount, double rate, boolean flush, boolean intermediate);

@@ -22,7 +22,6 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.BusSyncReply;
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.message.MessageType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
@@ -47,11 +46,11 @@ public interface GstBusAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Message gst_bus_peek(Bus bus);
     @CallerOwnsReturn Message gst_bus_pop(Bus bus);
     @CallerOwnsReturn Message gst_bus_pop_filtered(Bus bus, MessageType types);
-    @CallerOwnsReturn Message gst_bus_timed_pop(Bus bus, ClockTime timeout);
-    @CallerOwnsReturn Message gst_bus_timed_pop_filtered(Bus bus, ClockTime timeout, MessageType types);
+    @CallerOwnsReturn Message gst_bus_timed_pop(Bus bus, long timeout);
+    @CallerOwnsReturn Message gst_bus_timed_pop_filtered(Bus bus, long timeout, MessageType types);
     /* polling the bus */
-    @CallerOwnsReturn Message gst_bus_poll(Bus bus, MessageType events, /* GstClockTimeDiff */ long timeout);
-//    @CallerOwnsReturn Message gst_bus_poll(Bus bus, MessageType events, ClockTime timeout);
+    @CallerOwnsReturn Message gst_bus_poll(Bus bus, MessageType events, /* GstlongDiff */ long timeout);
+//    @CallerOwnsReturn Message gst_bus_poll(Bus bus, MessageType events, long timeout);
 
     void gst_bus_set_flushing(Bus ptr, int flushing);
     interface BusCallback extends GstCallback {

@@ -22,7 +22,6 @@ package org.freedesktop.gstreamer.lowlevel;
 import org.freedesktop.gstreamer.Clock;
 import org.freedesktop.gstreamer.ClockID;
 import org.freedesktop.gstreamer.ClockReturn;
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
@@ -35,26 +34,26 @@ public interface GstClockAPI extends com.sun.jna.Library {
     GstClockAPI GSTCLOCK_API = GstNative.load(GstClockAPI.class);
 
     GType gst_clock_get_type();
-    ClockTime gst_clock_set_resolution(Clock clock, ClockTime resolution);
-    ClockTime gst_clock_get_resolution(Clock clock);
-    ClockTime gst_clock_get_time(Clock clock);
-    void gst_clock_set_calibration(Clock clock, ClockTime internal, ClockTime external, ClockTime rate_num, ClockTime rate_denom);
+    long gst_clock_set_resolution(Clock clock, long resolution);
+    long gst_clock_get_resolution(Clock clock);
+    long gst_clock_get_time(Clock clock);
+    void gst_clock_set_calibration(Clock clock, long internal, long external, long rate_num, long rate_denom);
     void gst_clock_get_calibration(Clock clock, long[] internal, long[] external,
             long[] rate_num, long[] rate_denom);
     /* master/slave clocks */
     boolean gst_clock_set_master(Clock clock, Clock master);
     @CallerOwnsReturn Clock gst_clock_get_master(Clock clock);
-    boolean gst_clock_add_observation(Clock clock, ClockTime slave, ClockTime Master, double[] r_squared);
+    boolean gst_clock_add_observation(Clock clock, long slave, long Master, double[] r_squared);
     
     /* getting and adjusting internal time */
-    ClockTime gst_clock_get_internal_time(Clock clock);
-    ClockTime gst_clock_adjust_unlocked(Clock clock, ClockTime internal);
-    ClockTime gst_clock_unadjust_unlocked(Clock clock, ClockTime external);
+    long gst_clock_get_internal_time(Clock clock);
+    long gst_clock_adjust_unlocked(Clock clock, long internal);
+    long gst_clock_unadjust_unlocked(Clock clock, long external);
 
 
     /* creating IDs that can be used to get notifications */
-    @CallerOwnsReturn ClockID gst_clock_new_single_shot_id(Clock clock, ClockTime time);
-    @CallerOwnsReturn ClockID gst_clock_new_periodic_id(Clock clock, ClockTime start_time, ClockTime interval);
+    @CallerOwnsReturn ClockID gst_clock_new_single_shot_id(Clock clock, long time);
+    @CallerOwnsReturn ClockID gst_clock_new_periodic_id(Clock clock, long start_time, long interval);
 
     
     /* reference counting */
@@ -65,8 +64,8 @@ public interface GstClockAPI extends com.sun.jna.Library {
     /* operations on IDs */
     int gst_clock_id_compare_func(ClockID id1, ClockID id2);
 
-    ClockTime gst_clock_id_get_time(ClockID id);
-    ClockReturn gst_clock_id_wait(ClockID id, /* GstClockTimeDiff * */ long[] jitter);
+    long gst_clock_id_get_time(ClockID id);
+    ClockReturn gst_clock_id_wait(ClockID id, /* GstlongDiff * */ long[] jitter);
     public static interface GstClockCallback {
         /**
          * @param clock The clock that triggered the callback
@@ -74,7 +73,7 @@ public interface GstClockAPI extends com.sun.jna.Library {
          * @param id The {@link ClockID} that expired
          * @return currently unused.
          */
-        boolean callback(Clock clock, ClockTime time, ClockID id, Pointer user_data);
+        boolean callback(Clock clock, long time, ClockID id, Pointer user_data);
     }
 
     ClockReturn gst_clock_id_wait_async(ClockID id, GstClockCallback func, Pointer user_data);

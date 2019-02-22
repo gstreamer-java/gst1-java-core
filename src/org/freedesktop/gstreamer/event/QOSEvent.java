@@ -21,7 +21,6 @@
  */
 package org.freedesktop.gstreamer.event;
 
-import org.freedesktop.gstreamer.ClockTime;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -80,7 +79,7 @@ public class QOSEvent extends Event {
      * @param difference the time difference of the last Clock sync
      * @param timestamp the timestamp of the buffer
      */
-    public QOSEvent(QOSType type, double proportion, long difference, ClockTime timestamp) {
+    public QOSEvent(QOSType type, double proportion, long difference, long timestamp) {
         super(initializer(GSTEVENT_API.ptr_gst_event_new_qos(type, proportion, difference, timestamp)));
     }
 
@@ -89,7 +88,7 @@ public class QOSEvent extends Event {
      */
     public QOSType getType() {
         QOSType[] type = {null};
-        GSTEVENT_API.gst_event_parse_qos(this, type, null, null, (ClockTime[]) null);
+        GSTEVENT_API.gst_event_parse_qos(this, type, null, null, (long[]) null);
         return type[0];
     }
 
@@ -105,7 +104,7 @@ public class QOSEvent extends Event {
      */
     public double getProportion() {
         double[] p = {0d};
-        GSTEVENT_API.gst_event_parse_qos(this, null, p, null, (ClockTime[]) null);
+        GSTEVENT_API.gst_event_parse_qos(this, null, p, null, (long[]) null);
         return p[0];
     }
 
@@ -121,7 +120,7 @@ public class QOSEvent extends Event {
      */
     public long getDifference() {
         long[] diff = {0};
-        GSTEVENT_API.gst_event_parse_qos(this, null, null, diff, (ClockTime[]) null);
+        GSTEVENT_API.gst_event_parse_qos(this, null, null, diff, (long[]) null);
         return diff[0];
     }
 
@@ -134,8 +133,8 @@ public class QOSEvent extends Event {
      *
      * @return the timestamp
      */
-    public ClockTime getTimestamp() {
-        ClockTime[] timestamp = new ClockTime[1];
+    public long getTimestamp() {
+        long[] timestamp = new long[1];
         GSTEVENT_API.gst_event_parse_qos(this, null, null, null, timestamp);
         return timestamp[0];
     }
