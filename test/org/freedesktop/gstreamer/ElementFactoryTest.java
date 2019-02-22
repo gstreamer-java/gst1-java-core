@@ -193,7 +193,7 @@ public class ElementFactoryTest {
 
     @Test
     public void listGetElement() {
-        List<ElementFactory> list = ElementFactory.listGetElement(ListType.ANY,
+        List<ElementFactory> list = ElementFactory.listGetElements(ListType.ANY,
                 Rank.NONE);
         assertNotNull("List of factories is null", list);
         assertTrue("No factories found", !list.isEmpty());
@@ -204,27 +204,27 @@ public class ElementFactoryTest {
 //        System.out.println("<<<");
     }
 
-    @Test
-    public void filterList() {
-        List<ElementFactory> list = ElementFactory.listGetElement(ListType.ENCODER,
-                Rank.NONE);
-        assertNotNull("List of factories is null", list);
-        assertTrue("No factories found", !list.isEmpty());
-        List<ElementFactory> filterList = ElementFactory.listFilter(list, new Caps("video/x-h263"),
-                PadDirection.SRC, false);
-
-        assertNotNull("List of factories is null", filterList);
-        assertTrue("No factories found", !filterList.isEmpty());
-//        System.out.println("Filtered factories >>>");
-//        for (ElementFactory fact : filterList) {
-//            System.out.println(fact.getName());
-//        }
-//        System.out.println("<<<");
-    }
+//    @Test
+//    public void filterList() {
+//        List<ElementFactory> list = ElementFactory.listGetElements(ListType.ENCODER,
+//                Rank.NONE);
+//        assertNotNull("List of factories is null", list);
+//        assertTrue("No factories found", !list.isEmpty());
+//        List<ElementFactory> filterList = ElementFactory.listFilter(list, new Caps("video/x-h263"),
+//                PadDirection.SRC, false);
+//
+//        assertNotNull("List of factories is null", filterList);
+//        assertTrue("No factories found", !filterList.isEmpty());
+////        System.out.println("Filtered factories >>>");
+////        for (ElementFactory fact : filterList) {
+////            System.out.println(fact.getName());
+////        }
+////        System.out.println("<<<");
+//    }
 
     @Test
     public void filterList2() {
-        List<ElementFactory> list = ElementFactory.listGetElementFilter(ListType.ENCODER, Rank.NONE, new Caps("video/x-h263"),
+        List<ElementFactory> list = ElementFactory.listGetElementsFilter(ListType.ENCODER, Rank.NONE, new Caps("video/x-h263"),
                 PadDirection.SRC, false);
         assertNotNull("List of factories is null", list);
         assertTrue("No factories found", !list.isEmpty());

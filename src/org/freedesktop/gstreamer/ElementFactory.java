@@ -179,47 +179,47 @@ public class ElementFactory extends PluginFeature {
         return factory;
     }
 
-    /**
-     * Filter out all the elementfactories in list that can handle caps in the
-     * given direction.
-     *
-     * If subsetonly is true, then only the elements whose pads templates are a
-     * complete superset of caps will be returned. Else any element whose pad
-     * templates caps can intersect with caps will be returned.
-     *
-     * @param list a {@link List} of {@link ElementFactory} to filter
-     * @param caps a {@link Caps}
-     * @param direction a {@link PadDirection} to filter on
-     * @param subsetonly whether to filter on caps subsets or not.
-     * @return a {@link List} of {@link ElementFactory} elements that match the
-     * given requisits.
-     */
-    public static List<ElementFactory> listFilter(List<ElementFactory> list, Caps caps,
-            PadDirection direction, boolean subsetonly) {
-        GList glist = null;
-        List<ElementFactory> filterList = new ArrayList<ElementFactory>();
-
-        for (ElementFactory fact : list) {
-            fact.ref();
-            glist = GLIB_API.g_list_append(glist, fact.handle());
-        }
-
-        GList gFilterList = GSTELEMENTFACTORY_API.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
-
-        GList next = gFilterList;
-        while (next != null) {
-            if (next.data != null) {
-                ElementFactory fact = new ElementFactory(initializer(next.data, true, true));
-                filterList.add(fact);
-            }
-            next = next.next();
-        }
-
-        GSTPLUGIN_API.gst_plugin_list_free(glist);
-        GSTPLUGIN_API.gst_plugin_list_free(gFilterList);
-
-        return filterList;
-    }
+//    /**
+//     * Filter out all the elementfactories in list that can handle caps in the
+//     * given direction.
+//     *
+//     * If subsetonly is true, then only the elements whose pads templates are a
+//     * complete superset of caps will be returned. Else any element whose pad
+//     * templates caps can intersect with caps will be returned.
+//     *
+//     * @param list a {@link List} of {@link ElementFactory} to filter
+//     * @param caps a {@link Caps}
+//     * @param direction a {@link PadDirection} to filter on
+//     * @param subsetonly whether to filter on caps subsets or not.
+//     * @return a {@link List} of {@link ElementFactory} elements that match the
+//     * given requisits.
+//     */
+//    public static List<ElementFactory> listFilter(List<ElementFactory> list, Caps caps,
+//            PadDirection direction, boolean subsetonly) {
+//        GList glist = null;
+//        List<ElementFactory> filterList = new ArrayList<ElementFactory>();
+//
+//        for (ElementFactory fact : list) {
+//            fact.ref();
+//            glist = GLIB_API.g_list_append(glist, fact.handle());
+//        }
+//
+//        GList gFilterList = GSTELEMENTFACTORY_API.gst_element_factory_list_filter(glist, caps, direction, subsetonly);
+//
+//        GList next = gFilterList;
+//        while (next != null) {
+//            if (next.data != null) {
+//                ElementFactory fact = new ElementFactory(initializer(next.data, true, true));
+//                filterList.add(fact);
+//            }
+//            next = next.next();
+//        }
+//
+//        GSTPLUGIN_API.gst_plugin_list_free(glist);
+//        GSTPLUGIN_API.gst_plugin_list_free(gFilterList);
+//
+//        return filterList;
+//    }
 
     /**
      * Get a list of factories that match the given type. Only elements with a
@@ -230,7 +230,7 @@ public class ElementFactory extends PluginFeature {
      * @param minrank Minimum rank
      * @return a List of ElementFactory elements.
      */
-    public static List<ElementFactory> listGetElement(ListType type, Rank minrank) {
+    public static List<ElementFactory> listGetElements(ListType type, Rank minrank) {
         GList glist = GSTELEMENTFACTORY_API.gst_element_factory_list_get_elements(type.getValue(), minrank.intValue());
         List<ElementFactory> list = new ArrayList<ElementFactory>();
 
@@ -265,7 +265,7 @@ public class ElementFactory extends PluginFeature {
      * @return a {@link List} of {@link ElementFactory} elements that match the
      * given requisits.
      */
-    public static List<ElementFactory> listGetElementFilter(ListType type, Rank minrank,
+    public static List<ElementFactory> listGetElementsFilter(ListType type, Rank minrank,
             Caps caps, PadDirection direction, boolean subsetonly) {
         List<ElementFactory> filterList = new ArrayList<ElementFactory>();
 
@@ -388,7 +388,7 @@ public class ElementFactory extends PluginFeature {
         /** All sinks handling audio, video or image media types */
         AUDIOVIDEO_SINKS(SINK.getValue() | MEDIA_AUDIO.getValue() | MEDIA_VIDEO.getValue() | MEDIA_IMAGE.getValue()),
         /** All elements used to 'decode' streams (decoders, demuxers, parsers, depayloaders) */
-        DECODABLE(ENCODER.getValue() | DEMUXER.getValue() | DEPAYLOADER.getValue() | PARSER.getValue());
+        DECODABLE(DECODER.getValue() | DEMUXER.getValue() | DEPAYLOADER.getValue() | PARSER.getValue());
 
         private final long value;
 
