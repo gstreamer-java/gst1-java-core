@@ -21,7 +21,6 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Clock;
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
@@ -39,12 +38,12 @@ public interface GstPipelineAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Bus gst_pipeline_get_bus(Pipeline pipeline);
     void gst_pipeline_set_auto_flush_bus(Pipeline pipeline, boolean flush);
     boolean gst_pipeline_get_auto_flush_bus(Pipeline pipeline);
-    void gst_pipeline_set_new_stream_time(Pipeline pipeline, ClockTime time);
+    void gst_pipeline_set_new_stream_time(Pipeline pipeline, long time);
     long gst_pipeline_get_last_stream_time(Pipeline pipeline);
     void gst_pipeline_use_clock(Pipeline pipeline, Clock clock);
     boolean gst_pipeline_set_clock(Pipeline pipeline, Clock clock);
     @CallerOwnsReturn Clock gst_pipeline_get_clock(Pipeline pipeline);
     void gst_pipeline_auto_clock(Pipeline pipeline);
-    void gst_pipeline_set_delay(Pipeline pipeline, ClockTime delay);
+    void gst_pipeline_set_delay(Pipeline pipeline, long delay);
     long gst_pipeline_get_delay(Pipeline pipeline);
 }

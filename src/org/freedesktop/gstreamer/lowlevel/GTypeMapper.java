@@ -51,9 +51,7 @@ import com.sun.jna.TypeConverter;
 public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 
     public GTypeMapper() {
-//        addTypeConverter(QueryType.class, querytypeConverter);
         addToNativeConverter(URI.class, uriConverter);
-        addTypeConverter(ClockTime.class, clocktimeConverter);
     }
     private static ToNativeConverter nativeValueArgumentConverter = new ToNativeConverter() {
 
@@ -66,20 +64,6 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
         }        
     };
     
-    private static TypeConverter clocktimeConverter = new TypeConverter() {
-
-        public Object fromNative(Object arg, FromNativeContext arg1) {
-            return ClockTime.valueOf((Long) arg, TimeUnit.NANOSECONDS);
-        }
-
-        public Class<?> nativeType() {
-            return long.class;
-        }
-
-        public Object toNative(Object arg, ToNativeContext arg1) {
-            return arg != null ? ((ClockTime) arg).convertTo(TimeUnit.NANOSECONDS) : 0L;
-        }
-    };
     private static TypeConverter nativeObjectConverter = new TypeConverter() {
         public Object toNative(Object arg, ToNativeContext context) {
             if (arg == null) {

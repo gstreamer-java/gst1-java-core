@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
@@ -155,9 +154,9 @@ public interface GstBufferAPI extends com.sun.jna.Library {
         public Pointer /* BufferPool */ pool;
         
         /* timestamp */
-        public ClockTime pts;
-        public ClockTime dts;
-        public ClockTime duration;
+        public long pts;
+        public long dts;
+        public long duration;
         
         /* media specific offset */
         public long offset;

@@ -59,46 +59,46 @@ public class ClockTimeTest {
 
     @Test public void toSeconds() {
         final long TIME = TimeUnit.SECONDS.toNanos(0xdeadbeef);
-        ClockTime time = ClockTime.valueOf(TIME, TimeUnit.NANOSECONDS);
         assertEquals("toSeconds returned incorrect value", 
-                TimeUnit.NANOSECONDS.toSeconds(TIME), time.toSeconds()); 
-        assertEquals("convertTo returned incorrect value", 
-                TimeUnit.NANOSECONDS.toSeconds(TIME), time.convertTo(TimeUnit.SECONDS)); 
+                TimeUnit.NANOSECONDS.toSeconds(TIME), ClockTime.toSeconds(TIME)); 
     }
     @Test public void toMillis() {
         final long TIME = TimeUnit.SECONDS.toNanos(0xdeadbeef);
-        ClockTime time = ClockTime.valueOf(TIME, TimeUnit.NANOSECONDS);
         assertEquals("toMillis returned incorrect value", 
-                TimeUnit.NANOSECONDS.toMillis(TIME), time.toMillis());        
-        assertEquals("convertTo returned incorrect value", 
-                TimeUnit.NANOSECONDS.toMillis(TIME), time.convertTo(TimeUnit.MILLISECONDS));
+                TimeUnit.NANOSECONDS.toMillis(TIME), ClockTime.toMillis(TIME));        
     }
     @Test public void toMicros() {
         final long TIME = TimeUnit.SECONDS.toNanos(0xdeadbeef);
-        ClockTime time = ClockTime.valueOf(TIME, TimeUnit.NANOSECONDS);
         assertEquals("toMillis returned incorrect value", 
-                TimeUnit.NANOSECONDS.toMicros(TIME), time.toMicros());
-        assertEquals("convertTo returned incorrect value", 
-                TimeUnit.NANOSECONDS.toMicros(TIME), time.convertTo(TimeUnit.MICROSECONDS));
+                TimeUnit.NANOSECONDS.toMicros(TIME), ClockTime.toMicros(TIME));
     }
-    @Test public void toNanos() {
-        final long TIME = TimeUnit.SECONDS.toNanos(0xdeadbeef);
-        ClockTime time = ClockTime.valueOf(TIME, TimeUnit.NANOSECONDS);
-        assertEquals("toNanos returned incorrect value", 
-                TimeUnit.NANOSECONDS.toNanos(TIME), time.toNanos());
-        assertEquals("convertTo returned incorrect value", 
-                TimeUnit.NANOSECONDS.toNanos(TIME), time.convertTo(TimeUnit.NANOSECONDS));
+    @Test public void toStringRepresentation() {
+        long hours = 3;
+        long minutes = 27;
+        long seconds = 13;
+        long time = TimeUnit.HOURS.toNanos(hours) +
+                TimeUnit.MINUTES.toNanos(minutes) +
+                TimeUnit.SECONDS.toNanos(seconds);
+        assertEquals("ClockTime.toString() incorrect", "03:27:13", ClockTime.toString(time));
     }
-    @Test public void compareTo() {
-        // Collections.sort uses compareTo()
-        List<ClockTime> list = new ArrayList<ClockTime>();
-        list.add(ClockTime.valueOf(2, TimeUnit.SECONDS));
-        list.add(ClockTime.valueOf(3, TimeUnit.SECONDS));
-        list.add(ClockTime.valueOf(1, TimeUnit.SECONDS));
-        Collections.sort(list);
-        assertEquals("list not sorted correctly", 1, list.get(0).toSeconds());
-        assertEquals("list not sorted correctly", 2, list.get(1).toSeconds());
-        assertEquals("list not sorted correctly", 3, list.get(2).toSeconds());
-    }
-    
+//    @Test public void toNanos() {
+//        final long TIME = TimeUnit.SECONDS.toNanos(0xdeadbeef);
+//        ClockTime time = ClockTime.valueOf(TIME, TimeUnit.NANOSECONDS);
+//        assertEquals("toNanos returned incorrect value", 
+//                TimeUnit.NANOSECONDS.toNanos(TIME), time.toNanos());
+//        assertEquals("convertTo returned incorrect value", 
+//                TimeUnit.NANOSECONDS.toNanos(TIME), time.convertTo(TimeUnit.NANOSECONDS));
+//    }
+//    @Test public void compareTo() {
+//        // Collections.sort uses compareTo()
+//        List<ClockTime> list = new ArrayList<ClockTime>();
+//        list.add(ClockTime.valueOf(2, TimeUnit.SECONDS));
+//        list.add(ClockTime.valueOf(3, TimeUnit.SECONDS));
+//        list.add(ClockTime.valueOf(1, TimeUnit.SECONDS));
+//        Collections.sort(list);
+//        assertEquals("list not sorted correctly", 1, list.get(0).toSeconds());
+//        assertEquals("list not sorted correctly", 2, list.get(1).toSeconds());
+//        assertEquals("list not sorted correctly", 3, list.get(2).toSeconds());
+//    }
+//    
 }

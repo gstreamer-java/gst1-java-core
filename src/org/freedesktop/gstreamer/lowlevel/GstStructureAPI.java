@@ -68,7 +68,7 @@ public interface GstStructureAPI extends com.sun.jna.Library {
     
     boolean gst_structure_get_date(Structure structure, String fieldname, PointerByReference value);
     boolean gst_structure_get_date(Structure structure, String fieldname, Pointer[] value);
-    //boolean gst_structure_get_clock_time(Structure structure, String fieldname, GstClockTime *value);
+    //boolean gst_structure_get_clock_time(Structure structure, String fieldname, Gstlong *value);
     
     String gst_structure_get_string(Structure structure, String fieldname);
     boolean gst_structure_get_enum(Structure structure, String fieldname, GType enumtype, int[] value);

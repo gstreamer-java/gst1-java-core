@@ -119,22 +119,20 @@ public class Buffer extends MiniObject {
      * timestamp when the buffer should be decoded and is usually monotonically
      * increasing.
      *
-     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
+     * @return a long representing the timestamp or {@link ClockTime#NONE}
      * when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public ClockTime getDecodeTimestamp() {
-        return (ClockTime) this.struct.readField("dts");
+    public long getDecodeTimestamp() {
+        return (long) this.struct.readField("dts");
     }
 
     /**
      * Set the decode timestamp of the Buffer
      *
-     * @param val a ClockTime representing the timestamp or
+     * @param val a long representing the timestamp or
      * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public void setDecodeTimestamp(ClockTime val) {
+    public void setDecodeTimestamp(long val) {
         this.struct.writeField("dts", val);
     }
 
@@ -143,22 +141,20 @@ public class Buffer extends MiniObject {
      * timestamp when the buffer content should be presented to the user and is
      * not always monotonically increasing.
      *
-     * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
+     * @return a long representing the timestamp or {@link ClockTime#NONE}
      * when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public ClockTime getPresentationTimestamp() {
-        return (ClockTime) this.struct.readField("pts");
+    public long getPresentationTimestamp() {
+        return (long) this.struct.readField("pts");
     }
 
     /**
      * Set the presentation timestamp of the Buffer
      *
-     * @param val a ClockTime representing the timestamp or
+     * @param val a long representing the timestamp or
      * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public void setPresentationTimestamp(ClockTime val) {
+    public void setPresentationTimestamp(long val) {
         this.struct.writeField("pts", val);
     }
 
@@ -168,19 +164,17 @@ public class Buffer extends MiniObject {
      * @return a ClockTime representing the timestamp or {@link ClockTime#NONE}
      * when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public ClockTime getDuration() {
-        return (ClockTime) this.struct.readField("duration");
+    public long getDuration() {
+        return (long) this.struct.readField("duration");
     }
 
     /**
      * Set the duration of this buffer.
      *
-     * @param val a ClockTime representing the duration or
+     * @param val a long representing the duration or
      * {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
-    @Deprecated
-    public void setDuration(ClockTime val) {
+    public void setDuration(long val) {
         this.struct.writeField("duration", val);
     }
 

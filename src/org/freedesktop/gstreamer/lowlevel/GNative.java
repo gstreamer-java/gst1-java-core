@@ -22,9 +22,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.freedesktop.gstreamer.ClockTime;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -127,25 +124,10 @@ public final class GNative {
         }
     };
 
-    private static final Converter clocktimeConverter = new Converter() {
-        public Class<?> nativeType() {
-            return long.class;
-        }
-
-        public Object toNative(Object value) {
-            return value != null ? ((ClockTime) value).toNanos() : 0L;
-        }
-
-        public Object fromNative(Object value, Class<?> javaType) {
-            return ClockTime.valueOf(value != null ? (Long) value : 0L, TimeUnit.NANOSECONDS);
-        }
-    };
 
     private static Converter getConverter(Class<?> javaType) {
         if (Enum.class.isAssignableFrom(javaType))
             return enumConverter;
-        else if (ClockTime.class == javaType)
-            return clocktimeConverter;
         else if (boolean.class == javaType || Boolean.class == javaType)
             return booleanConverter;
         return null;

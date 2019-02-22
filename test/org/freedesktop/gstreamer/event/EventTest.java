@@ -132,7 +132,7 @@ public class EventTest {
         assertTrue("gst_event_new_flush_stop returned a non-FLUSH_STOP event", ev instanceof FlushStopEvent);
     }
     @Test public void gst_event_new_latency() {
-        Event ev = GSTEVENT_API.gst_event_new_latency(ClockTime.ZERO);
+        Event ev = GSTEVENT_API.gst_event_new_latency(0);
         assertNotNull("gst_event_new_latency returned null", ev);
         assertTrue("gst_event_new_latency returned a non-LATENCY event", ev instanceof LatencyEvent);
     }
@@ -147,7 +147,8 @@ public class EventTest {
         assertTrue("gst_event_new_latency returned a non-NEWSEGMENT event", ev instanceof SegmentEvent);
     }
     @Test public void getLatency() {
-        final ClockTime MAGIC = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
+//        final ClockTime MAGIC = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
+        long MAGIC = 0xdeadbeef;
         LatencyEvent ev = new LatencyEvent(MAGIC);
         assertEquals("Incorrect latency returned", MAGIC, ev.getLatency());
     }
@@ -238,13 +239,13 @@ public class EventTest {
         assertEquals("Wrong difference", DIFF, ev.getDifference());
     }
     @Test public void QOS_getTimestamp() {
-        final ClockTime STAMP = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
+        final long STAMP = 0xdeadbeef;
         QOSEvent ev = new QOSEvent(QOSType.THROTTLE, 0d, 0, STAMP);
         assertEquals("Wrong timestamp", STAMP, ev.getTimestamp());
     }
     @Test
     public void QOS_getType() {
-        final ClockTime STAMP = ClockTime.valueOf(0xdeadbeef, TimeUnit.NANOSECONDS);
+        final long STAMP = 0xdeadbeef;
         QOSEvent ev = new QOSEvent(QOSType.THROTTLE, 0d, 0, STAMP);
         assertEquals("Wrong QOSType", QOSType.THROTTLE, ev.getType());
     }

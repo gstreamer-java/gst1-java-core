@@ -18,7 +18,6 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.ClockTime;
 //import org.freedesktop.gstreamer.controller.ControlSource;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
@@ -54,7 +53,7 @@ public interface GstControlSourceAPI extends Library {
 //    public static final class TimedValue extends com.sun.jna.Structure {
 //    	public static final String GTYPE_NAME = "GstTimedValue";
 //        
-//        public volatile ClockTime timestamp;
+//        public volatile long timestamp;
 //        public volatile double value;
 //
 //        @Override
@@ -66,10 +65,10 @@ public interface GstControlSourceAPI extends Library {
 //    }
 //	
 //    public static interface GstControlSourceGetValue extends Callback {
-//        public boolean callback(ControlSource self, ClockTime timestamp, DoubleByReference value);
+//        public boolean callback(ControlSource self, long timestamp, DoubleByReference value);
 //    }
 //    public static interface GstControlSourceGetValueArray extends Callback {
-//        public boolean callback(ControlSource self, ClockTime timestamp, ClockTime interval, int n_values, DoubleByReference values);
+//        public boolean callback(ControlSource self, long timestamp, long interval, int n_values, DoubleByReference values);
 //    }
 //    public static interface GstControlSourceBind extends Callback {
 //        public boolean callback(ControlSource self, GParamSpec pspec);
@@ -124,6 +123,6 @@ public interface GstControlSourceAPI extends Library {
 //    GType gst_control_source_get_type();
 //
 //    /* Functions */
-//    boolean gst_control_source_get_value(ControlSource self, ClockTime timestamp, GValue value);
-//    boolean gst_control_source_get_value_array(ControlSource self, ClockTime timestamp, ClockTime interval, int n_values, DoubleByReference values);
+//    boolean gst_control_source_get_value(ControlSource self, long timestamp, GValue value);
+//    boolean gst_control_source_get_value_array(ControlSource self, long timestamp, long interval, int n_values, DoubleByReference values);
 }

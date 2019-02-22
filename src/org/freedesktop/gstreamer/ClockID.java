@@ -65,8 +65,7 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * 
      * @return The time of this clock id.
      */
-    @Deprecated
-    public ClockTime getTime() {
+    public long getTime() {
         return GSTCLOCK_API.gst_clock_id_get_time(this);
     }
     
@@ -76,6 +75,7 @@ public class ClockID extends RefCountedObject implements Comparable<ClockID> {
      * @param other The other ClockID to compare to
      * @return negative value if a < b; zero if a = b; positive value if a > b
      */
+    @Override
     public int compareTo(ClockID other) {
         return GSTCLOCK_API.gst_clock_id_compare_func(this, other);
     }
