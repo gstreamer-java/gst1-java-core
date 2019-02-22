@@ -48,8 +48,8 @@ public interface AppAPI extends com.sun.jna.Library {
     void gst_app_src_set_size(AppSrc appsrc, long size);
     long gst_app_src_get_size(AppSrc appsrc);
 
-    void gst_app_src_set_stream_type(AppSrc appsrc, AppSrc.Type type);
-    AppSrc.Type gst_app_src_get_stream_type(AppSrc appsrc);
+    void gst_app_src_set_stream_type(AppSrc appsrc, AppSrc.StreamType type);
+    AppSrc.StreamType gst_app_src_get_stream_type(AppSrc appsrc);
 
     void gst_app_src_set_max_bytes(AppSrc appsrc, long max);
     long gst_app_src_get_max_bytes(AppSrc appsrc);
