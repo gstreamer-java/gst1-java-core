@@ -23,6 +23,7 @@ import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import java.util.concurrent.Callable;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 /**
  *
  */

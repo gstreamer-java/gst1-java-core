@@ -25,7 +25,7 @@ import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**

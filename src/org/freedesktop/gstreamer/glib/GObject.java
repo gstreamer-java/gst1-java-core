@@ -41,8 +41,6 @@ import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.IntPtr;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;

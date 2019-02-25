@@ -29,7 +29,7 @@ import java.util.List;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import static org.freedesktop.gstreamer.lowlevel.GstIteratorAPI.GSTITERATOR_API;
 

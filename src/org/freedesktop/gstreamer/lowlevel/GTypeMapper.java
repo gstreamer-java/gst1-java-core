@@ -21,10 +21,6 @@ package org.freedesktop.gstreamer.lowlevel;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
-
-import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.ConstField;
@@ -43,6 +39,9 @@ import com.sun.jna.StructureReadContext;
 import com.sun.jna.ToNativeContext;
 import com.sun.jna.ToNativeConverter;
 import com.sun.jna.TypeConverter;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 /**
  *
@@ -84,11 +83,12 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                     Annotation[] annotations = parameterAnnotations[index];
                     for (int i = 0; i < annotations.length; ++i) {
                         if (annotations[i] instanceof Invalidate) {
-                            ((Handle) arg).invalidate();
+                            ((NativeObject) arg).invalidate();
                             break;
                         } else if (annotations[i] instanceof IncRef) {
-                            ((RefCountedObject) arg).ref();
-                            break;
+                            Natives.increaseRef((RefCountedObject) arg);
+//                            ((RefCountedObject) arg).ref();
+//                            break;
                         }
                     }
                 }

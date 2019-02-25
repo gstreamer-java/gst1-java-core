@@ -227,16 +227,16 @@ public class Bin extends Element {
         return GSTBIN_API.gst_bin_get_by_name_recurse_up(this, name);
     }
 
-    /**
-     * Looks for an element inside the bin that implements the given interface.
-     * If such an element is found, it returns the element.
-     *
-     * @param iface The class of the {@link Element} to search for.
-     * @return The {@link Element} that implements the interface.
-     */
-    public <T extends Element> T getElementByInterface(Class<T> iface) {
-        return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
-    }
+//    /**
+//     * Looks for an element inside the bin that implements the given interface.
+//     * If such an element is found, it returns the element.
+//     *
+//     * @param iface The class of the {@link Element} to search for.
+//     * @return The {@link Element} that implements the interface.
+//     */
+//    public <T extends Element> T getElementByInterface(Class<T> iface) {
+//        return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
+//    }
 
     /**
      * Calls {@link #debugToDotFile(int, String, boolean)} without timestamping

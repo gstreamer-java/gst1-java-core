@@ -22,7 +22,7 @@ package org.freedesktop.gstreamer.glib;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 

@@ -21,7 +21,7 @@ package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
 
-import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 import static org.freedesktop.gstreamer.lowlevel.GstClockAPI.GSTCLOCK_API;
 

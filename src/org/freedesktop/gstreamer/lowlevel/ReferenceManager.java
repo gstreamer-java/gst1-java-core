@@ -22,6 +22,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 /**
  * Manages keep alive links from one object to another.

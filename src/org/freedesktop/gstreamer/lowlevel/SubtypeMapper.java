@@ -61,6 +61,7 @@ import org.freedesktop.gstreamer.query.SeekingQuery;
 import org.freedesktop.gstreamer.query.SegmentQuery;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 /**
  * Mapper for classes which have subtypes (e.g. Event, Message, Query).
@@ -69,8 +70,8 @@ import com.sun.jna.Pointer;
  * raw pointer passed in.
  */
 @SuppressWarnings("serial")
-class SubtypeMapper {
-    static <T extends NativeObject> Class<?> subtypeFor(final Class<T> defaultClass, final Pointer ptr) {
+public class SubtypeMapper {
+    public static <T extends NativeObject> Class<?> subtypeFor(final Class<T> defaultClass, final Pointer ptr) {
         Mapper mapper = MapHolder.mappers.get(defaultClass);
         Class<?> cls = mapper != null ? mapper.subtypeFor(ptr) : null;
         return cls != null ? cls : defaultClass;

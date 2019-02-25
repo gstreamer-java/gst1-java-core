@@ -25,7 +25,7 @@ import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 /**
  * An allocation query for querying allocation properties.

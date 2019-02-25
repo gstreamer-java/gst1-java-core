@@ -27,7 +27,7 @@ import com.sun.jna.Pointer;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
-import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 

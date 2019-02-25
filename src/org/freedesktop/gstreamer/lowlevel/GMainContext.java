@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**

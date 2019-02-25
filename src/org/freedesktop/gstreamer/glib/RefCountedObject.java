@@ -16,7 +16,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel;
+package org.freedesktop.gstreamer.glib;
 
 /**
  * A {@link NativeObject} that has an associated reference count
@@ -31,6 +31,6 @@ abstract public class RefCountedObject extends NativeObject {
         }
     }
     // overridden in subclasses
-    abstract protected void ref();
-    abstract protected void unref();
+    protected abstract void ref();
+    protected abstract void unref();
 }

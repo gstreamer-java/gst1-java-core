@@ -20,7 +20,7 @@ package org.freedesktop.gstreamer.webrtc;
 import static org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI.GSTWEBRTCSESSIONDESCRIPTION_API;
 
 import org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.SDPMessage;

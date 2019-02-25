@@ -20,7 +20,7 @@ package org.freedesktop.gstreamer;
 import static org.freedesktop.gstreamer.lowlevel.GstDateTimeAPI.GSTDATETIME_API;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 

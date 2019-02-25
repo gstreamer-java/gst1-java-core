@@ -16,7 +16,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel;
+package org.freedesktop.gstreamer.glib;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -33,11 +33,14 @@ import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GstTypes;
+import org.freedesktop.gstreamer.lowlevel.SubtypeMapper;
 
 /**
  *
  */
-public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Handle {
+public abstract class NativeObject {
     private static final Logger logger = Logger.getLogger(NativeObject.class.getName());
     private static final Level LIFECYCLE = Level.FINE;
     
@@ -109,7 +112,6 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
         }
     }
     
-    @Override
     public void invalidate() {
         logger.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
         getInstanceMap().remove(handle(), nativeRef);
@@ -128,11 +130,10 @@ public abstract class NativeObject extends org.freedesktop.gstreamer.lowlevel.Ha
             super.finalize();
         }
     }
-    @Override
     protected Object nativeValue() {
         return handle();
     }
-    protected Pointer handle() {
+    public Pointer handle() {
         if (!valid.get() || disposed.get()) {
             throw new IllegalStateException("Native object has been disposed");
         }
