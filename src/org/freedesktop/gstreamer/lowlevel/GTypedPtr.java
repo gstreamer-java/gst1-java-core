@@ -13,24 +13,22 @@
  * You should have received a copy of the GNU Lesser General Public License version 3 along with
  * this work. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer.glib;
+package org.freedesktop.gstreamer.lowlevel;
+
+import com.sun.jna.Pointer;
 
 /**
- *
+ * Base GLib pointer with GType
  */
-public final class Natives {
+public abstract class GTypedPtr extends GPointer {
     
-    private Natives() {}
-    
-    
-    public static <T extends RefCountedObject> T ref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).ref();
-        return obj;
+    public GTypedPtr() {
     }
     
-    public static <T extends RefCountedObject> T unref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).unref();
-        return obj;
+    public GTypedPtr(Pointer ptr) {
+        super(ptr);
     }
+    
+    public abstract GType getGType();
     
 }

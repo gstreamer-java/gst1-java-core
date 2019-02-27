@@ -47,7 +47,7 @@ public class AllocationQuery extends Query {
         // special case : no ref shall be added
         // the allocationQuery is an in/out parameter during query notification
         // so, we shall keep query writable for add methods
-        super(initializer(init.ptr, false, true));
+        super(initializer(init.ptr.getPointer(), false, true));
     }
 
     /**

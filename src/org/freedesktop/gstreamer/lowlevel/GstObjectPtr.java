@@ -13,24 +13,20 @@
  * You should have received a copy of the GNU Lesser General Public License version 3 along with
  * this work. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer.glib;
+package org.freedesktop.gstreamer.lowlevel;
+
+import com.sun.jna.Pointer;
 
 /**
- *
+ * Base GObject pointer
  */
-public final class Natives {
+public class GstObjectPtr extends GObjectPtr {
     
-    private Natives() {}
-    
-    
-    public static <T extends RefCountedObject> T ref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).ref();
-        return obj;
+    public GstObjectPtr() {
     }
     
-    public static <T extends RefCountedObject> T unref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).unref();
-        return obj;
+    public GstObjectPtr(Pointer ptr) {
+        super(ptr);
     }
     
 }

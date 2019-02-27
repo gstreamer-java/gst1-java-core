@@ -78,10 +78,12 @@ public class PipelineTest {
     
     @Test
     public void testPipelineGC() throws Exception {
-        Pipeline p = new Pipeline();
+        Pipeline p = new Pipeline("test pipeline");
         int refcnt = new GObjectStruct(p).ref_count;
-        
         assertEquals("Refcount should be 1", refcnt, 1);
+        WeakReference<GObject> pref = new WeakReference<GObject>(p);
+        p = null;
+        assertTrue("pipe not disposed", GCTracker.waitGC(pref));
     }
     @Test
     public void testBusGC() throws Exception {

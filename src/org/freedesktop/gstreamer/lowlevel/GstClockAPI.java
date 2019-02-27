@@ -58,8 +58,9 @@ public interface GstClockAPI extends com.sun.jna.Library {
     
     /* reference counting */
     void gst_clock_id_ref(ClockID id);
+    void gst_clock_id_ref(GPointer id);
     void gst_clock_id_unref(ClockID id);
-    void gst_clock_id_unref(Pointer id);
+    void gst_clock_id_unref(GPointer id);
 
     /* operations on IDs */
     int gst_clock_id_compare_func(ClockID id1, ClockID id2);

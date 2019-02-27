@@ -13,24 +13,30 @@
  * You should have received a copy of the GNU Lesser General Public License version 3 along with
  * this work. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer.glib;
+package org.freedesktop.gstreamer.lowlevel;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.PointerType;
+import java.util.function.Function;
 
 /**
- *
+ * Base GLib pointer
  */
-public final class Natives {
+public class GPointer extends PointerType {
     
-    private Natives() {}
-    
-    
-    public static <T extends RefCountedObject> T ref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).ref();
-        return obj;
+    public GPointer() {
     }
     
-    public static <T extends RefCountedObject> T unref(T obj) {
-        ((RefCountedObject.Handle) obj.handle).unref();
-        return obj;
+    public GPointer(Pointer ptr) {
+        super(ptr);
+    }
+    
+    public <T extends GPointer> T as(Class<T> cls, Function<Pointer, T> converter) {
+        if (cls.isInstance(this)) {
+            return cls.cast(this);
+        } else {
+            return converter.apply(this.getPointer());
+        }
     }
     
 }

@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 import org.freedesktop.gstreamer.query.AllocationQuery;
@@ -207,7 +208,8 @@ public class QueryTest {
         Query query = new SegmentQuery(Format.TIME);
         assertTrue("New query is not writable", query.isWritable());
         // Bumping the ref count makes this instance non writable
-        GSTMINIOBJECT_API.gst_mini_object_ref(query);
+//        GSTMINIOBJECT_API.gst_mini_object_ref(query);
+        Natives.ref(query);
         assertFalse("Query with multiple references should not be writable", query.isWritable());
         // Now get a new reference that is writable
         query = query.makeWritable();

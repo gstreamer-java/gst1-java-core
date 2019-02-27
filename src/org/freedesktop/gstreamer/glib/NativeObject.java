@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -15,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer.glib;
 
 import java.lang.ref.WeakReference;
@@ -27,12 +27,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.glib.GObject;
-import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 
 import com.sun.jna.Pointer;
+import java.lang.ref.ReferenceQueue;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.SubtypeMapper;
@@ -41,134 +45,112 @@ import org.freedesktop.gstreamer.lowlevel.SubtypeMapper;
  *
  */
 public abstract class NativeObject {
-    private static final Logger logger = Logger.getLogger(NativeObject.class.getName());
+
     private static final Level LIFECYCLE = Level.FINE;
-    
-    // Use this to propagate low level pointer arguments up the constructor chain
-    protected static class Initializer {
-        public final Pointer ptr;
-        public final boolean needRef, ownsHandle;
-        public Initializer() {
-            this.ptr = null;
-            this.needRef = false;
-            this.ownsHandle = false;
-        }
-        public Initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
-            this.ptr = ptr;
-            this.needRef = needRef;
-            this.ownsHandle = ownsHandle;
-        }
-    }
-    protected static final Initializer defaultInit = new Initializer();
-    
-    /*
-     * The default for new objects is to not need a refcount increase, and that
-     * they own the native object.  Special cases can use the other constructor.
-     */
-    protected static Initializer initializer(Pointer ptr) {
-        Initializer initializer = initializer(ptr, false, true);
-        return initializer;
-    }
-    protected static Initializer initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        if (ptr == null) {
-            throw new IllegalArgumentException("Invalid native pointer");
-        }
-        return new Initializer(ptr, needRef, ownsHandle);
-    }
-    /** Creates a new instance of NativeObject */
-    protected NativeObject(final Initializer init) {
-        logger.entering("NativeObject", "<init>", new Object[] { init });
-        if (init == null) {
-            throw new IllegalArgumentException("Initializer cannot be null");
-        }
-        logger.log(LIFECYCLE, "Creating " + getClass().getSimpleName() + " (" + init.ptr + ")");
-        nativeRef = new NativeRef(this);
-        this.handle = init.ptr;
-        this.ownsHandle.set(init.ownsHandle);
-        
+    private static final Logger LOG = Logger.getLogger(NativeObject.class.getName());
+    private static final ConcurrentMap<Pointer, NativeRef> INSTANCES = new ConcurrentHashMap<>();
+
+    final Handle handle;
+    private final Pointer ptr;
+    private final NativeRef nativeRef;
+
+//    /**
+//     * Creates a new instance of NativeObject
+//     */
+//    protected NativeObject(final Initializer init) {
+//        this(new Handle(new GPointer(init.ptr), init.ownsHandle));
+//    }
+    protected NativeObject(Handle handle) {
+        this.handle = Objects.requireNonNull(handle);
         //
         // Only store this object in the map if we can tell when it has been disposed 
         // (i.e. must be at least a GObject - MiniObject and other NativeObject subclasses
         // don't signal destruction, so it is impossible to know if the instance 
         // is stale or not
         //
-        if (GObject.class.isAssignableFrom(getClass())) {
-            getInstanceMap().put(init.ptr, nativeRef);
-        }
-        
+        this.ptr = handle.ptrRef.get().getPointer();
+        this.nativeRef = new NativeRef(this, handle);
+//        if (GObject.class.isAssignableFrom(getClass())) {
+
+        // need to put all nativeRef in map now so WeakReference doesn't go out of scope
+        INSTANCES.put(this.ptr, nativeRef);
+//        }
     }
-    
-    abstract protected void disposeNativeHandle(Pointer ptr);
-    
+
+    //
+    // No longer want to garbage collect this object
+    //
+    public void disown() {
+        LOG.log(LIFECYCLE, "Disowning " + handle());
+        handle.ownsHandle.set(false);
+    }
+
     public void dispose() {
-        logger.log(LIFECYCLE, "Disposing object " + getClass().getName() + " = " + handle);
-//        System.out.println("Disposing " + handle);
-        if (!disposed.getAndSet(true)) {
-            getInstanceMap().remove(handle, nativeRef);
-            if (ownsHandle.get()) {
-                disposeNativeHandle(handle);
-            }
-            valid.set(false);
-        }
+        LOG.log(LIFECYCLE, "Disposing object " + getClass().getName() + " = " + handle);
+        handle.dispose();
     }
-    
-    public void invalidate() {
-        logger.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
-        getInstanceMap().remove(handle(), nativeRef);
-        disposed.set(true);
-        ownsHandle.set(false);
-        valid.set(false);
-    }
-    
+
     @Override
-    protected void finalize() throws Throwable {
-        try {
-            logger.log(LIFECYCLE, "Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
-//            System.out.println("Finalizing " + getClass().getSimpleName() + " (" + handle + ")");
-            dispose();
-        } finally {
-            super.finalize();
-        }
+    public boolean equals(Object o) {
+        return o instanceof NativeObject && ((NativeObject) o).ptr.equals(ptr);
     }
+
+    public Pointer getNativeAddress() {
+        return handle.ptrRef.get().getPointer();
+    }
+
+    public Pointer handle() {
+        GPointer ptr = handle.ptrRef.get();
+        if (ptr == null) {
+            throw new IllegalStateException("Native object has been disposed");
+        }
+        return ptr.getPointer();
+    }
+
+    @Override
+    public int hashCode() {
+        return ptr.hashCode();
+    }
+
+    public void invalidate() {
+        LOG.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
+        handle.invalidate();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + handle() + ")";
+    }
+
+//    @Override
+//    protected void finalize() throws Throwable {
+//        try {
+//            handle.dispose();
+//        } catch (Throwable t) {
+//            LOG.log(Level.SEVERE, "Finalize error", t);
+//        }
+//        super.finalize();
+//    }
+    
     protected Object nativeValue() {
         return handle();
     }
-    public Pointer handle() {
-        if (!valid.get() || disposed.get()) {
-            throw new IllegalStateException("Native object has been disposed");
-        }
-        return handle;
-    }
-    public Pointer getNativeAddress() {
-        return handle;
-    }
-    protected boolean isDisposed() {
-        return disposed.get();
-    }
-    protected static NativeObject instanceFor(Pointer ptr) {
-        WeakReference<NativeObject> ref = getInstanceMap().get(ptr);
-        
-        //
-        // If the reference was there, but the object it pointed to had been collected, remove it from the map
-        //
-        if (ref != null && ref.get() == null) {
-            getInstanceMap().remove(ptr);
-        }
-        return ref != null ? ref.get() : null;
-    }
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls) {
-    	return objectFor(ptr, cls, true);
+        return objectFor(ptr, cls, true);
     }
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef) {
         return objectFor(ptr, cls, needRef, true);
     }
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
         return objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
     }
-        
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
-        logger.entering("NativeObject", "instanceFor", new Object[] { ptr, refAdjust, ownsHandle });
-        
+        LOG.entering("NativeObject", "instanceFor", new Object[]{ptr, refAdjust, ownsHandle});
+
         // Ignore null pointers
         if (ptr == null) {
             return null;
@@ -176,20 +158,20 @@ public abstract class NativeObject {
         NativeObject obj = GObject.class.isAssignableFrom(cls) ? NativeObject.instanceFor(ptr) : null;
         if (obj != null && cls.isInstance(obj)) {
             if (refAdjust < 0) {
-                ((RefCountedObject) obj).unref(); // Lose the extra ref added by gstreamer
+                ((RefCountedObject.Handle) obj.handle).unref(); // Lose the extra ref added by gstreamer
             }
             return cls.cast(obj);
         }
-        
-    	final GType gType =
-    			GObject.class.isAssignableFrom(cls) ? GObject.getType(ptr) :
-    			MiniObject.class.isAssignableFrom(cls) ? MiniObject.getType(ptr) :
-    			null; // shall never appears
-        
-		//
-		// For a GObject, MiniObject, ..., use the GType field to find the most
-		// exact class match
-		//
+
+        final GType gType
+                = GObject.class.isAssignableFrom(cls) ? GObject.getType(ptr)
+                : MiniObject.class.isAssignableFrom(cls) ? MiniObject.getType(ptr)
+                : null; // shall never appears
+
+        //
+        // For a GObject, MiniObject, ..., use the GType field to find the most
+        // exact class match
+        //
         if (gType != null) {
             cls = NativeObject.classFor(ptr, gType, cls);
         }
@@ -213,116 +195,147 @@ public abstract class NativeObject {
         }
 
     }
-    
+
     @SuppressWarnings("unchecked")
     protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType, final Class<T> defaultClass) {
-        Class<T> cls = (Class<T>)GstTypes.classFor(gType);
-        if (cls == null) cls = defaultClass;
-        
-		if (cls.isAnnotationPresent(HasSubtype.class)) {
-			cls = (Class<T>)SubtypeMapper.subtypeFor(cls, ptr);
-		}
-    	
-    	return cls;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof NativeObject && ((NativeObject) o).handle.equals(handle);
-    }
-    
-    @Override
-    public int hashCode() {
-        return handle.hashCode();
-    }
-    
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" + handle() + ")";
-    }
-    
-    //
-    // No longer want to garbage collect this object
-    //
-    public void disown() {
-        logger.log(LIFECYCLE, "Disowning " + handle());
-        ownsHandle.set(false);
-    }
-    
-    static {
-        //
-        // Add a shutdown task to cleanup any dangling object references, so 
-        // Gst.deinit() can shutdown cleanly.  Unreffing objects after gst_deinit()
-        // has been called could be asking for trouble.
-        //
-        Gst.addStaticShutdownTask(new Runnable() {
-
-            public void run() {
-                System.gc(); 
-                int gcCount = 20;
-                // Give the GC a chance to cleanup nicely
-                while (!getInstanceMap().isEmpty() && gcCount-- > 0) {
-                    try {
-                        Thread.sleep(10);
-                        System.gc();
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
-                }
-                for (Object o : getInstanceMap().values().toArray()) {
-                    NativeObject obj = ((NativeRef) o).get();
-                    if (obj != null && !obj.disposed.get()) {
-//                        System.out.println("Disposing " + obj);
-                        obj.dispose();
-                    }
-                }
-            }
-        });
-    }
-    private static final ConcurrentMap<Pointer, NativeRef> getInstanceMap() {
-        return StaticData.instanceMap;
-    }
-    static class NativeRef extends WeakReference<NativeObject> {
-        public NativeRef(NativeObject obj) {
-            super(obj);
+        Class<T> cls = (Class<T>) GstTypes.classFor(gType);
+        if (cls == null) {
+            cls = defaultClass;
         }
-    }
-    private final AtomicBoolean disposed = new AtomicBoolean(false);
-    private final AtomicBoolean valid = new AtomicBoolean(true);
-    private final Pointer handle;
-    protected final AtomicBoolean ownsHandle = new AtomicBoolean(false);
-    private final NativeRef nativeRef;
-    private static final class StaticData {
-        private static final ConcurrentMap<Pointer, NativeRef> instanceMap = new ConcurrentHashMap<Pointer, NativeRef>();
-        static {
-            //
-            // Add a shutdown task to cleanup any dangling object references, so 
-            // Gst.deinit() can shutdown cleanly.  Unreffing objects after gst_deinit()
-            // has been called could be asking for trouble.
-            //
-            Gst.addStaticShutdownTask(new Runnable() {
 
-                public void run() {
-                    System.gc(); 
-                    int gcCount = 20;
-                    // Give the GC a chance to cleanup nicely
-                    while (!getInstanceMap().isEmpty() && gcCount-- > 0) {
-                        try {
-                            Thread.sleep(10);
-                            System.gc();
-                        } catch (InterruptedException ex) {
-                            break;
-                        }
-                    }
-                    for (Object o : getInstanceMap().values().toArray()) {
-                        NativeObject obj = ((NativeRef) o).get();
-                        if (obj != null && !obj.disposed.get()) {
-    //                        System.out.println("Disposing " + obj);
-                            obj.dispose();
-                        }
+        if (cls.isAnnotationPresent(HasSubtype.class)) {
+            cls = (Class<T>) SubtypeMapper.subtypeFor(cls, ptr);
+        }
+
+        return cls;
+    }
+
+    /*
+    * The default for new objects is to not need a refcount increase, and that
+    * they own the native object.  Special cases can use the other constructor.
+     */
+    protected static Initializer initializer(Pointer ptr) {
+        Initializer initializer = initializer(ptr, false, true);
+        return initializer;
+    }
+
+    protected static Initializer initializer(Pointer ptr, boolean needRef) {
+        Initializer initializer = initializer(ptr, needRef, true);
+        return initializer;
+    }
+
+    protected static Initializer initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
+        if (ptr == null) {
+            throw new IllegalArgumentException("Invalid native pointer");
+        }
+        return new Initializer(new GPointer(ptr), needRef, ownsHandle);
+    }
+
+    protected static NativeObject instanceFor(Pointer ptr) {
+        WeakReference<NativeObject> ref = INSTANCES.get(ptr);
+
+        //
+        // If the reference was there, but the object it pointed to had been collected, remove it from the map
+        //
+        if (ref != null && ref.get() == null) {
+            INSTANCES.remove(ptr);
+        }
+        return ref != null ? ref.get() : null;
+    }
+
+    // Use this to propagate low level pointer arguments up the constructor chain
+    public static final class Initializer {
+
+        public final GPointer ptr;
+        public final boolean needRef, ownsHandle;
+
+        public Initializer(GPointer ptr, boolean needRef, boolean ownsHandle) {
+            this.ptr = ptr;
+            this.needRef = needRef;
+            this.ownsHandle = ownsHandle;
+        }
+
+    }
+
+    private static final class NativeRef extends WeakReference<NativeObject> {
+
+        private static final ReferenceQueue<NativeObject> QUEUE = new ReferenceQueue<>();
+        private static final ExecutorService REAPER
+                = Executors.newSingleThreadExecutor((r) -> {
+                    Thread t = new Thread(r, "NativeObject Reaper");
+                    t.setDaemon(true);
+                    return t;
+                });
+
+        static {
+            REAPER.submit(() -> {
+                while (true) {
+                    try {
+                        NativeRef ref = (NativeRef) QUEUE.remove();
+                        LOG.log(LIFECYCLE, "Disposing of " + ref.type + " : " + ref.handle.ptrRef.get());
+                        ref.handle.dispose();
+                    } catch (Throwable t) {
+                        LOG.log(Level.WARNING, "Reaper thread exception", t);
                     }
                 }
             });
+        }
+
+        private final Handle handle;
+        private final String type;
+
+        private NativeRef(NativeObject obj, Handle handle) {
+            super(obj, QUEUE);
+            this.type = obj.getClass().getSimpleName();
+            this.handle = handle;
+        }
+
+    }
+
+    protected static abstract class Handle {
+
+        protected final AtomicReference<GPointer> ptrRef;
+        protected final AtomicBoolean ownsHandle;
+
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            this.ptrRef = new AtomicReference<>(ptr);
+            this.ownsHandle = new AtomicBoolean(ownsHandle);
+        }
+
+        public void disown() {
+            ownsHandle.set(false);
+        }
+
+        public void invalidate() {
+            GPointer ptr = ptrRef.getAndSet(null);
+            ownsHandle.set(false);
+            if (ptr != null) {
+                INSTANCES.remove(ptr.getPointer());
+            }
+        }
+
+        public void dispose() {
+            GPointer ptr = ptrRef.getAndSet(null);
+            if (ptr != null) {
+                INSTANCES.remove(ptr.getPointer());
+                if (ownsHandle.compareAndSet(true, false)) {
+                    disposeNativeHandle(ptr);
+                }
+            }
+        }
+
+        public boolean isCacheable() {
+            return false;
+        }
+
+        protected abstract void disposeNativeHandle(GPointer ptr);
+
+        protected GPointer getPointer() {
+            return ptrRef.get();
+        }
+
+        protected boolean ownsHandle() {
+            return ownsHandle.get();
         }
     }
 }

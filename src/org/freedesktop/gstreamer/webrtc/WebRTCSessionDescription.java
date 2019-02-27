@@ -24,6 +24,7 @@ import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.SDPMessage;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import static org.freedesktop.gstreamer.lowlevel.GstSDPMessageAPI.GSTSDPMESSAGE_API;
 
 /**
@@ -44,8 +45,9 @@ public class WebRTCSessionDescription extends NativeObject {
      * @param init internal initialization data.
      */
     WebRTCSessionDescription(Initializer init) {
-        super(init);
-        sessionDescriptionStruct = new GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct(handle());
+        super(new Handle(init.ptr, init.ownsHandle));
+        sessionDescriptionStruct = 
+                new GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct(init.ptr.getPointer());
     }
 
     /**
@@ -76,8 +78,17 @@ public class WebRTCSessionDescription extends NativeObject {
         return NativeObject.objectFor(ptr[0], SDPMessage.class, false, true);
     }
 
-    @Deprecated
-    protected void disposeNativeHandle(Pointer ptr) {
-        GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr);
+    
+    private static final class Handle extends NativeObject.Handle {
+
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr.getPointer());
+        }
+        
     }
 }

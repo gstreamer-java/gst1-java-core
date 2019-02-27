@@ -49,17 +49,16 @@ public interface GlibAPI extends Library {
     boolean g_main_loop_is_running(MainLoop loop);
     @CallerOwnsReturn GMainContext g_main_loop_get_context(MainLoop loop);
     void g_main_loop_quit(MainLoop loop);
-    void g_main_loop_ref(MainLoop ptr);
-    void g_main_loop_unref(MainLoop ptr);
-    void g_main_loop_unref(Pointer ptr);
+    void g_main_loop_ref(GPointer ptr);
+    void g_main_loop_unref(GPointer ptr);
     
     /*
      * GMainContext functions
      */
     
     Pointer g_main_context_new();
-    void g_main_context_ref(Pointer context);
-    void g_main_context_unref(Pointer context);
+    void g_main_context_ref(GPointer context);
+    void g_main_context_unref(GPointer context);
     Pointer g_main_context_default();
     boolean g_main_context_pending(GMainContext ctx);
     boolean g_main_context_acquire(GMainContext ctx);

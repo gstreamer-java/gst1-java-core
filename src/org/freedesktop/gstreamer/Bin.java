@@ -86,7 +86,7 @@ public class Bin extends Element {
      * Creates a new Bin with a unique name.
      */
     public Bin() {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(null), false));
+        this(initializer(GSTBIN_API.ptr_gst_bin_new(null), false, true));
     }
 
     /**
@@ -95,7 +95,7 @@ public class Bin extends Element {
      * @param name The Name to assign to the new Bin
      */
     public Bin(String name) {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false));
+        this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false, true));
     }
 
     /**

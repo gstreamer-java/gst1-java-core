@@ -86,7 +86,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                             ((NativeObject) arg).invalidate();
                             break;
                         } else if (annotations[i] instanceof IncRef) {
-                            Natives.increaseRef((RefCountedObject) arg);
+                            Natives.ref((RefCountedObject) arg);
 //                            ((RefCountedObject) arg).ref();
 //                            break;
                         }

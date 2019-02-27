@@ -71,7 +71,7 @@ public class BufferPool extends GstObject {
     	Structure config = GstBufferPoolAPI.GSTBUFFERPOOL_API.gst_buffer_pool_get_config(this);
     	Pointer[] ptr = new Pointer[1];
     	GstBufferPoolAPI.GSTBUFFERPOOL_API.gst_buffer_pool_config_get_params(config, ptr, null, null, null);
-    	return new Caps(new Initializer(ptr[0], false, true));
+    	return new Caps(initializer(ptr[0], false, true));
     }
 
 }

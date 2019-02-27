@@ -50,6 +50,7 @@ public class Promise extends MiniObject {
      */
     public Promise() {
         this(initializer(GSTPROMISE_API.ptr_gst_promise_new()));
+        Gst.checkVersion(1, 14); // @TODO ideally this check would be before native call!
     }
 
     /**
@@ -65,11 +66,6 @@ public class Promise extends MiniObject {
                 listener.onChange(promise);
             }
         }), false, false));
-    }
-
-    protected static Initializer initializer(final Pointer ptr) {
-        Gst.checkVersion(1, 14);
-        return new Initializer(ptr, false, true);
     }
 
     /**

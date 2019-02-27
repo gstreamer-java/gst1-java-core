@@ -69,7 +69,7 @@ public class Message extends MiniObject {
      */
     Message(Initializer init) {
         super(init);
-        messageStruct = new GstMessageAPI.MessageStruct(init.ptr);
+        messageStruct = new GstMessageAPI.MessageStruct(init.ptr.getPointer());
     }
 
     /**
