@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -39,6 +40,7 @@ import com.sun.jna.StructureReadContext;
 import com.sun.jna.ToNativeContext;
 import com.sun.jna.ToNativeConverter;
 import com.sun.jna.TypeConverter;
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.glib.RefCountedObject;
@@ -52,10 +54,10 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
     public GTypeMapper() {
         addToNativeConverter(URI.class, uriConverter);
     }
-    private static ToNativeConverter nativeValueArgumentConverter = new ToNativeConverter() {
+    private static ToNativeConverter interfaceConverter = new ToNativeConverter() {
 
         public Object toNative(Object arg, ToNativeContext context) {
-            return arg != null ? ((NativeValue) arg).nativeValue() : null;
+            return arg != null ? Natives.getRawPointer(((GObject.GInterface) arg).getGObject()) : null;
         }
 
         public Class<?> nativeType() {
@@ -280,8 +282,8 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 	public ToNativeConverter getToNativeConverter(Class type) {
         if (NativeObject.class.isAssignableFrom(type)) {
             return nativeObjectConverter;
-        } else if (NativeValue.class.isAssignableFrom(type)) {
-            return nativeValueArgumentConverter;
+        } else if (GObject.GInterface.class.isAssignableFrom(type)) {
+            return interfaceConverter;
         } else if (Enum.class.isAssignableFrom(type)) {
             return enumConverter;
         } else if (Boolean.class == type || boolean.class == type) {

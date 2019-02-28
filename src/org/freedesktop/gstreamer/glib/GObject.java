@@ -74,11 +74,10 @@ public abstract class GObject extends RefCountedObject {
     private final Handle handle;
     private Map<Class<?>, Map<Object, GCallback>> callbackListeners;
 
-    
     protected GObject(Initializer init) {
         this(new Handle(init.ptr.as(GObjectPtr.class, GObjectPtr::new), init.ownsHandle), init.needRef);
     }
-    
+
     protected GObject(Handle handle, boolean needRef) {
         super(handle);
         this.handle = handle;
@@ -641,6 +640,20 @@ public abstract class GObject extends RefCountedObject {
 //        }
     }
 
+    /**
+     * Base interface for classes that implement a GInterface
+     */
+    public static interface GInterface {
+
+        /**
+         * Get the GObject implementing this interface.
+         *
+         * @return implementing GObject
+         */
+        public GObject getGObject();
+
+    }
+
     private final class SignalCallback extends GCallback {
 
         protected SignalCallback(String signal, Callback cb) {
@@ -657,7 +670,7 @@ public abstract class GObject extends RefCountedObject {
     }
 
     protected static class Handle extends RefCountedObject.Handle {
-        
+
         private final IntPtr objectID;
 
         public Handle(GObjectPtr ptr, boolean ownsHandle) {
@@ -703,8 +716,6 @@ public abstract class GObject extends RefCountedObject {
             }
         }
 
-        
-        
     }
 
     private static final class ToggleNotify implements GObjectAPI.GToggleNotify {

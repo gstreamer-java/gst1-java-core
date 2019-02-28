@@ -21,28 +21,23 @@
 package org.freedesktop.gstreamer.interfaces;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.NativeValue;
 
 import org.freedesktop.gstreamer.Element;
 
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.GObject;
 
 /**
  * Base type for all gstreamer interface proxies
  */
-public class GstInterface extends NativeValue {
-    protected final Pointer handle;
+class GstInterface implements GObject.GInterface {
     protected final Element element;
     protected GstInterface(Element element, GType type) {
         this.element = element;
-        handle = Natives.getRawPointer(element);
-    }
-    protected Object nativeValue() {
-        return handle;
-    }
-    public Element getElement() {
-    	return element;
     }
 
+    @Override
+    public Element getGObject() {
+        return element;
+    }
+    
 }
