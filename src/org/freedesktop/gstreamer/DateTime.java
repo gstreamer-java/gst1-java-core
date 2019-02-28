@@ -49,31 +49,31 @@ public class DateTime extends NativeObject {
     }
 
     public int getYear() {
-        return GSTDATETIME_API.gst_date_time_get_year(handle());
+        return GSTDATETIME_API.gst_date_time_get_year(getRawPointer());
     }
 
     public int getMonth() {
-        return GSTDATETIME_API.gst_date_time_get_month(handle());
+        return GSTDATETIME_API.gst_date_time_get_month(getRawPointer());
     }
 
     public int getDay() {
-        return GSTDATETIME_API.gst_date_time_get_day(handle());
+        return GSTDATETIME_API.gst_date_time_get_day(getRawPointer());
     }
 
     public int getHour() {
-        return GSTDATETIME_API.gst_date_time_get_hour(handle());
+        return GSTDATETIME_API.gst_date_time_get_hour(getRawPointer());
     }
 
     public int getMinute() {
-        return GSTDATETIME_API.gst_date_time_get_minute(handle());
+        return GSTDATETIME_API.gst_date_time_get_minute(getRawPointer());
     }
 
     public int getSecond() {
-        return GSTDATETIME_API.gst_date_time_get_second(handle());
+        return GSTDATETIME_API.gst_date_time_get_second(getRawPointer());
     }
 
     public int getMicrosecond() {
-        return GSTDATETIME_API.gst_date_time_get_microsecond(handle());
+        return GSTDATETIME_API.gst_date_time_get_microsecond(getRawPointer());
     }
 
     @Override

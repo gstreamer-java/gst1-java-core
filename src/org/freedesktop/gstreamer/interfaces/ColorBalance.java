@@ -25,7 +25,6 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 import com.sun.jna.Pointer;
 import java.util.ArrayList;
-import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 
 import static org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI.GSTCOLORBALANCE_API;

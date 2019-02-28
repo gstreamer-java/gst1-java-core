@@ -25,6 +25,7 @@ package org.freedesktop.gstreamer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
@@ -228,7 +229,7 @@ public class Registry extends GstObject {
         GList next = glist;
         while (next != null) {
             if (next.data != null) {
-                list.add(GstObject.objectFor(next.data, objectClass, true, true));
+                list.add(Natives.objectFor(next.data, objectClass, true, true));
             }
             next = next.next();   
         }
@@ -251,7 +252,7 @@ public class Registry extends GstObject {
     public static Registry get() {
         // Need to handle the return value here, as it is a persistent object
         // i.e. the java proxy should not dispose of the underlying object when finalized
-        return GstObject.objectFor(GSTREGISTRY_API.gst_registry_get(), Registry.class,
+        return Natives.objectFor(GSTREGISTRY_API.gst_registry_get(), Registry.class,
                 false, false);
     }
     

@@ -138,7 +138,7 @@ public abstract class GObject extends RefCountedObject {
         if (result == null) {
             return null;
         } else {
-            return NativeObject.objectFor(result, resultType, false, true);
+            return Natives.objectFor(result, resultType, false, true);
         }
     }
 
@@ -298,7 +298,7 @@ public abstract class GObject extends RefCountedObject {
      */
     @Deprecated
     public GType getType() {
-        return GObject.getType(this.handle());
+        return GObject.getType(this.getRawPointer());
     }
 
     /**
@@ -449,7 +449,7 @@ public abstract class GObject extends RefCountedObject {
 //        return objectFor(ptr, defaultClass, true);
 //    }
     private GObjectAPI.GParamSpec findProperty(String propertyName) {
-        Pointer ptr = GOBJECT_API.g_object_class_find_property(handle().getPointer(0), propertyName);
+        Pointer ptr = GOBJECT_API.g_object_class_find_property(getRawPointer().getPointer(0), propertyName);
         if (ptr == null) {
             return null;
         }
@@ -457,7 +457,7 @@ public abstract class GObject extends RefCountedObject {
     }
 
     private GObjectAPI.GParamSpecTypeSpecific findProperty(String propertyName, GType type) {
-        Pointer ptr = GOBJECT_API.g_object_class_find_property(handle().getPointer(0), propertyName);
+        Pointer ptr = GOBJECT_API.g_object_class_find_property(getRawPointer().getPointer(0), propertyName);
         if (type.equals(GType.INT)) {
             return new GObjectAPI.GParamSpecInt(ptr);
         } else if (type.equals(GType.UINT)) {
@@ -495,7 +495,7 @@ public abstract class GObject extends RefCountedObject {
 
     private GObjectAPI.GParamSpec[] listProperties() {
         IntByReference len = new IntByReference();
-        Pointer ptrs = GOBJECT_API.g_object_class_list_properties(handle().getPointer(0), len);
+        Pointer ptrs = GOBJECT_API.g_object_class_list_properties(getRawPointer().getPointer(0), len);
         if (ptrs == null) {
             return null;
         }

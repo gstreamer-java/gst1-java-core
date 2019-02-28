@@ -31,8 +31,7 @@ public class GInetSocketAddress extends GSocketAddress {
 		this(createRawAddress(address, port));
 	}
 	
-        @Deprecated
-	public GInetSocketAddress(Initializer init) {
+	GInetSocketAddress(Initializer init) {
 		super(init);
 	}
         

@@ -36,6 +36,7 @@ import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * ElementFactory is used to create instances of elements.
@@ -333,7 +334,7 @@ public class ElementFactory extends PluginFeature {
 
             ElementFactory.TYPE_MAP.put(factoryName, cls);
         }
-        return NativeObject.objectFor(ptr, cls, false);
+        return Natives.objectFor(ptr, cls, false);
     }
 
     /**

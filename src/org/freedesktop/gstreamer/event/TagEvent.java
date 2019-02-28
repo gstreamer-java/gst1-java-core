@@ -26,6 +26,7 @@ import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -76,7 +77,7 @@ public class TagEvent extends Event {
         Pointer[] taglist = new Pointer[1];
         GSTEVENT_API.gst_event_parse_tag(this, taglist);
 //        TagList tl = new TagList(taglistInitializer(taglist[0], false, false));
-        TagList tl = NativeObject.objectFor(taglist[0], TagList.class, false, false);
+        TagList tl = Natives.objectFor(taglist[0], TagList.class, false, false);
         ReferenceManager.addKeepAliveReference(tl, this);
         return tl;
     }

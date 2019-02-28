@@ -26,6 +26,7 @@ import org.freedesktop.gstreamer.lowlevel.NativeValue;
 import org.freedesktop.gstreamer.Element;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * Base type for all gstreamer interface proxies
@@ -35,7 +36,7 @@ public class GstInterface extends NativeValue {
     protected final Element element;
     protected GstInterface(Element element, GType type) {
         this.element = element;
-        handle = element.getNativeAddress();
+        handle = Natives.getRawPointer(element);
     }
     protected Object nativeValue() {
         return handle;

@@ -28,6 +28,7 @@ import java.util.List;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
@@ -613,7 +614,7 @@ public class Structure extends NativeObject {
     }
     
     static Structure objectFor(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        return NativeObject.objectFor(ptr, Structure.class, needRef, ownsHandle);
+        return Natives.objectFor(ptr, Structure.class, needRef, ownsHandle);
     }
     
     public class InvalidFieldException extends RuntimeException {

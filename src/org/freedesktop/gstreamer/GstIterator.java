@@ -71,7 +71,7 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         }
 
         private T getNext() {
-            if (GSTITERATOR_API.gst_iterator_next(handle(), gValue) == 1) {
+            if (GSTITERATOR_API.gst_iterator_next(getRawPointer(), gValue) == 1) {
                 T result = (T) gValue.getValue();
                 // reset cached structure or we get a memory leak
                 gValue.reset();

@@ -38,7 +38,7 @@ public class ColorBalanceChannel extends GObject {
 	 * 
 	 * @param init
 	 */
-	public ColorBalanceChannel(Initializer init) {
+	ColorBalanceChannel(Initializer init) {
 		super(init);
 		throw new IllegalArgumentException("Cannot instantiate");
 	}

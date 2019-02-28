@@ -150,11 +150,8 @@ public interface GObjectAPI extends Library {
         public volatile int ref_count;
         public volatile Pointer qdata;
         public GObjectStruct() {}
-        public GObjectStruct(GObject obj) {
-            this(obj.handle());
-        }
-        public GObjectStruct(Pointer ptr) {
-            super(ptr);
+        public GObjectStruct(GObjectPtr ptr) {
+            super(ptr.getPointer());
             read();
         }
         

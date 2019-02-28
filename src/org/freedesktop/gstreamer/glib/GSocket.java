@@ -42,7 +42,10 @@ public class GSocket extends GObject{
 		GInetSocketAddress boundAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
-		if ( ! GioAPI.g_socket_bind(getNativeAddress(), boundAddress.getNativeAddress(), true, reference.getPointer()) ) {
+		if ( ! GioAPI.g_socket_bind(getRawPointer(),
+                        Natives.getRawPointer(boundAddress),
+                        true,
+                        reference.getPointer()) ) {
 			throw new GLibException(extractAndClearError(errorArray[0]));
 		}
 		return this;
@@ -52,7 +55,10 @@ public class GSocket extends GObject{
 		GInetSocketAddress connectedAddress = new GInetSocketAddress(address, port);
 		GErrorStruct reference = new GErrorStruct();
 		GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
-		if ( ! GioAPI.g_socket_connect(getNativeAddress(), connectedAddress.getNativeAddress(), new GCancellable().getNativeAddress(), reference.getPointer()) ) {
+		if ( ! GioAPI.g_socket_connect(getRawPointer(),
+                        Natives.getRawPointer(connectedAddress),
+                        Natives.getRawPointer(new GCancellable()),
+                        reference.getPointer()) ) {
 			throw new GLibException(extractAndClearError(errorArray[0]));
 		}
 	}

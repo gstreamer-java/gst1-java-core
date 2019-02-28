@@ -72,7 +72,7 @@ public class Buffer extends MiniObject {
     Buffer(Initializer init) {
         super(init);
         mapInfo = new MapInfoStruct();
-        struct = new BufferStruct(handle());
+        struct = new BufferStruct(getRawPointer());
     }
 
     private static Pointer allocBuffer(int size) {

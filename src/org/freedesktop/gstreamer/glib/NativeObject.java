@@ -57,9 +57,6 @@ public abstract class NativeObject {
 //    /**
 //     * Creates a new instance of NativeObject
 //     */
-//    protected NativeObject(final Initializer init) {
-//        this(new Handle(new GPointer(init.ptr), init.ownsHandle));
-//    }
     protected NativeObject(Handle handle) {
         this.handle = Objects.requireNonNull(handle);
         //
@@ -81,7 +78,7 @@ public abstract class NativeObject {
     // No longer want to garbage collect this object
     //
     public void disown() {
-        LOG.log(LIFECYCLE, "Disowning " + handle());
+        LOG.log(LIFECYCLE, "Disowning " + getRawPointer());
         handle.ownsHandle.set(false);
     }
 
@@ -95,11 +92,16 @@ public abstract class NativeObject {
         return o instanceof NativeObject && ((NativeObject) o).ptr.equals(ptr);
     }
 
-    public Pointer getNativeAddress() {
-        return handle.ptrRef.get().getPointer();
+    
+    protected GPointer getPointer() {
+        GPointer ptr = handle.ptrRef.get();
+        if (ptr == null) {
+            throw new IllegalStateException("Native object has been disposed");
+        }
+        return ptr;
     }
-
-    public Pointer handle() {
+    
+    protected Pointer getRawPointer() {
         GPointer ptr = handle.ptrRef.get();
         if (ptr == null) {
             throw new IllegalStateException("Native object has been disposed");
@@ -113,43 +115,17 @@ public abstract class NativeObject {
     }
 
     public void invalidate() {
-        LOG.log(LIFECYCLE, "Invalidating object " + this + " = " + handle());
+        LOG.log(LIFECYCLE, () -> "Invalidating object " + this + " = " + getRawPointer());
         handle.invalidate();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + handle() + ")";
+        return getClass().getSimpleName() + "(" + getRawPointer() + ")";
     }
 
-//    @Override
-//    protected void finalize() throws Throwable {
-//        try {
-//            handle.dispose();
-//        } catch (Throwable t) {
-//            LOG.log(Level.SEVERE, "Finalize error", t);
-//        }
-//        super.finalize();
-//    }
-    
-    protected Object nativeValue() {
-        return handle();
-    }
 
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls) {
-        return objectFor(ptr, cls, true);
-    }
-
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef) {
-        return objectFor(ptr, cls, needRef, true);
-    }
-
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
-        return objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
-    }
-
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
-        LOG.entering("NativeObject", "instanceFor", new Object[]{ptr, refAdjust, ownsHandle});
+    static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
 
         // Ignore null pointers
         if (ptr == null) {
@@ -197,7 +173,7 @@ public abstract class NativeObject {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType, final Class<T> defaultClass) {
+    private static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType, final Class<T> defaultClass) {
         Class<T> cls = (Class<T>) GstTypes.classFor(gType);
         if (cls == null) {
             cls = defaultClass;
@@ -231,7 +207,7 @@ public abstract class NativeObject {
         return new Initializer(new GPointer(ptr), needRef, ownsHandle);
     }
 
-    protected static NativeObject instanceFor(Pointer ptr) {
+    static NativeObject instanceFor(Pointer ptr) {
         WeakReference<NativeObject> ref = INSTANCES.get(ptr);
 
         //

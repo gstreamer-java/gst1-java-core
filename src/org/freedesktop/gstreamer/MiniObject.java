@@ -124,7 +124,7 @@ public abstract class MiniObject extends RefCountedObject {
     }
 
     public int getRefCount() {
-        final MiniObjectStruct struct = new MiniObjectStruct(handle());
+        final MiniObjectStruct struct = new MiniObjectStruct(getRawPointer());
         return (Integer) struct.readField("refcount");
     }
 

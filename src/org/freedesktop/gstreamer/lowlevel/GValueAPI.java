@@ -33,6 +33,7 @@ import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  *
@@ -169,7 +170,8 @@ public interface GValueAPI extends Library {
                 Class<? extends NativeObject> cls = GstTypes.classFor(g_type);
                 if (cls != null) {
                     Pointer ptr = GVALUE_API.g_value_get_boxed(this);
-                    return NativeObject.objectFor(ptr, cls, 1, true);
+//                    return NativeObject.objectFor(ptr, cls, 1, true);
+                    return Natives.objectFor(ptr, cls, true, true);
                 }
             }
             return GVALUE_API.g_value_get_object(this);        

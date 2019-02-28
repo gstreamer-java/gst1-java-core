@@ -29,8 +29,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GObjectStruct;
+import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -79,7 +81,7 @@ public class PipelineTest {
     @Test
     public void testPipelineGC() throws Exception {
         Pipeline p = new Pipeline("test pipeline");
-        int refcnt = new GObjectStruct(p).ref_count;
+        int refcnt = new GObjectStruct((GObjectPtr) Natives.getPointer(p)).ref_count;
         assertEquals("Refcount should be 1", refcnt, 1);
         WeakReference<GObject> pref = new WeakReference<GObject>(p);
         p = null;
@@ -90,7 +92,7 @@ public class PipelineTest {
         Pipeline pipe = new Pipeline("test playbin");
         pipe.play();
         Bus bus = pipe.getBus();
-        GObjectStruct struct = new GObjectStruct(bus);
+        GObjectStruct struct = new GObjectStruct((GObjectPtr) Natives.getPointer(bus));
         int refcnt = struct.ref_count;
         assertTrue(refcnt > 1);
         // reget the Bus - should return the same object and not increment ref count

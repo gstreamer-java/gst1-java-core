@@ -68,7 +68,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             if (arg == null) {
                 return null;
             }
-            Pointer ptr = ((NativeObject) arg).handle();
+            Pointer ptr = Natives.getRawPointer((NativeObject) arg);
             
             //
             // Deal with any adjustments to the proxy neccessitated by gstreamer
@@ -87,8 +87,6 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                             break;
                         } else if (annotations[i] instanceof IncRef) {
                             Natives.ref((RefCountedObject) arg);
-//                            ((RefCountedObject) arg).ref();
-//                            break;
                         }
                     }
                 }
@@ -107,16 +105,23 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                 // returned from functions, so drop a ref here
                 //
                 boolean ownsHandle = ((MethodResultContext) context).getMethod().isAnnotationPresent(CallerOwnsReturn.class);
-                int refadj = ownsHandle ? -1 : 0;
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), refadj, ownsHandle);
+//                int refadj = ownsHandle ? -1 : 0;
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), refadj, ownsHandle);
+                if (ownsHandle) {
+                    return Natives.callerOwnsReturn((Pointer) result, (Class<? extends NativeObject>) context.getTargetType());
+                } else {
+                    return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), false, false);
+                }
             }
             if (context instanceof CallbackParameterContext) {
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, true);
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, true);
+                return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), true, true);
             }
             if (context instanceof StructureReadContext) {
                 StructureReadContext sctx = (StructureReadContext) context;
                 boolean ownsHandle = sctx.getField().getAnnotation(ConstField.class) == null;
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, ownsHandle);
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, ownsHandle);
+                return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), true, true);
             }
             throw new IllegalStateException("Cannot convert to NativeObject from " + context);
         }

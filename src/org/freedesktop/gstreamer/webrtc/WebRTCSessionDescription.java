@@ -24,6 +24,7 @@ import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.SDPMessage;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import static org.freedesktop.gstreamer.lowlevel.GstSDPMessageAPI.GSTSDPMESSAGE_API;
 
@@ -75,7 +76,7 @@ public class WebRTCSessionDescription extends NativeObject {
         Pointer[] ptr = new Pointer[1];
         GSTSDPMESSAGE_API.gst_sdp_message_copy(originalSDP, ptr);
         originalSDP.invalidate();
-        return NativeObject.objectFor(ptr[0], SDPMessage.class, false, true);
+        return Natives.objectFor(ptr[0], SDPMessage.class, false, true);
     }
 
     

@@ -45,14 +45,14 @@ public class GDate extends NativeObject {
     }
 
     public int getDay() {
-        return GlibAPI.GLIB_API.g_date_get_day(handle());
+        return GlibAPI.GLIB_API.g_date_get_day(getRawPointer());
     }
     
     public int getMonth() {
-        return GlibAPI.GLIB_API.g_date_get_month(handle());
+        return GlibAPI.GLIB_API.g_date_get_month(getRawPointer());
     }
     public int getYear() {
-        return GlibAPI.GLIB_API.g_date_get_year(handle());
+        return GlibAPI.GLIB_API.g_date_get_year(getRawPointer());
     }
     
     @Override
