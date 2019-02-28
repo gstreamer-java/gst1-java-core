@@ -21,15 +21,16 @@ import com.sun.jna.Pointer;
 /**
  * Base GObject pointer
  */
-public class GObjectPtr extends GPointer {
-    
+public class GObjectPtr extends GTypedPtr {
+
     public GObjectPtr() {
     }
-    
+
     public GObjectPtr(Pointer ptr) {
         super(ptr);
     }
-    
+
+    @Override
     public GType getGType() {
         // Quick getter for GType without allocation
         // same as : new GObjectStruct(ptr).g_type_instance.g_class.g_type
@@ -42,5 +43,5 @@ public class GObjectPtr extends GPointer {
             throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
         }
     }
-    
+
 }

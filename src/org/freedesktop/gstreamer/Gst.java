@@ -19,17 +19,12 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.glib.GSocket;
-import org.freedesktop.gstreamer.glib.GInetSocketAddress;
 import org.freedesktop.gstreamer.glib.GError;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,18 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.elements.AppSrc;
-import org.freedesktop.gstreamer.elements.BaseSink;
-import org.freedesktop.gstreamer.elements.BaseSrc;
-import org.freedesktop.gstreamer.elements.BaseTransform;
-import org.freedesktop.gstreamer.elements.DecodeBin;
-import org.freedesktop.gstreamer.elements.PlayBin;
-import org.freedesktop.gstreamer.elements.URIDecodeBin;
-import org.freedesktop.gstreamer.webrtc.WebRTCBin;
-import org.freedesktop.gstreamer.glib.GDate;
-import org.freedesktop.gstreamer.glib.GInetAddress;
-import org.freedesktop.gstreamer.glib.GSocketAddress;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
@@ -68,9 +51,13 @@ import com.sun.jna.ptr.PointerByReference;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.stream.Stream;
+import org.freedesktop.gstreamer.elements.Elements;
+import org.freedesktop.gstreamer.glib.GLib;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
+import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
@@ -618,7 +605,7 @@ public final class Gst {
      *
      * @param task the task to execute.
      */
-    public static void addStaticShutdownTask(Runnable task) {
+    static void addStaticShutdownTask(Runnable task) {
         shutdownTasks.add(task);
     }
 
@@ -703,88 +690,50 @@ public final class Gst {
         }
     };
 
-    private static String getField(Class<? extends NativeObject> cls, String name)
-            throws SecurityException, IllegalArgumentException {
-        try {
-            Field f = cls.getDeclaredField(name);
-            int mod = f.getModifiers();
-            if (Modifier.isStatic(mod) && Modifier.isFinal(mod) && f.getType().equals(String.class)) {
-                f.setAccessible(true);
-                return (String) f.get(null);
-            }
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static synchronized void registerClass(Class<? extends NativeObject> cls) {
-        String value = null;
-        value = getField(cls, "GTYPE_NAME");
-        if (value != null) {
-            GstTypes.registerType(cls, value);
-        }
-        value = getField(cls, "GST_NAME");
-        if (Element.class.isAssignableFrom(cls) && value != null) {
-            ElementFactory.registerElement((Class<? extends Element>) cls, value);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
-        for (Class<? extends NativeObject> cls : nativeClasses) {
-            registerClass(cls);
-        }
+        Stream.of(new GLib.Types(),
+                new Types(),
+                new Event.Types(),
+                new Message.Types(),
+                new Query.Types(),
+                new Elements(),
+                new WebRTC.Types())
+                .flatMap(NativeObject.TypeProvider::types)
+                .forEachOrdered(GstTypes::register);
+        
     }
-    // to generate the list we use:
-    // egrep -rl "GST_NAME|GTYPE_NAME" src 2>/dev/null | egrep -v ".svn|Gst.java" | sort
-    // even though the best would be all subclasses of NativeObject
-    @SuppressWarnings("rawtypes")
-    private static List<Class<? extends NativeObject>> nativeClasses
-            = Arrays.<Class<? extends NativeObject>>asList(
-                    GDate.class,
-                    GInetAddress.class,
-                    GSocket.class,
-                    GSocketAddress.class,
-                    GInetSocketAddress.class,
-                    TagList.class,
-                    // ----------- Base -------------
-                    Buffer.class,
-                    BufferPool.class,
-                    Bus.class,
-                    Caps.class,
-                    Clock.class,
-                    DateTime.class,
-                    Element.class,
-                    ElementFactory.class,
-                    Event.class,
-                    GhostPad.class,
-                    Message.class,
-                    Pad.class,
-                    PadTemplate.class,
-                    Plugin.class,
-                    PluginFeature.class,
-                    Promise.class,
-                    Query.class,
-                    Registry.class,
-                    SDPMessage.class,
-                    Sample.class,
-                    WebRTCSessionDescription.class,
-                    // ----------- Elements -------------
-                    AppSink.class,
-                    AppSrc.class,
-                    BaseSrc.class,
-                    BaseSink.class,
-                    BaseTransform.class,
-                    Bin.class,
-                    DecodeBin.class,
-                    Pipeline.class,
-                    PlayBin.class,
-                    URIDecodeBin.class,
-                    WebRTCBin.class
+
+    
+    public static class Types implements NativeObject.TypeProvider {
+
+        @Override
+        public Stream<NativeObject.TypeRegistration<?>> types() {
+            return Stream.of(
+                    registration(Bin.class, Bin.GTYPE_NAME, Bin::new),
+                    registration(Buffer.class, Buffer.GTYPE_NAME, Buffer::new),
+                    registration(BufferPool.class, BufferPool.GTYPE_NAME, BufferPool::new),
+                    registration(Bus.class, Bus.GTYPE_NAME, Bus::new),
+                    registration(Caps.class, Caps.GTYPE_NAME, Caps::new),
+                    registration(Clock.class, Clock.GTYPE_NAME, Clock::new),
+                    registration(DateTime.class, DateTime.GTYPE_NAME, DateTime::new),
+                    registration(Element.class, Element.GTYPE_NAME, Element::new),
+                    registration(ElementFactory.class, ElementFactory.GTYPE_NAME, ElementFactory::new),
+                    registration(GhostPad.class, GhostPad.GTYPE_NAME, GhostPad::new),
+                    registration(Pad.class, Pad.GTYPE_NAME, Pad::new),
+                    registration(PadTemplate.class, PadTemplate.GTYPE_NAME, PadTemplate::new),
+                    registration(Pipeline.class, Pipeline.GTYPE_NAME, Pipeline::new),
+                    registration(Plugin.class, Plugin.GTYPE_NAME, Plugin::new),
+                    registration(PluginFeature.class, PluginFeature.GTYPE_NAME, PluginFeature::new),
+                    registration(Promise.class, Promise.GTYPE_NAME, Promise::new),
+                    registration(Registry.class, Registry.GTYPE_NAME, Registry::new),
+                    registration(SDPMessage.class, SDPMessage.GTYPE_NAME, SDPMessage::new),
+                    registration(Sample.class, Sample.GTYPE_NAME, Sample::new),
+                    registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );
+        }
+        
+    }
 
     /**
      * Annotation on classes, methods or fields to show the required GStreamer

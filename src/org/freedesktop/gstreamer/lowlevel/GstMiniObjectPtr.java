@@ -21,7 +21,7 @@ import com.sun.jna.Pointer;
 /**
  * Base MiniObject pointer
  */
-public class GstMiniObjectPtr extends GPointer {
+public class GstMiniObjectPtr extends GTypedPtr {
     
     public GstMiniObjectPtr() {
     }
@@ -30,6 +30,7 @@ public class GstMiniObjectPtr extends GPointer {
         super(ptr);
     }
     
+    @Override
     public GType getGType() {
         // Quick getter for GType without allocation
         // same as : new MiniObjectStruct(ptr).type

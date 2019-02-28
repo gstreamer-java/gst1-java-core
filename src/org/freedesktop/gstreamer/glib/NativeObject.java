@@ -27,19 +27,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
-
 import com.sun.jna.Pointer;
 import java.lang.ref.ReferenceQueue;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GTypedPtr;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.SubtypeMapper;
 
 /**
  *
@@ -125,37 +124,41 @@ public abstract class NativeObject {
     }
 
 
-    static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
+    static <T extends NativeObject> T objectFor(GPointer gptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
 
         // Ignore null pointers
-        if (ptr == null) {
+        if (gptr == null) {
             return null;
         }
-        NativeObject obj = GObject.class.isAssignableFrom(cls) ? NativeObject.instanceFor(ptr) : null;
+        
+        NativeObject obj = NativeObject.instanceFor(gptr.getPointer());
+        
         if (obj != null && cls.isInstance(obj)) {
             if (refAdjust < 0) {
                 ((RefCountedObject.Handle) obj.handle).unref(); // Lose the extra ref added by gstreamer
             }
             return cls.cast(obj);
         }
-
-        final GType gType
-                = GObject.class.isAssignableFrom(cls) ? GObject.getType(ptr)
-                : MiniObject.class.isAssignableFrom(cls) ? MiniObject.getType(ptr)
-                : null; // shall never appears
-
+        
+        final GType gtype = gptr instanceof GTypedPtr ? ((GTypedPtr) gptr).getGType() : null;
         //
         // For a GObject, MiniObject, ..., use the GType field to find the most
         // exact class match
         //
-        if (gType != null) {
-            cls = NativeObject.classFor(ptr, gType, cls);
+        if (gtype != null) {
+            TypeRegistration<?> reg = GstTypes.registrationFor(gtype);
+            if (reg != null) {
+                return cls.cast(reg.factory.apply(
+                        new Initializer(gptr, refAdjust > 0, ownsHandle)));
+            }
         }
+        
+        LOG.log(Level.FINE, () -> String.format("Unregistered type requested : %s", cls.getSimpleName()));
 
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
             constructor.setAccessible(true);
-            T retVal = constructor.newInstance(Natives.initializer(ptr, refAdjust > 0, ownsHandle));
+            T retVal = constructor.newInstance(new Initializer(gptr, refAdjust > 0, ownsHandle));
             //retVal.initNativeHandle(ptr, refAdjust > 0, ownsHandle);
             return retVal;
         } catch (SecurityException ex) {
@@ -170,20 +173,6 @@ public abstract class NativeObject {
             throw new RuntimeException(ex);
         }
 
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends NativeObject> Class<T> classFor(Pointer ptr, final GType gType, final Class<T> defaultClass) {
-        Class<T> cls = (Class<T>) GstTypes.classFor(gType);
-        if (cls == null) {
-            cls = defaultClass;
-        }
-
-        if (cls.isAnnotationPresent(HasSubtype.class)) {
-            cls = (Class<T>) SubtypeMapper.subtypeFor(cls, ptr);
-        }
-
-        return cls;
     }
 
 
@@ -293,5 +282,39 @@ public abstract class NativeObject {
         protected boolean ownsHandle() {
             return ownsHandle.get();
         }
+    }
+    
+    public static class TypeRegistration<T extends NativeObject> {
+        
+        private final Class<T> javaType;
+        private final String gTypeName;
+        private final Function<Initializer, ? extends T> factory;
+
+        TypeRegistration(Class<T> javaType, String gTypeName, Function<Initializer, ? extends T> factory) {
+            this.javaType = javaType;
+            this.gTypeName = gTypeName;
+            this.factory = factory;
+        }
+
+        public Class<T> getJavaType() {
+            return javaType;
+        }
+
+        public String getGTypeName() {
+            return gTypeName;
+        }
+
+        public Function<Initializer, ? extends T> getFactory() {
+            return factory;
+        }
+        
+        
+        
+    }
+    
+    public static interface TypeProvider {
+        
+        public Stream<TypeRegistration<?>> types();
+        
     }
 }

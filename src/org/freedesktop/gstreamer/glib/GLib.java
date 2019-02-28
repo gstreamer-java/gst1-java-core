@@ -20,7 +20,9 @@
  */
 package org.freedesktop.gstreamer.glib;
 
+import java.util.stream.Stream;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
 
 /**
  * Miscellaneous Utility Functions — a selection of portable utility functions from GLib
@@ -88,5 +90,21 @@ public class GLib {
      */
     public static void unsetEnv(String variable) {
         GlibAPI.GLIB_API.g_unsetenv(variable);
+    }
+    
+    public static class Types implements NativeObject.TypeProvider {
+
+        @Override
+        public Stream<NativeObject.TypeRegistration<?>> types() {
+            return Stream.of(
+                    registration(GDate.class, GDate.GTYPE_NAME, GDate::new),
+                    registration(GInetAddress.class, GInetAddress.GTYPE_NAME, GInetAddress::new),
+                    registration(GSocket.class, GSocket.GTYPE_NAME, GSocket::new),
+                    registration(GSocketAddress.class, GSocketAddress.GTYPE_NAME, GSocketAddress::new),
+                    registration(GInetSocketAddress.class, GInetSocketAddress.GTYPE_NAME, GInetSocketAddress::new)
+ 
+            );
+        }
+        
     }
 }

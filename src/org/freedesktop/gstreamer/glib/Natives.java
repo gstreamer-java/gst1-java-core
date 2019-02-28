@@ -16,14 +16,19 @@
 package org.freedesktop.gstreamer.glib;
 
 import com.sun.jna.Pointer;
+import java.util.function.Function;
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 /**
  *
  */
 public final class Natives {
-    
-    private Natives() {}
+
+    private Natives() {
+    }
 
     /*
      * The default for new objects is to not need a refcount increase, and that
@@ -55,29 +60,41 @@ public final class Natives {
     }
 
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
-        return NativeObject.objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
+        return objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
     }
     
     public static <T extends NativeObject> T callerOwnsReturn(Pointer ptr, Class<T> cls) {
-        return NativeObject.objectFor(ptr, cls, -1, true);
+        return objectFor(ptr, cls, -1, true);
+    }
+
+    private static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
+        final GPointer gptr = GObject.class.isAssignableFrom(cls) ? new GObjectPtr(ptr)
+                : MiniObject.class.isAssignableFrom(cls) ? new GstMiniObjectPtr(ptr)
+                : new GPointer(ptr);
+        return NativeObject.objectFor(gptr, cls, refAdjust, ownsHandle);
     }
     
     public static Pointer getRawPointer(NativeObject obj) {
         return obj.getRawPointer();
     }
-    
+
     public static GPointer getPointer(NativeObject obj) {
         return obj.getPointer();
     }
-    
+
     public static <T extends RefCountedObject> T ref(T obj) {
         ((RefCountedObject.Handle) obj.handle).ref();
         return obj;
     }
-    
+
     public static <T extends RefCountedObject> T unref(T obj) {
         ((RefCountedObject.Handle) obj.handle).unref();
         return obj;
     }
-    
+
+    public static <T extends NativeObject> NativeObject.TypeRegistration<T>
+            registration(Class<T> javaType, String gTypeName, Function<NativeObject.Initializer, ? extends T> factory) {
+        return new NativeObject.TypeRegistration<>(javaType, gTypeName, factory);
+    }
+
 }

@@ -19,9 +19,15 @@
  */
 package org.freedesktop.gstreamer.message;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Structure;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
@@ -59,6 +65,22 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 public class Message extends MiniObject {
 
     public static final String GTYPE_NAME = "GstMessage";
+
+    private static final Map<MessageType, Function<Initializer, Message>> TYPE_MAP
+            = new EnumMap<>(MessageType.class);
+
+    static {
+        TYPE_MAP.put(MessageType.EOS, EOSMessage::new);
+        TYPE_MAP.put(MessageType.ERROR, ErrorMessage::new);
+        TYPE_MAP.put(MessageType.BUFFERING, BufferingMessage::new);
+        TYPE_MAP.put(MessageType.DURATION_CHANGED, DurationChangedMessage::new);
+        TYPE_MAP.put(MessageType.INFO, InfoMessage::new);
+        TYPE_MAP.put(MessageType.LATENCY, LatencyMessage::new);
+        TYPE_MAP.put(MessageType.SEGMENT_DONE, SegmentDoneMessage::new);
+        TYPE_MAP.put(MessageType.STATE_CHANGED, StateChangedMessage::new);
+        TYPE_MAP.put(MessageType.TAG, TagMessage::new);
+        TYPE_MAP.put(MessageType.WARNING, WarningMessage::new);
+    }
 
     private final GstMessageAPI.MessageStruct messageStruct;
 
@@ -98,6 +120,23 @@ public class Message extends MiniObject {
     public MessageType getType() {
         MessageType type = (MessageType) messageStruct.readField("type");
         return type;
+    }
+
+    private static Message create(Initializer init) {
+        GstMessageAPI.MessageStruct struct = new GstMessageAPI.MessageStruct(init.ptr.getPointer());
+        MessageType type = (MessageType) struct.readField("type");
+        return TYPE_MAP.getOrDefault(type, Message::new).apply(init);
+    }
+    
+    public static class Types implements TypeProvider {
+
+        @Override
+        public Stream<TypeRegistration<?>> types() {
+            return Stream.of(
+                    Natives.registration(Message.class, GTYPE_NAME, Message::create)
+            );
+        }
+        
     }
 
 }

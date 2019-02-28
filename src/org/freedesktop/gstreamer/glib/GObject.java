@@ -50,8 +50,10 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
+import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 /**
  * GObject is the fundamental type providing the common attributes and methods
@@ -191,10 +193,14 @@ public abstract class GObject extends RefCountedObject {
         } else if (GVALUE_API.g_value_type_transformable(propType, GType.INT64)) {
             return GVALUE_API.g_value_get_int64(transform(propValue, GType.INT64));
         } else if (propValue.checkHolds(GType.BOXED)) {
+            // @TODO we already know the GType here - optimise this!
             Class<? extends NativeObject> cls = GstTypes.classFor(propType);
             if (cls != null) {
                 Pointer ptr = GVALUE_API.g_value_get_boxed(propValue);
-                return objectFor(ptr, cls, -1, true);
+                final GPointer gptr = GObject.class.isAssignableFrom(cls) ? new GObjectPtr(ptr)
+                : MiniObject.class.isAssignableFrom(cls) ? new GstMiniObjectPtr(ptr)
+                : new GPointer(ptr);
+                return objectFor(gptr, cls, -1, true);
             }
         }
         throw new IllegalArgumentException("Unknown conversion from GType=" + propType);
