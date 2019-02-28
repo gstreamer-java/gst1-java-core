@@ -155,7 +155,7 @@ public abstract class NativeObject {
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor(Initializer.class);
             constructor.setAccessible(true);
-            T retVal = constructor.newInstance(initializer(ptr, refAdjust > 0, ownsHandle));
+            T retVal = constructor.newInstance(Natives.initializer(ptr, refAdjust > 0, ownsHandle));
             //retVal.initNativeHandle(ptr, refAdjust > 0, ownsHandle);
             return retVal;
         } catch (SecurityException ex) {
@@ -186,26 +186,6 @@ public abstract class NativeObject {
         return cls;
     }
 
-    /*
-    * The default for new objects is to not need a refcount increase, and that
-    * they own the native object.  Special cases can use the other constructor.
-     */
-    protected static Initializer initializer(Pointer ptr) {
-        Initializer initializer = initializer(ptr, false, true);
-        return initializer;
-    }
-
-    protected static Initializer initializer(Pointer ptr, boolean needRef) {
-        Initializer initializer = initializer(ptr, needRef, true);
-        return initializer;
-    }
-
-    protected static Initializer initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        if (ptr == null) {
-            throw new IllegalArgumentException("Invalid native pointer");
-        }
-        return new Initializer(new GPointer(ptr), needRef, ownsHandle);
-    }
 
     static NativeObject instanceFor(Pointer ptr) {
         WeakReference<NativeObject> ref = INSTANCES.get(ptr);
@@ -225,7 +205,7 @@ public abstract class NativeObject {
         public final GPointer ptr;
         public final boolean needRef, ownsHandle;
 
-        public Initializer(GPointer ptr, boolean needRef, boolean ownsHandle) {
+        Initializer(GPointer ptr, boolean needRef, boolean ownsHandle) {
             this.ptr = ptr;
             this.needRef = needRef;
             this.ownsHandle = ownsHandle;

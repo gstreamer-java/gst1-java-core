@@ -48,6 +48,6 @@ public class GInetSocketAddress extends GSocketAddress {
             if (nativePointer == null) {
                 throw new GLibException("Can not create "+GInetSocketAddress.class.getSimpleName()+" for "+address+":"+port+", please check that the IP address is valid, with format x.x.x.x");
             }
-            return initializer(nativePointer);
+            return Natives.initializer(nativePointer);
         }
 }

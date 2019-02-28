@@ -106,7 +106,7 @@ public class GSocket extends GObject{
             if (socketPointer == null) {
                 throw new GLibException(extractAndClearError(errorArray[0]));
             }
-            return initializer(socketPointer);
+            return Natives.initializer(socketPointer);
         }
         
 	

@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
@@ -60,7 +61,7 @@ public class BufferSizeEvent extends Event {
      * @param async thread behaviour
      */
     public BufferSizeEvent(Format format, long minsize, long maxsize, boolean async) {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_buffer_size(format, minsize, maxsize, async)));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_buffer_size(format, minsize, maxsize, async)));
     }
 
     /**

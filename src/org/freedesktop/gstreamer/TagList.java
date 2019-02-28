@@ -71,7 +71,7 @@ public class TagList extends MiniObject {
 
     private static Initializer initializer() {
         final Pointer ptr_new_tag_list = GSTTAGLIST_API.ptr_gst_tag_list_new_empty();
-        return initializer(ptr_new_tag_list);
+        return Natives.initializer(ptr_new_tag_list);
     }
 
     /**

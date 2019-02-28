@@ -54,7 +54,7 @@ public class TagMessage extends Message {
      * it again after adding it to this message.
      */
     public TagMessage(GstObject src, TagList tagList) {
-        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_tag(src, tagList)));
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_tag(src, tagList)));
     }
 
     /**

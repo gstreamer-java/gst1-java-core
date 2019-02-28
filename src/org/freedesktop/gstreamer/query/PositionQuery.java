@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -46,7 +47,7 @@ public class PositionQuery extends Query {
      * @param format the default {@link Format} for the new query
      */
     public PositionQuery(Format format) {
-        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_position(format)));
+        super(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_position(format)));
     }
 
     /**

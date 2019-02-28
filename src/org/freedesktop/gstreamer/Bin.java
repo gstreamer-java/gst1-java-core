@@ -26,8 +26,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 
 import com.sun.jna.Pointer;
 import java.util.List;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
 /**
  * Base class and element that can contain other elements.
@@ -86,7 +86,7 @@ public class Bin extends Element {
      * Creates a new Bin with a unique name.
      */
     public Bin() {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(null), false, true));
+        this(Natives.initializer(GSTBIN_API.ptr_gst_bin_new(null), false, true));
     }
 
     /**
@@ -95,7 +95,7 @@ public class Bin extends Element {
      * @param name The Name to assign to the new Bin
      */
     public Bin(String name) {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false, true));
+        this(Natives.initializer(GSTBIN_API.ptr_gst_bin_new(name), false, true));
     }
 
     /**

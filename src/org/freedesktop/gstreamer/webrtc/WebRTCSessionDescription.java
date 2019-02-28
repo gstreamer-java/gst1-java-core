@@ -58,7 +58,7 @@ public class WebRTCSessionDescription extends NativeObject {
      * @param sdpMessage The {@link SDPMessage} of the session description
      */
     public WebRTCSessionDescription(WebRTCSDPType type, SDPMessage sdpMessage) {
-        this(initializer(GSTWEBRTCSESSIONDESCRIPTION_API.ptr_gst_webrtc_session_description_new(type, sdpMessage)));
+        this(Natives.initializer(GSTWEBRTCSESSIONDESCRIPTION_API.ptr_gst_webrtc_session_description_new(type, sdpMessage)));
     }
 
     /**

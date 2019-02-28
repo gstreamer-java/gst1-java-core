@@ -25,6 +25,7 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -42,7 +43,7 @@ public class FormatsQuery extends Query {
      * Constructs a new query object for querying formats of the stream.
      */
     public FormatsQuery() {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_formats()));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_formats()));
     }
 
     FormatsQuery(Initializer init) {

@@ -24,6 +24,7 @@ import java.util.List;
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Plugin;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.GstDeviceProviderAPI;
@@ -119,7 +120,7 @@ public class DeviceProvider extends GstObject {
         GlibAPI.GList next = glist;
         while (next != null) {
             if (next.data != null) {
-                Device dev = new Device(initializer(next.data, true, true));
+                Device dev = new Device(Natives.initializer(next.data, true, true));
                 list.add(dev);
             }
             next = next.next();

@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -50,6 +51,6 @@ public class DurationChangedMessage extends Message {
      * @param src The object originating the message.
      */
     public DurationChangedMessage(GstObject src) {
-        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_duration_changed(src)));
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_duration_changed(src)));
     }
 }

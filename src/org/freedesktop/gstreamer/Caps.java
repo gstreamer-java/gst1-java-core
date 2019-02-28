@@ -72,7 +72,7 @@ public class Caps extends MiniObject {
      * @see #emptyCaps
      */
     public Caps() {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
 
     /**
@@ -82,7 +82,7 @@ public class Caps extends MiniObject {
      * @see #fromString
      */
     public Caps(String caps) {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
 
     /**
@@ -92,7 +92,7 @@ public class Caps extends MiniObject {
      * @see #copy
      */
     public Caps(Caps caps) {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_copy(caps)));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_copy(caps)));
     }
 
     Caps(Initializer init) {
@@ -362,7 +362,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps anyCaps() {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_any()));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_any()));
     }
 
     /**
@@ -372,7 +372,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps emptyCaps() {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
 
     /**
@@ -386,7 +386,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps fromString(String caps) {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
 
     /**

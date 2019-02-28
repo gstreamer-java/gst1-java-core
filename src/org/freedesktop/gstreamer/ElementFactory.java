@@ -238,7 +238,7 @@ public class ElementFactory extends PluginFeature {
         GList next = glist;
         while (next != null) {
             if (next.data != null) {
-                ElementFactory fact = new ElementFactory(initializer(next.data, true, true));
+                ElementFactory fact = new ElementFactory(Natives.initializer(next.data, true, true));
                 list.add(fact);
             }
             next = next.next();
@@ -277,7 +277,7 @@ public class ElementFactory extends PluginFeature {
         GList next = gFilterList;
         while (next != null) {
             if (next.data != null) {
-                ElementFactory fact = new ElementFactory(initializer(next.data, true, true));
+                ElementFactory fact = new ElementFactory(Natives.initializer(next.data, true, true));
                 filterList.add(fact);
             }
             next = next.next();

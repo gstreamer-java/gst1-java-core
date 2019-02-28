@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -62,6 +63,6 @@ public class StepEvent extends Event {
      * @param intermediate intermediate steps
      */
     public StepEvent(Format format, long amount, double rate, boolean flush, boolean intermediate) {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_step(format, amount, rate, flush, intermediate)));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_step(format, amount, rate, flush, intermediate)));
     }
 }

@@ -26,7 +26,7 @@ public class GCancellable extends GObject{
 	public static final String GTYPE_NAME = "GCancellable";
 
 	public GCancellable() {
-		this(initializer(GioAPI.g_cancellable_new()));
+		this(Natives.initializer(GioAPI.g_cancellable_new()));
 	}
 	
 	private GCancellable(Initializer init) {

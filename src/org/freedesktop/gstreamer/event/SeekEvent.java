@@ -25,6 +25,7 @@ package org.freedesktop.gstreamer.event;
 import java.util.EnumSet;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.glib.NativeFlags;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -88,7 +89,7 @@ public class SeekEvent extends Event {
      */
     public SeekEvent(double rate, Format format, EnumSet<SeekFlags> flags, 
             SeekType startType, long start, SeekType stopType, long stop) {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_seek(sanitizeRate(rate), format, 
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_seek(sanitizeRate(rate), format, 
                 NativeFlags.toInt(flags), startType, start, stopType, stop)));
     }
     

@@ -23,6 +23,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.FlowReturn;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -60,6 +61,6 @@ public class EOSEvent extends Event {
      * Creates a new EOS event.
      */
     public EOSEvent() {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_eos()));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_eos()));
     }
 }

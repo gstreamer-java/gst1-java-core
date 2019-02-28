@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -46,7 +47,7 @@ public class ConvertQuery extends Query {
      * @param destFormat the target {@link Format}
      */
     public ConvertQuery(Format srcFormat, long value, Format destFormat) {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_convert(srcFormat, value, destFormat)));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_convert(srcFormat, value, destFormat)));
     }
 
     /**

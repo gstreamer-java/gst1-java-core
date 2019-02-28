@@ -26,6 +26,7 @@ import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
@@ -88,7 +89,7 @@ public class Element extends GstObject {
      * @return a raw element.
      */
     protected static Initializer makeRawElement(String factoryName, String elementName) {
-        return initializer(ElementFactory.makeRawElement(factoryName, elementName));
+        return Natives.initializer(ElementFactory.makeRawElement(factoryName, elementName));
     }
 
     /**

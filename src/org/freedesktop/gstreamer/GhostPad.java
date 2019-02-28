@@ -23,6 +23,7 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstGhostPadAPI.GSTGHOSTPAD_API;
 
 /**
@@ -68,7 +69,7 @@ public class GhostPad extends Pad {
      * @param target The {@link Pad} to ghost.
      */
     public GhostPad(String name, Pad target) {
-        this(initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new(name, target)));
+        this(Natives.initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new(name, target)));
     }
 
     /**
@@ -81,7 +82,7 @@ public class GhostPad extends Pad {
      * @param template The {@link PadTemplate} to use on the ghostpad.
      */
     public GhostPad(String name, Pad target, PadTemplate template) {
-        this(initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_from_template(name, target, template)));
+        this(Natives.initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_from_template(name, target, template)));
     }
 
     /**
@@ -94,7 +95,7 @@ public class GhostPad extends Pad {
      * @param direction The direction of the ghostpad.
      */
     public GhostPad(String name, PadDirection direction) {
-        this(initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_no_target(name, direction.ordinal())));
+        this(Natives.initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_no_target(name, direction.ordinal())));
     }
 
     /**
@@ -105,7 +106,7 @@ public class GhostPad extends Pad {
      * @param template The {@link PadTemplate} to use on the ghostpad.
      */
     public GhostPad(String name, PadTemplate template) {
-        this(initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_no_target_from_template(name, template)));
+        this(Natives.initializer(GSTGHOSTPAD_API.ptr_gst_ghost_pad_new_no_target_from_template(name, template)));
     }
 
     /**

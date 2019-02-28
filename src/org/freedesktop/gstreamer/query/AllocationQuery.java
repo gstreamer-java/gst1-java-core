@@ -48,7 +48,7 @@ public class AllocationQuery extends Query {
         // special case : no ref shall be added
         // the allocationQuery is an in/out parameter during query notification
         // so, we shall keep query writable for add methods
-        super(initializer(init.ptr.getPointer(), false, true));
+        super(Natives.initializer(init.ptr.getPointer(), false, true));
     }
 
     /**
@@ -58,7 +58,7 @@ public class AllocationQuery extends Query {
      * @param need_pool return a pool.
      */
     public AllocationQuery(Caps caps, boolean need_pool) {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_allocation(caps, need_pool)));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_allocation(caps, need_pool)));
     }
 
     /**

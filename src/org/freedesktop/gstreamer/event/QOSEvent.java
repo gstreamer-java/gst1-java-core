@@ -21,6 +21,7 @@
  */
 package org.freedesktop.gstreamer.event;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -80,7 +81,7 @@ public class QOSEvent extends Event {
      * @param timestamp the timestamp of the buffer
      */
     public QOSEvent(QOSType type, double proportion, long difference, long timestamp) {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_qos(type, proportion, difference, timestamp)));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_qos(type, proportion, difference, timestamp)));
     }
 
     /**

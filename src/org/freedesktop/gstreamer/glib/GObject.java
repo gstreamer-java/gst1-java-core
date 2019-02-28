@@ -717,7 +717,7 @@ public abstract class GObject extends RefCountedObject {
         }
 
     }
-
+    
     private static final class ToggleNotify implements GObjectAPI.GToggleNotify {
 
         @Override

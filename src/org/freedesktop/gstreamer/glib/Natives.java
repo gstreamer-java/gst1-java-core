@@ -25,6 +25,27 @@ public final class Natives {
     
     private Natives() {}
 
+    /*
+     * The default for new objects is to not need a refcount increase, and that
+     * they own the native object.  Special cases can use the other constructor.
+     */
+    public static final NativeObject.Initializer initializer(Pointer ptr) {
+        NativeObject.Initializer initializer = initializer(ptr, false, true);
+        return initializer;
+    }
+
+    public static final NativeObject.Initializer initializer(Pointer ptr, boolean needRef) {
+        NativeObject.Initializer initializer = initializer(ptr, needRef, true);
+        return initializer;
+    }
+
+    public static final NativeObject.Initializer initializer(Pointer ptr, boolean needRef, boolean ownsHandle) {
+        if (ptr == null) {
+            throw new IllegalArgumentException("Invalid native pointer");
+        }
+        return new NativeObject.Initializer(new GPointer(ptr), needRef, ownsHandle);
+    }
+
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls) {
         return objectFor(ptr, cls, true);
     }

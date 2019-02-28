@@ -503,7 +503,7 @@ public class Bus extends GstObject {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference list = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_tag(msg, list);
-                TagList tl = new TagList(TagList.initializer(list.getValue()));
+                TagList tl = new TagList(Natives.initializer(list.getValue()));
                 listener.tagsFound(msg.getSource(), tl);
                 return true;
             }

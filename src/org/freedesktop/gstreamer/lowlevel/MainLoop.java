@@ -28,6 +28,7 @@ import java.util.concurrent.FutureTask;
 import org.freedesktop.gstreamer.Gst;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 /**
@@ -47,11 +48,11 @@ public class MainLoop extends RefCountedObject {
      *
      */
     public MainLoop() {
-        this(initializer(GLIB_API.g_main_loop_new(Gst.getMainContext(), false)));
+        this(Natives.initializer(GLIB_API.g_main_loop_new(Gst.getMainContext(), false)));
     }
 
     public MainLoop(GMainContext ctx) {
-        this(initializer(GLIB_API.g_main_loop_new(ctx, false)));
+        this(Natives.initializer(GLIB_API.g_main_loop_new(ctx, false)));
     }
 
     /**

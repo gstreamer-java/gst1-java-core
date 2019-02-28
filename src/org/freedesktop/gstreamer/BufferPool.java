@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer;
 import org.freedesktop.gstreamer.lowlevel.GstBufferPoolAPI;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * A BufferPool is an object that can be used to pre-allocate and recycle
@@ -38,7 +39,7 @@ public class BufferPool extends GstObject {
      * Creates a new instance of BufferPool
      */
     public BufferPool() {
-        this(initializer(GstBufferPoolAPI.GSTBUFFERPOOL_API.ptr_gst_buffer_pool_new()));
+        this(Natives.initializer(GstBufferPoolAPI.GSTBUFFERPOOL_API.ptr_gst_buffer_pool_new()));
     }
     
     /**
@@ -71,7 +72,7 @@ public class BufferPool extends GstObject {
     	Structure config = GstBufferPoolAPI.GSTBUFFERPOOL_API.gst_buffer_pool_get_config(this);
     	Pointer[] ptr = new Pointer[1];
     	GstBufferPoolAPI.GSTBUFFERPOOL_API.gst_buffer_pool_config_get_params(config, ptr, null, null, null);
-    	return new Caps(initializer(ptr[0], false, true));
+    	return new Caps(Natives.initializer(ptr[0], false, true));
     }
 
 }

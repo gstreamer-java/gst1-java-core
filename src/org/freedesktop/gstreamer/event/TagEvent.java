@@ -62,7 +62,7 @@ public class TagEvent extends Event {
      * @param taglist the taglist to transmit with the event.
      */
     public TagEvent(TagList taglist) {
-        this(initializer(GSTEVENT_API.ptr_gst_event_new_tag(taglist)));
+        this(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_tag(taglist)));
     }
 
     /**

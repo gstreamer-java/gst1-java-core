@@ -22,6 +22,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.GSTPROMISE_API;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * A miniobject for future/promise-like functionality
@@ -49,7 +50,7 @@ public class Promise extends MiniObject {
      * Creates a new instance of promise
      */
     public Promise() {
-        this(initializer(GSTPROMISE_API.ptr_gst_promise_new()));
+        this(Natives.initializer(GSTPROMISE_API.ptr_gst_promise_new()));
         Gst.checkVersion(1, 14); // @TODO ideally this check would be before native call!
     }
 
@@ -60,7 +61,7 @@ public class Promise extends MiniObject {
      * {@link Promise} is changed
      */
     public Promise(final PROMISE_CHANGE listener) {
-        this(initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
+        this(Natives.initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
             @SuppressWarnings("unused")
             public void callback(Promise promise, Pointer userData) {
                 listener.onChange(promise);
