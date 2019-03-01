@@ -65,27 +65,27 @@ public class DeviceProvider extends GstObject {
         return GSTDEVICEPROVIDER_API.gst_device_provider_can_monitor(this);
     }
 
-    /**
-     * Set key with value as metadata in klass.
-     *
-     * @param klass class to set metadata for
-     * @param key the key to set
-     * @param value the value to set
-     */
-    public void addMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key, String value) {
-        GSTDEVICEPROVIDER_API.gst_device_provider_class_add_metadata(klass, key, value);
-    }
-
-    /**
-     * Get metadata with key in klass.
-     *
-     * @param klass class to get metadata for
-     * @param key the key to get
-     * @return the metadata for key
-     */
-    public String getMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key) {
-        return GSTDEVICEPROVIDER_API.gst_device_provider_class_get_metadata(klass, key);
-    }
+//    /**
+//     * Set key with value as metadata in klass.
+//     *
+//     * @param klass class to set metadata for
+//     * @param key the key to set
+//     * @param value the value to set
+//     */
+//    public void addMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key, String value) {
+//        GSTDEVICEPROVIDER_API.gst_device_provider_class_add_metadata(klass, key, value);
+//    }
+//
+//    /**
+//     * Get metadata with key in klass.
+//     *
+//     * @param klass class to get metadata for
+//     * @param key the key to get
+//     * @return the metadata for key
+//     */
+//    public String getMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass, String key) {
+//        return GSTDEVICEPROVIDER_API.gst_device_provider_class_get_metadata(klass, key);
+//    }
 
 //    public void setMetadata(GstDeviceProviderAPI.GstDeviceProviderClass klass,
 //            String longname, String classification, String description, String author) {
