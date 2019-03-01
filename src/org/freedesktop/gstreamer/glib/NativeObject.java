@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import com.sun.jna.Pointer;
 import java.lang.ref.ReferenceQueue;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -74,14 +75,23 @@ public abstract class NativeObject {
 //        }
     }
 
-    //
-    // No longer want to garbage collect this object
-    //
+    /**
+     * Disown this object. The underlying native object will no longer be
+     * disposed of when this Java object is explicitly or implicitly disposed.
+     * <p>
+     * The underlying reference will remain valid.
+     */
     public void disown() {
         LOG.log(LIFECYCLE, "Disowning " + getRawPointer());
         handle.ownsHandle.set(false);
     }
 
+    /**
+     * Dispose this object, and potentially clear (free, unref, etc.) the
+     * underlying native object if this object owns the reference.#
+     * <p>
+     * After calling this method this object should not be used.
+     */
     public void dispose() {
         LOG.log(LIFECYCLE, "Disposing object " + getClass().getName() + " = " + handle);
         handle.dispose();
@@ -92,7 +102,6 @@ public abstract class NativeObject {
         return o instanceof NativeObject && ((NativeObject) o).ptr.equals(ptr);
     }
 
-    
     protected GPointer getPointer() {
         GPointer ptr = handle.ptrRef.get();
         if (ptr == null) {
@@ -100,7 +109,7 @@ public abstract class NativeObject {
         }
         return ptr;
     }
-    
+
     protected Pointer getRawPointer() {
         GPointer ptr = handle.ptrRef.get();
         if (ptr == null) {
@@ -114,6 +123,12 @@ public abstract class NativeObject {
         return ptr.hashCode();
     }
 
+    /**
+     * Invalidate this object without clearing (free, unref, etc.) the
+     * underlying native object.
+     * <p>
+     * After calling this method this object should not be used.
+     */
     public void invalidate() {
         LOG.log(LIFECYCLE, () -> "Invalidating object " + this + " = " + getRawPointer());
         handle.invalidate();
@@ -124,23 +139,22 @@ public abstract class NativeObject {
         return getClass().getSimpleName() + "(" + getRawPointer() + ")";
     }
 
-
     static <T extends NativeObject> T objectFor(GPointer gptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
 
         // Ignore null pointers
         if (gptr == null) {
             return null;
         }
-        
+
         NativeObject obj = NativeObject.instanceFor(gptr.getPointer());
-        
+
         if (obj != null && cls.isInstance(obj)) {
             if (refAdjust < 0) {
                 ((RefCountedObject.Handle) obj.handle).unref(); // Lose the extra ref added by gstreamer
             }
             return cls.cast(obj);
         }
-        
+
         final GType gtype = gptr instanceof GTypedPtr ? ((GTypedPtr) gptr).getGType() : null;
         //
         // For a GObject, MiniObject, ..., use the GType field to find the most
@@ -153,7 +167,7 @@ public abstract class NativeObject {
                         new Initializer(gptr, refAdjust > 0, ownsHandle)));
             }
         }
-        
+
         LOG.log(Level.FINE, () -> String.format("Unregistered type requested : %s", cls.getSimpleName()));
 
         try {
@@ -176,7 +190,6 @@ public abstract class NativeObject {
 
     }
 
-
     static NativeObject instanceFor(Pointer ptr) {
         WeakReference<NativeObject> ref = INSTANCES.get(ptr);
 
@@ -189,7 +202,12 @@ public abstract class NativeObject {
         return ref != null ? ref.get() : null;
     }
 
-    // Use this to propagate low level pointer arguments up the constructor chain
+    /**
+     * A class for propagating low level pointer arguments up the constructor
+     * chain.
+     * 
+     * @see Natives#initializer(com.sun.jna.Pointer, boolean, boolean) 
+     */
     public static final class Initializer {
 
         public final GPointer ptr;
@@ -243,6 +261,9 @@ public abstract class NativeObject {
 
     }
 
+    /**
+     * A class for managing the underlying native pointer.
+     */
     protected static abstract class Handle {
 
         protected final AtomicReference<GPointer> ptrRef;
@@ -289,9 +310,15 @@ public abstract class NativeObject {
             return ownsHandle.get();
         }
     }
-    
+
+    /**
+     * Registration for creating native object subclasses for specific GTypes.
+     * 
+     * @see Natives#registration(java.lang.Class, java.lang.String, java.util.function.Function) 
+     * @param <T> type
+     */
     public static class TypeRegistration<T extends NativeObject> {
-        
+
         private final Class<T> javaType;
         private final String gTypeName;
         private final Function<Initializer, ? extends T> factory;
@@ -313,14 +340,21 @@ public abstract class NativeObject {
         public Function<Initializer, ? extends T> getFactory() {
             return factory;
         }
-        
-        
-        
+
     }
-    
+
+    /**
+     * Register implementations of this interface via the {@link ServiceLoader}
+     * mechanism to provide new native object registrations externally.
+     */
     public static interface TypeProvider {
-        
+
+        /**
+         * A {@link Stream} of {@link TypeRegistration} to register.
+         * 
+         * @return stream of type registrations
+         */
         public Stream<TypeRegistration<?>> types();
-        
+
     }
 }
