@@ -51,6 +51,7 @@ import com.sun.jna.ptr.PointerByReference;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.freedesktop.gstreamer.elements.Elements;
@@ -61,15 +62,15 @@ import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
- *
  */
 @SuppressWarnings("deprecation")
 public final class Gst {
-
+    
     private final static Logger LOG = Logger.getLogger(Gst.class.getName());
     private final static AtomicInteger INIT_COUNT = new AtomicInteger(0);
     private final static boolean CHECK_VERSIONS = !Boolean.getBoolean("gstreamer.suppressVersionChecks");
-
+    private final static boolean DISABLE_EXTERNAL = Boolean.getBoolean("gstreamer.disableExternalTypes");
+    
     private static ScheduledExecutorService executorService;
     private static volatile CountDownLatch quit = new CountDownLatch(1);
     private static GMainContext mainContext;
@@ -77,14 +78,14 @@ public final class Gst {
     private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
     // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
-
+    
     public static class NativeArgs {
-
+        
         public IntByReference argcRef;
         public PointerByReference argvRef;
         Memory[] argsCopy;
         Memory argvMemory;
-
+        
         public NativeArgs(String progname, String[] args) {
             //
             // Allocate some native memory to pass the args down to the native layer
@@ -98,7 +99,7 @@ public final class Gst {
             Memory arg = new Memory(progname.getBytes().length + 4);
             arg.setString(0, progname);
             argsCopy[0] = arg;
-
+            
             for (int i = 0; i < args.length; i++) {
                 arg = new Memory(args[i].getBytes().length + 1);
                 arg.setString(0, args[i]);
@@ -108,7 +109,7 @@ public final class Gst {
             argvRef = new PointerByReference(argvMemory);
             argcRef = new IntByReference(args.length + 1);
         }
-
+        
         String[] toStringArray() {
             //
             // Unpack the native arguments back into a String array
@@ -254,7 +255,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return pipeline;
     }
 
@@ -303,7 +304,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return pipeline;
     }
 
@@ -337,10 +338,10 @@ public final class Gst {
      * @throws GstException if the bin could not be created
      */
     public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads, List<GError> errors) {
-
+        
         Pointer[] err = {null};
         Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
-
+        
         if (bin == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -353,7 +354,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return bin;
     }
 
@@ -494,7 +495,7 @@ public final class Gst {
      */
     public static synchronized final String[] init(Version requestedVersion,
             String progname, String... args) throws GstException {
-
+        
         if (CHECK_VERSIONS) {
             Version availableVersion = getVersion();
             if (requestedVersion.getMajor() != 1 || availableVersion.getMajor() != 1) {
@@ -521,22 +522,22 @@ public final class Gst {
             }
             return args;
         }
-
+        
         NativeArgs argv = new NativeArgs(progname, args);
-
+        
         Pointer[] error = {null};
         if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
             INIT_COUNT.decrementAndGet();
             throw new GstException(new GError(new GErrorStruct(error[0])));
         }
-
+        
         LOG.fine("after gst_init, argc=" + argv.argcRef.getValue());
-
+        
         Version runningVersion = getVersion();
         if (runningVersion.getMajor() != 1) {
             LOG.warning("gst1-java-core only supports GStreamer 1.x");
         }
-
+        
         if (useDefaultContext) {
             mainContext = GMainContext.getDefaultContext();
             executorService = new MainContextExecutorService(mainContext);
@@ -546,11 +547,11 @@ public final class Gst {
         }
         quit = new CountDownLatch(1);
         loadAllClasses();
-
+        
         if (CHECK_VERSIONS) {
             minorVersion = requestedVersion.getMinor();
         }
-
+        
         return argv.toStringArray();
     }
 
@@ -592,7 +593,7 @@ public final class Gst {
             }
         } catch (InterruptedException ex) {
         }
-
+        
         mainContext = null;
         System.gc(); // Make sure any dangling objects are unreffed before calling deinit().
         GST_API.gst_deinit();
@@ -680,7 +681,7 @@ public final class Gst {
                 return null;
             }
         }
-
+        
         public Thread newThread(Runnable task) {
             final String name = "gstreamer service thread " + counter.incrementAndGet();
             Thread t = new Thread(getThreadGroup(), task, name);
@@ -689,7 +690,7 @@ public final class Gst {
             return t;
         }
     };
-
+    
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
         Stream.of(new GLib.Types(),
@@ -701,12 +702,20 @@ public final class Gst {
                 new WebRTC.Types())
                 .flatMap(NativeObject.TypeProvider::types)
                 .forEachOrdered(GstTypes::register);
-        
+        if (!DISABLE_EXTERNAL) {
+            try {
+                ServiceLoader<NativeObject.TypeProvider> extProviders
+                        = ServiceLoader.load(NativeObject.TypeProvider.class);
+                extProviders.iterator().forEachRemaining(prov
+                        -> prov.types().forEachOrdered(GstTypes::register));
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "Error during external types registration", t);
+            }
+        }
     }
-
     
     public static class Types implements NativeObject.TypeProvider {
-
+        
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {
             return Stream.of(
@@ -743,10 +752,10 @@ public final class Gst {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     public static @interface Since {
-
+        
         public int major() default 1;
-
+        
         public int minor();
     }
-
+    
 }
