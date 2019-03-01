@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
-import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.glib.NativeObject;
@@ -56,6 +55,7 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.freedesktop.gstreamer.elements.Elements;
 import org.freedesktop.gstreamer.glib.GLib;
+import org.freedesktop.gstreamer.glib.GMainContext;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 import org.freedesktop.gstreamer.webrtc.WebRTC;

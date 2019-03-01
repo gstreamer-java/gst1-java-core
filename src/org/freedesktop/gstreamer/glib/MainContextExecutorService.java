@@ -33,9 +33,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.freedesktop.gstreamer.lowlevel.GMainContext;
-import org.freedesktop.gstreamer.lowlevel.GSource;
-
 /**
  * Wraps the glib main loop/main context in a ScheduledExecutor interface.
  */
