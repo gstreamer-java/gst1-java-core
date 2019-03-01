@@ -17,11 +17,10 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel;
+package org.freedesktop.gstreamer.glib;
 
+import org.freedesktop.gstreamer.lowlevel.*;
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.glib.RefCountedObject;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**

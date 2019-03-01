@@ -17,8 +17,9 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel;
+package org.freedesktop.gstreamer.glib;
 
+import org.freedesktop.gstreamer.lowlevel.*;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 import java.util.concurrent.Callable;
@@ -30,7 +31,7 @@ import org.freedesktop.gstreamer.glib.RefCountedObject;
  */
 public class GSource extends RefCountedObject {
     
-    public GSource(Initializer init) {
+    GSource(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle), init.needRef);
     }
     

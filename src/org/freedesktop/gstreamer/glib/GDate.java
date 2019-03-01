@@ -20,7 +20,6 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 
 import com.sun.jna.Pointer;
@@ -33,8 +32,8 @@ import org.freedesktop.gstreamer.lowlevel.GPointer;
  * >https://developer.gnome.org/glib/stable/glib-Date-and-Time-Functions.html</a>
  */
 public class GDate extends NativeObject {
+    
     public static final String GTYPE_NAME = "GDate";
-    public static final GType GTYPE = GType.valueOf(GTYPE_NAME); 
 
     GDate(Initializer init) {
         this(new Handle(init.ptr, init.ownsHandle));

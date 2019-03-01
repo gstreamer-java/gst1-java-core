@@ -207,27 +207,6 @@ public abstract class GObject extends RefCountedObject {
     }
 
     /**
-     * Gets the pointer to the the value of the specified property.
-     *
-     * @param property The name of the property to get.
-     *
-     * @return A java pointer.
-     */
-    @Deprecated
-    public Pointer getPointer(String property) {
-        LOG.entering("GObject", "getPointer", new Object[]{property});
-        GObjectAPI.GParamSpec propertySpec = findProperty(property);
-        if (propertySpec == null) {
-            throw new IllegalArgumentException("Unknown property: " + property);
-        }
-
-        PointerByReference refPtr = new PointerByReference();
-        GOBJECT_API.g_object_get(this, property, refPtr, null);
-        Pointer ptr = refPtr.getValue();
-        return ptr;
-    }
-
-    /**
      * Gets the default value set to <tt>GObject</tt> property.
      *
      * @param property The name of the property.
@@ -402,13 +381,6 @@ public abstract class GObject extends RefCountedObject {
         map.put(listener, cb);
     }
 
-//    @Override
-//    @Deprecated
-//    protected void disposeNativeHandle(Pointer ptr) {
-//        LOG.log(LIFECYCLE, "Removing toggle ref " + getClass().getSimpleName() + " (" + ptr + ")");
-//        GOBJECT_API.g_object_remove_toggle_ref(ptr, TOGGLE_NOTIFY, objectID);
-//        STRONG_REFS.remove(this);
-//    }
     @Override
     public void invalidate() {
         try {

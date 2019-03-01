@@ -28,6 +28,8 @@ import java.util.concurrent.FutureTask;
 import org.freedesktop.gstreamer.Gst;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.GMainContext;
+import org.freedesktop.gstreamer.glib.GSource;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.glib.RefCountedObject;
 

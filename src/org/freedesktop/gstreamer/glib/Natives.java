@@ -85,33 +85,6 @@ public final class Natives {
         return new NativeObject.Initializer(new GPointer(ptr), needRef, ownsHandle);
     }
 
-    /**
-     * Get a {@link NativeObject} instance of the requested type for the
-     * provided Pointer. Will return a cached instance if one already exists.
-     *
-     * @param <T> NativeObject type to return
-     * @param ptr native Pointer
-     * @param cls Class of type T
-     * @return native object of type T
-     */
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls) {
-        return objectFor(ptr, cls, true);
-    }
-
-    /**
-     * Get a {@link NativeObject} instance of the requested type for the
-     * provided Pointer. Will return a cached instance if one already exists.
-     *
-     * @param <T> NativeObject type to return
-     * @param ptr native Pointer
-     * @param cls Class of type T
-     * @param needRef whether to request a ref increase (only relevant if T is
-     * subclass of {@link RefCountedObject})
-     * @return native object of type T
-     */
-    public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef) {
-        return objectFor(ptr, cls, needRef, true);
-    }
 
     /**
      * Get a {@link NativeObject} instance of the requested type for the

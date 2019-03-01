@@ -52,7 +52,7 @@ import org.freedesktop.gstreamer.glib.Natives;
 public class TagList extends MiniObject {
 
     public static final String GTYPE_NAME = "GstTagList";
-
+    
     /**
      * Creates a new instance of TagList
      *
@@ -281,18 +281,17 @@ public class TagList extends MiniObject {
                         return ret;
                     }
                 });
-                put(GDate.GTYPE, new TagGetter() {
+                put(GType.valueOf(GDate.GTYPE_NAME), new TagGetter() {
                     public Object get(TagList tl, String tag, int index) {
                         PointerByReference value = new PointerByReference();
                         GSTTAGLIST_API.gst_tag_list_get_date_index(tl, tag, index, value);
                         if (value.getValue() == null) {
                             return null;
                         }
-//                        return new GDate(value.getValue(), false, true);
-                        return Natives.objectFor(value.getValue(), GDate.class);
+                        return Natives.objectFor(value.getValue(), GDate.class, false, true);
                     }
                 });
-                put(DateTime.GTYPE, new TagGetter() {
+                put(GType.valueOf(DateTime.GTYPE_NAME), new TagGetter() {
                     public Object get(TagList tl, String tag, int index) {
                         PointerByReference value = new PointerByReference();
                         GSTTAGLIST_API.gst_tag_list_get_date_time_index(tl, tag, index, value);

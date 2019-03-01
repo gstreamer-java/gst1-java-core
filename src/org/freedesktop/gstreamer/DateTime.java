@@ -19,7 +19,6 @@ package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstDateTimeAPI.GSTDATETIME_API;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
@@ -30,7 +29,6 @@ import org.freedesktop.gstreamer.lowlevel.GPointer;
 public class DateTime extends NativeObject {
 
     public static final String GTYPE_NAME = "GstDateTime";
-    public static final GType GTYPE = GSTDATETIME_API.gst_date_time_get_type();
 
     public static DateTime createInstanceLocalEpoch(long secs) {
         return new DateTime(GSTDATETIME_API.gst_date_time_new_from_unix_epoch_local_time(secs), false, true);

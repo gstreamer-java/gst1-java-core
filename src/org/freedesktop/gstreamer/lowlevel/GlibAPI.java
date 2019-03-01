@@ -29,6 +29,8 @@ import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.glib.GMainContext;
+import org.freedesktop.gstreamer.glib.GSource;
 
 /**
  *

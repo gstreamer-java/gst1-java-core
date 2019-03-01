@@ -20,9 +20,6 @@
 package org.freedesktop.gstreamer.glib;
 
 import java.util.Objects;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  * Base GLib error type.
@@ -43,13 +40,6 @@ public class GError {
         this.message = Objects.requireNonNull(message);
     }
     
-    // rewrite to accept code and message - handle struct elsewhere
-    @Deprecated
-    public GError(GErrorStruct error) {
-        code = error.getCode();
-        message = error.getMessage();
-        GLIB_API.g_error_free(error);
-    }
     /**
      * Gets a numeric code representing this error.
      * 
