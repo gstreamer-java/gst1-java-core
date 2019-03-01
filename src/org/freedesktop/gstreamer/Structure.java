@@ -27,7 +27,9 @@ import java.util.List;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 import static org.freedesktop.gstreamer.lowlevel.GstStructureAPI.GSTSTRUCTURE_API;
@@ -72,7 +74,7 @@ public class Structure extends NativeObject {
      * @param name The name of new structure.
      */
     public Structure(String name) {
-        this(GSTSTRUCTURE_API.ptr_gst_structure_new_empty(name));
+        this(new Handle(new GPointer(GSTSTRUCTURE_API.ptr_gst_structure_new_empty(name)), true));
     }
 
     /**
@@ -85,16 +87,17 @@ public class Structure extends NativeObject {
      * @param data Additional arguments.
      */
     public Structure(String name, String firstFieldName, Object... data) {
-        this(GSTSTRUCTURE_API.ptr_gst_structure_new(name, firstFieldName, data));
+        this(new Handle(new GPointer(GSTSTRUCTURE_API.ptr_gst_structure_new(name, firstFieldName, data)), true));
     }
     /**
      * Creates a new instance of Structure
      */
     Structure(Initializer init) {
-        super(init);
+        this(new Handle(init.ptr, init.ownsHandle));
     }
-    private Structure(Pointer ptr) {
-        this(initializer(ptr));
+    
+    private Structure(Handle handle) {
+        super(handle);
     }
 
     public Structure copy() {
@@ -597,10 +600,6 @@ public class Structure extends NativeObject {
         return GSTSTRUCTURE_API.gst_structure_to_string(this);
     }
 
-    @Deprecated
-    protected void disposeNativeHandle(Pointer ptr) {
-        GSTSTRUCTURE_API.gst_structure_free(ptr);
-    }
     /**
      * Creates a Structure from a string representation.
      *
@@ -608,11 +607,14 @@ public class Structure extends NativeObject {
      * @return A new Structure or null when the string could not be parsed.
      */
     public static Structure fromString(String data) {
-        return new Structure(GSTSTRUCTURE_API.ptr_gst_structure_from_string(data, new PointerByReference()));
+        return new Structure(
+                new Handle(
+                        new GPointer(GSTSTRUCTURE_API.ptr_gst_structure_from_string(data, new PointerByReference()))
+                , true));
     }
     
     static Structure objectFor(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        return NativeObject.objectFor(ptr, Structure.class, needRef, ownsHandle);
+        return Natives.objectFor(ptr, Structure.class, needRef, ownsHandle);
     }
     
     public class InvalidFieldException extends RuntimeException {
@@ -623,5 +625,17 @@ public class Structure extends NativeObject {
             super(String.format("Structure does not contain %s field '%s'", type, fieldName));
         }
     }
+    
+    private static final class Handle extends NativeObject.Handle {
 
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GSTSTRUCTURE_API.gst_structure_free(ptr.getPointer());
+        }
+        
+    }
 }

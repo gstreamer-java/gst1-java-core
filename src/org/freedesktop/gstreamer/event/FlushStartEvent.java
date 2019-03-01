@@ -23,6 +23,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Pad;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -64,6 +65,6 @@ public class FlushStartEvent extends Event {
      * Creates a new flush start event.
      */
     public FlushStartEvent() {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_flush_start()));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_flush_start()));
     }
 }

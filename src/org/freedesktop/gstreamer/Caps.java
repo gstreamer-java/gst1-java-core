@@ -20,8 +20,8 @@
  */
 package org.freedesktop.gstreamer;
 
-import com.sun.jna.Pointer;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstCapsAPI.GSTCAPS_API;
 
 /**
@@ -72,7 +72,7 @@ public class Caps extends MiniObject {
      * @see #emptyCaps
      */
     public Caps() {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
 
     /**
@@ -82,7 +82,7 @@ public class Caps extends MiniObject {
      * @see #fromString
      */
     public Caps(String caps) {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
 
     /**
@@ -92,7 +92,7 @@ public class Caps extends MiniObject {
      * @see #copy
      */
     public Caps(Caps caps) {
-        this(initializer(GSTCAPS_API.ptr_gst_caps_copy(caps)));
+        this(Natives.initializer(GSTCAPS_API.ptr_gst_caps_copy(caps)));
     }
 
     Caps(Initializer init) {
@@ -282,7 +282,8 @@ public class Caps extends MiniObject {
      * @see Structure
      */
     public Caps normalize() {
-        this.ref(); // gst_caps_normalize copies "this" and drops one reference
+//        this.ref(); // gst_caps_normalize copies "this" and drops one reference
+        Natives.ref(this);
         return GSTCAPS_API.gst_caps_normalize(this);
     }
 
@@ -309,7 +310,8 @@ public class Caps extends MiniObject {
      * @return The new {@link Caps}
      */
     public Caps simplify() {
-        this.ref(); // gst_caps_simplify copies "this" and drops one reference
+//        this.ref(); // gst_caps_simplify copies "this" and drops one reference
+        Natives.ref(this);
         return GSTCAPS_API.gst_caps_simplify(this);
     }
 
@@ -348,7 +350,8 @@ public class Caps extends MiniObject {
      * @return truncated copy of the Caps
      */
     public Caps truncate() {
-        this.ref();
+//        this.ref();
+        Natives.ref(this);
         return GSTCAPS_API.gst_caps_truncate(this);
     }
 
@@ -359,7 +362,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps anyCaps() {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_any()));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_any()));
     }
 
     /**
@@ -369,7 +372,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps emptyCaps() {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_new_empty()));
     }
 
     /**
@@ -383,7 +386,7 @@ public class Caps extends MiniObject {
      * @return The new Caps.
      */
     public static Caps fromString(String caps) {
-        return new Caps(initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
+        return new Caps(Natives.initializer(GSTCAPS_API.ptr_gst_caps_from_string(caps)));
     }
 
     /**
@@ -403,7 +406,4 @@ public class Caps extends MiniObject {
         return GSTCAPS_API.gst_caps_merge(caps1, caps2);
     }
 
-    protected static Initializer initializer(Pointer ptr) {
-        return new Initializer(ptr, false, true);
-    }
 }

@@ -25,6 +25,7 @@ package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
@@ -91,7 +92,7 @@ public class Pad extends GstObject {
      * @param direction The direction of the new pad.
      */
     public Pad(String name, PadDirection direction) {
-        this(initializer(GSTPAD_API.ptr_gst_pad_new(name, direction), false));
+        this(Natives.initializer(GSTPAD_API.ptr_gst_pad_new(name, direction), false));
     }
 
     /**
@@ -104,7 +105,7 @@ public class Pad extends GstObject {
      * @param name The name of the new pad.
      */
     public Pad(PadTemplate template, String name) {
-        this(initializer(GSTPAD_API.ptr_gst_pad_new_from_template(template, name), false));
+        this(Natives.initializer(GSTPAD_API.ptr_gst_pad_new_from_template(template, name), false));
     }
 
     /**

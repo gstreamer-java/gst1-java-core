@@ -26,8 +26,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 
 import com.sun.jna.Pointer;
 import java.util.List;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
 /**
  * Base class and element that can contain other elements.
@@ -86,7 +86,7 @@ public class Bin extends Element {
      * Creates a new Bin with a unique name.
      */
     public Bin() {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(null), false));
+        this(Natives.initializer(GSTBIN_API.ptr_gst_bin_new(null), false, true));
     }
 
     /**
@@ -95,7 +95,7 @@ public class Bin extends Element {
      * @param name The Name to assign to the new Bin
      */
     public Bin(String name) {
-        this(initializer(GSTBIN_API.ptr_gst_bin_new(name), false));
+        this(Natives.initializer(GSTBIN_API.ptr_gst_bin_new(name), false, true));
     }
 
     /**
@@ -227,16 +227,16 @@ public class Bin extends Element {
         return GSTBIN_API.gst_bin_get_by_name_recurse_up(this, name);
     }
 
-    /**
-     * Looks for an element inside the bin that implements the given interface.
-     * If such an element is found, it returns the element.
-     *
-     * @param iface The class of the {@link Element} to search for.
-     * @return The {@link Element} that implements the interface.
-     */
-    public <T extends Element> T getElementByInterface(Class<T> iface) {
-        return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
-    }
+//    /**
+//     * Looks for an element inside the bin that implements the given interface.
+//     * If such an element is found, it returns the element.
+//     *
+//     * @param iface The class of the {@link Element} to search for.
+//     * @return The {@link Element} that implements the interface.
+//     */
+//    public <T extends Element> T getElementByInterface(Class<T> iface) {
+//        return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
+//    }
 
     /**
      * Calls {@link #debugToDotFile(int, String, boolean)} without timestamping

@@ -21,6 +21,7 @@
  */
 package org.freedesktop.gstreamer.query;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -43,7 +44,7 @@ public class LatencyQuery extends Query {
      * format.
      */
     public LatencyQuery() {
-        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_latency()));
+        super(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_latency()));
     }
 
     /**

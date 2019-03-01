@@ -41,9 +41,9 @@ public interface GstObjectAPI extends com.sun.jna.Library {
     GstObjectAPI GSTOBJECT_API = GstNative.load(GstObjectAPI.class);
 
     GType gst_object_get_type();
-    void gst_object_ref(GstObject ptr);
-    void gst_object_unref(GstObject ptr);
-    void gst_object_ref_sink(GstObject ptr);
+    void gst_object_ref(GstObjectPtr ptr);
+    void gst_object_unref(GstObjectPtr ptr);
+    void gst_object_ref_sink(GstObjectPtr ptr);
     
     boolean gst_object_set_name(GstObject obj, String name);
     @FreeReturnValue String gst_object_get_name(GstObject obj);

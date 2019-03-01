@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Structure;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
@@ -50,7 +51,7 @@ public class NavigationEvent extends Event {
      * @param structure the description of the navigation event.
      */
     public NavigationEvent(Structure structure) {
-        this(initializer(GSTEVENT_API.ptr_gst_event_new_navigation(structure)));
+        this(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_navigation(structure)));
     }
 
     /**

@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -54,7 +55,7 @@ public class SegmentDoneMessage extends Message {
      * @param position the position of the segment being done
      */
     public SegmentDoneMessage(GstObject src, Format format, long position) {
-        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_segment_done(src, format, position)));
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_segment_done(src, format, position)));
     }
     
     /**

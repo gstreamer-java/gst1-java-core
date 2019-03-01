@@ -23,6 +23,7 @@ package org.freedesktop.gstreamer.event;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Segment;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
@@ -77,7 +78,7 @@ public class SegmentEvent extends Event {
      * Allocates a new segment event with the given segment.
      */
     SegmentEvent(GstSegmentStruct segment) {
-        this(initializer(GSTEVENT_API.ptr_gst_event_new_segment(segment)));
+        this(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_segment(segment)));
     }
 
     /**

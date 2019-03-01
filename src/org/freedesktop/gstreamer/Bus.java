@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
@@ -36,6 +35,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Locale;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
@@ -44,7 +44,6 @@ import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
-import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 
 /**
  * The {@link Bus} is an object responsible for delivering {@link Message}s in a
@@ -84,7 +83,6 @@ public class Bus extends GstObject {
     public static final String GTYPE_NAME = "GstBus";
 
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
-    private static final Level LOG_DEBUG = Level.FINE;
 
     private final Object lock = new Object();
     private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
@@ -505,7 +503,7 @@ public class Bus extends GstObject {
             public boolean callback(Bus bus, Message msg, Pointer user_data) {
                 PointerByReference list = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_tag(msg, list);
-                TagList tl = new TagList(TagList.initializer(list.getValue()));
+                TagList tl = new TagList(Natives.initializer(list.getValue()));
                 listener.tagsFound(msg.getSource(), tl);
                 return true;
             }
@@ -741,7 +739,8 @@ public class Bus extends GstObject {
             // Unref the message, since we are dropping it.
             // (the normal GC will drop other refs to it)
             //
-            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
+//            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
+            Natives.unref(msg);
             return BusSyncReply.DROP;
         }
     };

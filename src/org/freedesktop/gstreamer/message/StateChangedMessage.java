@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.State;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -52,7 +53,7 @@ public class StateChangedMessage extends Message {
      * @param pending the pending (target) state.
      */
     public StateChangedMessage(GstObject src, State old, State current, State pending) {
-        super(initializer(GSTMESSAGE_API.ptr_gst_message_new_state_changed(src, old, current, pending)));
+        super(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_state_changed(src, old, current, pending)));
     }
     
     /**

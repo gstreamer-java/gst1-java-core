@@ -32,6 +32,7 @@ import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 import com.sun.jna.Pointer;
 import java.util.EnumSet;
 import org.freedesktop.gstreamer.glib.NativeFlags;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * Buffers are the basic unit of data transfer in GStreamer. They contain the
@@ -53,7 +54,7 @@ public class Buffer extends MiniObject {
      * Creates a newly allocated buffer without any data.
      */
     public Buffer() {
-        this(initializer(GSTBUFFER_API.ptr_gst_buffer_new()));
+        this(Natives.initializer(GSTBUFFER_API.ptr_gst_buffer_new()));
     }
 
     /**
@@ -66,13 +67,13 @@ public class Buffer extends MiniObject {
      * @param size
      */
     public Buffer(int size) {
-        this(initializer(allocBuffer(size)));
+        this(Natives.initializer(allocBuffer(size)));
     }
 
     Buffer(Initializer init) {
         super(init);
         mapInfo = new MapInfoStruct();
-        struct = new BufferStruct(handle());
+        struct = new BufferStruct(getRawPointer());
     }
 
     private static Pointer allocBuffer(int size) {

@@ -21,9 +21,10 @@ import java.nio.charset.StandardCharsets;
 
 import static org.freedesktop.gstreamer.lowlevel.GstSDPMessageAPI.GSTSDPMESSAGE_API;
 
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 
 /**
  * Wrapping type and helper methods for dealing with SDP messages.
@@ -41,16 +42,20 @@ public class SDPMessage extends NativeObject {
      * @param init internal initialization data
      */
     SDPMessage(Initializer init) {
-        super(init);
+        this(new Handle(init.ptr, init.ownsHandle));
     }
 
+    SDPMessage(Handle handle) {
+        super(handle);
+    }
+    
     /**
      * Creates a new instance of SDPMessage
      */
     public SDPMessage() {
-        this(initializer());
+        this(initHandle());
     }
-
+    
     /**
      * A SDP formatted string representation of SDPMessage.
      *
@@ -89,13 +94,22 @@ public class SDPMessage extends NativeObject {
 //        return new SDPMessage(initializer(ptr[0]));
 //    }
 
-    private static Initializer initializer() {
+    private static Handle initHandle() {
         Pointer[] ptr = new Pointer[1];
         GSTSDPMESSAGE_API.gst_sdp_message_new(ptr);
-        return initializer(ptr[0]);
+        return new Handle(new GPointer(ptr[0]), true);
     }
 
-    protected void disposeNativeHandle(Pointer ptr) {
-        GSTSDPMESSAGE_API.gst_sdp_message_free(ptr);
+    private static final class Handle extends NativeObject.Handle {
+
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GSTSDPMESSAGE_API.gst_sdp_message_free(ptr.getPointer());
+        }
+        
     }
 }

@@ -22,9 +22,9 @@ package org.freedesktop.gstreamer.glib;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 
 /**
  * Wrapper to the GDate data structure.
@@ -36,24 +36,23 @@ public class GDate extends NativeObject {
     public static final String GTYPE_NAME = "GDate";
     public static final GType GTYPE = GType.valueOf(GTYPE_NAME); 
 
-    @Deprecated
-    public GDate(Initializer init) {
-        super(init);
+    GDate(Initializer init) {
+        this(new Handle(init.ptr, init.ownsHandle));
     }
     
-    @Deprecated
-    public GDate(Pointer ptr, boolean needRef, boolean ownsHandle) {
-        this(initializer(ptr, needRef, ownsHandle));
+    GDate(Handle handle) {
+        super(handle);
     }
+
     public int getDay() {
-        return GlibAPI.GLIB_API.g_date_get_day(handle());
+        return GlibAPI.GLIB_API.g_date_get_day(getRawPointer());
     }
     
     public int getMonth() {
-        return GlibAPI.GLIB_API.g_date_get_month(handle());
+        return GlibAPI.GLIB_API.g_date_get_month(getRawPointer());
     }
     public int getYear() {
-        return GlibAPI.GLIB_API.g_date_get_year(handle());
+        return GlibAPI.GLIB_API.g_date_get_year(getRawPointer());
     }
     
     @Override
@@ -61,16 +60,27 @@ public class GDate extends NativeObject {
         return "" + getYear() + "-" + getMonth() + "-" + getDay();
     }
     
-    @Override
-    protected void disposeNativeHandle(Pointer ptr) {
-        GlibAPI.GLIB_API.g_date_free(ptr);
-    }
-    
     public static GDate createInstance(int day, int month, int year) {
-        return new GDate(GlibAPI.GLIB_API.g_date_new_dmy(day, month , year), false, true);
+        Pointer ptr = GlibAPI.GLIB_API.g_date_new_dmy(day, month, year);
+        return new GDate(new Handle(new GPointer(ptr), true));
     }
     
     public static GDate createInstance(int julian_day) {
-        return new GDate(GlibAPI.GLIB_API.g_date_new_julian(julian_day), false, true);
+        Pointer ptr = GlibAPI.GLIB_API.g_date_new_julian(julian_day);
+        return new GDate(new Handle(new GPointer(ptr), true));
     }
+    
+    private static final class Handle extends NativeObject.Handle {
+
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GlibAPI.GLIB_API.g_date_free(ptr.getPointer());
+        }
+        
+    }
+    
 }

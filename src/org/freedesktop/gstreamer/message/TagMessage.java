@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.TagList;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -53,7 +54,7 @@ public class TagMessage extends Message {
      * it again after adding it to this message.
      */
     public TagMessage(GstObject src, TagList tagList) {
-        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_tag(src, tagList)));
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_tag(src, tagList)));
     }
 
     /**
@@ -64,6 +65,6 @@ public class TagMessage extends Message {
     public TagList getTagList() {
         PointerByReference list = new PointerByReference();
         GSTMESSAGE_API.gst_message_parse_tag(this, list);
-        return objectFor(list.getValue(), TagList.class, false, true);
+        return Natives.objectFor(list.getValue(), TagList.class, false, true);
     }
 }

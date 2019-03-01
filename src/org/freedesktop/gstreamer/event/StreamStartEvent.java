@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.event;
 
 
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -45,6 +46,6 @@ public class StreamStartEvent extends Event {
      * @param stream_id identifier for this stream
      */
     public StreamStartEvent(final String stream_id) {
-        super(initializer(GSTEVENT_API.ptr_gst_event_new_stream_start(stream_id)));
+        super(Natives.initializer(GSTEVENT_API.ptr_gst_event_new_stream_start(stream_id)));
     }
 }

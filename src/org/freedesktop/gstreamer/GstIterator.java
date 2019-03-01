@@ -29,7 +29,8 @@ import java.util.List;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstIteratorAPI.GSTITERATOR_API;
 
@@ -41,18 +42,13 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
     private final GType gtype;
 
     GstIterator(Pointer ptr, Class<T> cls) {
-        super(initializer(ptr));
+        super(new Handle(new GPointer(ptr), true));
         gtype = GstTypes.typeFor(cls);
     }
 
     @Override
     public Iterator<T> iterator() {
         return new IteratorImpl();
-    }
-
-    @Override
-    protected void disposeNativeHandle(Pointer ptr) {
-        GSTITERATOR_API.gst_iterator_free(ptr);
     }
 
     public List<T> asList() {
@@ -75,7 +71,7 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         }
 
         private T getNext() {
-            if (GSTITERATOR_API.gst_iterator_next(handle(), gValue) == 1) {
+            if (GSTITERATOR_API.gst_iterator_next(getRawPointer(), gValue) == 1) {
                 T result = (T) gValue.getValue();
                 // reset cached structure or we get a memory leak
                 gValue.reset();
@@ -101,5 +97,18 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         public void remove() {
             throw new UnsupportedOperationException("Items cannot be removed.");
         }
+    }
+    
+    private static final class Handle extends NativeObject.Handle {
+
+        public Handle(GPointer ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GSTITERATOR_API.gst_iterator_free(ptr.getPointer());
+        }
+        
     }
 }

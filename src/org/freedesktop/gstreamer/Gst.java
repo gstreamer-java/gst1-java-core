@@ -19,17 +19,12 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.glib.GSocket;
-import org.freedesktop.gstreamer.glib.GInetSocketAddress;
 import org.freedesktop.gstreamer.glib.GError;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,23 +37,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.elements.AppSrc;
-import org.freedesktop.gstreamer.elements.BaseSink;
-import org.freedesktop.gstreamer.elements.BaseSrc;
-import org.freedesktop.gstreamer.elements.BaseTransform;
-import org.freedesktop.gstreamer.elements.DecodeBin;
-import org.freedesktop.gstreamer.elements.PlayBin;
-import org.freedesktop.gstreamer.elements.URIDecodeBin;
-import org.freedesktop.gstreamer.webrtc.WebRTCBin;
-import org.freedesktop.gstreamer.glib.GDate;
-import org.freedesktop.gstreamer.glib.GInetAddress;
-import org.freedesktop.gstreamer.glib.GSocketAddress;
 import org.freedesktop.gstreamer.glib.MainContextExecutorService;
 import org.freedesktop.gstreamer.lowlevel.GMainContext;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -68,21 +51,26 @@ import com.sun.jna.ptr.PointerByReference;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Arrays;
+import java.util.ServiceLoader;
 import java.util.logging.Level;
+import java.util.stream.Stream;
+import org.freedesktop.gstreamer.elements.Elements;
+import org.freedesktop.gstreamer.glib.GLib;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
+import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
- *
  */
 @SuppressWarnings("deprecation")
 public final class Gst {
-
+    
     private final static Logger LOG = Logger.getLogger(Gst.class.getName());
     private final static AtomicInteger INIT_COUNT = new AtomicInteger(0);
     private final static boolean CHECK_VERSIONS = !Boolean.getBoolean("gstreamer.suppressVersionChecks");
-
+    private final static boolean DISABLE_EXTERNAL = Boolean.getBoolean("gstreamer.disableExternalTypes");
+    
     private static ScheduledExecutorService executorService;
     private static volatile CountDownLatch quit = new CountDownLatch(1);
     private static GMainContext mainContext;
@@ -90,14 +78,14 @@ public final class Gst {
     private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
     // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
-
+    
     public static class NativeArgs {
-
+        
         public IntByReference argcRef;
         public PointerByReference argvRef;
         Memory[] argsCopy;
         Memory argvMemory;
-
+        
         public NativeArgs(String progname, String[] args) {
             //
             // Allocate some native memory to pass the args down to the native layer
@@ -111,7 +99,7 @@ public final class Gst {
             Memory arg = new Memory(progname.getBytes().length + 4);
             arg.setString(0, progname);
             argsCopy[0] = arg;
-
+            
             for (int i = 0; i < args.length; i++) {
                 arg = new Memory(args[i].getBytes().length + 1);
                 arg.setString(0, args[i]);
@@ -121,7 +109,7 @@ public final class Gst {
             argvRef = new PointerByReference(argvMemory);
             argcRef = new IntByReference(args.length + 1);
         }
-
+        
         String[] toStringArray() {
             //
             // Unpack the native arguments back into a String array
@@ -267,7 +255,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return pipeline;
     }
 
@@ -316,7 +304,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return pipeline;
     }
 
@@ -350,10 +338,10 @@ public final class Gst {
      * @throws GstException if the bin could not be created
      */
     public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads, List<GError> errors) {
-
+        
         Pointer[] err = {null};
         Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
-
+        
         if (bin == null) {
             throw new GstException(new GError(new GErrorStruct(err[0])));
         }
@@ -366,7 +354,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
             }
         }
-
+        
         return bin;
     }
 
@@ -507,7 +495,7 @@ public final class Gst {
      */
     public static synchronized final String[] init(Version requestedVersion,
             String progname, String... args) throws GstException {
-
+        
         if (CHECK_VERSIONS) {
             Version availableVersion = getVersion();
             if (requestedVersion.getMajor() != 1 || availableVersion.getMajor() != 1) {
@@ -534,22 +522,22 @@ public final class Gst {
             }
             return args;
         }
-
+        
         NativeArgs argv = new NativeArgs(progname, args);
-
+        
         Pointer[] error = {null};
         if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
             INIT_COUNT.decrementAndGet();
             throw new GstException(new GError(new GErrorStruct(error[0])));
         }
-
+        
         LOG.fine("after gst_init, argc=" + argv.argcRef.getValue());
-
+        
         Version runningVersion = getVersion();
         if (runningVersion.getMajor() != 1) {
             LOG.warning("gst1-java-core only supports GStreamer 1.x");
         }
-
+        
         if (useDefaultContext) {
             mainContext = GMainContext.getDefaultContext();
             executorService = new MainContextExecutorService(mainContext);
@@ -559,11 +547,11 @@ public final class Gst {
         }
         quit = new CountDownLatch(1);
         loadAllClasses();
-
+        
         if (CHECK_VERSIONS) {
             minorVersion = requestedVersion.getMinor();
         }
-
+        
         return argv.toStringArray();
     }
 
@@ -605,7 +593,7 @@ public final class Gst {
             }
         } catch (InterruptedException ex) {
         }
-
+        
         mainContext = null;
         System.gc(); // Make sure any dangling objects are unreffed before calling deinit().
         GST_API.gst_deinit();
@@ -618,7 +606,7 @@ public final class Gst {
      *
      * @param task the task to execute.
      */
-    public static void addStaticShutdownTask(Runnable task) {
+    static void addStaticShutdownTask(Runnable task) {
         shutdownTasks.add(task);
     }
 
@@ -693,7 +681,7 @@ public final class Gst {
                 return null;
             }
         }
-
+        
         public Thread newThread(Runnable task) {
             final String name = "gstreamer service thread " + counter.incrementAndGet();
             Thread t = new Thread(getThreadGroup(), task, name);
@@ -702,89 +690,59 @@ public final class Gst {
             return t;
         }
     };
-
-    private static String getField(Class<? extends NativeObject> cls, String name)
-            throws SecurityException, IllegalArgumentException {
-        try {
-            Field f = cls.getDeclaredField(name);
-            int mod = f.getModifiers();
-            if (Modifier.isStatic(mod) && Modifier.isFinal(mod) && f.getType().equals(String.class)) {
-                f.setAccessible(true);
-                return (String) f.get(null);
-            }
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static synchronized void registerClass(Class<? extends NativeObject> cls) {
-        String value = null;
-        value = getField(cls, "GTYPE_NAME");
-        if (value != null) {
-            GstTypes.registerType(cls, value);
-        }
-        value = getField(cls, "GST_NAME");
-        if (Element.class.isAssignableFrom(cls) && value != null) {
-            ElementFactory.registerElement((Class<? extends Element>) cls, value);
-        }
-    }
-
+    
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
-        for (Class<? extends NativeObject> cls : nativeClasses) {
-            registerClass(cls);
+        Stream.of(new GLib.Types(),
+                new Types(),
+                new Event.Types(),
+                new Message.Types(),
+                new Query.Types(),
+                new Elements(),
+                new WebRTC.Types())
+                .flatMap(NativeObject.TypeProvider::types)
+                .forEachOrdered(GstTypes::register);
+        if (!DISABLE_EXTERNAL) {
+            try {
+                ServiceLoader<NativeObject.TypeProvider> extProviders
+                        = ServiceLoader.load(NativeObject.TypeProvider.class);
+                extProviders.iterator().forEachRemaining(prov
+                        -> prov.types().forEachOrdered(GstTypes::register));
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "Error during external types registration", t);
+            }
         }
     }
-    // to generate the list we use:
-    // egrep -rl "GST_NAME|GTYPE_NAME" src 2>/dev/null | egrep -v ".svn|Gst.java" | sort
-    // even though the best would be all subclasses of NativeObject
-    @SuppressWarnings("rawtypes")
-    private static List<Class<? extends NativeObject>> nativeClasses
-            = Arrays.<Class<? extends NativeObject>>asList(
-                    GDate.class,
-                    GInetAddress.class,
-                    GSocket.class,
-                    GSocketAddress.class,
-                    GInetSocketAddress.class,
-                    TagList.class,
-                    // ----------- Base -------------
-                    Buffer.class,
-                    BufferPool.class,
-                    Bus.class,
-                    Caps.class,
-                    Clock.class,
-                    DateTime.class,
-                    Element.class,
-                    ElementFactory.class,
-                    Event.class,
-                    GhostPad.class,
-                    Message.class,
-                    Pad.class,
-                    PadTemplate.class,
-                    Plugin.class,
-                    PluginFeature.class,
-                    Promise.class,
-                    Query.class,
-                    Registry.class,
-                    SDPMessage.class,
-                    Sample.class,
-                    WebRTCSessionDescription.class,
-                    // ----------- Elements -------------
-                    AppSink.class,
-                    AppSrc.class,
-                    BaseSrc.class,
-                    BaseSink.class,
-                    BaseTransform.class,
-                    Bin.class,
-                    DecodeBin.class,
-                    Pipeline.class,
-                    PlayBin.class,
-                    URIDecodeBin.class,
-                    WebRTCBin.class
+    
+    public static class Types implements NativeObject.TypeProvider {
+        
+        @Override
+        public Stream<NativeObject.TypeRegistration<?>> types() {
+            return Stream.of(
+                    registration(Bin.class, Bin.GTYPE_NAME, Bin::new),
+                    registration(Buffer.class, Buffer.GTYPE_NAME, Buffer::new),
+                    registration(BufferPool.class, BufferPool.GTYPE_NAME, BufferPool::new),
+                    registration(Bus.class, Bus.GTYPE_NAME, Bus::new),
+                    registration(Caps.class, Caps.GTYPE_NAME, Caps::new),
+                    registration(Clock.class, Clock.GTYPE_NAME, Clock::new),
+                    registration(DateTime.class, DateTime.GTYPE_NAME, DateTime::new),
+                    registration(Element.class, Element.GTYPE_NAME, Element::new),
+                    registration(ElementFactory.class, ElementFactory.GTYPE_NAME, ElementFactory::new),
+                    registration(GhostPad.class, GhostPad.GTYPE_NAME, GhostPad::new),
+                    registration(Pad.class, Pad.GTYPE_NAME, Pad::new),
+                    registration(PadTemplate.class, PadTemplate.GTYPE_NAME, PadTemplate::new),
+                    registration(Pipeline.class, Pipeline.GTYPE_NAME, Pipeline::new),
+                    registration(Plugin.class, Plugin.GTYPE_NAME, Plugin::new),
+                    registration(PluginFeature.class, PluginFeature.GTYPE_NAME, PluginFeature::new),
+                    registration(Promise.class, Promise.GTYPE_NAME, Promise::new),
+                    registration(Registry.class, Registry.GTYPE_NAME, Registry::new),
+                    registration(SDPMessage.class, SDPMessage.GTYPE_NAME, SDPMessage::new),
+                    registration(Sample.class, Sample.GTYPE_NAME, Sample::new),
+                    registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );
+        }
+        
+    }
 
     /**
      * Annotation on classes, methods or fields to show the required GStreamer
@@ -794,10 +752,10 @@ public final class Gst {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     public static @interface Since {
-
+        
         public int major() default 1;
-
+        
         public int minor();
     }
-
+    
 }

@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -45,7 +46,7 @@ public class SegmentQuery extends Query {
      * @param format the {@link Format} for the new query.
      */
     public SegmentQuery(Format format) {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_segment(format)));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_segment(format)));
     }
 
     /**

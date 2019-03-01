@@ -34,6 +34,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GstPipelineAPI.GSTPIPELINE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 import org.freedesktop.gstreamer.glib.NativeFlags;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * A {@code Pipeline} is a special {@link Bin} used as the top level container
@@ -102,7 +103,7 @@ public class Pipeline extends Bin {
      * Creates a new instance of Pipeline with a unique name.
      */
     public Pipeline() {
-        this(initializer(GSTPIPELINE_API.ptr_gst_pipeline_new(null), false));
+        this(Natives.initializer(GSTPIPELINE_API.ptr_gst_pipeline_new(null), false));
         initBus();
     }
 
@@ -118,7 +119,7 @@ public class Pipeline extends Bin {
 
     private static Initializer initializer(String name) {
         Pointer new_pipeline = GSTPIPELINE_API.ptr_gst_pipeline_new(name);
-        return initializer(new_pipeline, false);
+        return Natives.initializer(new_pipeline, false);
     }
 
     private void initBus() {

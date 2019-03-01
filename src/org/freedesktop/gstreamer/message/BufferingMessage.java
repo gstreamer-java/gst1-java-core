@@ -21,6 +21,7 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -56,7 +57,7 @@ public class BufferingMessage extends Message {
      * @param percent The buffering percent
      */
     public BufferingMessage(GstObject src, int percent) {
-        this(initializer(GSTMESSAGE_API.ptr_gst_message_new_buffering(src, percent)));
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_buffering(src, percent)));
     }
     
     /**

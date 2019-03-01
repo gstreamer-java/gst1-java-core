@@ -21,6 +21,7 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
 
 /**
@@ -62,7 +63,7 @@ public class PadTemplate extends GstObject {
      * @param caps a {@code Caps} set for the template.
      */
     public PadTemplate(String nameTemplate, PadDirection direction, Caps caps) {
-        this(initializer(GSTPADTEMPLATE_API.ptr_gst_pad_template_new(nameTemplate, direction, PadPresence.ALWAYS, caps)));
+        this(Natives.initializer(GSTPADTEMPLATE_API.ptr_gst_pad_template_new(nameTemplate, direction, PadPresence.ALWAYS, caps)));
     }
 
     /**
@@ -75,7 +76,7 @@ public class PadTemplate extends GstObject {
      * @param caps a {@code Caps} set for the template.
      */
     public PadTemplate(String nameTemplate, PadDirection direction, PadPresence presence, Caps caps) {
-        this(initializer(GSTPADTEMPLATE_API.ptr_gst_pad_template_new(nameTemplate, direction, presence, caps)));
+        this(Natives.initializer(GSTPADTEMPLATE_API.ptr_gst_pad_template_new(nameTemplate, direction, presence, caps)));
     }
 
     /**

@@ -63,25 +63,26 @@ public interface GObjectAPI extends Library {
     NativeLong g_signal_connect_data(GObject obj, String signal, Callback callback, Pointer data,
             GClosureNotify destroy_data, int connect_flags);
     void g_signal_handler_disconnect(GObject obj, NativeLong id);
-    boolean g_object_is_floating(Pointer obj);
+    boolean g_object_is_floating(GObjectPtr obj);
     /** Sink floating ref 
      * https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref-sink 
      */
     Pointer g_object_ref_sink(Pointer ptr);
+    GObjectPtr g_object_ref_sink(GObjectPtr ptr);
     interface GToggleNotify extends Callback {
         void callback(Pointer data, Pointer obj, boolean is_last_ref);
     }
     void g_object_add_toggle_ref(Pointer object, GToggleNotify notify, Pointer data);
     void g_object_remove_toggle_ref(Pointer object, GToggleNotify notify, Pointer data);
-    void g_object_add_toggle_ref(Pointer object, GToggleNotify notify, IntPtr data);
-    void g_object_remove_toggle_ref(Pointer object, GToggleNotify notify, IntPtr data);
+    void g_object_add_toggle_ref(GObjectPtr object, GToggleNotify notify, IntPtr data);
+    void g_object_remove_toggle_ref(GObjectPtr object, GToggleNotify notify, IntPtr data);
     interface GWeakNotify extends Callback {
         void callback(IntPtr data, Pointer obj);
     }
     void g_object_weak_ref(GObject object, GWeakNotify notify, IntPtr data);
     void g_object_weak_unref(GObject object, GWeakNotify notify, IntPtr data);
-    Pointer g_object_ref(GObject object);
-    void g_object_unref(GObject object);
+    Pointer g_object_ref(GObjectPtr object);
+    void g_object_unref(GObjectPtr object);
 
     GParamSpec g_object_class_find_property(GObjectClass oclass, String property_name);
     Pointer g_object_class_find_property(Pointer oclass, String property_name);
@@ -149,11 +150,8 @@ public interface GObjectAPI extends Library {
         public volatile int ref_count;
         public volatile Pointer qdata;
         public GObjectStruct() {}
-        public GObjectStruct(GObject obj) {
-            this(obj.handle());
-        }
-        public GObjectStruct(Pointer ptr) {
-            super(ptr);
+        public GObjectStruct(GObjectPtr ptr) {
+            super(ptr.getPointer());
             read();
         }
         

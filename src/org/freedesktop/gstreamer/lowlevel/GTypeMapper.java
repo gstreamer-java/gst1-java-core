@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -21,10 +22,6 @@ package org.freedesktop.gstreamer.lowlevel;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
-
-import org.freedesktop.gstreamer.ClockTime;
-import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.ConstField;
@@ -43,6 +40,10 @@ import com.sun.jna.StructureReadContext;
 import com.sun.jna.ToNativeContext;
 import com.sun.jna.ToNativeConverter;
 import com.sun.jna.TypeConverter;
+import org.freedesktop.gstreamer.glib.GObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 /**
  *
@@ -53,10 +54,10 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
     public GTypeMapper() {
         addToNativeConverter(URI.class, uriConverter);
     }
-    private static ToNativeConverter nativeValueArgumentConverter = new ToNativeConverter() {
+    private static ToNativeConverter interfaceConverter = new ToNativeConverter() {
 
         public Object toNative(Object arg, ToNativeContext context) {
-            return arg != null ? ((NativeValue) arg).nativeValue() : null;
+            return arg != null ? Natives.getRawPointer(((GObject.GInterface) arg).getGObject()) : null;
         }
 
         public Class<?> nativeType() {
@@ -69,7 +70,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             if (arg == null) {
                 return null;
             }
-            Pointer ptr = ((NativeObject) arg).handle();
+            Pointer ptr = Natives.getRawPointer((NativeObject) arg);
             
             //
             // Deal with any adjustments to the proxy neccessitated by gstreamer
@@ -84,11 +85,10 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                     Annotation[] annotations = parameterAnnotations[index];
                     for (int i = 0; i < annotations.length; ++i) {
                         if (annotations[i] instanceof Invalidate) {
-                            ((Handle) arg).invalidate();
+                            ((NativeObject) arg).invalidate();
                             break;
                         } else if (annotations[i] instanceof IncRef) {
-                            ((RefCountedObject) arg).ref();
-                            break;
+                            Natives.ref((RefCountedObject) arg);
                         }
                     }
                 }
@@ -107,16 +107,23 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                 // returned from functions, so drop a ref here
                 //
                 boolean ownsHandle = ((MethodResultContext) context).getMethod().isAnnotationPresent(CallerOwnsReturn.class);
-                int refadj = ownsHandle ? -1 : 0;
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), refadj, ownsHandle);
+//                int refadj = ownsHandle ? -1 : 0;
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), refadj, ownsHandle);
+                if (ownsHandle) {
+                    return Natives.callerOwnsReturn((Pointer) result, (Class<? extends NativeObject>) context.getTargetType());
+                } else {
+                    return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), false, false);
+                }
             }
             if (context instanceof CallbackParameterContext) {
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, true);
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, true);
+                return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), true, true);
             }
             if (context instanceof StructureReadContext) {
                 StructureReadContext sctx = (StructureReadContext) context;
                 boolean ownsHandle = sctx.getField().getAnnotation(ConstField.class) == null;
-                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, ownsHandle);
+//                return NativeObject.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), 1, ownsHandle);
+                return Natives.objectFor((Pointer) result, (Class<? extends NativeObject>) context.getTargetType(), true, true);
             }
             throw new IllegalStateException("Cannot convert to NativeObject from " + context);
         }
@@ -275,8 +282,8 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 	public ToNativeConverter getToNativeConverter(Class type) {
         if (NativeObject.class.isAssignableFrom(type)) {
             return nativeObjectConverter;
-        } else if (NativeValue.class.isAssignableFrom(type)) {
-            return nativeValueArgumentConverter;
+        } else if (GObject.GInterface.class.isAssignableFrom(type)) {
+            return interfaceConverter;
         } else if (Enum.class.isAssignableFrom(type)) {
             return enumConverter;
         } else if (Boolean.class == type || boolean.class == type) {

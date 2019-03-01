@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.PluginFeature.Rank;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 import static org.freedesktop.gstreamer.lowlevel.GstDeviceProviderFactoryAPI.GSTDEVICEPROVIDERFACTORY_API;
@@ -129,7 +130,7 @@ public class DeviceProviderFactory extends GstObject {
         while (next != null) {
             if (next.data != null) {
                 DeviceProviderFactory factory =
-                        new DeviceProviderFactory(initializer(next.data, true, true));
+                        new DeviceProviderFactory(Natives.initializer(next.data, true, true));
                 list.add(factory);
             }
             next = next.next();

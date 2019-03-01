@@ -41,8 +41,6 @@ import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.IntPtr;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.RefCountedObject;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;
@@ -52,6 +50,10 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Arrays;
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 /**
  * GObject is the fundamental type providing the common attributes and methods
@@ -71,26 +73,29 @@ public abstract class GObject extends RefCountedObject {
             = new ConcurrentHashMap<GObject, Boolean>();
     private static final GObjectAPI.GToggleNotify TOGGLE_NOTIFY = new ToggleNotify();
 
-    
+    private final Handle handle;
     private Map<Class<?>, Map<Object, GCallback>> callbackListeners;
-    private final IntPtr objectID = new IntPtr(System.identityHashCode(this));
 
     protected GObject(Initializer init) {
-        super(init.needRef ? initializer(init.ptr, false, init.ownsHandle) : init);
-        LOG.entering("GObject", "<init>", init);
-        if (init.ownsHandle) {
-            final boolean is_floating = GOBJECT_API.g_object_is_floating(init.ptr);
-            LOG.fine(() -> String.format(
+        this(new Handle(init.ptr.as(GObjectPtr.class, GObjectPtr::new), init.ownsHandle), init.needRef);
+    }
+
+    protected GObject(Handle handle, boolean needRef) {
+        super(handle);
+        this.handle = handle;
+        if (handle.ownsHandle()) {
+            final boolean is_floating = GOBJECT_API.g_object_is_floating(handle.getPointer());
+            LOG.log(LIFECYCLE, () -> String.format(
                     "Initialising owned handle for %s floating = %b refs = %d need ref = %b",
                     this.getClass().getName(),
                     is_floating,
                     getRefCount(),
-                    init.needRef));
+                    needRef));
 
-            if (!init.needRef) {
+            if (!needRef) {
                 if (is_floating) {
                     // Sink floating ref
-                    sink();
+                    handle.sink();
                 }
             }
 
@@ -99,10 +104,10 @@ public abstract class GObject extends RefCountedObject {
                 STRONG_REFS.put(this, Boolean.TRUE);
             }
 
-            GOBJECT_API.g_object_add_toggle_ref(init.ptr, TOGGLE_NOTIFY, objectID);
-            if (!init.needRef) {
+            GOBJECT_API.g_object_add_toggle_ref(handle.getPointer(), TOGGLE_NOTIFY, handle.objectID);
+            if (!needRef) {
                 // Toggle ref has created extra reference
-                unref();
+                handle.unref();
             }
         }
     }
@@ -134,7 +139,7 @@ public abstract class GObject extends RefCountedObject {
         if (result == null) {
             return null;
         } else {
-            return NativeObject.objectFor(result, resultType, false, true);
+            return Natives.objectFor(result, resultType, false, true);
         }
     }
 
@@ -188,10 +193,14 @@ public abstract class GObject extends RefCountedObject {
         } else if (GVALUE_API.g_value_type_transformable(propType, GType.INT64)) {
             return GVALUE_API.g_value_get_int64(transform(propValue, GType.INT64));
         } else if (propValue.checkHolds(GType.BOXED)) {
+            // @TODO we already know the GType here - optimise this!
             Class<? extends NativeObject> cls = GstTypes.classFor(propType);
             if (cls != null) {
                 Pointer ptr = GVALUE_API.g_value_get_boxed(propValue);
-                return objectFor(ptr, cls, -1, true);
+                final GPointer gptr = GObject.class.isAssignableFrom(cls) ? new GObjectPtr(ptr)
+                : MiniObject.class.isAssignableFrom(cls) ? new GstMiniObjectPtr(ptr)
+                : new GPointer(ptr);
+                return objectFor(gptr, cls, -1, true);
             }
         }
         throw new IllegalArgumentException("Unknown conversion from GType=" + propType);
@@ -276,29 +285,25 @@ public abstract class GObject extends RefCountedObject {
         // Check if disposed as a disposed object may
         // have been free'd and we mustn't access it's
         // memory or we face possible SEGFAULT
-        if (!isDisposed()) {
+        GPointer ptr = handle.ptrRef.get();
+
+        if (ptr != null) {
 //            final GObjectStruct struct = new GObjectStruct(this);
 //            return struct.ref_count;
 
 // ref count is after pointer to GTypeInstance
-            return handle().getInt(Native.POINTER_SIZE);
+            int count = ptr.getPointer().getInt(Native.POINTER_SIZE);
+            return count;
         }
         return 0;
     }
 
     /**
-     * Gives the type value.
-     */
-    @Deprecated
-    public GType getType() {
-        return GObject.getType(this.handle());
-    }
-
-    /**
-     * Gives the type name.
+     * Get the native GType type name.
+     * @return GType type name 
      */
     public String getTypeName() {
-        return this.getType().getTypeName();
+        return handle.getPointer().getGType().getTypeName();
     }
 
     public List<String> listPropertyNames() {
@@ -397,35 +402,28 @@ public abstract class GObject extends RefCountedObject {
         map.put(listener, cb);
     }
 
-    @Override
-    @Deprecated
-    protected void disposeNativeHandle(Pointer ptr) {
-        LOG.log(LIFECYCLE, "Removing toggle ref " + getClass().getSimpleName() + " (" + ptr + ")");
-        GOBJECT_API.g_object_remove_toggle_ref(ptr, TOGGLE_NOTIFY, objectID);
-        STRONG_REFS.remove(this);
-    }
-
+//    @Override
+//    @Deprecated
+//    protected void disposeNativeHandle(Pointer ptr) {
+//        LOG.log(LIFECYCLE, "Removing toggle ref " + getClass().getSimpleName() + " (" + ptr + ")");
+//        GOBJECT_API.g_object_remove_toggle_ref(ptr, TOGGLE_NOTIFY, objectID);
+//        STRONG_REFS.remove(this);
+//    }
     @Override
     public void invalidate() {
         try {
             // Need to increase the ref count before removing the toggle ref, so
             // ensure the native object is not destroyed.
-            if (ownsHandle.get()) {
-                ref();
+            if (handle.ownsHandle()) {
+                handle.ref();
 
                 // Disconnect the callback.
-                GOBJECT_API.g_object_remove_toggle_ref(handle(), TOGGLE_NOTIFY, objectID);
+                GOBJECT_API.g_object_remove_toggle_ref(handle.getPointer(), TOGGLE_NOTIFY, handle.objectID);
             }
             STRONG_REFS.remove(this);
         } finally {
             super.invalidate();
         }
-    }
-
-    @Override
-    @Deprecated
-    protected void ref() {
-        GOBJECT_API.g_object_ref(this);
     }
 
     protected synchronized <T> void removeCallback(Class<T> listenerClass, T listener) {
@@ -445,26 +443,11 @@ public abstract class GObject extends RefCountedObject {
         }
     }
 
-    /**
-     * Sink floating reference. This will turn a floating reference into a real
-     * one.
-     */
-    @Deprecated
-    protected void sink() {
-        GOBJECT_API.g_object_ref_sink(this.handle());
-    }
-
-    @Override
-    @Deprecated
-    protected void unref() {
-        GOBJECT_API.g_object_unref(this);
-    }
-
     //    public static <T extends GObject> T objectFor(Pointer ptr, Class<T> defaultClass) {
 //        return objectFor(ptr, defaultClass, true);
 //    }
     private GObjectAPI.GParamSpec findProperty(String propertyName) {
-        Pointer ptr = GOBJECT_API.g_object_class_find_property(handle().getPointer(0), propertyName);
+        Pointer ptr = GOBJECT_API.g_object_class_find_property(getRawPointer().getPointer(0), propertyName);
         if (ptr == null) {
             return null;
         }
@@ -472,7 +455,7 @@ public abstract class GObject extends RefCountedObject {
     }
 
     private GObjectAPI.GParamSpecTypeSpecific findProperty(String propertyName, GType type) {
-        Pointer ptr = GOBJECT_API.g_object_class_find_property(handle().getPointer(0), propertyName);
+        Pointer ptr = GOBJECT_API.g_object_class_find_property(getRawPointer().getPointer(0), propertyName);
         if (type.equals(GType.INT)) {
             return new GObjectAPI.GParamSpecInt(ptr);
         } else if (type.equals(GType.UINT)) {
@@ -510,7 +493,7 @@ public abstract class GObject extends RefCountedObject {
 
     private GObjectAPI.GParamSpec[] listProperties() {
         IntByReference len = new IntByReference();
-        Pointer ptrs = GOBJECT_API.g_object_class_list_properties(handle().getPointer(0), len);
+        Pointer ptrs = GOBJECT_API.g_object_class_list_properties(getRawPointer().getPointer(0), len);
         if (ptrs == null) {
             return null;
         }
@@ -522,20 +505,6 @@ public abstract class GObject extends RefCountedObject {
             offset += Native.POINTER_SIZE;
         }
         return props;
-    }
-
-    @Deprecated
-    public static GType getType(Pointer ptr) {
-        // Quick getter for GType without allocation
-        // same as : new GObjectStruct(ptr).g_type_instance.g_class.g_type
-        Pointer g_class = ptr.getPointer(0);
-        if (Native.SIZE_T_SIZE == 8) {
-            return GType.valueOf(g_class.getLong(0));
-        } else if (Native.SIZE_T_SIZE == 4) {
-            return GType.valueOf(((long) g_class.getInt(0)) & 0xffffffffL);
-        } else {
-            throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
-        }
     }
 
     private static boolean booleanValue(Object value) {
@@ -656,6 +625,20 @@ public abstract class GObject extends RefCountedObject {
 //        }
     }
 
+    /**
+     * Base interface for classes that implement a GInterface
+     */
+    public static interface GInterface {
+
+        /**
+         * Get the GObject implementing this interface.
+         *
+         * @return implementing GObject
+         */
+        public GObject getGObject();
+
+    }
+
     private final class SignalCallback extends GCallback {
 
         protected SignalCallback(String signal, Callback cb) {
@@ -671,6 +654,55 @@ public abstract class GObject extends RefCountedObject {
         }
     }
 
+    protected static class Handle extends RefCountedObject.Handle {
+
+        private final IntPtr objectID;
+
+        public Handle(GObjectPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+            this.objectID = new IntPtr(System.identityHashCode(this));
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GOBJECT_API.g_object_remove_toggle_ref((GObjectPtr) ptr, TOGGLE_NOTIFY, objectID);
+        }
+
+        @Override
+        protected void ref() {
+            GOBJECT_API.g_object_ref(getPointer());
+        }
+
+        /**
+         * Sink floating reference. This will turn a floating reference into a
+         * real one.
+         */
+        protected void sink() {
+            GOBJECT_API.g_object_ref_sink(getPointer());
+        }
+
+        @Override
+        protected void unref() {
+            GOBJECT_API.g_object_unref(getPointer());
+        }
+
+        @Override
+        protected GObjectPtr getPointer() {
+            return (GObjectPtr) super.getPointer();
+        }
+
+        @Override
+        public String toString() {
+            GObjectPtr ptr = getPointer();
+            if (ptr != null) {
+                return ptr.getGType().getTypeName() + " : " + objectID;
+            } else {
+                return "Disposed handle";
+            }
+        }
+
+    }
+    
     private static final class ToggleNotify implements GObjectAPI.GToggleNotify {
 
         @Override

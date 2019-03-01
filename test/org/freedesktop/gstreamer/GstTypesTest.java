@@ -18,6 +18,8 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
 import static org.junit.Assert.assertEquals;
 
 import org.freedesktop.gstreamer.lowlevel.GType;
@@ -64,7 +66,10 @@ public class GstTypesTest {
     	GType elementType = GType.valueOf(Element.GTYPE_NAME);
     	// check a unregistered class which derived from Element 
     	Element anElement = ElementFactory.make("avidemux", "avidemux");
-    	assertEquals(Element.class, GstTypes.classFor(anElement.getType()));
+//    	assertEquals(Element.class, GstTypes.classFor(anElement.getType()));
+    	assertEquals(Element.class, GstTypes.classFor(
+                Natives.getPointer(anElement)
+                        .as(GObjectPtr.class, GObjectPtr::new).getGType()));
     	
     	// verify GType has not changed for Element.class
     	assertEquals(elementType, GstTypes.typeFor(Element.class));

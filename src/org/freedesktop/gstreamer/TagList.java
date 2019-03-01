@@ -37,6 +37,8 @@ import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * List of tags and values used to describe media metadata.
@@ -69,7 +71,7 @@ public class TagList extends MiniObject {
 
     private static Initializer initializer() {
         final Pointer ptr_new_tag_list = GSTTAGLIST_API.ptr_gst_tag_list_new_empty();
-        return initializer(ptr_new_tag_list);
+        return Natives.initializer(ptr_new_tag_list);
     }
 
     /**
@@ -286,7 +288,8 @@ public class TagList extends MiniObject {
                         if (value.getValue() == null) {
                             return null;
                         }
-                        return new GDate(value.getValue(), false, true);
+//                        return new GDate(value.getValue(), false, true);
+                        return Natives.objectFor(value.getValue(), GDate.class);
                     }
                 });
                 put(DateTime.GTYPE, new TagGetter() {

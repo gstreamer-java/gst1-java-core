@@ -26,6 +26,7 @@ import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 
 public class ColorBalanceChannel extends GObject {
 	public static final String GTYPE_NAME = "GstColorBalanceChannel";
@@ -38,14 +39,14 @@ public class ColorBalanceChannel extends GObject {
 	 * 
 	 * @param init
 	 */
-	public ColorBalanceChannel(Initializer init) {
+	ColorBalanceChannel(Initializer init) {
 		super(init);
 		throw new IllegalArgumentException("Cannot instantiate");
 	}
 
 	ColorBalanceChannel(ColorBalance colorBalance, Pointer ptr,
 			boolean needRef, boolean ownsHandle) {
-		super(initializer(ptr, needRef, ownsHandle));
+		super(Natives.initializer(ptr, needRef, ownsHandle));
 		struct = new GstColorBalanceAPI.ColorBalanceChannelStruct(ptr);
 		this.colorBalance = colorBalance;
 	}

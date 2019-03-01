@@ -25,7 +25,8 @@ import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.lowlevel.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * An allocation query for querying allocation properties.
@@ -47,7 +48,7 @@ public class AllocationQuery extends Query {
         // special case : no ref shall be added
         // the allocationQuery is an in/out parameter during query notification
         // so, we shall keep query writable for add methods
-        super(initializer(init.ptr, false, true));
+        super(Natives.initializer(init.ptr.getPointer(), false, true));
     }
 
     /**
@@ -57,7 +58,7 @@ public class AllocationQuery extends Query {
      * @param need_pool return a pool.
      */
     public AllocationQuery(Caps caps, boolean need_pool) {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_allocation(caps, need_pool)));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_allocation(caps, need_pool)));
     }
 
     /**
@@ -80,7 +81,7 @@ public class AllocationQuery extends Query {
         Pointer[] ptr = new Pointer[1];
         GstQueryAPI.GSTQUERY_API.gst_query_parse_allocation(this, ptr, null);
 //    	return new Caps(new Initializer(ptr[0], false, true));
-        return NativeObject.objectFor(ptr[0], Caps.class, false, true);
+        return Natives.objectFor(ptr[0], Caps.class, false, true);
     }
 
     // @TODO how best not to expose GType?

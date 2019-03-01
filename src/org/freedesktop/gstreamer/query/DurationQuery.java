@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -46,7 +47,7 @@ public class DurationQuery extends Query {
      * @param format the {@link Format} for this duration query.
      */
     public DurationQuery(Format format) {
-        super(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_duration(format)));
+        super(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_duration(format)));
     }
 
     /**

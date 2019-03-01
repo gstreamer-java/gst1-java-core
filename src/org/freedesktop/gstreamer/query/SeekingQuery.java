@@ -22,6 +22,7 @@
 package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 /**
@@ -45,7 +46,7 @@ public class SeekingQuery extends Query {
      * @param format the default {@link Format} for the new query.
      */
     public SeekingQuery(Format format) {
-        this(initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_seeking(format)));
+        this(Natives.initializer(GstQueryAPI.GSTQUERY_API.ptr_gst_query_new_seeking(format)));
     }
 
     /**
