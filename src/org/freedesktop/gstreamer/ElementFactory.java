@@ -311,7 +311,7 @@ public class ElementFactory extends PluginFeature {
     }
 
     private static Element elementFor(Pointer ptr, String factoryName) {
-        return Natives.objectFor(ptr, Element.class, false);
+        return Natives.objectFor(ptr, Element.class, false, true);
     }
 
     /**

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -58,12 +57,12 @@ import org.freedesktop.gstreamer.glib.GLib;
 import org.freedesktop.gstreamer.glib.GMainContext;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 import static org.freedesktop.gstreamer.glib.Natives.registration;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
  */
-@SuppressWarnings("deprecation")
 public final class Gst {
     
     private final static Logger LOG = Logger.getLogger(Gst.class.getName());
@@ -79,7 +78,7 @@ public final class Gst {
     // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
     
-    public static class NativeArgs {
+    private static class NativeArgs {
         
         public IntByReference argcRef;
         public PointerByReference argvRef;
@@ -126,9 +125,6 @@ public final class Gst {
         }
     }
 
-    /**
-     * Creates a new instance of Gst
-     */
     private Gst() {
     }
 
@@ -195,27 +191,6 @@ public final class Gst {
      * @return an executor that can be used for background tasks.
      */
     public static ScheduledExecutorService getExecutor() {
-        return getScheduledExecutorService();
-    }
-
-    /**
-     * Gets the common {@code ExecutorService} used to execute background tasks.
-     *
-     * @return an executor that can be used for background tasks.
-     */
-    @Deprecated
-    public static ExecutorService getExecutorService() {
-        return getScheduledExecutorService();
-    }
-
-    /**
-     * Gets the common {@code ScheduledExecutorService} used to execute
-     * background tasks and schedule timeouts.
-     *
-     * @return an executor that can be used for background tasks.
-     */
-    @Deprecated
-    public static ScheduledExecutorService getScheduledExecutorService() {
         return executorService;
     }
 
@@ -244,15 +219,15 @@ public final class Gst {
         Pointer[] err = {null};
         Element pipeline = GSTPARSE_API.gst_parse_launch(pipelineDescription, err);
         if (pipeline == null) {
-            throw new GstException(new GError(new GErrorStruct(err[0])));
+            throw new GstException(extractError(err[0]));
         }
 
         // check for error
         if (err[0] != null) {
             if (errors != null) {
-                errors.add(new GError(new GErrorStruct(err[0])));
+                errors.add(extractError(err[0]));
             } else {
-                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
         
@@ -293,15 +268,15 @@ public final class Gst {
         Pointer[] err = {null};
         Element pipeline = GSTPARSE_API.gst_parse_launchv(pipelineDescription, err);
         if (pipeline == null) {
-            throw new GstException(new GError(new GErrorStruct(err[0])));
+            throw new GstException(extractError(err[0]));
         }
 
         // check for error
         if (err[0] != null) {
             if (errors != null) {
-                errors.add(new GError(new GErrorStruct(err[0])));
+                errors.add(extractError(err[0]));
             } else {
-                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
         
@@ -343,15 +318,15 @@ public final class Gst {
         Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
         
         if (bin == null) {
-            throw new GstException(new GError(new GErrorStruct(err[0])));
+            throw new GstException(extractError(err[0]));
         }
 
         // check for error
         if (err[0] != null) {
             if (errors != null) {
-                errors.add(new GError(new GErrorStruct(err[0])));
+                errors.add(extractError(err[0]));
             } else {
-                LOG.log(Level.WARNING, new GError(new GErrorStruct(err[0])).getMessage());
+                LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
         
@@ -372,6 +347,14 @@ public final class Gst {
      */
     public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads) {
         return parseBinFromDescription(binDescription, ghostUnlinkedPads, null);
+    }
+    
+    private static GError extractError(Pointer errorPtr) {
+        GErrorStruct struct = new GErrorStruct(errorPtr);
+        struct.read();
+        GError err = new GError(struct.getCode(), struct.getMessage());
+        GLIB_API.g_error_free(struct);
+        return err;
     }
 
     /**
@@ -403,21 +386,6 @@ public final class Gst {
         getExecutor().execute(task);
     }
 
-    /**
-     * Executes a task on the gstreamer background
-     * {@link java.util.concurrent.Executor}, waiting until the task completes
-     * before returning.
-     *
-     * @param task the task to execute.
-     */
-    @Deprecated
-    public static void invokeAndWait(Runnable task) {
-        try {
-            getExecutorService().submit(task).get();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.getCause());
-        }
-    }
 
     /**
      * Gets the current main context used (if any).
@@ -528,7 +496,7 @@ public final class Gst {
         Pointer[] error = {null};
         if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
             INIT_COUNT.decrementAndGet();
-            throw new GstException(new GError(new GErrorStruct(error[0])));
+            throw new GstException(extractError(error[0]));
         }
         
         LOG.fine("after gst_init, argc=" + argv.argcRef.getValue());
