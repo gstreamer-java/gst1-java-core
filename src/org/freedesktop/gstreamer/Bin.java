@@ -25,7 +25,9 @@ package org.freedesktop.gstreamer;
 import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 
 import com.sun.jna.Pointer;
+import java.util.EnumSet;
 import java.util.List;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
@@ -66,17 +68,6 @@ public class Bin extends Element {
 
     public static final String GST_NAME = "bin";
     public static final String GTYPE_NAME = "GstBin";
-
-    @Deprecated
-    public static final int DEBUG_GRAPH_SHOW_MEDIA_TYPE = (1 << 0);
-    @Deprecated
-    public static final int DEBUG_GRAPH_SHOW_CAPS_DETAILS = (1 << 1);
-    @Deprecated
-    public static final int DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS = (1 << 2);
-    @Deprecated
-    public static final int DEBUG_GRAPH_SHOW_STATES = (1 << 3);
-    @Deprecated
-    public static final int DEBUG_GRAPH_SHOW_ALL = ((1 << 4) - 1);
 
     protected Bin(Initializer init) {
         super(init);
@@ -237,37 +228,44 @@ public class Bin extends Element {
 //    public <T extends Element> T getElementByInterface(Class<T> iface) {
 //        return iface.cast(GSTBIN_API.gst_bin_get_by_interface(this, GstTypes.typeFor(iface)));
 //    }
-
-    /**
-     * Calls {@link #debugToDotFile(int, String, boolean)} without timestamping
-     */
-    @Deprecated
-    public void debugToDotFile(int details, String fileName) {
-        debugToDotFile(details, fileName, false);
-    }
-
     /**
      * To aid debugging applications one can use this method to write out the
-     * whole network of gstreamer elements that form the pipeline into an dot
+     * whole network of gstreamer elements that form the pipeline into a dot
      * file. This file can be processed with graphviz to get an image. e.g. dot
      * -Tpng -oimage.png graph_lowlevel.dot
-     *
+     * <p>
      * The function is only active if gstreamer is configured with
      * "--gst-enable-gst-debug" and the environment variable
      * GST_DEBUG_DUMP_DOT_DIR is set to a basepath (e.g. /tmp).
      *
-     * @param details to show in the graph, e.g. DEBUG_GRAPH_SHOW_ALL
+     * @param details to show in the graph
      * @param fileName output base filename (e.g. "myplayer")
-     * @param timestampFileName if true it adds the current timestamp to the
-     * filename, so that it can be used to take multiple snapshots.
      */
-    @Deprecated
-    public void debugToDotFile(int details, String fileName, boolean timestampFileName) {
-        if (timestampFileName) {
-            GSTBIN_API.gst_debug_bin_to_dot_file_with_ts(this, details, fileName);
-        } else {
-            GSTBIN_API.gst_debug_bin_to_dot_file(this, details, fileName);
-        }
+    public void debugToDotFile(EnumSet<DebugGraphDetails> details, String fileName) {
+        GSTBIN_API.gst_debug_bin_to_dot_file(
+                this, NativeFlags.toInt(details), fileName);
+    }
+
+    /**
+     * To aid debugging applications one can use this method to write out the
+     * whole network of gstreamer elements that form the pipeline into a dot
+     * file. This file can be processed with graphviz to get an image. e.g. dot
+     * -Tpng -oimage.png graph_lowlevel.dot
+     * <p>
+     * The function is only active if gstreamer is configured with
+     * "--gst-enable-gst-debug" and the environment variable
+     * GST_DEBUG_DUMP_DOT_DIR is set to a basepath (e.g. /tmp).
+     * <p>
+     * Unlike {@link #debugToDotFile(java.util.EnumSet, java.lang.String)} this
+     * method adds the current timestamp to the filename, so that it can be
+     * used to take multiple snapshots.
+     * 
+     * @param details to show in the graph
+     * @param fileName output base filename (e.g. "myplayer")
+     */
+    public void debugToDotFileWithTS(EnumSet<DebugGraphDetails> details, String fileName) {
+        GSTBIN_API.gst_debug_bin_to_dot_file_with_ts(
+                this, NativeFlags.toInt(details), fileName);
     }
 
     /**
@@ -490,4 +488,47 @@ public class Bin extends Element {
     public void disconnect(DO_LATENCY listener) {
         disconnect(DO_LATENCY.class, listener);
     }
+
+    /**
+     * Available details for pipeline graphs produced by
+     * {@link #debugToDotFile(int, java.lang.String, boolean)}
+     */
+    public static enum DebugGraphDetails implements NativeFlags<DebugGraphDetails> {
+
+        /**
+         * Show caps-name on edges.
+         */
+        SHOW_MEDIA_TYPE(1 << 0),
+        /**
+         * Show caps-details on edges.
+         */
+        SHOW_CAPS_DETAILS(1 << 1),
+        /**
+         * Show modified parameters on elements.
+         */
+        SHOW_NON_DEFAULT_PARAMS(1 << 2),
+        /**
+         * Show element states.
+         */
+        SHOW_STATES(1 << 3);
+
+        /**
+         * A convenience EnumSet with all values.
+         */
+        public final static EnumSet<DebugGraphDetails> SHOW_ALL
+                = EnumSet.allOf(DebugGraphDetails.class);
+        
+        private final int value;
+
+        private DebugGraphDetails(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int intValue() {
+            return value;
+        }
+
+    }
+
 }
