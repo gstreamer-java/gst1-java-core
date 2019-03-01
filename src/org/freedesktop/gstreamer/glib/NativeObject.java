@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GTypedPtr;
@@ -204,6 +205,7 @@ public abstract class NativeObject {
 
     private static final class NativeRef extends WeakReference<NativeObject> {
 
+        private static final boolean REAP_ON_EDT = Boolean.getBoolean("glib.reapOnEDT");
         private static final ReferenceQueue<NativeObject> QUEUE = new ReferenceQueue<>();
         private static final ExecutorService REAPER
                 = Executors.newSingleThreadExecutor((r) -> {
@@ -217,8 +219,12 @@ public abstract class NativeObject {
                 while (true) {
                     try {
                         NativeRef ref = (NativeRef) QUEUE.remove();
-                        LOG.log(LIFECYCLE, "Disposing of " + ref.type + " : " + ref.handle.ptrRef.get());
-                        ref.handle.dispose();
+                        LOG.log(LIFECYCLE, () -> "Disposing of " + ref.type + " : " + ref.handle.ptrRef.get());
+                        if (REAP_ON_EDT) {
+                            Gst.invokeLater(ref.handle::dispose);
+                        } else {
+                            ref.handle.dispose();
+                        }
                     } catch (Throwable t) {
                         LOG.log(Level.WARNING, "Reaper thread exception", t);
                     }
