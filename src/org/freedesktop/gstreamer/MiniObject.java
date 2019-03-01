@@ -21,10 +21,6 @@
  */
 package org.freedesktop.gstreamer;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.glib.RefCountedObject;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
@@ -57,22 +53,6 @@ public abstract class MiniObject extends RefCountedObject {
     }
 
     /**
-     * Gives the type value.
-     */
-    @Deprecated
-    public static GType getType(Pointer ptr) {
-        // Quick getter for GType without allocation
-        // same as : new MiniObjectStruct(ptr).type
-        if (Native.SIZE_T_SIZE == 8) {
-            return GType.valueOf(ptr.getLong(0));
-        } else if (Native.SIZE_T_SIZE == 4) {
-            return GType.valueOf(((long) ptr.getInt(0)) & 0xffffffffL);
-        } else {
-            throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
-        }
-    }
-
-    /**
      * If mini_object has the LOCKABLE flag set, check if the current EXCLUSIVE
      * lock on object is the only one, this means that changes to the object
      * will not be visible to any other object.
@@ -88,7 +68,6 @@ public abstract class MiniObject extends RefCountedObject {
      *
      * @return true if the object is writable.
      */
-    @Deprecated
     public boolean isWritable() {
         return GSTMINIOBJECT_API.gst_mini_object_is_writable(this);
     }
@@ -100,7 +79,6 @@ public abstract class MiniObject extends RefCountedObject {
      *
      * @return a writable version (possibly a duplicate) of this MiniObject.
      */
-    @Deprecated
     protected <T extends MiniObject> T makeWritable() {
         MiniObject result = GSTMINIOBJECT_API.gst_mini_object_make_writable(this);
         if (result == null) {
@@ -114,7 +92,6 @@ public abstract class MiniObject extends RefCountedObject {
      *
      * @return the new MiniObject.
      */
-    @Deprecated
     public <T extends MiniObject> T copy() {
         MiniObject result = GSTMINIOBJECT_API.gst_mini_object_copy(this);
         if (result == null) {

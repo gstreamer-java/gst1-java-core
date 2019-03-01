@@ -18,7 +18,6 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstElementFactoryAPI.GSTELEMENTFACTORY_API;
 import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
@@ -32,8 +31,6 @@ import java.util.logging.Logger;
 
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GstStaticPadTemplate;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.glib.NativeObject;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.Natives;
@@ -55,9 +52,6 @@ public class ElementFactory extends PluginFeature {
     
     private static final Level DEBUG = Level.FINE;
     private static final Logger LOG = Logger.getLogger(ElementFactory.class.getName());
-
-    private static final Map<String, Class<? extends Element>> TYPE_MAP
-            = new HashMap<String, Class<? extends Element>>();
 
     /**
      * Creates a new instance of ElementFactory
@@ -316,25 +310,8 @@ public class ElementFactory extends PluginFeature {
         return elem;
     }
 
-    /**
-     * Register a new class into the typeMap.
-     */
-    static void registerElement(Class<? extends Element> klass, String name) {
-        TYPE_MAP.put(name, klass);
-    }
-
-    @SuppressWarnings("unchecked")
     private static Element elementFor(Pointer ptr, String factoryName) {
-        Class<? extends Element> cls = ElementFactory.TYPE_MAP.get(factoryName);
-        if (cls == null) {
-            cls = (Class<Element>) GstTypes.classFor(Element.getType(ptr));
-            if (cls == null) {
-                cls = Element.class;
-            }
-
-            ElementFactory.TYPE_MAP.put(factoryName, cls);
-        }
-        return Natives.objectFor(ptr, cls, false);
+        return Natives.objectFor(ptr, Element.class, false);
     }
 
     /**

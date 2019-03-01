@@ -299,18 +299,11 @@ public abstract class GObject extends RefCountedObject {
     }
 
     /**
-     * Gives the type value.
-     */
-    @Deprecated
-    public GType getType() {
-        return GObject.getType(this.getRawPointer());
-    }
-
-    /**
-     * Gives the type name.
+     * Get the native GType type name.
+     * @return GType type name 
      */
     public String getTypeName() {
-        return this.getType().getTypeName();
+        return handle.getPointer().getGType().getTypeName();
     }
 
     public List<String> listPropertyNames() {
@@ -512,20 +505,6 @@ public abstract class GObject extends RefCountedObject {
             offset += Native.POINTER_SIZE;
         }
         return props;
-    }
-
-    @Deprecated
-    public static GType getType(Pointer ptr) {
-        // Quick getter for GType without allocation
-        // same as : new GObjectStruct(ptr).g_type_instance.g_class.g_type
-        Pointer g_class = ptr.getPointer(0);
-        if (Native.SIZE_T_SIZE == 8) {
-            return GType.valueOf(g_class.getLong(0));
-        } else if (Native.SIZE_T_SIZE == 4) {
-            return GType.valueOf(((long) g_class.getInt(0)) & 0xffffffffL);
-        } else {
-            throw new IllegalStateException("SIZE_T size not supported: " + Native.SIZE_T_SIZE);
-        }
     }
 
     private static boolean booleanValue(Object value) {
