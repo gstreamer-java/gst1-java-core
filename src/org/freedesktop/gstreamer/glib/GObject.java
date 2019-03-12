@@ -382,6 +382,12 @@ public abstract class GObject extends RefCountedObject {
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        STRONG_REFS.remove(this);
+    }
+    
+    @Override
     public void invalidate() {
         try {
             // Need to increase the ref count before removing the toggle ref, so
