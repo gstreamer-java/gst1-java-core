@@ -83,7 +83,7 @@ public abstract class GObject extends RefCountedObject {
     protected GObject(Handle handle, boolean needRef) {
         super(handle);
         this.handle = handle;
-        if (handle.ownsHandle()) {
+        if (handle.ownsReference()) {
             final boolean is_floating = GOBJECT_API.g_object_is_floating(handle.getPointer());
             LOG.log(LIFECYCLE, () -> String.format(
                     "Initialising owned handle for %s floating = %b refs = %d need ref = %b",
@@ -264,7 +264,7 @@ public abstract class GObject extends RefCountedObject {
         // Check if disposed as a disposed object may
         // have been free'd and we mustn't access it's
         // memory or we face possible SEGFAULT
-        GPointer ptr = handle.ptrRef.get();
+        GPointer ptr = handle.getPointer();
 
         if (ptr != null) {
 //            final GObjectStruct struct = new GObjectStruct(this);
@@ -392,7 +392,7 @@ public abstract class GObject extends RefCountedObject {
         try {
             // Need to increase the ref count before removing the toggle ref, so
             // ensure the native object is not destroyed.
-            if (handle.ownsHandle()) {
+            if (handle.ownsReference()) {
                 handle.ref();
 
                 // Disconnect the callback.

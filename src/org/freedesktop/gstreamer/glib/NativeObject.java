@@ -53,7 +53,6 @@ public abstract class NativeObject {
 
     final Handle handle;
     private final Pointer ptr;
-    private final NativeRef nativeRef;
 
 //    /**
 //     * Creates a new instance of NativeObject
@@ -67,12 +66,10 @@ public abstract class NativeObject {
         // is stale or not
         //
         this.ptr = handle.ptrRef.get().getPointer();
-        this.nativeRef = new NativeRef(this, handle);
-//        if (GObject.class.isAssignableFrom(getClass())) {
-
-        // need to put all nativeRef in map now so WeakReference doesn't go out of scope
-        INSTANCES.put(this.ptr, nativeRef);
-//        }
+        if (handle.isCacheable()) {
+            // need to put all nativeRef in map now so WeakReference doesn't go out of scope
+            INSTANCES.put(this.ptr, new NativeRef(this, handle));
+        }
     }
 
     /**
@@ -83,7 +80,7 @@ public abstract class NativeObject {
      */
     public void disown() {
         LOG.log(LIFECYCLE, "Disowning " + getRawPointer());
-        handle.ownsHandle.set(false);
+        handle.ownsReference.set(false);
     }
 
     /**
@@ -205,8 +202,8 @@ public abstract class NativeObject {
     /**
      * A class for propagating low level pointer arguments up the constructor
      * chain.
-     * 
-     * @see Natives#initializer(com.sun.jna.Pointer, boolean, boolean) 
+     *
+     * @see Natives#initializer(com.sun.jna.Pointer, boolean, boolean)
      */
     public static final class Initializer {
 
@@ -266,55 +263,115 @@ public abstract class NativeObject {
      */
     protected static abstract class Handle {
 
-        protected final AtomicReference<GPointer> ptrRef;
-        protected final AtomicBoolean ownsHandle;
+        private final AtomicReference<GPointer> ptrRef;
+        private final AtomicBoolean ownsReference;
 
-        public Handle(GPointer ptr, boolean ownsHandle) {
+        /**
+         * Construct a Handle for the supplied native reference.
+         *
+         * @param ptr native reference
+         * @param ownsReference whether the Handle owns the native reference and
+         * should dispose it when itself disposed.
+         */
+        public Handle(GPointer ptr, boolean ownsReference) {
             this.ptrRef = new AtomicReference<>(ptr);
-            this.ownsHandle = new AtomicBoolean(ownsHandle);
+            this.ownsReference = new AtomicBoolean(ownsReference);
         }
 
+        /**
+         * Disown the native reference. After calling this method,
+         * {@link #ownsReference()} will return {@code false}.
+         */
         public void disown() {
-            ownsHandle.set(false);
+            ownsReference.set(false);
         }
 
+        /**
+         * Invalidate the handle. After calling this method, {@link #getPointer()
+         * } will return {@code null}, {@link #ownsReference() } will return
+         * {@code false}, and any NativeObject weak reference cached for this
+         * pointer will be removed. Unlike calling {@link #dispose() } the
+         * native handle will not be disposed - {@link #disposeNativeHandle(org.freedesktop.gstreamer.lowlevel.GPointer)
+         * } will not be called.
+         */
         public void invalidate() {
             GPointer ptr = ptrRef.getAndSet(null);
-            ownsHandle.set(false);
+            ownsReference.set(false);
             if (ptr != null) {
                 INSTANCES.remove(ptr.getPointer());
             }
         }
 
+        /**
+         * Dispose the handle, and dispose the native reference if owned by this
+         * handle. After calling this method, {@link #getPointer()
+         * } will return {@code null}, {@link #ownsReference() } will return
+         * {@code false}, and any NativeObject weak reference cached for this
+         * pointer will be removed.
+         */
         public void dispose() {
             GPointer ptr = ptrRef.getAndSet(null);
             if (ptr != null) {
                 INSTANCES.remove(ptr.getPointer());
-                if (ownsHandle.compareAndSet(true, false)) {
+                if (ownsReference.compareAndSet(true, false)) {
                     disposeNativeHandle(ptr);
                 }
             }
         }
 
+        /**
+         * Control whether a WeakReference to the NativeObject wrapping this
+         * Handle should be created and cached. This means that the same
+         * NativeObject instance will be returned for identical native pointers,
+         * and that the Handle will be disposed automatically when the
+         * NativeObject is garbage collected.
+         * <p>
+         * The default implementation always returns {@code true}. Subclasses
+         * may override this behaviour if required.
+         *
+         * @return true if the NativeObject should be cached and automatically
+         * disposed
+         */
         public boolean isCacheable() {
-            return false;
+            return true;
         }
 
+        /**
+         * Subclasses should override this method to dispose of the native
+         * reference (free, unref, etc.). The pointer supplied should be used -
+         * {@link #getPointer()} will return {@code null} by the time this
+         * method is called.
+         *
+         * @param ptr native reference
+         */
         protected abstract void disposeNativeHandle(GPointer ptr);
 
+        /**
+         * Get the native pointer, or null. Subclasses may override to return a
+         * GPointer subclass.
+         *
+         * @return native pointer or null
+         */
         protected GPointer getPointer() {
             return ptrRef.get();
         }
 
-        protected boolean ownsHandle() {
-            return ownsHandle.get();
+        /**
+         * Test whether this Handle owns the underlying native reference -
+         * should dispose the native reference on {@link #dispose() }.
+         *
+         * @return true if this Handle owns the reference.
+         */
+        protected boolean ownsReference() {
+            return ownsReference.get();
         }
     }
 
     /**
      * Registration for creating native object subclasses for specific GTypes.
-     * 
-     * @see Natives#registration(java.lang.Class, java.lang.String, java.util.function.Function) 
+     *
+     * @see Natives#registration(java.lang.Class, java.lang.String,
+     * java.util.function.Function)
      * @param <T> type
      */
     public static class TypeRegistration<T extends NativeObject> {
@@ -351,7 +408,7 @@ public abstract class NativeObject {
 
         /**
          * A {@link Stream} of {@link TypeRegistration} to register.
-         * 
+         *
          * @return stream of type registrations
          */
         public Stream<TypeRegistration<?>> types();

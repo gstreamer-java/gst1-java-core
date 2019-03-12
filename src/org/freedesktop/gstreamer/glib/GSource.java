@@ -25,7 +25,6 @@ import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import java.util.concurrent.Callable;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.RefCountedObject;
 /**
  *
  */
@@ -71,12 +70,12 @@ public class GSource extends RefCountedObject {
 
         @Override
         protected void ref() {
-            GLIB_API.g_source_ref(ptrRef.get().getPointer());
+            GLIB_API.g_source_ref(getPointer().getPointer());
         }
 
         @Override
         protected void unref() {
-            GLIB_API.g_source_unref(ptrRef.get().getPointer());
+            GLIB_API.g_source_unref(getPointer().getPointer());
         }
         
     }
