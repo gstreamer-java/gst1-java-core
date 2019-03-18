@@ -70,7 +70,9 @@ public abstract class GObject extends RefCountedObject {
     private static final Level LIFECYCLE = Level.FINE;
     private static final Logger LOG = Logger.getLogger(GObject.class.getName());
     private static final CallbackThreadInitializer GCALLBACK_THREAD_INIT
-            = new CallbackThreadInitializer(true, false, "GCallback");
+            = new CallbackThreadInitializer(true,
+                    Boolean.getBoolean("glib.detachCallbackThreads"),
+                    "GCallback");
     private static final Map<GObject, Boolean> STRONG_REFS
             = new ConcurrentHashMap<GObject, Boolean>();
     private static final GObjectAPI.GToggleNotify TOGGLE_NOTIFY = new ToggleNotify();

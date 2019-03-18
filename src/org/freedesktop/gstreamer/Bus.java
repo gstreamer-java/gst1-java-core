@@ -83,7 +83,7 @@ public class Bus extends GstObject {
     public static final String GTYPE_NAME = "GstBus";
 
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
-
+    
     private final Object lock = new Object();
     private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
     private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<MessageProxy>();
@@ -715,12 +715,14 @@ public class Bus extends GstObject {
     public void setSyncHandler(BusSyncHandler handler) {
         syncHandler = handler;
     }
-    private static org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
-
+    
+    private static final org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
+        
         {
             Native.setCallbackThreadInitializer(this,
-                    new CallbackThreadInitializer(true, false, "GstBus"));
-
+                    new CallbackThreadInitializer(true,
+                            Boolean.getBoolean("glib.detachCallbackThreads"),
+                            "GstBus"));
         }
 
         public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
