@@ -45,7 +45,7 @@ import org.freedesktop.gstreamer.lowlevel.GstTypes;
 /**
  *
  */
-public abstract class NativeObject {
+public abstract class NativeObject implements AutoCloseable {
 
     private static final Level LIFECYCLE = Level.FINE;
     private static final Logger LOG = Logger.getLogger(NativeObject.class.getName());
@@ -84,8 +84,20 @@ public abstract class NativeObject {
     }
 
     /**
+     * Implements {@link AutoCloseable#close()} by calling {@link #dispose() }.
+     * <p>
+     * If writing a NativeObject subclass you almost certainly want to override
+     * dispose() to customize behaviour unless you have a very specific reason
+     * that try-with-resources should work differently.
+     */
+    @Override
+    public void close() {
+        dispose();
+    }
+    
+    /**
      * Dispose this object, and potentially clear (free, unref, etc.) the
-     * underlying native object if this object owns the reference.#
+     * underlying native object if this object owns the reference.
      * <p>
      * After calling this method this object should not be used.
      */
