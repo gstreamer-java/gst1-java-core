@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.sun.jna.Pointer;
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 
@@ -35,6 +36,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstPipelineAPI.GSTPIPELINE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
  * A {@code Pipeline} is a special {@link Bin} used as the top level container
@@ -94,9 +96,17 @@ public class Pipeline extends Bin {
     public static final String GTYPE_NAME = "GstPipeline";
 
     private static Logger LOG = Logger.getLogger(Pipeline.class.getName());
+    
+    private final Handle handle;
 
     protected Pipeline(Initializer init) {
-        super(init);
+        this(new Handle(init.ptr.as(GstObjectPtr.class, GstObjectPtr::new), init.ownsHandle), init.needRef);
+    }
+    
+    Pipeline(Handle handle, boolean needRef) {
+        super(handle, needRef);
+        this.handle = handle;
+        handle.busRef.set(GSTPIPELINE_API.gst_pipeline_get_bus(this));
     }
 
     /**
@@ -104,7 +114,6 @@ public class Pipeline extends Bin {
      */
     public Pipeline() {
         this(Natives.initializer(GSTPIPELINE_API.ptr_gst_pipeline_new(null), false));
-        initBus();
     }
 
     /**
@@ -114,22 +123,11 @@ public class Pipeline extends Bin {
      */
     public Pipeline(String name) {
         this(initializer(name));
-        initBus();
     }
 
     private static Initializer initializer(String name) {
         Pointer new_pipeline = GSTPIPELINE_API.ptr_gst_pipeline_new(name);
         return Natives.initializer(new_pipeline, false);
-    }
-
-    private void initBus() {
-        Bus bus = getBus();
-        // TODO started to work around with add_signal_watch - when working can
-        // remove this comment!
-        // This is mostly a hack to get the Bus to install a sync message handler
-        //
-//        bus.setFlushing(true);
-//        bus.setFlushing(false);
     }
 
     /**
@@ -214,7 +212,7 @@ public class Pipeline extends Bin {
      */
     @Override
     public Bus getBus() {
-        return GSTPIPELINE_API.gst_pipeline_get_bus(this);
+        return handle.busRef.get();
     }
 
     /**
@@ -357,4 +355,35 @@ public class Pipeline extends Bin {
         GSTQUERY_API.gst_query_parse_segment(qry, rate, fmt, start_value, stop_value);
         return new Segment(rate[0], fmt[0], start_value[0], stop_value[0]);
     }
+    
+    static class Handle extends Bin.Handle {
+        
+        private final AtomicReference<Bus> busRef;
+        
+        public Handle(GstObjectPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+            this.busRef = new AtomicReference<>();
+        }
+
+        @Override
+        public void invalidate() {
+            disposeBus();
+            super.invalidate();
+        }
+
+        @Override
+        public void dispose() {
+            disposeBus();
+            super.dispose();
+        }
+
+        private void disposeBus() {
+            Bus bus = busRef.getAndSet(null);
+            if (bus != null) {
+                bus.dispose();
+            }
+        }
+        
+    }
+    
 }

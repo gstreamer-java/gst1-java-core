@@ -30,6 +30,7 @@ import java.util.List;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
  * Base class and element that can contain other elements.
@@ -73,6 +74,10 @@ public class Bin extends Element {
         super(init);
     }
 
+    Bin(Handle handle, boolean needRef) {
+        super(handle, needRef);
+    }
+    
     /**
      * Creates a new Bin with a unique name.
      */
@@ -529,6 +534,14 @@ public class Bin extends Element {
             return value;
         }
 
+    }
+    
+    static class Handle extends Element.Handle {
+        
+        public Handle(GstObjectPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+        
     }
 
 }

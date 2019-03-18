@@ -131,14 +131,9 @@ public class GarbageCollectionEDTTest {
 
     }
     @Test
-    @Ignore("See comment below.")
     public void busWithListeners() {
         Pipeline pipe = new Pipeline("test");
         Bus bus = pipe.getBus();
-        // Reasoning for @Igore:
-        //
-        // #connect increments the native reference count this in turn prevents 
-        // the native part of the BUS to get out of scope.
         bus.connect(new Bus.EOS() {
 
             public void endOfStream(GstObject source) {

@@ -32,6 +32,7 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
  * Abstract base class for all pipeline elements.
@@ -78,6 +79,10 @@ public class Element extends GstObject {
      */
     protected Element(Initializer init) {
         super(init);
+    }
+    
+    Element(Handle handle, boolean needRef) {
+        super(handle, needRef);
     }
 
     /**
@@ -722,6 +727,14 @@ public class Element extends GstObject {
      */
     public boolean query(Query query) {
         return GSTELEMENT_API.gst_element_query(this, query);
+    }
+    
+    static class Handle extends GstObject.Handle {
+        
+        public Handle(GstObjectPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+        
     }
 
 }
