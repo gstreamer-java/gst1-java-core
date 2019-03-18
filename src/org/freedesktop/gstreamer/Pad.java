@@ -23,8 +23,11 @@
  */
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.NativeLong;
 import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
+import java.util.HashSet;
+import java.util.Set;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -32,6 +35,7 @@ import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
 import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
 
 import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
+import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
 
 /**
  * Object contained by elements that allows links to other elements.
@@ -76,14 +80,21 @@ import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
 public class Pad extends GstObject {
 
     public static final String GTYPE_NAME = "GstPad";
+    
+    private final Handle handle;
 
     /**
      * Creates a new instance of Pad
      */
     Pad(Initializer init) {
-        super(init);
+        this(new Handle(init.ptr.as(GstPadPtr.class, GstPadPtr::new), init.ownsHandle), init.needRef);
     }
 
+    private Pad(Handle handle, boolean needRef) {
+        super(handle, needRef);
+        this.handle = handle;
+    }
+    
     /**
      * Creates a new pad with the given name in the given direction. If name is
      * null, a guaranteed unique name (across all pads) will be assigned.
@@ -379,7 +390,7 @@ public class Pad extends GstObject {
         addEventProbe(listener, mask);
     }
 
-    public void addEventProbe(final EVENT_PROBE listener, final int mask) {
+    void addEventProbe(final EVENT_PROBE listener, final int mask) {
         final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
 //        	    System.out.println("CALLBACK " + probeInfo.padProbeType);
@@ -393,10 +404,10 @@ public class Pad extends GstObject {
             }
         };
 
-        GCallback cb = new GCallback(GSTPAD_API.gst_pad_add_probe(this, mask, probe, null, null), probe) {
+        GCallback cb = new GCallback(handle.addProbe(mask, probe), probe) {
             @Override
             protected void disconnect() {
-                GSTPAD_API.gst_pad_remove_probe(Pad.this, id);
+                handle.removeProbe(id);
             }
         };
         addCallback(EVENT_PROBE.class, listener, cb);
@@ -420,10 +431,10 @@ public class Pad extends GstObject {
             }
         };
 
-        GCallback cb = new GCallback(GSTPAD_API.gst_pad_add_probe(this, GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER, probe, null, null), probe) {
+        GCallback cb = new GCallback(handle.addProbe(GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER, probe), probe) {
             @Override
             protected void disconnect() {
-                GSTPAD_API.gst_pad_remove_probe(Pad.this, id);
+                handle.removeProbe(id);
             }
         };
 
@@ -644,5 +655,53 @@ public class Pad extends GstObject {
     public static interface DATA_PROBE {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
+    }
+    
+    private static class Handle extends GstObject.Handle {
+        
+        private final Set<NativeLong> probes;
+        
+        private Handle(GstPadPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+            probes = new HashSet<>();
+        }
+
+        @Override
+        protected GstPadPtr getPointer() {
+            return (GstPadPtr) super.getPointer();
+        }
+        
+        private synchronized NativeLong addProbe(int mask, GstPadAPI.PadProbeCallback probe) {
+            NativeLong id = GSTPAD_API.gst_pad_add_probe(getPointer(), mask, probe, null, null);
+            if (id.longValue() != 0) {
+                probes.add(id);
+            }
+            return id;
+        }
+        
+        private synchronized void removeProbe(NativeLong id) {
+            if (probes.remove(id)) {
+                GSTPAD_API.gst_pad_remove_probe(getPointer(), id);
+            }
+        }
+        
+        private synchronized void clearProbes() {
+            probes.forEach(id -> GSTPAD_API.gst_pad_remove_probe(getPointer(), id));
+            probes.clear();
+        }
+
+        @Override
+        public void invalidate() {
+            clearProbes();
+            super.invalidate();
+        }
+
+        @Override
+        public void dispose() {
+            clearProbes();
+            super.dispose();
+        }
+        
+        
     }
 }

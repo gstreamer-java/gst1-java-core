@@ -154,9 +154,9 @@ public interface GstPadAPI extends com.sun.jna.Library {
      * @param destroy_data
      * @return
      */
-    NativeLong gst_pad_add_probe(Pad pad, int mask, PadProbeCallback callback, 
+    NativeLong gst_pad_add_probe(GstPadPtr pad, int mask, PadProbeCallback callback, 
     		Pointer user_data, GDestroyNotify destroy_data);
-    void gst_pad_remove_probe(Pad pad, NativeLong id);
+    void gst_pad_remove_probe(GstPadPtr pad, NativeLong id);
     
     Event gst_pad_probe_info_get_event(GstPadProbeInfo probeInfo);
 

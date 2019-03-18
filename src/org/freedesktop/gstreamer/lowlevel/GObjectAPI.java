@@ -60,9 +60,12 @@ public interface GObjectAPI extends Library {
     interface GClosureNotify extends Callback {
         void callback(Pointer data, Pointer closure);
     }
-    NativeLong g_signal_connect_data(GObject obj, String signal, Callback callback, Pointer data,
+//    NativeLong g_signal_connect_data(GObject obj, String signal, Callback callback, Pointer data,
+//            GClosureNotify destroy_data, int connect_flags);
+//    void g_signal_handler_disconnect(GObject obj, NativeLong id);
+    NativeLong g_signal_connect_data(GObjectPtr obj, String signal, Callback callback, Pointer data,
             GClosureNotify destroy_data, int connect_flags);
-    void g_signal_handler_disconnect(GObject obj, NativeLong id);
+    void g_signal_handler_disconnect(GObjectPtr obj, NativeLong id);
     boolean g_object_is_floating(GObjectPtr obj);
     /** Sink floating ref 
      * https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref-sink 
