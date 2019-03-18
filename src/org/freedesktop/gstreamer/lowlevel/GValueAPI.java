@@ -174,7 +174,8 @@ public interface GValueAPI extends Library {
                     return Natives.objectFor(ptr, cls, true, true);
                 }
             }
-            return GVALUE_API.g_value_get_object(this);        
+//            return GVALUE_API.g_value_get_object(this);  
+            return GVALUE_API.g_value_dup_object(this);  
         }
         
         public Integer toInt() {
