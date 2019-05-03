@@ -66,6 +66,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
             SeekType cur_type, long cur, SeekType stop_type, long stop);
     boolean gst_element_seek_simple(Element elem, Format format, int flags, long pos);
     boolean gst_element_link(Element elem1, Element elem2);
+    boolean gst_element_link_filtered(Element elem1, Element elem2, Caps filter);
     boolean gst_element_link_many(Element... elements);
     void gst_element_unlink_many(Element... elements);
     void gst_element_unlink(Element elem1, Element elem2);

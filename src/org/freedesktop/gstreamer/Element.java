@@ -107,6 +107,9 @@ public class Element extends GstObject {
      * <p>
      * Make sure you have added your elements to a bin or pipeline with
      * {@link Bin#add} or {@link Bin#addMany} before trying to link them.
+     * <p>
+     * See {@link Element#linkPadsFiltered} if you need more control about
+     * which pads are selected for linking.
      *
      * @param dest The {@link Element} containing the destination pad.
      * @return true if the elements could be linked, false otherwise.
@@ -114,6 +117,30 @@ public class Element extends GstObject {
     public boolean link(Element dest) {
         return GSTELEMENT_API.gst_element_link(this, dest);
     }
+
+    /**
+     * Links this element to another element using the given caps as filtercaps.
+     * The link must be from source to destination; the other direction will
+     * not be tried.
+     * <p>
+     * The function looks for existing pads that aren't linked yet. It will
+     * request new pads if necessary. Such pads need to be released manualy when
+     * unlinking. If multiple links are possible, only one is established.
+     * <p>
+     * Make sure you have added your elements to a bin or pipeline with
+     * {@link Bin#add} or {@link Bin#addMany} before trying to link them.
+     * <p>
+     * See {@link Element#linkPadsFiltered} if you need more control about
+     * which pads are selected for linking.
+     *
+     * @param dest The {@link Element} containing the destination pad.
+     * @param filter The {@link Caps} to filter the link, or Null for no filter.
+     * @return true if the elements could be linked, false otherwise.
+     */
+    public boolean linkFiltered(Element dest, Caps filter) {
+        return GSTELEMENT_API.gst_element_link_filtered(this, dest, filter);
+    }
+
 
 //    /**
 //     * Chain together a series of elements, with this element as the first in the list. 
