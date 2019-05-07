@@ -31,10 +31,9 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
  * structured to mimic the RTCPeerConnection API that is available in web
  * browsers
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
  *
- * @see
- * https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/blob/master/ext/webrtc/gstwebrtcbin.c
+ * @link https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/blob/master/ext/webrtc/gstwebrtcbin.c
  * available since Gstreamer 1.14
  */
 @Gst.Since(minor = 14)
@@ -83,7 +82,7 @@ public class WebRTCBin extends Bin {
     public static interface CREATE_OFFER {
 
         /**
-         * @param a @WebRTCSessionDescription of the offer
+         * @param offer @WebRTCSessionDescription of the offer
          */
         public void onOfferCreated(WebRTCSessionDescription offer);
     }
@@ -94,7 +93,7 @@ public class WebRTCBin extends Bin {
     public static interface CREATE_ANSWER {
 
         /**
-         * @param a @WebRTCSessionDescription of the answer
+         * @param answer @WebRTCSessionDescription of the answer
          */
         public void onAnswerCreated(WebRTCSessionDescription answer);
     }
@@ -186,7 +185,7 @@ public class WebRTCBin extends Bin {
 
     /**
      * Sets the local description for the WebRTC connection. Should be called
-     * after {@link #createOffer} or {@link #createAnser} is called.
+     * after {@link #createOffer} or {@link #createAnswer} is called.
      *
      * @param description the {@link WebRTCSessionDescription} to set for the
      * local description
@@ -262,7 +261,7 @@ public class WebRTCBin extends Bin {
      * state
      */
     public WebRTCPeerConnectionState getConnectionState() {
-        return (WebRTCPeerConnectionState) get("connection-state");
+        return WebRTCPeerConnectionState.values()[(Integer) get("connection-state")];
     }
 
     /**
