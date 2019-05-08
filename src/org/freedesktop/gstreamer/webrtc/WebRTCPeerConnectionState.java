@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -44,10 +44,27 @@ public enum WebRTCPeerConnectionState implements NativeEnum<WebRTCPeerConnection
     private WebRTCPeerConnectionState(int value) {
         this.value = value;
     }
-    
+
     @Override
     public int intValue() {
         return value;
     }
-    
+
+    public static WebRTCPeerConnectionState fromInt(int value) {
+        switch (value) {
+            case 1:
+                return WebRTCPeerConnectionState.CONNECTING;
+            case 2:
+                return WebRTCPeerConnectionState.CONNECTED;
+            case 3:
+                return WebRTCPeerConnectionState.DISCONNECTED;
+            case 4:
+                return WebRTCPeerConnectionState.FAILED;
+            case 5:
+                return WebRTCPeerConnectionState.CLOSED;
+            case 0:
+            default:
+                return WebRTCPeerConnectionState.NEW;
+        }
+    }
 }

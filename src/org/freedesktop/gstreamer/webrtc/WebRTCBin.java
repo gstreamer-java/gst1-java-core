@@ -18,12 +18,7 @@
  */
 package org.freedesktop.gstreamer.webrtc;
 
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Promise;
-import org.freedesktop.gstreamer.Structure;
-
+import org.freedesktop.gstreamer.*;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 /**
@@ -261,7 +256,7 @@ public class WebRTCBin extends Bin {
      * state
      */
     public WebRTCPeerConnectionState getConnectionState() {
-        return WebRTCPeerConnectionState.values()[(Integer) get("connection-state")];
+        return WebRTCPeerConnectionState.fromInt((Integer) get("connection-state"));
     }
 
     /**
