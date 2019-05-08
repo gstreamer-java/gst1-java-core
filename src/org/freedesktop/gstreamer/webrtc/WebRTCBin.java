@@ -19,6 +19,7 @@
 package org.freedesktop.gstreamer.webrtc;
 
 import org.freedesktop.gstreamer.*;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 /**
@@ -256,7 +257,7 @@ public class WebRTCBin extends Bin {
      * state
      */
     public WebRTCPeerConnectionState getConnectionState() {
-        return WebRTCPeerConnectionState.fromInt((Integer) get("connection-state"));
+        return NativeEnum.fromInt(WebRTCPeerConnectionState.class, (Integer) get("connection-state"));
     }
 
     /**

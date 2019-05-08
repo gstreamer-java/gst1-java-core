@@ -49,24 +49,4 @@ public enum WebRTCPeerConnectionState implements NativeEnum<WebRTCPeerConnection
     public int intValue() {
         return value;
     }
-
-    public static WebRTCPeerConnectionState fromInt(int value) {
-        switch (value) {
-            case 0:
-                return WebRTCPeerConnectionState.NEW;
-            case 1:
-                return WebRTCPeerConnectionState.CONNECTING;
-            case 2:
-                return WebRTCPeerConnectionState.CONNECTED;
-            case 3:
-                return WebRTCPeerConnectionState.DISCONNECTED;
-            case 4:
-                return WebRTCPeerConnectionState.FAILED;
-            case 5:
-                return WebRTCPeerConnectionState.CLOSED;
-            default:
-                throw new IllegalStateException("WebRTCPeerConnectionState shouldn't be " +
-                        "initialized with integer: " + value);
-        }
-    }
 }
