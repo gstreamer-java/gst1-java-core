@@ -20,6 +20,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.ptr.LongByReference;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.FlowReturn;
@@ -29,14 +30,12 @@ import org.freedesktop.gstreamer.elements.AppSrc;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
-import com.sun.jna.ptr.LongByReference;
-
 /**
  *
  * @author wayne
  */
 public interface AppAPI extends com.sun.jna.Library {
-    
+
     AppAPI APP_API = GstNative.load("gstapp", AppAPI.class);
 
     // AppSrc functions
@@ -58,7 +57,7 @@ public interface AppAPI extends com.sun.jna.Library {
     void gst_app_src_get_latency(AppSrc appsrc, LongByReference min, LongByReference max);
 
     void gst_app_src_flush_queued(AppSrc appsrc);
-    
+
     FlowReturn gst_app_src_push_buffer(AppSrc appsrc, @Invalidate Buffer buffer);
     FlowReturn gst_app_src_end_of_stream(AppSrc appsrc);
 

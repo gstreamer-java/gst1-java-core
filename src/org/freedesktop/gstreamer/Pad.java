@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2018 Antonio Morales
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
@@ -9,13 +9,13 @@
  *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -24,18 +24,18 @@
 package org.freedesktop.gstreamer;
 
 import com.sun.jna.NativeLong;
-import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
+import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
+import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
+
 import java.util.HashSet;
 import java.util.Set;
-import org.freedesktop.gstreamer.glib.Natives;
-
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
-import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
 
 import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
-import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
 
 /**
  * Object contained by elements that allows links to other elements.
@@ -80,7 +80,7 @@ import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
 public class Pad extends GstObject {
 
     public static final String GTYPE_NAME = "GstPad";
-    
+
     private final Handle handle;
 
     /**
@@ -94,7 +94,7 @@ public class Pad extends GstObject {
         super(handle, needRef);
         this.handle = handle;
     }
-    
+
     /**
      * Creates a new pad with the given name in the given direction. If name is
      * null, a guaranteed unique name (across all pads) will be assigned.
@@ -189,7 +189,7 @@ public class Pad extends GstObject {
      * filter contains the caps accepted by downstream in the preferred order.
      * filter might be NULL but if it is not NULL the returned caps will be a
      * subset of filter .
-     * 
+     *
      * @param filter Caps to filter by, or null
      * @return the {@link Caps} of the peer pad, or null if there is no peer
      * pad.
@@ -598,7 +598,7 @@ public class Pad extends GstObject {
     public boolean hasCurrentCaps() {
         return GSTPAD_API.gst_pad_has_current_caps(this);
     }
-    
+
 
     /**
      * Signal emitted when new this {@link Pad} is linked to another {@link Pad}
@@ -656,11 +656,11 @@ public class Pad extends GstObject {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
     }
-    
+
     private static class Handle extends GstObject.Handle {
-        
+
         private final Set<NativeLong> probes;
-        
+
         private Handle(GstPadPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
             probes = new HashSet<>();
@@ -670,7 +670,7 @@ public class Pad extends GstObject {
         protected GstPadPtr getPointer() {
             return (GstPadPtr) super.getPointer();
         }
-        
+
         private synchronized NativeLong addProbe(int mask, GstPadAPI.PadProbeCallback probe) {
             NativeLong id = GSTPAD_API.gst_pad_add_probe(getPointer(), mask, probe, null, null);
             if (id.longValue() != 0) {
@@ -678,13 +678,13 @@ public class Pad extends GstObject {
             }
             return id;
         }
-        
+
         private synchronized void removeProbe(NativeLong id) {
             if (probes.remove(id)) {
                 GSTPAD_API.gst_pad_remove_probe(getPointer(), id);
             }
         }
-        
+
         private synchronized void clearProbes() {
             probes.forEach(id -> GSTPAD_API.gst_pad_remove_probe(getPointer(), id));
             probes.clear();
@@ -701,7 +701,7 @@ public class Pad extends GstObject {
             clearProbes();
             super.dispose();
         }
-        
-        
+
+
     }
 }

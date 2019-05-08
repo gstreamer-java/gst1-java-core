@@ -19,15 +19,13 @@
  */
 package org.freedesktop.gstreamer.device;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.GstObject;
-import org.freedesktop.gstreamer.Plugin;
 import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.GstDeviceProviderAPI;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.freedesktop.gstreamer.lowlevel.GstDeviceProviderAPI.GSTDEVICEPROVIDER_API;
 
@@ -125,7 +123,7 @@ public class DeviceProvider extends GstObject {
             }
             next = next.next();
         }
-        
+
 
         return list;
     }
@@ -144,11 +142,11 @@ public class DeviceProvider extends GstObject {
 //    /**
 //     * Create a new device providerfactory capable of instantiating objects of
 //     * the type and add the factory to plugin.
-//     * 
-//     * @param plugin {@link Plugin} to register the device provider with, or NULL for a static device provider. 
+//     *
+//     * @param plugin {@link Plugin} to register the device provider with, or NULL for a static device provider.
 //     * @param name name of device providers of this type
 //     * @param rank rank of device provider (higher rank means more importance when autoplugging)
-//     * @param type 
+//     * @param type
 //     * @return
 //     */
 //    public boolean register(Plugin plugin, String name, int rank, GType type) {

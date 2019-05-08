@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,29 +19,29 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.*;
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  *
  */
 public class GMainContext extends RefCountedObject {
-    
+
     public GMainContext() {
         this(Natives.initializer(GLIB_API.g_main_context_new()));
     }
     private GMainContext(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle), init.needRef);
     }
-    
+
     public int attach(GSource source) {
         return GLIB_API.g_source_attach(source, this);
     }
     public static GMainContext getDefaultContext() {
         return new GMainContext(Natives.initializer(GLIB_API.g_main_context_default(), false, false));
     }
-    
+
     private static final class Handle extends RefCountedObject.Handle {
 
         public Handle(GPointer ptr, boolean ownsHandle) {
@@ -62,6 +62,6 @@ public class GMainContext extends RefCountedObject {
         protected void unref() {
             GLIB_API.g_main_context_unref(getPointer());
         }
-        
+
     }
 }

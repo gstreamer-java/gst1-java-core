@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -18,22 +18,19 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstElementFactoryAPI.GSTELEMENTFACTORY_API;
-import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
-import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GstStaticPadTemplate;
 
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.Natives;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.freedesktop.gstreamer.lowlevel.GstElementFactoryAPI.GSTELEMENTFACTORY_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPadTemplateAPI.GSTPADTEMPLATE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstPluginAPI.GSTPLUGIN_API;
 
 /**
  * ElementFactory is used to create instances of elements.
@@ -49,7 +46,7 @@ import org.freedesktop.gstreamer.glib.Natives;
 public class ElementFactory extends PluginFeature {
 
     public static final String GTYPE_NAME = "GstElementFactory";
-    
+
     private static final Level DEBUG = Level.FINE;
     private static final Logger LOG = Logger.getLogger(ElementFactory.class.getName());
 
@@ -331,7 +328,7 @@ public class ElementFactory extends PluginFeature {
         MUXER((long) 1 << 4),
         /** Demuxer elements */
         DEMUXER((long) 1 << 5),
-        /** Parser elements */        
+        /** Parser elements */
         PARSER((long) 1 << 6),
         /** Payloader elements */
         PAYLOADER((long) 1 << 7),

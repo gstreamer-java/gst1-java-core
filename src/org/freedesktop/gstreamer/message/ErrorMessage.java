@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -21,10 +21,11 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
- * This message is posted by element when a fatal event occurs.  
+ * This message is posted by element when a fatal event occurs.
  * <p>
  * See upstream documentation at
  * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-error"
@@ -37,16 +38,16 @@ public class ErrorMessage extends GErrorMessage {
 
     /**
      * Creates a new error message.
-     * 
+     *
      * @param init internal initialization data.
      */
     ErrorMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Retrieves the GError structure contained in this message.
-     * 
+     *
      * @return the GError contained in this message.
      */
     @Override

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -17,14 +17,13 @@
 
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+
 import java.nio.charset.StandardCharsets;
 
 import static org.freedesktop.gstreamer.lowlevel.GstSDPMessageAPI.GSTSDPMESSAGE_API;
-
-import org.freedesktop.gstreamer.glib.NativeObject;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
 
 /**
  * Wrapping type and helper methods for dealing with SDP messages.
@@ -48,14 +47,14 @@ public class SDPMessage extends NativeObject {
     SDPMessage(Handle handle) {
         super(handle);
     }
-    
+
     /**
      * Creates a new instance of SDPMessage
      */
     public SDPMessage() {
         this(initHandle());
     }
-    
+
     /**
      * A SDP formatted string representation of SDPMessage.
      *
@@ -110,6 +109,6 @@ public class SDPMessage extends NativeObject {
         protected void disposeNativeHandle(GPointer ptr) {
             GSTSDPMESSAGE_API.gst_sdp_message_free(ptr.getPointer());
         }
-        
+
     }
 }

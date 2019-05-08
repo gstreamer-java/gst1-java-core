@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,13 +20,12 @@
 
 package org.freedesktop.gstreamer.interfaces;
 
-import static org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI.GSTCOLORBALANCE_API;
-
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.GObject;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI;
 
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.Natives;
+import static org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI.GSTCOLORBALANCE_API;
 
 public class ColorBalanceChannel extends GObject {
 	public static final String GTYPE_NAME = "GstColorBalanceChannel";
@@ -36,7 +35,7 @@ public class ColorBalanceChannel extends GObject {
 
 	/**
 	 * For internal gstreamer-java use only
-	 * 
+	 *
 	 * @param init
 	 */
 	ColorBalanceChannel(Initializer init) {

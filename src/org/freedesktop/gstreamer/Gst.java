@@ -1,17 +1,17 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -19,57 +19,48 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.message.Message;
-import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.glib.GError;
-import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
-
-import org.freedesktop.gstreamer.glib.MainContextExecutorService;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.glib.NativeObject;
-
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.elements.Elements;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.glib.*;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+import org.freedesktop.gstreamer.lowlevel.GstTypes;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.webrtc.WebRTC;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.ServiceLoader;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
-import org.freedesktop.gstreamer.elements.Elements;
-import org.freedesktop.gstreamer.glib.GLib;
-import org.freedesktop.gstreamer.glib.GMainContext;
-import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
+
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-import org.freedesktop.gstreamer.webrtc.WebRTC;
+import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
+import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 
 /**
  * Media library supporting arbitrary formats and filter graphs.
  */
 public final class Gst {
-    
+
     private final static Logger LOG = Logger.getLogger(Gst.class.getName());
     private final static AtomicInteger INIT_COUNT = new AtomicInteger(0);
     private final static boolean CHECK_VERSIONS = !Boolean.getBoolean("gstreamer.suppressVersionChecks");
     private final static boolean DISABLE_EXTERNAL = Boolean.getBoolean("gstreamer.disableExternalTypes");
-    
+
     private static ScheduledExecutorService executorService;
     private static volatile CountDownLatch quit = new CountDownLatch(1);
     private static GMainContext mainContext;
@@ -77,14 +68,14 @@ public final class Gst {
     private static List<Runnable> shutdownTasks = Collections.synchronizedList(new ArrayList<Runnable>());
     // set minorVersion to a value guaranteed to be >= anything else unless set in init()
     private static int minorVersion = Integer.MAX_VALUE;
-    
+
     private static class NativeArgs {
-        
+
         public IntByReference argcRef;
         public PointerByReference argvRef;
         Memory[] argsCopy;
         Memory argvMemory;
-        
+
         public NativeArgs(String progname, String[] args) {
             //
             // Allocate some native memory to pass the args down to the native layer
@@ -98,7 +89,7 @@ public final class Gst {
             Memory arg = new Memory(progname.getBytes().length + 4);
             arg.setString(0, progname);
             argsCopy[0] = arg;
-            
+
             for (int i = 0; i < args.length; i++) {
                 arg = new Memory(args[i].getBytes().length + 1);
                 arg.setString(0, args[i]);
@@ -108,7 +99,7 @@ public final class Gst {
             argvRef = new PointerByReference(argvMemory);
             argcRef = new IntByReference(args.length + 1);
         }
-        
+
         String[] toStringArray() {
             //
             // Unpack the native arguments back into a String array
@@ -230,7 +221,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
-        
+
         return pipeline;
     }
 
@@ -279,7 +270,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
-        
+
         return pipeline;
     }
 
@@ -313,10 +304,10 @@ public final class Gst {
      * @throws GstException if the bin could not be created
      */
     public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads, List<GError> errors) {
-        
+
         Pointer[] err = {null};
         Bin bin = GSTPARSE_API.gst_parse_bin_from_description(binDescription, ghostUnlinkedPads, err);
-        
+
         if (bin == null) {
             throw new GstException(extractError(err[0]));
         }
@@ -329,7 +320,7 @@ public final class Gst {
                 LOG.log(Level.WARNING, extractError(err[0]).getMessage());
             }
         }
-        
+
         return bin;
     }
 
@@ -348,7 +339,7 @@ public final class Gst {
     public static Bin parseBinFromDescription(String binDescription, boolean ghostUnlinkedPads) {
         return parseBinFromDescription(binDescription, ghostUnlinkedPads, null);
     }
-    
+
     private static GError extractError(Pointer errorPtr) {
         GErrorStruct struct = new GErrorStruct(errorPtr);
         struct.read();
@@ -463,7 +454,7 @@ public final class Gst {
      */
     public static synchronized final String[] init(Version requestedVersion,
             String progname, String... args) throws GstException {
-        
+
         if (CHECK_VERSIONS) {
             Version availableVersion = getVersion();
             if (requestedVersion.getMajor() != 1 || availableVersion.getMajor() != 1) {
@@ -490,22 +481,22 @@ public final class Gst {
             }
             return args;
         }
-        
+
         NativeArgs argv = new NativeArgs(progname, args);
-        
+
         Pointer[] error = {null};
         if (!GST_API.gst_init_check(argv.argcRef, argv.argvRef, error)) {
             INIT_COUNT.decrementAndGet();
             throw new GstException(extractError(error[0]));
         }
-        
+
         LOG.fine("after gst_init, argc=" + argv.argcRef.getValue());
-        
+
         Version runningVersion = getVersion();
         if (runningVersion.getMajor() != 1) {
             LOG.warning("gst1-java-core only supports GStreamer 1.x");
         }
-        
+
         if (useDefaultContext) {
             mainContext = GMainContext.getDefaultContext();
             executorService = new MainContextExecutorService(mainContext);
@@ -515,11 +506,11 @@ public final class Gst {
         }
         quit = new CountDownLatch(1);
         loadAllClasses();
-        
+
         if (CHECK_VERSIONS) {
             minorVersion = requestedVersion.getMinor();
         }
-        
+
         return argv.toStringArray();
     }
 
@@ -561,7 +552,7 @@ public final class Gst {
             }
         } catch (InterruptedException ex) {
         }
-        
+
         mainContext = null;
         System.gc(); // Make sure any dangling objects are unreffed before calling deinit().
         GST_API.gst_deinit();
@@ -624,7 +615,7 @@ public final class Gst {
         return true;
     }
 
-    // Make the gstreamer executor threads daemon, so they don't stop the main 
+    // Make the gstreamer executor threads daemon, so they don't stop the main
     // program from exiting
     private static final ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger counter = new AtomicInteger(0);
@@ -649,7 +640,7 @@ public final class Gst {
                 return null;
             }
         }
-        
+
         public Thread newThread(Runnable task) {
             final String name = "gstreamer service thread " + counter.incrementAndGet();
             Thread t = new Thread(getThreadGroup(), task, name);
@@ -658,7 +649,7 @@ public final class Gst {
             return t;
         }
     };
-    
+
     @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
         Stream.of(new GLib.Types(),
@@ -681,9 +672,9 @@ public final class Gst {
             }
         }
     }
-    
+
     public static class Types implements NativeObject.TypeProvider {
-        
+
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {
             return Stream.of(
@@ -709,7 +700,7 @@ public final class Gst {
                     registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );
         }
-        
+
     }
 
     /**
@@ -720,10 +711,10 @@ public final class Gst {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     public static @interface Since {
-        
+
         public int major() default 1;
-        
+
         public int minor();
     }
-    
+
 }

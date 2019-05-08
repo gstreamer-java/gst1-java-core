@@ -1,20 +1,20 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2004 Wim Taymans <wim@fluendo.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -22,15 +22,16 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
-
 import com.sun.jna.Pointer;
-import java.util.EnumSet;
-import java.util.List;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+
+import java.util.EnumSet;
+import java.util.List;
+
+import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 
 /**
  * Base class and element that can contain other elements.
@@ -77,7 +78,7 @@ public class Bin extends Element {
     Bin(Handle handle, boolean needRef) {
         super(handle, needRef);
     }
-    
+
     /**
      * Creates a new Bin with a unique name.
      */
@@ -264,7 +265,7 @@ public class Bin extends Element {
      * Unlike {@link #debugToDotFile(java.util.EnumSet, java.lang.String)} this
      * method adds the current timestamp to the filename, so that it can be
      * used to take multiple snapshots.
-     * 
+     *
      * @param details to show in the graph
      * @param fileName output base filename (e.g. "myplayer")
      */
@@ -522,7 +523,7 @@ public class Bin extends Element {
          */
         public final static EnumSet<DebugGraphDetails> SHOW_ALL
                 = EnumSet.allOf(DebugGraphDetails.class);
-        
+
         private final int value;
 
         private DebugGraphDetails(int value) {
@@ -535,13 +536,13 @@ public class Bin extends Element {
         }
 
     }
-    
+
     static class Handle extends Element.Handle {
-        
+
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
         }
-        
+
     }
 
 }

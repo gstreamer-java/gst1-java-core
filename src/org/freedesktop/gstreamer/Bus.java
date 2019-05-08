@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -20,26 +20,25 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.message.MessageType;
-import org.freedesktop.gstreamer.message.Message;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
-
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Locale;
 import org.freedesktop.gstreamer.glib.Natives;
-
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.message.MessageType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
@@ -83,7 +82,7 @@ public class Bus extends GstObject {
     public static final String GTYPE_NAME = "GstBus";
 
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
-    
+
     private final Object lock = new Object();
     private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
     private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<MessageProxy>();
@@ -715,9 +714,9 @@ public class Bus extends GstObject {
     public void setSyncHandler(BusSyncHandler handler) {
         syncHandler = handler;
     }
-    
+
     private static final org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
-        
+
         {
             Native.setCallbackThreadInitializer(this,
                     new CallbackThreadInitializer(true,

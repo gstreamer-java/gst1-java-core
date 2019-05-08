@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,30 +20,21 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.freedesktop.gstreamer.Bus;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.Clock;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.ElementFactory;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.*;
 import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.message.Message;
-import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.event.SeekType;
-import org.freedesktop.gstreamer.State;
-import org.freedesktop.gstreamer.StateChangeReturn;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectClass;
 import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.query.Query;
 
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * GstElement methods and structures
@@ -51,7 +42,7 @@ import com.sun.jna.Pointer;
  */
 
 public interface GstElementAPI extends com.sun.jna.Library {
-    
+
     GstElementAPI GSTELEMENT_API = GstNative.load(GstElementAPI.class);
 
     GType gst_element_get_type();
@@ -81,7 +72,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
     void gst_element_unlink_pads(Element src, String srcpadname, Element dest, String destpadname);
     boolean gst_element_link_pads_filtered(Element src, String srcpadname, Element dest, String destpadname,
             Caps filter);
-    
+
     Pointer gst_element_iterate_pads(Element element);
     Pointer gst_element_iterate_src_pads(Element element);
     Pointer gst_element_iterate_sink_pads(Element element);
@@ -99,7 +90,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
     long gst_element_get_base_time(Element element);
     void gst_element_set_start_time(Element element, long time);
     long gst_element_get_start_time(Element element);
-    
+
     /**
     * GstElement:
     * @state_lock: Used to serialize execution of gst_element_set_state()
@@ -133,26 +124,26 @@ public interface GstElementAPI extends com.sun.jna.Library {
     */
     public static final class GstElementStruct extends com.sun.jna.Structure {
         public GstObjectStruct object;
-        
+
         /*< public >*/ /* with LOCK */
         public volatile Pointer /* GRecMutex */ state_lock;
-        
+
         /* element state */
         public volatile Pointer /* GCond */ state_cond;
         public volatile int state_cookie;
         public volatile State target_state;
         public volatile State current_state;
-        public volatile State next_state; 
-        public volatile State pending_state;         
+        public volatile State next_state;
+        public volatile State pending_state;
         public volatile StateChangeReturn last_return;
-        
+
         public volatile Pointer /* GstBus */ bus;
-        
+
         /* allocated clock */
         public volatile Pointer /* GstClock */ clock;
         public volatile long base_time;
         public volatile long start_time;
-        
+
         /* element pads, these lists can only be iterated while holding
         * the LOCK or checking the cookie after each LOCK. */
         public volatile short numpads;
@@ -162,10 +153,10 @@ public interface GstElementAPI extends com.sun.jna.Library {
         public volatile short numsinkpads;
         public volatile Pointer /* GList */sinkpads;
         public volatile int pads_cookie;
-        
+
         /* with object LOCK */
         public volatile Pointer /* GList */contexts;
-        
+
         /*< private >*/
         public volatile Pointer[] _gst_reserved = new Pointer[GstAPI.GST_PADDING-1];
 
@@ -186,8 +177,8 @@ public interface GstElementAPI extends com.sun.jna.Library {
             });
         }
     }
-    
-    
+
+
     /**
     * GstElementClass:
     * @parent_class: the parent class structure
@@ -228,7 +219,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
             public void callback(Element element);
         }
         public static interface RequestNewPad extends GstCallback {
-            public Pad callback(Element element, /* PadTemplate */ Pointer templ, 
+            public Pad callback(Element element, /* PadTemplate */ Pointer templ,
                     String name, Caps caps);
         }
         public static interface ReleasePad extends GstCallback {
@@ -271,38 +262,38 @@ public interface GstElementAPI extends com.sun.jna.Library {
         // Actual data members
         //
         public GstObjectClass parent_class;
-        
+
         /*< public >*/
         /* the element metadata */
         public volatile Pointer metadata;
-        
+
         /* factory that the element was created from */
         public volatile ElementFactory elementfactory;
-        
+
         /* templates for our pads */
         public volatile Pointer /* GList */ padtemplates;
         public volatile int numpadtemplates;
         public volatile int pad_templ_cookie;
-        
+
         /*< private >*/
         /* signal callbacks */
         public PadAdded pad_added;
         public PadRemoved pad_removed;
         public NoMorePads no_more_pads;
-        
+
         /* request/release pads */
         public RequestNewPad request_new_pad;
         public ReleasePad release_pad;
-        
+
         /* state changes */
         public GetState get_state;
         public SetState set_state;
         public ChangeState change_state;
         public StateChanged state_changed;
-        
+
         /* bus */
         public volatile SetBus set_bus;
-        
+
         /* set/get clocks */
         public volatile ProvideClock provide_clock;
         public volatile SetClock set_clock;

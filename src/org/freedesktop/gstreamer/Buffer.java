@@ -4,16 +4,16 @@
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -21,18 +21,17 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
-
-import java.nio.ByteBuffer;
-
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.NativeFlags;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
-import com.sun.jna.Pointer;
+import java.nio.ByteBuffer;
 import java.util.EnumSet;
-import org.freedesktop.gstreamer.glib.NativeFlags;
-import org.freedesktop.gstreamer.glib.Natives;
+
+import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 /**
  * Buffers are the basic unit of data transfer in GStreamer. They contain the

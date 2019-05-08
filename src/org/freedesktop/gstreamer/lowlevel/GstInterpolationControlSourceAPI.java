@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,22 +20,16 @@ package org.freedesktop.gstreamer.lowlevel;
 
 //import org.freedesktop.gstreamer.controller.ControlSource;
 //import org.freedesktop.gstreamer.controller.InterpolationControlSource;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI.GSList;
 
 import com.sun.jna.Library;
-import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 // @TODO review in line with https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/libs/gst/controller/gstinterpolationcontrolsource.h
 
 public interface GstInterpolationControlSourceAPI extends Library {
-//	GstInterpolationControlSourceAPI GSTINTERPOLATIONCONTROLSOURCE_API 
+//	GstInterpolationControlSourceAPI GSTINTERPOLATIONCONTROLSOURCE_API
 //		= GstNative.load("gstcontroller", GstInterpolationControlSourceAPI.class);
 //    int GST_PADDING = GstAPI.GST_PADDING;
-//    
+//
 //    public enum InterpolateMode {
 //      NONE,
 //      TRIGGER,
@@ -44,7 +38,7 @@ public interface GstInterpolationControlSourceAPI extends Library {
 //      CUBIC,
 //      USER;
 //    }
-//	
+//
 //	public static final class GstInterpolationControlSourceStruct extends com.sun.jna.Structure {
 //		public volatile ControlSource parent;
 //
@@ -61,10 +55,10 @@ public interface GstInterpolationControlSourceAPI extends Library {
 //            });
 //        }
 //	}
-//	
+//
 //	public static final class GstInterpolationControlSourceClass extends com.sun.jna.Structure {
 //		public volatile ControlSource parent_class;
-//		  
+//
 //		/*< private >*/
 //		public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
 //
@@ -75,7 +69,7 @@ public interface GstInterpolationControlSourceAPI extends Library {
 //            });
 //        }
 //	}
-//	
+//
 //	GType gst_interpolation_control_source_get_type();
 //
 //	/* Functions */

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -20,25 +20,19 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-import static org.freedesktop.gstreamer.lowlevel.GstTagAPI.GSTTAG_API;
-import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
-
-import java.util.AbstractList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
 import org.freedesktop.gstreamer.glib.GDate;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+import static org.freedesktop.gstreamer.lowlevel.GstTagAPI.GSTTAG_API;
+import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
 
 /**
  * List of tags and values used to describe media metadata.
@@ -52,7 +46,7 @@ import org.freedesktop.gstreamer.glib.Natives;
 public class TagList extends MiniObject {
 
     public static final String GTYPE_NAME = "GstTagList";
-    
+
     /**
      * Creates a new instance of TagList
      *

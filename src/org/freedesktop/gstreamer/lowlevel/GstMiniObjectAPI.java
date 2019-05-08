@@ -21,16 +21,15 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
-import com.sun.jna.Pointer;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * GstMiniObject functions
@@ -51,7 +50,7 @@ public interface GstMiniObjectAPI extends com.sun.jna.Library {
     Pointer gst_mini_object_steal_qdata(MiniObject mini_object, GQuark quark);
 
     public static final class MiniObjectStruct extends com.sun.jna.Structure {
-        public volatile GType type; 
+        public volatile GType type;
         public volatile int refcount;
         public volatile int lockstate;
         public volatile int flags;

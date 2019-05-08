@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,11 +18,11 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.NativeLibrary;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-
-import com.sun.jna.NativeLibrary;
 
 /**
  *

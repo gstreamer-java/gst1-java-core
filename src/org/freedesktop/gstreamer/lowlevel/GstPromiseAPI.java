@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018 Vinicius Tona
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -17,9 +17,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Promise;
 import org.freedesktop.gstreamer.PromiseResult;
 import org.freedesktop.gstreamer.Structure;
@@ -27,11 +25,12 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
-import com.sun.jna.Pointer;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * GstPromise methods and structures
- * 
+ *
  * @see https://github.com/GStreamer/gstreamer/blob/master/gst/gstpromise.h
  * available since GStreamer 1.14
  */

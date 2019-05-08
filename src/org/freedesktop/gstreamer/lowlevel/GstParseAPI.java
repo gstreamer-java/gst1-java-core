@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,12 +19,10 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Pipeline;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.Bin;
 import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
  * gstparse functions

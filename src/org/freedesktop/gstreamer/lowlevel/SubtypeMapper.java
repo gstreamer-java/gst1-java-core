@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,50 +18,14 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.event.*;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.message.*;
+import org.freedesktop.gstreamer.query.*;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.event.EventType;
-import org.freedesktop.gstreamer.message.Message;
-import org.freedesktop.gstreamer.message.MessageType;
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.query.QueryType;
-import org.freedesktop.gstreamer.event.BufferSizeEvent;
-import org.freedesktop.gstreamer.event.CapsEvent;
-import org.freedesktop.gstreamer.event.EOSEvent;
-import org.freedesktop.gstreamer.event.FlushStartEvent;
-import org.freedesktop.gstreamer.event.FlushStopEvent;
-import org.freedesktop.gstreamer.event.LatencyEvent;
-import org.freedesktop.gstreamer.event.NavigationEvent;
-import org.freedesktop.gstreamer.event.QOSEvent;
-import org.freedesktop.gstreamer.event.ReconfigureEvent;
-import org.freedesktop.gstreamer.event.SeekEvent;
-import org.freedesktop.gstreamer.event.SegmentEvent;
-import org.freedesktop.gstreamer.event.StepEvent;
-import org.freedesktop.gstreamer.event.StreamStartEvent;
-import org.freedesktop.gstreamer.event.TagEvent;
-import org.freedesktop.gstreamer.message.BufferingMessage;
-import org.freedesktop.gstreamer.message.DurationChangedMessage;
-import org.freedesktop.gstreamer.message.EOSMessage;
-import org.freedesktop.gstreamer.message.ErrorMessage;
-import org.freedesktop.gstreamer.message.InfoMessage;
-import org.freedesktop.gstreamer.message.LatencyMessage;
-import org.freedesktop.gstreamer.message.SegmentDoneMessage;
-import org.freedesktop.gstreamer.message.StateChangedMessage;
-import org.freedesktop.gstreamer.message.TagMessage;
-import org.freedesktop.gstreamer.message.WarningMessage;
-import org.freedesktop.gstreamer.query.AllocationQuery;
-import org.freedesktop.gstreamer.query.ConvertQuery;
-import org.freedesktop.gstreamer.query.DurationQuery;
-import org.freedesktop.gstreamer.query.FormatsQuery;
-import org.freedesktop.gstreamer.query.LatencyQuery;
-import org.freedesktop.gstreamer.query.PositionQuery;
-import org.freedesktop.gstreamer.query.SeekingQuery;
-import org.freedesktop.gstreamer.query.SegmentQuery;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.NativeObject;
 
 /**
  * Mapper for classes which have subtypes (e.g. Event, Message, Query).

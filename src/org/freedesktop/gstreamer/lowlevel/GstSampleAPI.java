@@ -1,9 +1,9 @@
-/* 
+/*
  * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -21,15 +21,15 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Sample;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
-
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * GstSampleAPI functions and structure
@@ -40,13 +40,13 @@ public interface GstSampleAPI extends com.sun.jna.Library {
 
     public static final class SampleStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
-        
+
         public volatile Pointer /* GstBuffer* */buffer;             // to Buffer
         public volatile Pointer /* GstCaps* */ caps;                // to Caps
         public volatile GstSegmentStruct segment;                   // Segment
         public volatile Pointer /* GstStructure* */ info;           // to Strucutre
         public volatile Pointer /* GstBufferList* */ buffer_list;   // to buffer_list
-        
+
         /**
          * Creates a new instance of MessageStruct
          */
@@ -63,8 +63,8 @@ public interface GstSampleAPI extends com.sun.jna.Library {
             });
         }
     }
-    
+
     /*@CallerOwnsReturn*/ Caps gst_sample_get_caps(Sample sample);
     /*@CallerOwnsReturn*/ Buffer gst_sample_get_buffer(Sample sample);
-    
+
 }

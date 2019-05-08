@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 Neil C Smith
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -16,12 +16,13 @@
 package org.freedesktop.gstreamer.glib;
 
 import com.sun.jna.Pointer;
-import java.util.ServiceLoader;
-import java.util.function.Function;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
+
+import java.util.ServiceLoader;
+import java.util.function.Function;
 
 /**
  * <b>Here be Dragons!</b>

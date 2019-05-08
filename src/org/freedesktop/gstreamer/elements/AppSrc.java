@@ -21,15 +21,15 @@
  */
 package org.freedesktop.gstreamer.elements;
 
+import com.sun.jna.ptr.LongByReference;
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import static org.freedesktop.gstreamer.lowlevel.AppAPI.APP_API;
-
-import com.sun.jna.ptr.LongByReference;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.glib.NativeEnum;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+
+import static org.freedesktop.gstreamer.lowlevel.AppAPI.APP_API;
 
 /**
  * A source {@link Element} that provides an easy way for applications to insert
@@ -220,7 +220,7 @@ public class AppSrc extends BaseSrc {
      * <p>
      * When the block property is TRUE, this function can block until free space
      * becomes available in the queue.
-     * 
+     *
      * @param buffer a {@link Buffer} to push
      * @return GST_FLOW_OK when the buffer was successfully queued.
      * GST_FLOW_FLUSHING when appsrc is not PAUSED or PLAYING. GST_FLOW_EOS when
@@ -233,7 +233,7 @@ public class AppSrc extends BaseSrc {
     /**
      * Indicates to the appsrc element that the last buffer queued in the
      * element is the last buffer of the stream.
-     * 
+     *
      * @return GST_FLOW_OK when the EOS was successfuly queued. GST_FLOW_FLUSHING when
      * appsrc is not PAUSED or PLAYING.
      */

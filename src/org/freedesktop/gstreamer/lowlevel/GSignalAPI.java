@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,18 +19,17 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.freedesktop.gstreamer.glib.GObject;
-import org.freedesktop.gstreamer.glib.GQuark;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GClosureNotify;
-
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.GObject;
+import org.freedesktop.gstreamer.glib.GQuark;
+import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GClosureNotify;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -45,7 +44,7 @@ public interface GSignalAPI extends Library {
 
     public static int G_CONNECT_AFTER = 1 << 0;
     public static int G_CONNECT_SWAPPED = 1 << 1;
-    
+
     public static final class GSignalQuery extends com.sun.jna.Structure {
     	public int signal_id;
     	public String signal_name;
@@ -64,11 +63,11 @@ public interface GSignalAPI extends Library {
             });
         }
     }
-    
+
     NativeLong g_signal_connect_data(GObject obj, String signal, Callback callback, Pointer data,
             GClosureNotify destroy_data, int connect_flags);
     void g_signal_handler_disconnect(GObject obj, NativeLong id);
-    
+
     int g_signal_lookup(String name, GType itype);
     String g_signal_name(int signal_id);
     void g_signal_query(int signal_id, GSignalQuery query);
@@ -76,7 +75,7 @@ public interface GSignalAPI extends Library {
 
     void g_signal_emit(GObject obj, int signal_id, GQuark detail, Object... arguments);
     void g_signal_emit_by_name(GObject obj, String signal, Object... arguments);
-    
+
     // Do nothing, but provide a base Callback class that gets automatic type conversion
     public static interface GSignalCallbackProxy extends com.sun.jna.CallbackProxy {}
 }

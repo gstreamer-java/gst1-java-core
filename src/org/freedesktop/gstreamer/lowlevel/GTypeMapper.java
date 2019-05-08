@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,31 +19,13 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.*;
+import org.freedesktop.gstreamer.glib.*;
+import org.freedesktop.gstreamer.lowlevel.annotations.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
-import org.freedesktop.gstreamer.glib.GQuark;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.annotations.ConstField;
-import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
-import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
-import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
-
-import com.sun.jna.CallbackParameterContext;
-import com.sun.jna.FromNativeContext;
-import com.sun.jna.FromNativeConverter;
-import com.sun.jna.MethodParameterContext;
-import com.sun.jna.MethodResultContext;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.StructureReadContext;
-import com.sun.jna.ToNativeContext;
-import com.sun.jna.ToNativeConverter;
-import com.sun.jna.TypeConverter;
-import org.freedesktop.gstreamer.glib.GObject;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 /**
  *
@@ -62,16 +44,16 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 
         public Class<?> nativeType() {
             return Void.class; // not really correct, but not used in this instance
-        }        
+        }
     };
-    
+
     private static TypeConverter nativeObjectConverter = new TypeConverter() {
         public Object toNative(Object arg, ToNativeContext context) {
             if (arg == null) {
                 return null;
             }
             Pointer ptr = Natives.getRawPointer((NativeObject) arg);
-            
+
             //
             // Deal with any adjustments to the proxy neccessitated by gstreamer
             // breaking their reference-counting idiom with special cases
@@ -95,7 +77,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             }
             return ptr;
         }
- 
+
         @SuppressWarnings(value = "unchecked")
         public Object fromNative(Object result, FromNativeContext context) {
             if (result == null) {
@@ -103,7 +85,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             }
             if (context instanceof MethodResultContext) {
                 //
-                // By default, gstreamer increments the refcount on objects 
+                // By default, gstreamer increments the refcount on objects
                 // returned from functions, so drop a ref here
                 //
                 boolean ownsHandle = ((MethodResultContext) context).getMethod().isAnnotationPresent(CallerOwnsReturn.class);
@@ -127,7 +109,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             }
             throw new IllegalStateException("Cannot convert to NativeObject from " + context);
         }
-        
+
         public Class<?> nativeType() {
             return Pointer.class;
         }
@@ -170,7 +152,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
                 return s;
             } else {
                 return ((Pointer) result).getString(0);
-            }           
+            }
         }
 
         public Class<?> nativeType() {
@@ -179,7 +161,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
 
         public Object toNative(Object arg, ToNativeContext context) {
             // Let the default String -> native conversion handle it
-            return arg;            
+            return arg;
         }
     };
 
@@ -210,15 +192,15 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
             return ((GQuark) arg0).intValue();
         }
     };
-    
+
     private TypeConverter intptrConverter = new TypeConverter() {
-        
+
         public Object toNative(Object arg, ToNativeContext context) {
-            return ((IntPtr)arg).value;            
+            return ((IntPtr)arg).value;
         }
 
         public Object fromNative(Object arg0, FromNativeContext arg1) {
-            return new IntPtr(((Number) arg0).intValue());            
+            return new IntPtr(((Number) arg0).intValue());
         }
 
         public Class<?> nativeType() {
@@ -226,13 +208,13 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
         }
     };
 //    private TypeConverter querytypeConverter = new TypeConverter() {
-//        
+//
 //        public Object toNative(Object arg, ToNativeContext context) {
 //            return ((QueryType)arg).intValue();
 //        }
 //
 //        public Object fromNative(Object arg0, FromNativeContext arg1) {
-//            return QueryType.valueOf(((Number) arg0).intValue());            
+//            return QueryType.valueOf(((Number) arg0).intValue());
 //        }
 //
 //        public Class<?> nativeType() {
@@ -263,7 +245,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
     @SuppressWarnings("rawtypes")
 	public FromNativeConverter getFromNativeConverter(Class type) {
         if (Enum.class.isAssignableFrom(type)) {
-            return enumConverter;              
+            return enumConverter;
         } else if (NativeObject.class.isAssignableFrom(type)) {
             return nativeObjectConverter;
         } else if (Boolean.class == type || boolean.class == type) {
@@ -289,7 +271,7 @@ public class GTypeMapper extends com.sun.jna.DefaultTypeMapper {
         } else if (Boolean.class == type || boolean.class == type) {
             return booleanConverter;
         } else if (String.class == type) {
-            return stringConverter;        
+            return stringConverter;
         } else if (IntPtr.class == type) {
             return intptrConverter;
         } else if (GQuark.class == type) {

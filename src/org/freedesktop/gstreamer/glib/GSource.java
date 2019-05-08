@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,25 +19,26 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.*;
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 
 import java.util.concurrent.Callable;
 
-import com.sun.jna.Pointer;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 /**
  *
  */
 public class GSource extends RefCountedObject {
-    
+
     GSource(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle), init.needRef);
     }
-    
+
     public int attach(GMainContext context) {
         return GLIB_API.g_source_attach(this, context);
     }
-    
+
     public void setCallback(final Callable<Boolean> call) {
         this.callback = new GlibAPI.GSourceFunc() {
             public boolean callback(Pointer data) {
@@ -53,9 +54,9 @@ public class GSource extends RefCountedObject {
         };
         GLIB_API.g_source_set_callback(this, callback, null, null);
     }
-    
+
     private GlibAPI.GSourceFunc callback;
-    
+
     private static final class Handle extends RefCountedObject.Handle {
 
         Handle(GPointer ptr, boolean ownsHandle) {
@@ -77,6 +78,6 @@ public class GSource extends RefCountedObject {
         protected void unref() {
             GLIB_API.g_source_unref(getPointer().getPointer());
         }
-        
+
     }
 }

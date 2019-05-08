@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  *
@@ -22,13 +22,14 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  * Package private base class for ERROR, WARNING and INFO messages.
  */
 abstract class GErrorMessage extends Message {
-    
+
     /**
      * Creates a new GError message.
      * @param init internal initialization data.
@@ -36,12 +37,12 @@ abstract class GErrorMessage extends Message {
     GErrorMessage(Initializer init) {
         super(init);
     }
-    
+
     abstract GstAPI.GErrorStruct parseMessage();
-    
+
     /**
      * Gets the error code from this message.
-     * 
+     *
      * @return the error code.
      */
     public int getCode() {
@@ -53,10 +54,10 @@ abstract class GErrorMessage extends Message {
         GLIB_API.g_error_free(err);
         return code;
     }
-    
+
     /**
      * Gets the message contained in this message.
-     * 
+     *
      * @return the message contained in this message.
      */
     public String getMessage() {

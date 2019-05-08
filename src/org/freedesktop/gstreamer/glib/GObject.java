@@ -5,16 +5,16 @@
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
  * Copyright (c) 2009 Andres Colubri
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -22,40 +22,23 @@
  */
 package org.freedesktop.gstreamer.glib;
 
-import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
-import static org.freedesktop.gstreamer.lowlevel.GSignalAPI.GSIGNAL_API;
-import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
+import com.sun.jna.*;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.lowlevel.*;
+import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.IntPtr;
-
-import com.sun.jna.Callback;
-import com.sun.jna.CallbackThreadInitializer;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
+import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GSignalAPI.GSIGNAL_API;
+import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
 
 /**
  * GObject is the fundamental type providing the common attributes and methods

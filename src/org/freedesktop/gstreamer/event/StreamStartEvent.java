@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer.event;
 
 
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**
@@ -32,7 +33,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
  * <p>
  */
 public class StreamStartEvent extends Event {
-	
+
     /**
      * This constructor is for internal use only.
      * @param init initialization data.

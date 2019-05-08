@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,11 +20,9 @@
 
 package org.freedesktop.gstreamer.interfaces;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
-
 import org.freedesktop.gstreamer.Element;
-
 import org.freedesktop.gstreamer.glib.GObject;
+import org.freedesktop.gstreamer.lowlevel.GType;
 
 /**
  * Base type for all gstreamer interface proxies
@@ -39,5 +37,5 @@ class GstInterface implements GObject.GInterface {
     public Element getGObject() {
         return element;
     }
-    
+
 }

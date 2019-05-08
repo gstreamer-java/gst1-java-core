@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2016 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,10 +20,10 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Library;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.sun.jna.Library;
 
 /**
  * A convenience wrapper to aid in loading an API interface.
@@ -36,7 +36,7 @@ public final class GstNative {
             System.getProperty("gstreamer.GstNative.nameFormats", "%s-1.0").split("\\|");
 
     private GstNative() {}
-    
+
     private static final Map<String, Object> options = new HashMap<String, Object>() {{
         put(Library.OPTION_TYPE_MAPPER, new GTypeMapper());
         put(Library.OPTION_FUNCTION_MAPPER, new GFunctionMapper());

@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2009 Tamas Korodi <kotyo@zamba.fm>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,14 +18,13 @@
  */
 package org.freedesktop.gstreamer.interfaces;
 
-import java.util.List;
-
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Element;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
-import com.sun.jna.Pointer;
 import java.util.ArrayList;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
+import java.util.List;
 
 import static org.freedesktop.gstreamer.lowlevel.GstColorBalanceAPI.GSTCOLORBALANCE_API;
 
@@ -56,7 +55,7 @@ public class ColorBalance extends GstInterface {
      * @return a list of color balance channels available on this device
      */
     public List<ColorBalanceChannel> getChannelList() {
-        
+
         GlibAPI.GList glist = GSTCOLORBALANCE_API.gst_color_balance_list_channels(this);
         List<ColorBalanceChannel> list = new ArrayList<>();
         GlibAPI.GList next = glist;
@@ -68,7 +67,7 @@ public class ColorBalance extends GstInterface {
         }
         return list;
     }
-        
+
     /**
      * Retrieves a ColorBalanceChannel for the given Pointer
      *

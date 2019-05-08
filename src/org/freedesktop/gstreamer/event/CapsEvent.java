@@ -20,6 +20,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**

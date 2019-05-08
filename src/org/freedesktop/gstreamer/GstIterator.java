@@ -1,17 +1,17 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -20,17 +20,16 @@
 package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
+import org.freedesktop.gstreamer.lowlevel.GstTypes;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstIteratorAPI.GSTITERATOR_API;
 
@@ -98,7 +97,7 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
             throw new UnsupportedOperationException("Items cannot be removed.");
         }
     }
-    
+
     private static final class Handle extends NativeObject.Handle {
 
         public Handle(GPointer ptr, boolean ownsHandle) {
@@ -109,6 +108,6 @@ class GstIterator<T extends NativeObject> extends NativeObject implements java.l
         protected void disposeNativeHandle(GPointer ptr) {
             GSTITERATOR_API.gst_iterator_free(ptr.getPointer());
         }
-        
+
     }
 }

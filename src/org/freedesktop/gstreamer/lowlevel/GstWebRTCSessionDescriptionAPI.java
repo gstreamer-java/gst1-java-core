@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018 Vinicius Tona
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -17,20 +17,18 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.SDPMessage;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+import org.freedesktop.gstreamer.webrtc.WebRTCSDPType;
+import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
+
 import java.util.Arrays;
 import java.util.List;
 
-import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
-import org.freedesktop.gstreamer.webrtc.WebRTCSDPType;
-import org.freedesktop.gstreamer.SDPMessage;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
-
-import com.sun.jna.Pointer;
-
 /**
  * GstWebRTCSessionDescription methods and structures
- * 
+ *
  * @see https://github.com/GStreamer/gst-plugins-bad/blob/master/gst-libs/gst/webrtc/rtcsessiondescription.h
  * Available since GStreamer 1.14
  */

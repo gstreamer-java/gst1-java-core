@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2015 Andres Colubri <andres.colubri@gmail.com>
  * Copyright (C) 2013 Olivier Crete <olivier.crete@collabora.com>
@@ -20,13 +20,14 @@
  */
 package org.freedesktop.gstreamer.device;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.freedesktop.gstreamer.lowlevel.GstDeviceMonitorAPI.GSTDEVICEMONITOR_API;
 
@@ -121,7 +122,7 @@ public class DeviceMonitor extends GstObject {
     /**
      * Gets a list of devices from all of the relevant monitors. This may
      * actually probe the hardware if the monitor is not currently started.
-     * 
+     *
      * @return list of {@link Device}
      */
     public List<Device> getDevices() {

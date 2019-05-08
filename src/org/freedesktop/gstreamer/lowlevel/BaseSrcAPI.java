@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,37 +19,33 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.FlowReturn;
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.elements.BaseSrc;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementClass;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
-
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Union;
 import com.sun.jna.ptr.LongByReference;
+import org.freedesktop.gstreamer.*;
+import org.freedesktop.gstreamer.elements.BaseSrc;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
+import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementClass;
+import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
+import org.freedesktop.gstreamer.query.Query;
+
 import java.util.Arrays;
 import java.util.List;
-import org.freedesktop.gstreamer.query.Query;
 
 /**
  * GstBaseSrc methods and structures
  * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesrc.h?h=1.8
  */
 public interface BaseSrcAPI extends Library {
-    
+
     BaseSrcAPI BASESRC_API = GstNative.load("gstbase", BaseSrcAPI.class);
-    
+
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
-    
+
     public static final class GstBaseSrcStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
 
@@ -81,16 +77,16 @@ public interface BaseSrcAPI extends Library {
         public volatile boolean typefind;
         public volatile boolean running;
         public volatile Event pending_seek;
-        
+
         public volatile Pointer /* GstBaseSrcPrivate */ priv;
-        
-        /*< private >*/        
+
+        /*< private >*/
         public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
-                "element", "srcpad", 
+                "element", "srcpad",
                 "live_lock", "live_cond", "is_live", "live_running",
                 "blocksize", "can_activate_push", "random_access",
                 "clock_id", "segment", "need_newsegment",
@@ -100,7 +96,7 @@ public interface BaseSrcAPI extends Library {
             });
         }
     }
-    
+
     public static final class GstBaseSrcAbiData extends Union {
         public volatile GstBaseSrcAbi abi;
         public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE - 1];
@@ -118,7 +114,7 @@ public interface BaseSrcAPI extends Library {
             });
         }
     }
-    
+
     // -------------- Callbacks -----------------
     public static interface GetCaps extends Callback {
         public Caps callback(BaseSrc src, Caps filter);
@@ -132,10 +128,10 @@ public interface BaseSrcAPI extends Library {
     public static interface DecideAllocation extends Callback {
         public boolean callback(BaseSrc src, Query query);
     }
-    
+
 
     public static interface GetTimes extends Callback {
-        public void callback(BaseSrc src, Buffer buffer, 
+        public void callback(BaseSrc src, Buffer buffer,
                 Pointer /* GstClockTime */ start, Pointer /* GstClockTime */ end);
     }
     public static interface GetSize extends Callback {
@@ -156,7 +152,7 @@ public interface BaseSrcAPI extends Library {
         boolean callback(BaseSrc src, GstSegmentStruct segment);
     }
     public static interface QueryFunc extends Callback {
-        boolean callback(BaseSrc src, Query query);            
+        boolean callback(BaseSrc src, Query query);
     }
     public static interface Fixate extends Callback {
         public Caps callback(BaseSrc src, Caps caps);
@@ -164,19 +160,19 @@ public interface BaseSrcAPI extends Library {
     public static interface PrepareSeek extends Callback {
         boolean callback(BaseSrc src, Event seek, GstSegmentStruct segment);
     }
-    
+
     public static final class GstBaseSrcClass extends com.sun.jna.Structure {
         public GstBaseSrcClass() {}
         public GstBaseSrcClass(Pointer ptr) {
             useMemory(ptr);
             read();
         }
-        
+
         //
         // Actual data members
         //
         public GstElementClass parent_class;
-        
+
         /*< public >*/
         /* virtual methods for subclasses */
 
@@ -185,24 +181,24 @@ public interface BaseSrcAPI extends Library {
         /* decide on caps */
         public BooleanFunc1 negotiate;
         /* called if, in negotation, caps need fixating */
-        public Fixate fixate;   
+        public Fixate fixate;
         /* notify the subclass of new caps */
         public SetCaps set_caps;
-        
+
         /* setup allocation query */
-        public DecideAllocation decide_allocation;       
-  
-  
+        public DecideAllocation decide_allocation;
+
+
         /* start and stop processing, ideal for opening/closing the resource */
         public BooleanFunc1 start;
         public BooleanFunc1 stop;
-  
-        /* 
+
+        /*
          * Given a buffer, return start and stop time when it should be pushed
-         * out. The base class will sync on the clock using these times. 
+         * out. The base class will sync on the clock using these times.
          */
         public GetTimes get_times;
-  
+
         /* get the total size of the resource in bytes */
         public GetSize get_size;
 
@@ -211,35 +207,35 @@ public interface BaseSrcAPI extends Library {
 
         /* Prepare the segment on which to perform do_seek(), converting to the
         * current basesrc format. */
-        public PrepareSeek prepare_seek_segment;        
+        public PrepareSeek prepare_seek_segment;
         /* notify subclasses of a seek */
         public Seek do_seek;
-        
+
         /* unlock any pending access to the resource. subclasses should unlock
         * any function ASAP. */
         public BooleanFunc1 unlock;
         /* Clear any pending unlock request, as we succeeded in unlocking */
         public BooleanFunc1 unlock_stop;
- 
+
         /* notify subclasses of a query */
         public QueryFunc query;
-        
+
         /* notify subclasses of an event */
         public EventNotify event;
 
         /* ask the subclass to create a buffer with offset and size, the default
         * implementation will call alloc and fill. */
         public Create create;
-  
+
         /* ask the subclass to allocate an output buffer. The default implementation
         * will use the negotiated allocator. */
         public Create alloc;
-        
+
         public Fill fill;
-        
+
         /*< private >*/
         public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
-    
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[] {
@@ -252,10 +248,10 @@ public interface BaseSrcAPI extends Library {
                 "unlock", "unlock_stop",
                 "query", "event", "create", "alloc", "fill",
                 "_gst_reserved"
-                
+
             });
         }
-    
+
     }
 
     GType gst_base_src_get_type();

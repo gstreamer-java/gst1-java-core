@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,14 +19,13 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Plugin;
 import org.freedesktop.gstreamer.PluginFeature;
 import org.freedesktop.gstreamer.Registry;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 /**
  * GstRegistry functions
@@ -48,7 +47,7 @@ public interface GstRegistryAPI extends com.sun.jna.Library {
         boolean callback(Plugin plugin, Pointer user_data);
     }
 
-    
+
     static interface PluginFeatureFilter extends GstCallback {
         /**
          * A function that can be used with e.g. gst_registry_feature_filter()
@@ -64,7 +63,7 @@ public interface GstRegistryAPI extends com.sun.jna.Library {
     GType gst_registry_get_type();
     /* registry_get_default returns a non-refcounted object */
     Pointer gst_registry_get();
-    
+
     GList gst_registry_get_feature_list(Registry registry, GType type);
     int gst_registry_get_feature_list_cookie (Registry registry);
     GList gst_registry_get_feature_list_by_plugin(Registry registry, String name);

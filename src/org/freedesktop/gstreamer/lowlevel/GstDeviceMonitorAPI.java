@@ -20,18 +20,18 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Bus;
-import org.freedesktop.gstreamer.device.DeviceMonitor;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.device.DeviceMonitor;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
  *
  * http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/gstreamer-GstDeviceMonitor.html
- */ 
+ */
 public interface GstDeviceMonitorAPI extends com.sun.jna.Library {
     GstDeviceMonitorAPI GSTDEVICEMONITOR_API = GstNative.load(GstDeviceMonitorAPI.class);
-    
+
     @CallerOwnsReturn DeviceMonitor gst_device_monitor_new();
     @CallerOwnsReturn Pointer ptr_gst_device_monitor_new();
     @CallerOwnsReturn Bus gst_device_monitor_get_bus(DeviceMonitor monitor);

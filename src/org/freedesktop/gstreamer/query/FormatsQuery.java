@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -21,12 +21,12 @@
  */
 package org.freedesktop.gstreamer.query;
 
-import java.util.AbstractList;
-import java.util.List;
-
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
+
+import java.util.AbstractList;
+import java.util.List;
 
 /**
  * Used for querying formats of the stream.

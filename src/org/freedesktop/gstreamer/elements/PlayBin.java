@@ -20,16 +20,11 @@
  */
 package org.freedesktop.gstreamer.elements;
 
+import org.freedesktop.gstreamer.*;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+
 import java.io.File;
 import java.net.URI;
-import org.freedesktop.gstreamer.Bus;
-
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.Pipeline;
-import org.freedesktop.gstreamer.TagList;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 /**
  * <p>

@@ -21,12 +21,12 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.glib.RefCountedObject;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 /**
  * Lightweight base class for the GStreamer object hierarchy
@@ -47,7 +47,7 @@ public abstract class MiniObject extends RefCountedObject {
         this(new Handle(init.ptr.as(GstMiniObjectPtr.class, GstMiniObjectPtr::new),
                 init.ownsHandle), init.needRef);
     }
-    
+
     protected MiniObject(Handle handle, boolean needRef) {
         super(handle, needRef);
     }

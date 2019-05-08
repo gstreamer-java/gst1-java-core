@@ -19,12 +19,12 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.sun.jna.FromNativeContext;
 import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
 
@@ -39,7 +39,7 @@ public class GType extends IntegerType {
 
     private static final Map<Long, GType> gTypeByValues = new ConcurrentHashMap<Long, GType>();
     private static final Map<String, GType> gTypeByNames = new ConcurrentHashMap<String, GType>();
-    
+
     public static final GType INVALID = init(0);
     public static final GType NONE = init(1);
     public static final GType INTERFACE = init(2);
@@ -66,7 +66,7 @@ public class GType extends IntegerType {
     // descriptions set in lazy
     private GType parent;
     private String name;
-    
+
     /**
      * @param value the fundamental type number.
      * @return the GType
@@ -74,7 +74,7 @@ public class GType extends IntegerType {
     private static GType init(int value) {
         return valueOf(value << G_TYPE_FUNDAMENTAL_SHIFT);
     }
-    
+
     protected GType(long t) {
     	super(SIZE, t);
     }
@@ -107,7 +107,7 @@ public class GType extends IntegerType {
     	}
     	return result;
     }
-    
+
     // FIXME : to move in GstTypes
     public static GType valueOf(Class<?> javaType) {
         if (Integer.class == javaType || int.class == javaType) {
@@ -135,19 +135,19 @@ public class GType extends IntegerType {
      * @return the direct parent type or INVALID if the type has no parent
      */
     public GType getParentType() {
-    	if (this.parent == null) 
+    	if (this.parent == null)
     		this.parent = GOBJECT_API.g_type_parent(this);
     	return this.parent;
     }
-    
+
     public String getTypeName() {
     	if (this.name == null) {
     		this.name = GOBJECT_API.g_type_name(this);
     		gTypeByNames.put(this.name, this);
     	}
-    	return this.name;    	
+    	return this.name;
     }
-    
+
     @Override
 	public String toString() {
     	return "[" + this.getTypeName() + ":" + super.longValue() + "]";

@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,41 +19,34 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.freedesktop.gstreamer.PadMode;
-import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.ClockReturn;
-import org.freedesktop.gstreamer.event.Event;
-import org.freedesktop.gstreamer.FlowReturn;
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.query.Query;
+import com.sun.jna.Callback;
+import com.sun.jna.Library;
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.*;
 import org.freedesktop.gstreamer.elements.BaseSink;
+import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementClass;
 import org.freedesktop.gstreamer.lowlevel.GstElementAPI.GstElementStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.query.AllocationQuery;
+import org.freedesktop.gstreamer.query.Query;
 
-import com.sun.jna.Callback;
-import com.sun.jna.Library;
-import com.sun.jna.Pointer;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * GstBaseSink methods and structures
  * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/libs/gst/base/gstbasesink.h?h=1.8
  */
 public interface BaseSinkAPI extends Library {
-    
+
     BaseSinkAPI BASESINK_API = GstNative.load("gstbase", BaseSinkAPI.class);
-    
+
     int GST_PADDING = GstAPI.GST_PADDING;
     int GST_PADDING_LARGE = GstAPI.GST_PADDING_LARGE;
-    
+
     public static final class GstBaseSinkStruct extends com.sun.jna.Structure {
         public GstElementStruct element;
 
@@ -67,8 +60,8 @@ public interface BaseSinkAPI extends Library {
         public volatile boolean can_activate_push;
 
         /*< protected >*/ /* with PREROLL_LOCK */
-        public volatile /* GMutex */ Pointer preroll_lock; 
-        public volatile /* GCond */ Pointer preroll_cond; 
+        public volatile /* GMutex */ Pointer preroll_lock;
+        public volatile /* GCond */ Pointer preroll_cond;
         public volatile boolean eos;
         public volatile boolean need_preroll;
         public volatile boolean have_preroll;
@@ -88,7 +81,7 @@ public interface BaseSinkAPI extends Library {
 
         /*< private >*/
         public volatile Pointer /* GstBaseSinkPrivate */ priv;
-        
+
         /*< private >*/
         public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING_LARGE];
 
@@ -101,7 +94,7 @@ public interface BaseSinkAPI extends Library {
             return Arrays.asList(new String[] {
                 "element", "sinkpad", "pad_mode",
                 "offset", "can_activate_pull", "can_activate_push",
-                "preroll_lock", "preroll_cond", 
+                "preroll_lock", "preroll_cond",
                 "eos", "need_preroll", "have_preroll",
                 "playing_async", "have_newsegment", "segment",
                 "clock_id", "sync",
@@ -110,7 +103,7 @@ public interface BaseSinkAPI extends Library {
             });
         }
     }
-    
+
     // -------------- Callbacks -----------------
     public static interface GetCaps extends Callback {
         public Caps callback(BaseSink sink, Caps caps);
@@ -230,12 +223,12 @@ public interface BaseSinkAPI extends Library {
             });
         }
     }
-    
+
     GType gst_base_sink_get_type();
 
     FlowReturn gst_base_sink_do_preroll(BaseSink sink, MiniObject obj);
     FlowReturn gst_base_sink_wait_preroll(BaseSink sink);
-    
+
     /* synchronizing against the clock */
     void gst_base_sink_set_sync(BaseSink sink, boolean sync);
     boolean gst_base_sink_get_sync(BaseSink sink);
@@ -243,15 +236,15 @@ public interface BaseSinkAPI extends Library {
     /* dropping late buffers */
     void gst_base_sink_set_max_lateness (BaseSink sink, long max_lateness);
     long gst_base_sink_get_max_lateness(BaseSink sink);
-    
+
     /* performing QoS */
     void gst_base_sink_set_qos_enabled(BaseSink sink, boolean enabled);
     boolean gst_base_sink_is_qos_enabled(BaseSink sink);
-    
+
     /* doing async state changes */
     void gst_base_sink_set_async_enabled(BaseSink sink, boolean enabled);
     boolean gst_base_sink_is_async_enabled(BaseSink sink);
-    
+
     /* tuning synchronisation */
     void gst_base_sink_set_ts_offset(BaseSink sink, long offset);
     long gst_base_sink_get_ts_offset(BaseSink sink);
@@ -264,15 +257,15 @@ public interface BaseSinkAPI extends Library {
     /* latency */
     boolean gst_base_sink_query_latency(BaseSink sink, boolean live, boolean upstream_live, long min_latency, long max_latency);
     long gst_base_sink_get_latency(BaseSink sink);
-        
+
     /* render delay */
     void gst_base_sink_set_render_delay(BaseSink sink, long delay);
     long gst_base_sink_get_render_delay(BaseSink sink);
-    
+
     /* blocksize */
     void gst_base_sink_set_blocksize(BaseSink sink, int blocksize);
     int gst_base_sink_get_blocksize(BaseSink sink);
-    
+
     ClockReturn gst_base_sink_wait_clock(BaseSink sink, long time, /* GstlongDiff */ Pointer jitter);
     FlowReturn gst_base_sink_wait_eos(BaseSink sink, long time, /* GstlongDiff */ Pointer jitter);
 }

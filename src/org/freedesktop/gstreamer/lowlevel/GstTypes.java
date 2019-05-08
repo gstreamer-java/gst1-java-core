@@ -21,12 +21,13 @@
  */
 package org.freedesktop.gstreamer.lowlevel;
 
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.NativeObject.TypeRegistration;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.NativeObject.TypeRegistration;
 
 /**
  *
@@ -62,7 +63,7 @@ public class GstTypes {
     public static final TypeRegistration<?> registrationFor(final GType gType) {
         final String gTypeName = gType.getTypeName();
 
-        // Is this GType still registered in the map ? 
+        // Is this GType still registered in the map ?
         TypeRegistration<?> reg = TYPES.get(gTypeName);
         if (reg != null) {
             return reg;
@@ -88,7 +89,7 @@ public class GstTypes {
         // No registered class found for this gType
         return null;
     }
-    
+
     public static final Class<? extends NativeObject> classFor(final GType gType) {
     	TypeRegistration<?> reg = registrationFor(gType);
         return reg != null ? reg.getJavaType() : null;

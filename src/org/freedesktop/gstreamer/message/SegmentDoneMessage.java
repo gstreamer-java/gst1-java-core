@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -23,11 +23,12 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
- * This message is posted by elements that finish playback of a segment as a 
- * result of a segment seek. 
+ * This message is posted by elements that finish playback of a segment as a
+ * result of a segment seek.
  * <p>
  * See upstream documentation at
  * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-segment-done"
@@ -40,16 +41,16 @@ public class SegmentDoneMessage extends Message {
 
     /**
      * Creates a new segment-done message.
-     * 
+     *
      * @param init internal initialization data.
      */
     SegmentDoneMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new segment done message.
-     * 
+     *
      * @param src the object originating the message.
      * @param format the format of the position being done
      * @param position the position of the segment being done
@@ -57,10 +58,10 @@ public class SegmentDoneMessage extends Message {
     public SegmentDoneMessage(GstObject src, Format format, long position) {
         this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_segment_done(src, format, position)));
     }
-    
+
     /**
      * Gets the format of the position in this message.
-     * 
+     *
      * @return the format of the position.
      */
     public Format getFormat() {
@@ -68,10 +69,10 @@ public class SegmentDoneMessage extends Message {
         GSTMESSAGE_API.gst_message_parse_segment_done(this, format, null);
         return format[0];
     }
-    
+
     /**
      * Gets the position of the segment that is done.
-     * 
+     *
      * @return the position.
      */
     public long getPosition() {

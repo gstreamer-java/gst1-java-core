@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,14 +19,13 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
-
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
 
 /**
  * GstStructure functions
@@ -49,10 +48,10 @@ public interface GstStructureAPI extends com.sun.jna.Library {
     void gst_structure_remove_field(Structure structure, String fieldName);
     void gst_structure_remove_fields(Structure structure, String... fieldNames);
     void gst_structure_remove_all_fields(Structure structure);
-    
+
     String gst_structure_get_name(Structure structure);
     void gst_structure_set_name(Structure structure, String name);
-    boolean gst_structure_has_name(Structure structure, String name); 
+    boolean gst_structure_has_name(Structure structure, String name);
     int gst_structure_n_fields(Structure structure);
     String gst_structure_nth_field_name(Structure structure, int index);
     boolean gst_structure_has_field(Structure structure, String fieldname);
@@ -65,11 +64,11 @@ public interface GstStructureAPI extends com.sun.jna.Library {
     boolean gst_structure_get_uint(Structure structure, String fieldname, int[] value);
     boolean gst_structure_get_fourcc(Structure structure, String fieldname, int[] value);
     boolean gst_structure_get_double(Structure structure, String fieldname, double[] value);
-    
+
     boolean gst_structure_get_date(Structure structure, String fieldname, PointerByReference value);
     boolean gst_structure_get_date(Structure structure, String fieldname, Pointer[] value);
     //boolean gst_structure_get_clock_time(Structure structure, String fieldname, Gstlong *value);
-    
+
     String gst_structure_get_string(Structure structure, String fieldname);
     boolean gst_structure_get_enum(Structure structure, String fieldname, GType enumtype, int[] value);
     boolean gst_structure_get_fraction(Structure structure, String fieldname,
@@ -77,6 +76,6 @@ public interface GstStructureAPI extends com.sun.jna.Library {
 							    int[] value_denominator);
     GValue gst_structure_get_value(Structure structure, String fieldname);
     void gst_structure_set(Structure structure, String fieldname, Object... args);
-    
+
     void gst_structure_free(Pointer ptr);
 }

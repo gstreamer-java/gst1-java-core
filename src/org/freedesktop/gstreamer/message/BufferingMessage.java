@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
@@ -39,7 +40,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
  * The application must be prepared to receive BUFFERING messages in the
  * PREROLLING state and may only set the pipeline to PLAYING after receiving a
  * message with <tt>percent</tt> set to 100, which can happen after the pipeline
- * completed prerolling. 
+ * completed prerolling.
  */
 public class BufferingMessage extends Message {
 
@@ -50,7 +51,7 @@ public class BufferingMessage extends Message {
     BufferingMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new Buffering message.
      * @param src The object originating the message.
@@ -59,10 +60,10 @@ public class BufferingMessage extends Message {
     public BufferingMessage(GstObject src, int percent) {
         this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_buffering(src, percent)));
     }
-    
+
     /**
      * Gets the buffering percentage.
-     * 
+     *
      * @return the percentage that is being buffered.
      */
     public int getPercent() {

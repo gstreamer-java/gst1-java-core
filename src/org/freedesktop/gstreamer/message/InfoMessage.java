@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.message;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
+
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**

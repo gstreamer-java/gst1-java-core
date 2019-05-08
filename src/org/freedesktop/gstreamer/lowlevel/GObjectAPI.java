@@ -2,7 +2,7 @@
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Andres Colubri
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,22 +20,17 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
+import com.sun.jna.*;
+import com.sun.jna.Structure.ByReference;
+import com.sun.jna.ptr.IntByReference;
 import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.GQuark;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
-import com.sun.jna.Callback;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure.ByReference;
-import com.sun.jna.ptr.IntByReference;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -54,9 +49,9 @@ public interface GObjectAPI extends Library {
     void g_object_set(GObject obj, String propertyName, Object... data);
     void g_object_get(GObject obj, String propertyName, Object... data);
     Pointer g_object_class_list_properties(Pointer oclass, IntByReference size);
-    
+
     Pointer g_object_new(GType object_type, Object... args);
-    
+
     interface GClosureNotify extends Callback {
         void callback(Pointer data, Pointer closure);
     }
@@ -67,8 +62,8 @@ public interface GObjectAPI extends Library {
             GClosureNotify destroy_data, int connect_flags);
     void g_signal_handler_disconnect(GObjectPtr obj, NativeLong id);
     boolean g_object_is_floating(GObjectPtr obj);
-    /** Sink floating ref 
-     * https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref-sink 
+    /** Sink floating ref
+     * https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref-sink
      */
     Pointer g_object_ref_sink(Pointer ptr);
     GObjectPtr g_object_ref_sink(GObjectPtr ptr);
@@ -96,7 +91,7 @@ public interface GObjectAPI extends Library {
 
     String g_intern_string(String string);
     String g_intern_static_string(String string);
-    
+
     void g_type_init();
     void g_type_init_with_debug_flags(int flags);
     String g_type_name(GType type);
@@ -107,7 +102,7 @@ public interface GObjectAPI extends Library {
     Pointer g_type_create_instance(GType type);
     void g_type_free_instance(Pointer instance);
     boolean g_type_is_a(GType type, GType is_a_type);
-    
+
     GType g_type_register_static(GType parent_type, String type_name,
         GTypeInfo info, /* GTypeFlags */ int flags);
     GType g_type_register_static(GType parent_type, Pointer type_name,
@@ -118,7 +113,7 @@ public interface GObjectAPI extends Library {
     GType g_type_register_static_simple(GType parent_type, Pointer type_name,
         int class_size, GClassInitFunc class_init, int instance_size,
         GInstanceInitFunc instance_init, /* GTypeFlags */ int flags);
-    /* 
+    /*
      * Basic Type Structures
      */
     public static class GTypeClass extends com.sun.jna.Structure {
@@ -131,7 +126,7 @@ public interface GObjectAPI extends Library {
             return Collections.singletonList("g_type");
         }
     }
-    
+
     public static final class GTypeClassByReference extends GTypeClass implements ByReference {
     	//
     }
@@ -140,14 +135,14 @@ public interface GObjectAPI extends Library {
     public static final class GTypeInstance extends com.sun.jna.Structure {
 
         /*< private >*/
-    	public volatile GTypeClassByReference g_class; 
-        
+    	public volatile GTypeClassByReference g_class;
+
         @Override
         protected List<String> getFieldOrder() {
             return Collections.singletonList("g_class");
         }
-    }                  
-    
+    }
+
     public static final class GObjectStruct extends com.sun.jna.Structure {
         public volatile GTypeInstance g_type_instance;
         public volatile int ref_count;
@@ -157,7 +152,7 @@ public interface GObjectAPI extends Library {
             super(ptr.getPointer());
             read();
         }
-        
+
 
         @Override
         protected List<String> getFieldOrder() {
@@ -165,7 +160,7 @@ public interface GObjectAPI extends Library {
                 "g_type_instance", "ref_count", "qdata"
             });
         }
-           
+
     }
     public static final class GObjectConstructParam {
         public volatile Pointer spec;
@@ -182,9 +177,9 @@ public interface GObjectAPI extends Library {
         public volatile Pointer dispatch_properties_changed;
         public Notify notify;
         public volatile byte[] p_dummy = new byte[8 * Native.POINTER_SIZE];
-        
+
         public static interface Constructor extends Callback {
-            public Pointer callback(GType type, int n_construct_properties, 
+            public Pointer callback(GType type, int n_construct_properties,
                     GObjectConstructParam properties);
         };
         public static interface SetProperty extends Callback {
@@ -208,7 +203,7 @@ public interface GObjectAPI extends Library {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
@@ -218,10 +213,10 @@ public interface GObjectAPI extends Library {
                "p_dummy"
             });
         }
-        
+
     }
-    
-    
+
+
     public static interface GBaseInitFunc extends Callback {
         public void callback(Pointer g_class);
     }
@@ -239,13 +234,13 @@ public interface GObjectAPI extends Library {
     }
     public static interface GInstanceInitFunc extends Callback {
         void callback(GTypeInstance instance, Pointer g_class);
-    }    
+    }
     public static final class GTypeInfo extends com.sun.jna.Structure {
-        public GTypeInfo() { 
+        public GTypeInfo() {
             clear();
         }
-        public GTypeInfo(Pointer ptr) { 
-            super(ptr); 
+        public GTypeInfo(Pointer ptr) {
+            super(ptr);
             read();
         }
         /* interface types, classed types, instantiated types */
@@ -259,11 +254,11 @@ public interface GObjectAPI extends Library {
         /* instantiated types */
         public short instance_size;
         public short n_preallocs;
-        
+
         public GInstanceInitFunc instance_init;
 
         /* value handling */
-        public volatile /* GTypeValueTable */ Pointer value_table;                
+        public volatile /* GTypeValueTable */ Pointer value_table;
 
         @Override
         protected List<String> getFieldOrder() {
@@ -280,9 +275,9 @@ public interface GObjectAPI extends Library {
     	public abstract Object getMinimum();
     	public abstract Object getMaximum();
     	public abstract Object getDefault();
-    	
-        public GParamSpecTypeSpecific() { 
-        	clear(); 
+
+        public GParamSpecTypeSpecific() {
+        	clear();
         }
         public GParamSpecTypeSpecific(Pointer ptr) {
         	super(ptr);
@@ -291,21 +286,21 @@ public interface GObjectAPI extends Library {
     public static final class GParamSpecBoolean extends GParamSpecTypeSpecific {
     	public volatile GParamSpec parent_instance;
     	public volatile boolean default_value;
-    	
+
     	public Object getMinimum() { return null; }
     	public Object getMaximum() { return null; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecBoolean(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecInt extends GParamSpecTypeSpecific {
@@ -313,46 +308,46 @@ public interface GObjectAPI extends Library {
     	public volatile int minimum;
     	public volatile int maximum;
     	public volatile int default_value;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecInt(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
-        
+
     }
     public static final class GParamSpecUInt extends GParamSpecTypeSpecific {
     	public volatile GParamSpec parent_instance;
     	public volatile int minimum;
     	public volatile int maximum;
     	public volatile int default_value;
-    	
+
     	public Object getMinimum() { return ((long)minimum)&0xffffff; }
     	public Object getMaximum() { return ((long)maximum)&0xffffff; }
     	public Object getDefault() { return ((long)default_value)&0xffffff; }
-    	
+
         public GParamSpecUInt(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecChar extends GParamSpecTypeSpecific {
@@ -360,22 +355,22 @@ public interface GObjectAPI extends Library {
     	public volatile byte minimum;
     	public volatile byte maximum;
     	public volatile byte default_value;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecChar(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecUChar extends GParamSpecTypeSpecific {
@@ -383,22 +378,22 @@ public interface GObjectAPI extends Library {
     	public volatile byte minimum;
     	public volatile byte maximum;
     	public volatile byte default_value;
-    	
+
     	public Object getMinimum() { return ((short)minimum)&0xff; }
     	public Object getMaximum() { return ((short)maximum)&0xff; }
     	public Object getDefault() { return ((short)default_value)&0xff; }
-    	
+
         public GParamSpecUChar(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecLong extends GParamSpecTypeSpecific {
@@ -406,22 +401,22 @@ public interface GObjectAPI extends Library {
     	public volatile NativeLong minimum;
     	public volatile NativeLong maximum;
     	public volatile NativeLong default_value;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecLong(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecInt64 extends GParamSpecTypeSpecific {
@@ -429,22 +424,22 @@ public interface GObjectAPI extends Library {
     	public volatile long minimum;
     	public volatile long maximum;
     	public volatile long default_value;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecInt64(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value"
-            });           
+            });
         }
     }
     public static final class GParamSpecFloat extends GParamSpecTypeSpecific {
@@ -453,22 +448,22 @@ public interface GObjectAPI extends Library {
     	public volatile float maximum;
     	public volatile float default_value;
     	public volatile float epsilon;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecFloat(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value", "epsilon"
-            });           
+            });
         }
     }
     public static final class GParamSpecDouble extends GParamSpecTypeSpecific {
@@ -477,22 +472,22 @@ public interface GObjectAPI extends Library {
     	public volatile double maximum;
     	public volatile double default_value;
     	public volatile double epsilon;
-    	
+
     	public Object getMinimum() { return minimum; }
     	public Object getMaximum() { return maximum; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecDouble(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "minimum", "maximum",
                 "default_value", "epsilon"
-            });           
+            });
         }
     }
     public static final class GParamSpecString extends GParamSpecTypeSpecific {
@@ -503,25 +498,25 @@ public interface GObjectAPI extends Library {
     	public volatile byte substitutor;
     	public volatile int null_fold_if_empty_ensure_non_null;
 
-    	
+
     	public Object getMinimum() { return null; }
     	public Object getMaximum() { return null; }
     	public Object getDefault() { return default_value; }
-    	
+
         public GParamSpecString(Pointer ptr) {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
                 "parent_instance", "default_value", "cset_first",
                 "cset_nth", "substitutor", "null_fold_if_empty_ensure_non_null"
-            });           
+            });
         }
     }
-    
+
     public static final class GParamSpec extends com.sun.jna.Structure {
         public volatile GTypeInstance g_type_instance;
         public volatile String g_name;
@@ -534,7 +529,7 @@ public interface GObjectAPI extends Library {
         public volatile Pointer qdata;
         public volatile int ref_count;
         public volatile int param_id;      /* sort-criteria */
-        
+
         public GParamSpec() {
             clear();
         }
@@ -542,7 +537,7 @@ public interface GObjectAPI extends Library {
             super(ptr);
             read();
         }
-        
+
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{
@@ -550,9 +545,9 @@ public interface GObjectAPI extends Library {
                 "value_type", "owner_type", "_nick",
                 "_blurb", "qdata", "ref_count",
                 "param_id"
-            });           
+            });
         }
-        
+
 /*
         public String getName() {
             return (String) readField("g_name");

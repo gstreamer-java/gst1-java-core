@@ -18,15 +18,13 @@
  */
 package org.freedesktop.gstreamer.query;
 
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.BufferPool;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Structure;
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * An allocation query for querying allocation properties.

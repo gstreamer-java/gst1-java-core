@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2004 Wim Taymans <wim@fluendo.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -21,18 +21,18 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.query.Query;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.freedesktop.gstreamer.glib.Natives;
 
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-
-import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
-import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 
 /**
  * Abstract base class for all pipeline elements.
@@ -80,7 +80,7 @@ public class Element extends GstObject {
     protected Element(Initializer init) {
         super(init);
     }
-    
+
     Element(Handle handle, boolean needRef) {
         super(handle, needRef);
     }
@@ -143,7 +143,7 @@ public class Element extends GstObject {
 
 
 //    /**
-//     * Chain together a series of elements, with this element as the first in the list. 
+//     * Chain together a series of elements, with this element as the first in the list.
 //     * <p>
 //     * Make sure you have added your elements to a bin or pipeline with
 //     * {@link Bin#add} or {@link Bin#addMany} before trying to link them.
@@ -755,13 +755,13 @@ public class Element extends GstObject {
     public boolean query(Query query) {
         return GSTELEMENT_API.gst_element_query(this, query);
     }
-    
+
     static class Handle extends GstObject.Handle {
-        
+
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
         }
-        
+
     }
 
 }

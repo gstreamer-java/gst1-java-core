@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -23,16 +23,13 @@ package org.freedesktop.gstreamer.lowlevel;
 //import org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.GstControlSourceStruct;
 
 import com.sun.jna.Library;
-import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
 
 // @TODO review in line with https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/libs/gst/controller/gstlfocontrolsource.h
 
 public interface GstLFOControlSourceAPI extends Library {
 //	GstLFOControlSourceAPI GSTLFOCONTROLSOURCE_API = GstNative.load("gstcontroller", GstLFOControlSourceAPI.class);
 //    int GST_PADDING = GstAPI.GST_PADDING;
-//	
+//
 //    public enum Waveform
 //    {
 //      SINE,
@@ -41,7 +38,7 @@ public interface GstLFOControlSourceAPI extends Library {
 //      REVERSE_SAW,
 //      TRIANGLE;
 //    }
-//    
+//
 //	public static final class GstLFOControlSourceStruct extends com.sun.jna.Structure {
 //		public volatile GstControlSourceStruct parent;
 //
@@ -58,10 +55,10 @@ public interface GstLFOControlSourceAPI extends Library {
 //            });
 //        }
 //	}
-//	
+//
 //	public static final class GstLFOControlSourceClass extends com.sun.jna.Structure {
 //		public volatile GstControlSourceClass parent_class;
-//		  
+//
 //		  /*< private >*/
 //		public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
 //
@@ -72,7 +69,7 @@ public interface GstLFOControlSourceAPI extends Library {
 //            });
 //        }
 //	}
-//	
+//
 //	GType gst_lfo_control_source_get_type();
 //	GType gst_lfo_waveform_get_type();
 //

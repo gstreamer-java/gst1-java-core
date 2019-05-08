@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Vinicius Tona
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -17,12 +17,11 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.GSTPROMISE_API;
-
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+
+import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.GSTPROMISE_API;
 
 /**
  * A miniobject for future/promise-like functionality

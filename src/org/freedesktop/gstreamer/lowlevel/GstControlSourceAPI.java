@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,18 +19,8 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 //import org.freedesktop.gstreamer.controller.ControlSource;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
-import com.sun.jna.Callback;
 import com.sun.jna.Library;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.DoubleByReference;
-import java.util.Arrays;
-import java.util.List;
-import org.freedesktop.gstreamer.GstObject;
-import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
-import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectClass;
 
 /**
  * GstControlSource methods and structures
@@ -40,10 +30,10 @@ import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectClass;
 // @TODO review in line with https://gitlab.freedesktop.org/gstreamer/gstreamer/tree/master/libs/gst/controller
 
 public interface GstControlSourceAPI extends Library {
-//    
-//    GstControlSourceAPI GSTCONTROLSOURCE_API = GstNative.load("gstcontroller", GstControlSourceAPI.class);    
-//	
-//    /**    
+//
+//    GstControlSourceAPI GSTCONTROLSOURCE_API = GstNative.load("gstcontroller", GstControlSourceAPI.class);
+//
+//    /**
 //    * GstTimedValue:
 //    * @timestamp: timestamp of the value change
 //    * @value: the corresponding value
@@ -52,7 +42,7 @@ public interface GstControlSourceAPI extends Library {
 //    */
 //    public static final class TimedValue extends com.sun.jna.Structure {
 //    	public static final String GTYPE_NAME = "GstTimedValue";
-//        
+//
 //        public volatile long timestamp;
 //        public volatile double value;
 //
@@ -63,7 +53,7 @@ public interface GstControlSourceAPI extends Library {
 //            });
 //        }
 //    }
-//	
+//
 //    public static interface GstControlSourceGetValue extends Callback {
 //        public boolean callback(ControlSource self, long timestamp, DoubleByReference value);
 //    }
@@ -73,7 +63,7 @@ public interface GstControlSourceAPI extends Library {
 //    public static interface GstControlSourceBind extends Callback {
 //        public boolean callback(ControlSource self, GParamSpec pspec);
 //    }
-//    
+//
 //    /**
 //    * GstControlSource:
 //    * @get_value: Function for returning a value for a given timestamp
@@ -119,7 +109,7 @@ public interface GstControlSourceAPI extends Library {
 //            });
 //        }
 //    }
-//	
+//
 //    GType gst_control_source_get_type();
 //
 //    /* Functions */

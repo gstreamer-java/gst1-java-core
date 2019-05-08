@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,19 +19,12 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  * Wraps the glib main loop/main context in a ScheduledExecutor interface.
@@ -56,7 +49,7 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
     };
     private GSource idleSource = null;
     private volatile boolean running = true;
-    
+
     public MainContextExecutorService(GMainContext context) {
         this.context = context;
     }
@@ -143,7 +136,7 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
         };
         private final long period;
         private final TimeUnit units;
-        
+
         public ScheduledTimeout(Callable<V> call, long delay, TimeUnit units) {
             this(call, delay, 0, units);
         }
@@ -154,11 +147,11 @@ public class MainContextExecutorService extends AbstractExecutorService implemen
             this.units = units;
             start(delay, delayCallback);
         }
-        
+
         private final int getMilliseconds(long time) {
             return (int) units.toMillis(time);
         }
-        
+
         private void start(long timeout, Callable<Boolean> callback) {
             int milliseconds = getMilliseconds(timeout);
             /*

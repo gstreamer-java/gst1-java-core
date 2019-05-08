@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -14,16 +14,15 @@
  * this work. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.freedesktop.gstreamer.lowlevel; 
+package org.freedesktop.gstreamer.lowlevel;
+
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.SDPMessage;
+import org.freedesktop.gstreamer.SDPResult;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.freedesktop.gstreamer.SDPResult;
-import org.freedesktop.gstreamer.SDPMessage;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
-
-import com.sun.jna.Pointer;
 
 /**
  * GstSDPMessage methods and structures
@@ -78,7 +77,7 @@ public interface GstSDPMessageAPI extends com.sun.jna.Library {
     @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(new String[] {
-          "username", "sess_id", "sess_version", "nettype", "addrtype", "addr" 
+          "username", "sess_id", "sess_version", "nettype", "addrtype", "addr"
         });
     }
   }
@@ -108,10 +107,10 @@ public interface GstSDPMessageAPI extends com.sun.jna.Library {
         useMemory(ptr);
     }
 
-    @Override 
+    @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(new String[] {
-          "nettype", "addrtype", "address", "ttl", "addr_number" 
+          "nettype", "addrtype", "address", "ttl", "addr_number"
         });
     }
   }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -23,10 +23,11 @@ package org.freedesktop.gstreamer.message;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.State;
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
 /**
- * A state change message. 
+ * A state change message.
  * <p>
  * See upstream documentation at
  * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#gst-message-new-state-changed"
@@ -43,7 +44,7 @@ public class StateChangedMessage extends Message {
     StateChangedMessage(Initializer init) {
         super(init);
     }
-    
+
     /**
      * Creates a new state-changed message.
      *
@@ -55,10 +56,10 @@ public class StateChangedMessage extends Message {
     public StateChangedMessage(GstObject src, State old, State current, State pending) {
         super(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_state_changed(src, old, current, pending)));
     }
-    
+
     /**
      * Gets the previous state.
-     * 
+     *
      * @return the previous state.
      */
     public State getOldState() {
@@ -66,10 +67,10 @@ public class StateChangedMessage extends Message {
         GSTMESSAGE_API.gst_message_parse_state_changed(this, state, null, null);
         return state[0];
     }
-    
+
     /**
      * Gets the new (current) state.
-     * 
+     *
      * @return the new state.
      */
     public State getNewState() {
@@ -77,10 +78,10 @@ public class StateChangedMessage extends Message {
         GSTMESSAGE_API.gst_message_parse_state_changed(this, null, state, null);
         return state[0];
     }
-    
+
     /**
      * Gets the pending (target) state.
-     * 
+     *
      * @return the pending state.
      */
     public State getPendingState() {

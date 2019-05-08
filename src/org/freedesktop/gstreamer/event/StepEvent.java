@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2010 DHoyt <david.g.hoyt@gmail.com>
  * Copyright (c) 2010 Levente Farkas
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer.event;
 
 import org.freedesktop.gstreamer.Format;
 import org.freedesktop.gstreamer.glib.Natives;
+
 import static org.freedesktop.gstreamer.lowlevel.GstEventAPI.GSTEVENT_API;
 
 /**

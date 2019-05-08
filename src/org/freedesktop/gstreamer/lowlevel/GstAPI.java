@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,13 +19,13 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Format;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.Format;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,12 +33,12 @@ import java.util.List;
  *
  */
 public interface GstAPI extends Library {
-    
+
     GstAPI GST_API = GstNative.load(GstAPI.class);
-    
+
     int GST_PADDING = 4;
     int GST_PADDING_LARGE = 20;
-        
+
     GType gst_type_find_get_type();
     @CallerOwnsReturn String gst_version_string();
     void gst_version(long[] major, long[] minor, long[] micro, long[] nano);
@@ -48,7 +48,7 @@ public interface GstAPI extends Library {
     boolean gst_segtrap_is_enabled();
     void gst_segtrap_set_enabled(boolean enabled);
     void gst_deinit();
-    
+
     /**
     * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstsegment.h?h=1.8
     *
@@ -92,13 +92,13 @@ public interface GstAPI extends Library {
             this.position = position;
             this.duration = duration;
         }
-        
+
         /*< public >*/
         public int flags;
-        
+
         public double rate;
         public double applied_rate;
-        
+
         public Format format;
         public long base;
         public long offset;
@@ -122,12 +122,12 @@ public interface GstAPI extends Library {
             });
         }
     };
-    
+
     public static final class GErrorStruct extends com.sun.jna.Structure {
         public volatile int domain; /* GQuark */
         public volatile int code;
         public volatile String message;
-        
+
         /** Creates a new instance of GError */
         public GErrorStruct() { clear(); }
         public GErrorStruct(Pointer ptr) {

@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -19,13 +19,12 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
 import org.freedesktop.gstreamer.TagList;
 import org.freedesktop.gstreamer.TagMergeMode;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.PointerByReference;
 
 /**
  * GstTagList functions
@@ -39,9 +38,9 @@ public interface GstTagListAPI extends com.sun.jna.Library {
     interface TagMergeFunc extends GstCallback {
         void callback(Pointer dest, Pointer src);
     }
-    
+
     @CallerOwnsReturn Pointer ptr_gst_tag_list_new_empty();
-    
+
     void gst_tag_list_add(TagList list, TagMergeMode mode, String tag, Object... tags);
     @CallerOwnsReturn TagList gst_tag_list_copy(TagList list);
     @CallerOwnsReturn Pointer ptr_gst_tag_list_copy(TagList list);
@@ -53,7 +52,7 @@ public interface GstTagListAPI extends com.sun.jna.Library {
     int gst_tag_list_get_tag_size(TagList list, String tag);
     void gst_tag_list_remove_tag(TagList list, TagList tag);
     void gst_tag_list_foreach(TagList list, TagForeachFunc func, Pointer user_data);
-    
+
     boolean gst_tag_list_get_char(TagList list, String tag, byte[] value);
     boolean gst_tag_list_get_char_index(TagList list, String tag, int index, byte[] value);
     boolean gst_tag_list_get_uchar(TagList list, String tag, byte[] value);
@@ -75,5 +74,5 @@ public interface GstTagListAPI extends com.sun.jna.Library {
     boolean gst_tag_list_get_date_index(TagList list, String tag, int index, Pointer[] value);
     boolean gst_tag_list_get_date_time(TagList list, String tag, PointerByReference value);
     boolean gst_tag_list_get_date_time_index(TagList list, String tag, int index, PointerByReference value);
-    
+
 }

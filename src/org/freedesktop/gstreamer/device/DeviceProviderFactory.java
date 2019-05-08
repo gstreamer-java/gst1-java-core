@@ -19,15 +19,16 @@
  */
 package org.freedesktop.gstreamer.device;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.PluginFeature.Rank;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
+import org.freedesktop.gstreamer.lowlevel.GstPluginAPI;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.freedesktop.gstreamer.lowlevel.GstDeviceProviderFactoryAPI.GSTDEVICEPROVIDERFACTORY_API;
-import org.freedesktop.gstreamer.lowlevel.GstPluginAPI;
 
 /**
  * A factory for {@link DeviceProvider}
@@ -63,7 +64,7 @@ public class DeviceProviderFactory extends GstObject {
         return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get(this);
     }
 
-    
+
     /**
      * Get the metadata on factory with key.
      *
@@ -115,7 +116,7 @@ public class DeviceProviderFactory extends GstObject {
     public static DeviceProvider getByName(String factoryName) {
         return GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_get_by_name(factoryName);
     }
-    
+
     /**
      * Get a list of factories with a rank greater or equal to minrank . The
      * list of factories is returned by decreasing rank.
@@ -125,7 +126,7 @@ public class DeviceProviderFactory extends GstObject {
     public static List<DeviceProviderFactory> getDeviceProviders(Rank minRank) {
         GList glist = GSTDEVICEPROVIDERFACTORY_API.gst_device_provider_factory_list_get_device_providers(minRank);
         List<DeviceProviderFactory> list = new ArrayList<>();
-        
+
         GList next = glist;
         while (next != null) {
             if (next.data != null) {
@@ -135,9 +136,9 @@ public class DeviceProviderFactory extends GstObject {
             }
             next = next.next();
         }
-        
+
         GstPluginAPI.GSTPLUGIN_API.gst_plugin_list_free(glist);
-        
+
         return list;
     }
 //    public GType getDeviceProviderType() {

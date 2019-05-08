@@ -1,17 +1,17 @@
 /*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
- * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm> 
+ * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 2003 David A. Schleef <ds@schleef.org>
- * 
- * This code is free software: you can redistribute it and/or modify it under 
+ *
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -21,16 +21,16 @@ package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.freedesktop.gstreamer.lowlevel.GstStructureAPI.GSTSTRUCTURE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
@@ -95,7 +95,7 @@ public class Structure extends NativeObject {
     Structure(Initializer init) {
         this(new Handle(init.ptr, init.ownsHandle));
     }
-    
+
     private Structure(Handle handle) {
         super(handle);
     }
@@ -210,7 +210,7 @@ public class Structure extends NativeObject {
             }
         }
     }
-    
+
     /**
      * Get the number of fields in the {@link Structure}.
      *
@@ -247,7 +247,7 @@ public class Structure extends NativeObject {
             (byte) ((f >> 16) & 0xff), (byte) ((f >> 24) & 0xff)};
         return new String(b);
     }
-    
+
     /**
      * Get the value of the named field as a Fraction. Throws
      * {@link InvalidFieldException} if the Structure does not contain the named
@@ -371,7 +371,7 @@ public class Structure extends NativeObject {
     public String getName() {
         return GSTSTRUCTURE_API.gst_structure_get_name(this);
     }
-    
+
     /**
      * Get the @structure's ith field name as a string.
      *
@@ -406,7 +406,7 @@ public class Structure extends NativeObject {
     public String getString(String fieldName) {
         return GSTSTRUCTURE_API.gst_structure_get_string(this, fieldName);
     }
-    
+
     /**
      * Get the value of the named field. Throws {@link InvalidFieldException} if
      * the Structure does not contain the named field.
@@ -416,7 +416,7 @@ public class Structure extends NativeObject {
      */
     public Object getValue(String fieldName) {
         GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
-        
+
         if (val == null) {
             throw new InvalidFieldException("Object", fieldName);
         }
@@ -466,7 +466,7 @@ public class Structure extends NativeObject {
             }
         }
     }
-    
+
     /**
      * Check if the {@link Structure} contains a double field named fieldName.
      *
@@ -559,16 +559,16 @@ public class Structure extends NativeObject {
     public void removeFields(String... fieldNames) {
         GSTSTRUCTURE_API.gst_structure_remove_fields(this, fieldNames);
     }
-    
+
     public void setDouble(String field, Double value) {
         GSTSTRUCTURE_API.gst_structure_set(this, field, GType.DOUBLE, value);
     }
-    
+
     public void setDoubleRange(String field, Double min, Double max) {
         GSTSTRUCTURE_API.gst_structure_set(this, field,
                 GSTVALUE_API.gst_double_range_get_type(), min, max);
     }
-    
+
     public void setFraction(String field, Integer numerator, Integer denominator) {
         GSTSTRUCTURE_API.gst_structure_set(this, field,
                 GSTVALUE_API.gst_fraction_get_type(), numerator, denominator);
@@ -582,12 +582,12 @@ public class Structure extends NativeObject {
     public void setInteger(String field, Integer value) {
         GSTSTRUCTURE_API.gst_structure_set(this, field, GType.INT, value);
     }
-    
+
     public void setIntegerRange(String field, Integer min, Integer max) {
         GSTSTRUCTURE_API.gst_structure_set(this, field,
                 GSTVALUE_API.gst_int_range_get_type(), min, max);
     }
-    
+
     void setPointer(String field, Pointer value) {
         GSTSTRUCTURE_API.gst_structure_set(this, field, GType.POINTER, value);
     }
@@ -612,20 +612,20 @@ public class Structure extends NativeObject {
                         new GPointer(GSTSTRUCTURE_API.ptr_gst_structure_from_string(data, new PointerByReference()))
                 , true));
     }
-    
+
     static Structure objectFor(Pointer ptr, boolean needRef, boolean ownsHandle) {
         return Natives.objectFor(ptr, Structure.class, needRef, ownsHandle);
     }
-    
+
     public class InvalidFieldException extends RuntimeException {
-        
+
         private static final long serialVersionUID = 864118748304334069L;
-        
+
         public InvalidFieldException(String type, String fieldName) {
             super(String.format("Structure does not contain %s field '%s'", type, fieldName));
         }
     }
-    
+
     private static final class Handle extends NativeObject.Handle {
 
         public Handle(GPointer ptr, boolean ownsHandle) {
@@ -636,6 +636,6 @@ public class Structure extends NativeObject {
         protected void disposeNativeHandle(GPointer ptr) {
             GSTSTRUCTURE_API.gst_structure_free(ptr.getPointer());
         }
-        
+
     }
 }

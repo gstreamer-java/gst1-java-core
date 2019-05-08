@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Vinicius Tona
  * Copyright (c) 2018 Antonio Morales
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -17,16 +17,15 @@
  */
 package org.freedesktop.gstreamer.webrtc;
 
-import static org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI.GSTWEBRTCSESSIONDESCRIPTION_API;
-
-import org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI;
-import org.freedesktop.gstreamer.glib.NativeObject;
-
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.SDPMessage;
+import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI;
+
 import static org.freedesktop.gstreamer.lowlevel.GstSDPMessageAPI.GSTSDPMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstWebRTCSessionDescriptionAPI.GSTWEBRTCSESSIONDESCRIPTION_API;
 
 /**
  * Wraps a GstWebRTCSessionDescription
@@ -47,7 +46,7 @@ public class WebRTCSessionDescription extends NativeObject {
      */
     WebRTCSessionDescription(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle));
-        sessionDescriptionStruct = 
+        sessionDescriptionStruct =
                 new GstWebRTCSessionDescriptionAPI.WebRTCSessionDescriptionStruct(init.ptr.getPointer());
     }
 
@@ -71,7 +70,7 @@ public class WebRTCSessionDescription extends NativeObject {
         // making a copy of the SDPMessage since the original SDPMessage in the struct belongs to WebRTCSessionDescription.
         // Once WebRTCSessionDescription is disposed it would also dispose of SDPMessage leading to any objects with a reference
         // to the original SDPMessage to be invalid and potentially lead to runtime errors.
-        
+
         //    return originalSDP.copy(true);
         Pointer[] ptr = new Pointer[1];
         GSTSDPMESSAGE_API.gst_sdp_message_copy(originalSDP, ptr);
@@ -79,7 +78,7 @@ public class WebRTCSessionDescription extends NativeObject {
         return Natives.objectFor(ptr[0], SDPMessage.class, false, true);
     }
 
-    
+
     private static final class Handle extends NativeObject.Handle {
 
         public Handle(GPointer ptr, boolean ownsHandle) {
@@ -90,6 +89,6 @@ public class WebRTCSessionDescription extends NativeObject {
         protected void disposeNativeHandle(GPointer ptr) {
             GSTWEBRTCSESSIONDESCRIPTION_API.gst_webrtc_session_description_free(ptr.getPointer());
         }
-        
+
     }
 }

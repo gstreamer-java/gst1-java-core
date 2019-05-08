@@ -18,15 +18,15 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Map;
-
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Map;
 
 /**
  *
@@ -34,9 +34,9 @@ import com.sun.jna.Platform;
 public final class GNative {
     // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
     // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
-            
+
     private final static String[] nameFormats;
-    
+
     static {
         String defFormats = "%s";
         if (Platform.isWindows()) {
@@ -74,7 +74,7 @@ public final class GNative {
 //        System.out.println("Using custom library proxy for " + interfaceClass.getName());
         return interfaceClass.cast(
         		Proxy.newProxyInstance(interfaceClass.getClassLoader(),
-        				new Class[]{ interfaceClass }, 
+        				new Class[]{ interfaceClass },
         				new Handler<T>(library, options)));
     }
 
@@ -117,7 +117,7 @@ public final class GNative {
         public Object toNative(Object value) {
             return value != null ? Boolean.TRUE.equals(value) ? 1 : 0 : 0;
         }
-        
+
         @SuppressWarnings("rawtypes")
         public Object fromNative(Object value, Class javaType) {
             return value != null ? ((Integer) value).intValue() != 0 : 0;
@@ -137,12 +137,12 @@ public final class GNative {
         private final InvocationHandler proxy;
         @SuppressWarnings("unused") // Keep a reference to stop underlying Library being GC'd
         private final T library;
-        
+
         public Handler(T library, Map<String, ?> options) {
             this.library = library;
             this.proxy = Proxy.getInvocationHandler(library);
         }
-        
+
         @SuppressWarnings("null")
         public Object invoke(Object self, Method method, Object[] args) throws Throwable {
             int lastArg = args != null ? args.length : 0;
@@ -182,7 +182,7 @@ public final class GNative {
                 postInvoke[i].run();
             return retval;
         }
-        
+
         @SuppressWarnings("unused")
         Class<?> getNativeClass(Class<?> cls) {
             if (cls == Integer.class)

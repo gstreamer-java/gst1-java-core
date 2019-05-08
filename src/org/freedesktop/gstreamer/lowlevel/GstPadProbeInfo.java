@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -17,12 +17,13 @@
  */
 package org.freedesktop.gstreamer.lowlevel;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**
@@ -30,7 +31,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
  * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstpad.h?h=1.8
  */
 public class GstPadProbeInfo extends Structure {
-    
+
     public volatile int padProbeType;   // GstPadProbeInfo enum constants
     public volatile NativeLong id;      // id of the probe
     public volatile Pointer data;       // (allow-none): type specific data, check the @type field to know the datatype. This field can be %NULL.
@@ -39,7 +40,7 @@ public class GstPadProbeInfo extends Structure {
 
     /*< private >*/
     public volatile Pointer[] _gst_reserved = new Pointer[GST_PADDING];
-    
+
     @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(new String[] {

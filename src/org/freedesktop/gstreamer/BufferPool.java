@@ -18,10 +18,9 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.lowlevel.GstBufferPoolAPI;
-
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstBufferPoolAPI;
 
 /**
  * A BufferPool is an object that can be used to pre-allocate and recycle
@@ -41,7 +40,7 @@ public class BufferPool extends GstObject {
     public BufferPool() {
         this(Natives.initializer(GstBufferPoolAPI.GSTBUFFERPOOL_API.ptr_gst_buffer_pool_new()));
     }
-    
+
     /**
      * This constructor is for internal use only.
      * @param init initialization data.
@@ -52,7 +51,7 @@ public class BufferPool extends GstObject {
 
     /**
      * Configure the BufferPool with the given parameters.
-     * 
+     *
      * @param caps the {@link Caps} for the buffers
      * @param size the size of each buffer, not including prefix and padding
      * @param min_buffers the minimum amount of buffers to allocate
@@ -65,7 +64,7 @@ public class BufferPool extends GstObject {
 
     /**
      * Query the {@link Caps} configured on the BufferPool.
-     * 
+     *
      * @return Caps configured on the BufferPool
      */
     public Caps getCaps() {

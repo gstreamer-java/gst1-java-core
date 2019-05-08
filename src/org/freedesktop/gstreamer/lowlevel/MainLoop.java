@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -17,7 +17,12 @@
  */
 package org.freedesktop.gstreamer.lowlevel;
 
-import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.GMainContext;
+import org.freedesktop.gstreamer.glib.GSource;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.RefCountedObject;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,13 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import org.freedesktop.gstreamer.Gst;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.GMainContext;
-import org.freedesktop.gstreamer.glib.GSource;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.glib.RefCountedObject;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 
 /**
  * The GLib main loop.

@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -20,17 +20,16 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.BusSyncReply;
-import org.freedesktop.gstreamer.message.Message;
-import org.freedesktop.gstreamer.message.MessageType;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
-
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.message.MessageType;
 
 /**
  * GstBus functions
@@ -63,8 +62,8 @@ public interface GstBusAPI extends com.sun.jna.Library {
     void gst_bus_set_sync_handler(Bus bus, BusSyncHandler function, Pointer data, GDestroyNotify destroyCallback);
     void gst_bus_enable_sync_message_emission(Bus bus);
     void gst_bus_disable_sync_message_emission(Bus bus);
-    
+
     void gst_bus_add_signal_watch(Bus bus);
     void gst_bus_remove_signal_watch(Bus bus);
-    
+
 }

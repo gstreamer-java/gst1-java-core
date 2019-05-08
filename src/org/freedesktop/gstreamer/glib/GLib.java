@@ -1,5 +1,5 @@
-/* 
- * 
+/*
+ *
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2018 Ingo Randalf
  *
@@ -20,13 +20,15 @@
  */
 package org.freedesktop.gstreamer.glib;
 
-import java.util.stream.Stream;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI;
+
+import java.util.stream.Stream;
+
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 
 /**
  * Miscellaneous Utility Functions — a selection of portable utility functions from GLib
- * 
+ *
  * Documentation derived from https://developer.gnome.org/glib/stable/glib-Miscellaneous-Utility-Functions.html#g-setenv
  */
 public class GLib {
@@ -46,8 +48,8 @@ public class GLib {
      * only safe to use at the very start of your program, before creating any
      * other threads (or creating objects that create worker threads of their
      * own).
-     * 
-     * @param variable the environment variable to set, must not contain '='. 
+     *
+     * @param variable the environment variable to set, must not contain '='.
      * @param value the value to set the variable to.
      * @param overwrite whether to change the variable if it already exists.
      * @return FALSE if the environment variable couldn't be set.
@@ -63,8 +65,8 @@ public class GLib {
      * in some consistent character set and encoding. On Windows, they are in
      * UTF-8. On Windows, in case the environment variable's value contains
      * references to other environment variables, they are expanded.
-     * 
-     * @param variable the environment variable to get. 
+     *
+     * @param variable the environment variable to get.
      * @return the value of the environment variable, or NULL if the environment
      * variable is not found.
      */
@@ -91,7 +93,7 @@ public class GLib {
     public static void unsetEnv(String variable) {
         GlibAPI.GLIB_API.g_unsetenv(variable);
     }
-    
+
     public static class Types implements NativeObject.TypeProvider {
 
         @Override
@@ -102,9 +104,9 @@ public class GLib {
                     registration(GSocket.class, GSocket.GTYPE_NAME, GSocket::new),
                     registration(GSocketAddress.class, GSocketAddress.GTYPE_NAME, GSocketAddress::new),
                     registration(GInetSocketAddress.class, GInetSocketAddress.GTYPE_NAME, GInetSocketAddress::new)
- 
+
             );
         }
-        
+
     }
 }

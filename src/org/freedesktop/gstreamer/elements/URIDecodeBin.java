@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,20 +18,17 @@
  */
 package org.freedesktop.gstreamer.elements;
 
+import org.freedesktop.gstreamer.*;
+import org.freedesktop.gstreamer.glib.NativeEnum;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.query.Query;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.ElementFactory;
-import org.freedesktop.gstreamer.Pad;
-import org.freedesktop.gstreamer.glib.NativeEnum;
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 
 /**
  * A {@link Bin} that decodes data from a URI into raw media. It selects a

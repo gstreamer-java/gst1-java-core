@@ -1,7 +1,7 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -18,29 +18,29 @@
  */
 package org.freedesktop.gstreamer.glib;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.sun.jna.Pointer;
-import java.lang.ref.ReferenceQueue;
-import java.util.Objects;
-import java.util.ServiceLoader;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GTypedPtr;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
+
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  *
@@ -60,9 +60,9 @@ public abstract class NativeObject implements AutoCloseable {
     protected NativeObject(Handle handle) {
         this.handle = Objects.requireNonNull(handle);
         //
-        // Only store this object in the map if we can tell when it has been disposed 
+        // Only store this object in the map if we can tell when it has been disposed
         // (i.e. must be at least a GObject - MiniObject and other NativeObject subclasses
-        // don't signal destruction, so it is impossible to know if the instance 
+        // don't signal destruction, so it is impossible to know if the instance
         // is stale or not
         //
         this.ptr = handle.ptrRef.get().getPointer();
@@ -94,7 +94,7 @@ public abstract class NativeObject implements AutoCloseable {
     public void close() {
         dispose();
     }
-    
+
     /**
      * Dispose this object, and potentially clear (free, unref, etc.) the
      * underlying native object if this object owns the reference.
