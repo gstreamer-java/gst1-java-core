@@ -33,6 +33,7 @@ public interface NativeEnum<T extends Enum<T>> {
             }
         }
 
-        throw new IllegalArgumentException(""); // or return null?
+        throw new IllegalArgumentException("Value " + intValue + " is unacceptable for " +
+                type.getSimpleName() + " enum");
     }
 }
