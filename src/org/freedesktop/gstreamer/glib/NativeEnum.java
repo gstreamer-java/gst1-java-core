@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2019 Neil C Smith
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -23,7 +23,18 @@ package org.freedesktop.gstreamer.glib;
  * @param <T> Java enum type
  */
 public interface NativeEnum<T extends Enum<T>> {
-    
+
     public int intValue();
+
+    public static <T extends Enum<T> & NativeEnum<T>> T fromInt(Class<T> type, int intValue) {
+        for (T value : type.getEnumConstants()) {
+            if (value.intValue() == intValue) {
+                return value;
+            }
+        }
+
+        throw new IllegalArgumentException("Value " + intValue + " is unacceptable for " +
+                type.getSimpleName() + " enum");
+    }
 
 }
