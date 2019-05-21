@@ -102,6 +102,23 @@ public final class Natives {
     public static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
         return objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
     }
+    
+    /**
+     * Get a {@link NativeObject} instance of the requested type for the
+     * provided Pointer. Will return a cached instance if one already exists.
+     *
+     * @param <T> NativeObject type to return
+     * @param ptr native Pointer
+     * @param cls Class of type T
+     * @param needRef whether to request a ref increase (only relevant if T is
+     * subclass of {@link RefCountedObject})
+     * @param ownsHandle whether the NativeObject will own the handle, and
+     * should dispose of the native resource when GC'd or explicitly disposed.
+     * @return native object of type T
+     */
+    public static <T extends NativeObject> T objectFor(GPointer ptr, Class<T> cls, boolean needRef, boolean ownsHandle) {
+        return NativeObject.objectFor(ptr, cls, needRef ? 1 : 0, ownsHandle);
+    }
 
     /**
      * Get a {@link NativeObject} instance of the requested type for the
@@ -120,6 +137,24 @@ public final class Natives {
     public static <T extends NativeObject> T callerOwnsReturn(Pointer ptr, Class<T> cls) {
         return objectFor(ptr, cls, -1, true);
     }
+    
+    /**
+     * Get a {@link NativeObject} instance of the requested type for the
+     * provided Pointer, for use with native functions returning
+     * {@code Transfer Full} or {@code Transfer Floating} results.
+     * <p>
+     * This method will return a cached instance if one already exists. If the
+     * cached instance is a {@link RefCountedObject} this method will release a
+     * reference.
+     *
+     * @param <T> NativeObject type to return
+     * @param ptr native Pointer
+     * @param cls Class of type T
+     * @return native object of type T
+     */
+    public static <T extends NativeObject> T callerOwnsReturn(GPointer ptr, Class<T> cls) {
+        return NativeObject.objectFor(ptr, cls, -1, true);
+    }
 
     private static <T extends NativeObject> T objectFor(Pointer ptr, Class<T> cls, int refAdjust, boolean ownsHandle) {
         final GPointer gptr = GObject.class.isAssignableFrom(cls) ? new GObjectPtr(ptr)
@@ -127,7 +162,7 @@ public final class Natives {
                 : new GPointer(ptr);
         return NativeObject.objectFor(gptr, cls, refAdjust, ownsHandle);
     }
-
+    
     /**
      * Get the underlying raw native Pointer for a {@link NativeObject}.
      *
