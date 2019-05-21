@@ -21,21 +21,31 @@ import com.sun.jna.Library;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
- * All GstController API functions
+ * GstController API functions
  * 
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstTimedValueControlSource.html
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstInterpolationControlSource.html
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstTriggerControlSource.html
+ * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstDirectControlBinding.html
  * 
- * 
- * @author Neil C Smith - https://www.neilcsmith.net
  */
 public interface GstControllerAPI extends Library {
     
     GstControllerAPI GSTCONTROLLER_API = GstNative.load("gstcontroller", GstControllerAPI.class);
     
     @CallerOwnsReturn GstTriggerControlSourcePtr gst_trigger_control_source_new();
+    
     @CallerOwnsReturn GstInterpolationControlSourcePtr gst_interpolation_control_source_new();
+    
+    @CallerOwnsReturn GstDirectControlBindingPtr gst_direct_control_binding_new(
+            GstObjectPtr object,
+            String property_name,
+            GstControlSourcePtr cs);
+    
+    @CallerOwnsReturn GstDirectControlBindingPtr gst_direct_control_binding_new_absolute(
+            GstObjectPtr object,
+            String property_name,
+            GstControlSourcePtr cs);
     
     // GSequenceIter gst_timed_value_control_source_find_control_point_iter(
     //                        GstTimedValueControlSourcePtr self,
