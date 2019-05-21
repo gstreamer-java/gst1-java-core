@@ -21,29 +21,34 @@ package org.freedesktop.gstreamer.lowlevel;
 import com.sun.jna.Library;
 
 /**
- * GstControlSource API
- *
+ * GstControlBinding API
+ * 
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/GstControlBinding.html
  * https://gitlab.freedesktop.org/gstreamer/gstreamer/tree/master/libs/gst/controller
  */
 
-public interface GstControlSourceAPI extends Library {
+public interface GstControlBindingAPI extends Library {
 
-    GstControlSourceAPI GSTCONTROLSOURCE_API = GstNative.load(GstControlSourceAPI.class);    
+    GstControlBindingAPI GSTCONTROLBINDING_API = GstNative.load(GstControlBindingAPI.class);    
 
 
-    boolean gst_control_source_get_value(GstControlSourcePtr self, long timestamp, double[] value);
-    boolean gst_control_source_get_value_array(GstControlSourcePtr self, long timestamp, long interval, int n_values, double[] values);
-
-//    static class Direct implements GstControlSourceAPI {
-//
-//        @Override
-//        public native boolean gst_control_source_get_value(GstControlSourcePtr self, long timestamp, double[] value);
-//
-//        @Override
-//        public native boolean gst_control_source_get_value_array(GstControlSourcePtr self, long timestamp, long interval, int n_values, double[] values);
-//        
-//    }
-
+    boolean gst_control_binding_sync_values(GstControlBindingPtr binding,
+            GstObjectPtr object,
+            long timestamp,
+            long lastSync);
+    
+    GValueAPI.GValue gst_control_binding_get_value(GstControlBindingPtr binding,
+            long timestamp);
+    
+    boolean gst_control_binding_get_g_value_array(GstControlBindingPtr binding,
+            long timestamp,
+            long internal,
+            int n_values,
+            GValueAPI.GValueArray values);
+    
+    void gst_control_binding_set_disabled(GstControlBindingPtr binding,
+            boolean disabled);
+    
+    boolean gst_control_binding_is_disabled(GstControlBindingPtr binding);
 
 }
