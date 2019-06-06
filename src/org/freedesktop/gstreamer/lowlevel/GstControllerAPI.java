@@ -25,6 +25,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
  * 
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstTimedValueControlSource.html
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstInterpolationControlSource.html
+ * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstLFOControlSource.html
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstTriggerControlSource.html
  * https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/GstDirectControlBinding.html
  * 
@@ -36,6 +37,8 @@ public interface GstControllerAPI extends Library {
     @CallerOwnsReturn GstTriggerControlSourcePtr gst_trigger_control_source_new();
     
     @CallerOwnsReturn GstInterpolationControlSourcePtr gst_interpolation_control_source_new();
+    
+    @CallerOwnsReturn GstLFOControlSourcePtr gst_lfo_control_source_new();
     
     @CallerOwnsReturn GstDirectControlBindingPtr gst_direct_control_binding_new(
             GstObjectPtr object,
