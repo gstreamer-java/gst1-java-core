@@ -17,7 +17,10 @@
  */
 package org.freedesktop.gstreamer.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.freedesktop.gstreamer.ControlSource;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import static org.freedesktop.gstreamer.lowlevel.GstControllerAPI.GSTCONTROLLER_API;
 import org.freedesktop.gstreamer.lowlevel.GstTimedValueControlSourcePtr;
 
@@ -57,11 +60,45 @@ public class TimedValueControlSource extends ControlSource {
      *
      * @param timestamp the time the control-change is scheduled for
      * @param value the control value
-     * @return false if the the value could not be set
+     * @return false if the value could not be set
      */
     public boolean set(long timestamp, double value) {
         return GSTCONTROLLER_API.gst_timed_value_control_source_set(
                 handle.getPointer(), timestamp, value);
+    }
+    
+    /**
+     * Sets multiple timed values at once.
+     *
+     * @param timedValues a list of {@link TimedValue}
+     * @return false if the values could not be set
+     */
+    public boolean setFromList(List<TimedValue> timedValues) {
+        for (TimedValue timedvalue : timedValues) {
+            boolean ok = set(timedvalue.timestamp, timedvalue.value);
+            if (!ok) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Returns a copy of the list of {@link TimedValue} for the given property.
+     * 
+     * @return a list of TimedValue
+     */
+    public List<TimedValue> getAll() {
+        GList next = 
+                GSTCONTROLLER_API.gst_timed_value_control_source_get_all(handle.getPointer());
+        List<TimedValue> list = new ArrayList<>();
+        while (next != null) {
+            if (next.data != null) {
+                list.add(new TimedValue(next.data.getLong(0), next.data.getDouble(Long.BYTES)));
+            }
+            next = next.next();
+        }
+        return list;
     }
     
     /**

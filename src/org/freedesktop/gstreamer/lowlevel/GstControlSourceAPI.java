@@ -19,6 +19,8 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 import com.sun.jna.Library;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 /**
  * GstControlSource API
@@ -45,5 +47,22 @@ public interface GstControlSourceAPI extends Library {
 //        
 //    }
 
+    @Structure.FieldOrder({"timestamp", "value"})
+    public static final class GstTimedValue extends Structure {
+        
+        public volatile long timestamp;
+        public volatile double value;
+        
+        public GstTimedValue() {
+            super();
+        }
+        
+        public GstTimedValue(Pointer ptr) {
+            super(ptr);
+        }
+        
+    } 
+    
+    
 
 }
