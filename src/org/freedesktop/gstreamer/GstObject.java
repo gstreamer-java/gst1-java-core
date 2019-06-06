@@ -120,14 +120,11 @@ public class GstObject extends GObject {
      * fault. Most probably the control sources are not setup correctly.
      *
      * @param timestamp the time that should be processed
-     * @throws IllegalStateException if the controller values could not be
-     * applied
+     * @return true if the controller values have been applied to the object
+     * properties
      */
-    public void syncValues(long timestamp) {
-        boolean ok = GSTOBJECT_API.gst_object_sync_values(handle.getPointer(), timestamp);
-        if (!ok) {
-            throw new IllegalStateException();
-        }
+    public boolean syncValues(long timestamp) {
+        return GSTOBJECT_API.gst_object_sync_values(handle.getPointer(), timestamp);
     }
 
     /**
