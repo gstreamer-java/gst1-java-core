@@ -68,9 +68,11 @@ public class LFOControlSource extends ControlSource {
      * Default value: 1
      *
      * @param value amplitude between 0 and 1
+     * @return this
      */
-    public void setAmplitude(double value) {
+    public LFOControlSource setAmplitude(double value) {
         set("amplitude", value);
+        return this;
     }
 
     /**
@@ -96,9 +98,11 @@ public class LFOControlSource extends ControlSource {
      * Default value: 1
      *
      * @param value frequency >= {@link Double#MIN_VALUE }
+     * @return this
      */
-    public void setFrequency(double value) {
+    public LFOControlSource setFrequency(double value) {
         set("frequency", value);
+        return this;
     }
 
     /**
@@ -122,9 +126,11 @@ public class LFOControlSource extends ControlSource {
      * Default value: 1
      *
      * @param value offset between 0 and 1
+     * @return this
      */
-    public void setOffset(double value) {
+    public LFOControlSource setOffset(double value) {
         set("offset", value);
+        return this;
     }
 
     /**
@@ -147,9 +153,11 @@ public class LFOControlSource extends ControlSource {
      * Default value: 0
      *
      * @param value timeshift in nanoseconds
+     * @return this
      */
-    public void setTimeshift(long value) {
+    public LFOControlSource setTimeshift(long value) {
         set("timeshift", value);
+        return this;
     }
 
     /**
@@ -171,9 +179,11 @@ public class LFOControlSource extends ControlSource {
      * Default value: {@link LFOWaveform#SINE }
      *
      * @param value waveform
+     * @return this
      */
-    public void setWaveform(LFOWaveform value) {
+    public LFOControlSource setWaveform(LFOWaveform value) {
         set("waveform", value.intValue());
+        return this;
     }
 
     /**

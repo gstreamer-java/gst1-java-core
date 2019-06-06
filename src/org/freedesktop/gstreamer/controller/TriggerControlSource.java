@@ -71,9 +71,11 @@ public class TriggerControlSource extends TimedValueControlSource {
      * Default value: 0
      *
      * @param tolerance in nanoseconds
+     * @return this
      */
-    public void setTolerance(long tolerance) {
+    public TriggerControlSource setTolerance(long tolerance) {
         set("tolerance", tolerance);
+        return this;
     }
 
     /**

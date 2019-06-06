@@ -67,9 +67,11 @@ public class InterpolationControlSource extends TimedValueControlSource {
      * Interpolation mode to use.
      * 
      * @param mode
+     * @return this
      */
-    public void setMode(InterpolationMode mode) {
+    public InterpolationControlSource setMode(InterpolationMode mode) {
         set("mode", mode.intValue());
+        return this;
     }
     
     /**
