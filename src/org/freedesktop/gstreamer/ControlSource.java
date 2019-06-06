@@ -30,6 +30,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstControlSourceAPI.GSTCONTROLS
  * <p>
  */
 public class ControlSource extends GstObject {
+    
+    public static final String GTYPE_NAME = "GstControlSource";
 
     private final Handle handle;
 

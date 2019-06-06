@@ -40,6 +40,8 @@ import org.freedesktop.gstreamer.lowlevel.GstTimedValueControlSourcePtr;
  */
 public class TimedValueControlSource extends ControlSource {
     
+    public static final String GTYPE_NAME = "GstTimedValueControlSource";
+    
     private final Handle handle;
 
     protected TimedValueControlSource(Handle handle, boolean needRef) {

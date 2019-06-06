@@ -39,6 +39,8 @@ import org.freedesktop.gstreamer.lowlevel.GstLFOControlSourcePtr;
  */
 public class LFOControlSource extends ControlSource {
 
+    public static final String GTYPE_NAME = "GstLFOControlSource";
+    
     /**
      * Create a new, unbound LFOControlSource.
      */

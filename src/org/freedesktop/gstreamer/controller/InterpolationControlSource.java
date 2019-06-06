@@ -41,6 +41,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstControllerAPI.GSTCONTROLLER_
  * All functions are MT-safe.
  */
 public class InterpolationControlSource extends TimedValueControlSource {
+    
+    public static final String GTYPE_NAME = "GstInterpolationControlSource";
 
     /**
      * Create a new, unbound InterpolationControlSource.

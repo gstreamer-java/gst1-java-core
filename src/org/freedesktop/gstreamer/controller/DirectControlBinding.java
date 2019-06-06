@@ -37,6 +37,8 @@ import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
  * <p>
  */
 public class DirectControlBinding extends ControlBinding {
+    
+    public static final String GTYPE_NAME = "GstDirectControlBinding";
 
     DirectControlBinding(Initializer init) {
         this(new Handle(

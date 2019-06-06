@@ -32,6 +32,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstControlBindingAPI.GSTCONTROL
  */
 public class ControlBinding extends GstObject {
 
+    public static final String GTYPE_NAME = "GstControlBinding";
+    
     private final Handle handle;
 
     protected ControlBinding(Handle handle, boolean needRef) {
