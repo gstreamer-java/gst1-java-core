@@ -57,6 +57,13 @@ public interface GstControllerAPI extends Library {
             GstControlSourcePtr cs_r,
             GstControlSourcePtr cs_g,
             GstControlSourcePtr cs_b);
+    
+    // since 1.12
+    @CallerOwnsReturn GstProxyControlBindingPtr gst_proxy_control_binding_new(
+            GstObjectPtr object,
+            String property_name,
+            GstObjectPtr ref_object,
+            String ref_property_name); 
             
     
     // GSequenceIter gst_timed_value_control_source_find_control_point_iter(

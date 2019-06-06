@@ -29,9 +29,15 @@ public class Controllers implements NativeObject.TypeProvider {
     @Override
     public Stream<NativeObject.TypeRegistration<?>> types() {
         return Stream.of(
+                registration(ARGBControlBinding.class,
+                        ARGBControlBinding.GTYPE_NAME,
+                        ARGBControlBinding::new),
                 registration(DirectControlBinding.class,
                         DirectControlBinding.GTYPE_NAME,
                         DirectControlBinding::new),
+                registration(ProxyControlBinding.class,
+                        ProxyControlBinding.GTYPE_NAME,
+                        ProxyControlBinding::new),
                 registration(InterpolationControlSource.class,
                         InterpolationControlSource.GTYPE_NAME,
                         InterpolationControlSource::new),
