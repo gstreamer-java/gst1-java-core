@@ -210,7 +210,22 @@ public class Structure extends NativeObject {
             }
         }
     }
-    
+
+    public <T> List<T> getValueList(String fieldName) {
+        GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
+        if(!val.g_type.equals(GSTVALUE_API.gst_value_list_get_type())) {
+            return null;
+        }
+
+        int size = GSTVALUE_API.gst_value_list_get_size(val);
+        ArrayList<T> values = new ArrayList<>(size);
+        for (int i = 0; i <size; i++) {
+            //noinspection unchecked
+            values.add((T) GSTVALUE_API.gst_value_list_get_value(val, i).getValue());
+        }
+        return values;
+    }
+
     /**
      * Get the number of fields in the {@link Structure}.
      *
