@@ -308,7 +308,7 @@ public abstract class GObject extends RefCountedObject {
     public void set(String property, Object data) {
         LOG.entering("GObject", "set", new Object[]{property, data});
         GObjectAPI.GParamSpec propertySpec = findProperty(property);
-        if (propertySpec == null || data == null) {
+        if (propertySpec == null /*|| data == null*/) {
             throw new IllegalArgumentException("Unknown property: " + property);
         }
         final GType propType = propertySpec.value_type;

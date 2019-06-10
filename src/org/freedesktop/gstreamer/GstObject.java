@@ -24,6 +24,8 @@ package org.freedesktop.gstreamer;
 
 import java.util.logging.Logger;
 import org.freedesktop.gstreamer.glib.GObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstControlBindingPtr;
 import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 import static org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GSTOBJECT_API;
@@ -44,6 +46,8 @@ public class GstObject extends GObject {
 
     private static Logger LOG = Logger.getLogger(GstObject.class.getName());
 
+    private final Handle handle;
+
     /**
      * Wraps an underlying C GstObject with a Java proxy
      *
@@ -52,9 +56,10 @@ public class GstObject extends GObject {
     protected GstObject(Initializer init) {
         this(new Handle(init.ptr.as(GstObjectPtr.class, GstObjectPtr::new), init.ownsHandle), init.needRef);
     }
-    
+
     protected GstObject(Handle handle, boolean needRef) {
         super(handle, needRef);
+        this.handle = handle;
     }
 
     /**
@@ -96,6 +101,105 @@ public class GstObject extends GObject {
         return GSTOBJECT_API.gst_object_get_parent(this);
     }
 
+    /**
+     * Returns a suggestion for timestamps where buffers should be split to get
+     * best controller results.
+     *
+     * @return the suggested timestamp or {@link ClockTime#NONE} if no
+     * control-rate was set.
+     */
+    public long suggestNextSync() {
+        return GSTOBJECT_API.gst_object_suggest_next_sync(handle.getPointer());
+    }
+
+    /**
+     * Sets the properties of the object, according to the {@link ControlSource}
+     * that (maybe) handle them and for the given timestamp.
+     * <p>
+     * If this function fails, it is most likely the application developers
+     * fault. Most probably the control sources are not setup correctly.
+     *
+     * @param timestamp the time that should be processed
+     * @return true if the controller values have been applied to the object
+     * properties
+     */
+    public boolean syncValues(long timestamp) {
+        return GSTOBJECT_API.gst_object_sync_values(handle.getPointer(), timestamp);
+    }
+
+    /**
+     * Check if this object has active controlled properties.
+     *
+     * @return TRUE if the object has active controlled properties
+     */
+    public boolean hasActiveControlBindings() {
+        return GSTOBJECT_API.gst_object_has_active_control_bindings(handle.getPointer());
+    }
+
+    /**
+     * This function is used to disable all controlled properties of the object
+     * for some time, i.e. {@link #syncValues(long) } will do nothing.
+     *
+     * @param disabled whether to disable the controllers or not
+     */
+    public void setControlBindingsDisabled(boolean disabled) {
+        GSTOBJECT_API.gst_object_set_control_bindings_disabled(handle.getPointer(), disabled);
+    }
+
+    /**
+     * This function is used to disable the control bindings on a property for
+     * some time, i.e. {@link #syncValues(long) } will do nothing for the
+     * property.
+     *
+     * @param propertyName property to disable
+     * @param disabled whether to disable the controller or not
+     */
+    public void setControlBindingDisabled(String propertyName, boolean disabled) {
+        GSTOBJECT_API.gst_object_set_control_binding_disabled(handle.getPointer(), propertyName, disabled);
+    }
+
+    /**
+     * Attach a {@link ControlBinding } to this object. If there was already a
+     * binding for this property it will be replaced.
+     *
+     * @param binding the ControlBinding that should be used
+     * @throws IllegalStateException if the binding has not been setup for this
+     * object
+     */
+    public void addControlBinding(ControlBinding binding) {
+        GstControlBindingPtr bindingPtr = Natives.getPointer(binding)
+                .as(GstControlBindingPtr.class, GstControlBindingPtr::new);
+        boolean ok = GSTOBJECT_API.gst_object_add_control_binding(handle.getPointer(), bindingPtr);
+        if (!ok) {
+            throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * Gets the corresponding {@link ControlBinding} for the property.
+     *
+     * @param propertyName name of the property
+     * @return control binding for the property or NULL if the property is not
+     * controlled
+     */
+    public ControlBinding getControlBinding(String propertyName) {
+        GstControlBindingPtr ptr = GSTOBJECT_API.gst_object_get_control_binding(
+                handle.getPointer(), propertyName);
+        return ptr == null ? null : Natives.callerOwnsReturn(ptr, ControlBinding.class);
+    }
+
+    /**
+     * Removes the corresponding {@link ControlBinding }.
+     *
+     * @param binding the binding to remove
+     * @return true if the binding could be removed
+     */
+    public boolean removeControlBinding(ControlBinding binding) {
+        GstControlBindingPtr bindingPtr = Natives.getPointer(binding)
+                .as(GstControlBindingPtr.class, GstControlBindingPtr::new);
+        return GSTOBJECT_API.gst_object_remove_control_binding(handle.getPointer(), bindingPtr);
+    }
+
     @Override
     public String toString() {
         return String.format("%s: [%s]", getClass().getSimpleName(), getName());
@@ -107,7 +211,7 @@ public class GstObject extends GObject {
 //    protected static Initializer initializer(Pointer ptr, boolean needRef) {
 //        return initializer(ptr, needRef, true);
 //    }
-    
+
     protected static class Handle extends GObject.Handle {
 
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {
@@ -128,12 +232,11 @@ public class GstObject extends GObject {
         protected void unref() {
             GSTOBJECT_API.gst_object_unref(getPointer());
         }
-        
+
         @Override
         protected GstObjectPtr getPointer() {
             return (GstObjectPtr) super.getPointer();
         }
-
 
     }
 

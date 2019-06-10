@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -28,8 +29,6 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import java.util.Arrays;
 import java.util.List;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.elements.BaseSrc;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 
 /**
@@ -58,6 +57,17 @@ public interface GstObjectAPI extends com.sun.jna.Library {
     
     Pointer gst_implements_interface_cast(GstObject obj, NativeLong gtype);    
     boolean gst_implements_interface_check(GstObject from, NativeLong type);
+    
+    /* controller functions */
+    long gst_object_suggest_next_sync(GstObjectPtr object);
+    boolean gst_object_sync_values(GstObjectPtr object, long timestamp);
+    boolean gst_object_has_active_control_bindings(GstObjectPtr object);
+    void gst_object_set_control_bindings_disabled(GstObjectPtr object, boolean disabled);
+    void gst_object_set_control_binding_disabled(GstObjectPtr object, String property_name, boolean disabled);
+    boolean gst_object_add_control_binding(GstObjectPtr object, GstControlBindingPtr binding);
+    GstControlBindingPtr gst_object_get_control_binding(GstObjectPtr object, String property_name);
+    boolean gst_object_remove_control_binding(GstObjectPtr object, GstControlBindingPtr binding);
+    
     
     /**
     * GstObject:
