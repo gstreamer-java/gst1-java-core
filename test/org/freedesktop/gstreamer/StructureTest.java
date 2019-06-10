@@ -1,5 +1,6 @@
 package org.freedesktop.gstreamer;
 
+import java.util.Arrays;
 import java.util.List;
 import static org.junit.Assert.*;
 
@@ -150,5 +151,19 @@ public class StructureTest {
 		structure.setFraction("fraction", 17, 10);
 		assertEquals(17, structure.getFraction("fraction").getNumerator());
 		assertEquals(10, structure.getFraction("fraction").getDenominator());
+	}
+
+	@Test
+	public void testValueListInteger() {
+		Caps caps = Caps.fromString("audio/x-raw,rate={44100,48000}");
+		List<Integer> rates = caps.getStructure(0).getValueList("rate");
+		assertEquals(Arrays.asList(44100, 48000), rates);
+	}
+
+	@Test
+	public void testValueListStrings() {
+		Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
+		List<String> formats = caps.getStructure(0).getValueList("format");
+		assertEquals(Arrays.asList("RGB", "BGR", "RGBx","BGRx"), formats);
 	}
 }
