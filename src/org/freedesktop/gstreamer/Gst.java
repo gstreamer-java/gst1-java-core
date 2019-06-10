@@ -52,6 +52,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+import org.freedesktop.gstreamer.controller.Controllers;
 import org.freedesktop.gstreamer.elements.Elements;
 import org.freedesktop.gstreamer.glib.GLib;
 import org.freedesktop.gstreamer.glib.GMainContext;
@@ -666,6 +667,7 @@ public final class Gst {
                 new Event.Types(),
                 new Message.Types(),
                 new Query.Types(),
+                new Controllers(),
                 new Elements(),
                 new WebRTC.Types())
                 .flatMap(NativeObject.TypeProvider::types)
