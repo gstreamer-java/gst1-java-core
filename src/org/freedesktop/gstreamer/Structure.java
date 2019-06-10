@@ -436,8 +436,8 @@ public class Structure extends NativeObject {
      * Throws {@link InvalidFieldException} if the field does not exist, or the
      * field values cannot be converted to type T.
      * <p>
-     * This method only currently supports lists of values inside a GValueArray
-     * - other native list types will be supported in future.
+     * This method currently supports lists of values inside a GValueArray or
+     * GstValueList.
      *
      * @param <T>
      * @param type type of values
