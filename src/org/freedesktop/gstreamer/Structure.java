@@ -21,17 +21,18 @@ package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-
+import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstStructureAPI.GSTSTRUCTURE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
 
@@ -209,21 +210,6 @@ public class Structure extends NativeObject {
                 throw new InvalidFieldException("double", fieldName);
             }
         }
-    }
-
-    public <T> List<T> getValueList(String fieldName) {
-        GValue val = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
-        if(!val.g_type.equals(GSTVALUE_API.gst_value_list_get_type())) {
-            return null;
-        }
-
-        int size = GSTVALUE_API.gst_value_list_get_size(val);
-        ArrayList<T> values = new ArrayList<>(size);
-        for (int i = 0; i <size; i++) {
-            //noinspection unchecked
-            values.add((T) GSTVALUE_API.gst_value_list_get_value(val, i).getValue());
-        }
-        return values;
     }
 
     /**
@@ -459,7 +445,28 @@ public class Structure extends NativeObject {
      * @return List of values from the named field
      */
     public <T> List<T> getValues(Class<T> type, String fieldName) {
-        Object val = getValue(fieldName);
+        GValue gValue = GSTSTRUCTURE_API.gst_structure_get_value(this, fieldName);
+        if (gValue == null) {
+            throw new InvalidFieldException(type.getSimpleName(), fieldName);
+        }
+
+        GType gType = gValue.getType();
+        if (gType.equals(GSTVALUE_API.gst_value_list_get_type())) {
+            int size = GSTVALUE_API.gst_value_list_get_size(gValue);
+            ArrayList<T> values = new ArrayList<>(size);
+            for (int i = 0; i <size; i++) {
+                Object o = GSTVALUE_API.gst_value_list_get_value(gValue, i).getValue();
+                if (type.isInstance(o)) {
+                    values.add(type.cast(o));
+                } else {
+                    throw new InvalidFieldException(type.getSimpleName(), fieldName);
+                }
+            }
+
+            return values;
+        }
+
+        Object val = gValue.getValue();
         if (val instanceof GValueAPI.GValueArray) {
             GValueAPI.GValueArray arr = (GValueAPI.GValueArray) val;
             int count = arr.getNValues();

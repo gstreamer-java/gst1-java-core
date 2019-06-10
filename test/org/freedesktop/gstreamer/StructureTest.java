@@ -1,15 +1,16 @@
 package org.freedesktop.gstreamer;
 
-import java.util.Arrays;
-import java.util.List;
-import static org.junit.Assert.*;
-
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class StructureTest {
 	private Structure structure;
@@ -153,17 +154,23 @@ public class StructureTest {
 		assertEquals(10, structure.getFraction("fraction").getDenominator());
 	}
 
-	@Test
-	public void testValueListInteger() {
-		Caps caps = Caps.fromString("audio/x-raw,rate={44100,48000}");
-		List<Integer> rates = caps.getStructure(0).getValueList("rate");
-		assertEquals(Arrays.asList(44100, 48000), rates);
-	}
+    @Test
+    public void testValueListInteger() {
+        Caps caps = Caps.fromString("audio/x-raw,rate={44100,48000}");
+        List<Integer> rates = caps.getStructure(0).getValues(Integer.class, "rate");
+        assertEquals(Arrays.asList(44100, 48000), rates);
+    }
 
-	@Test
-	public void testValueListStrings() {
-		Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
-		List<String> formats = caps.getStructure(0).getValueList("format");
-		assertEquals(Arrays.asList("RGB", "BGR", "RGBx","BGRx"), formats);
-	}
+    @Test
+    public void testValueListStrings() {
+        Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
+        List<String> formats = caps.getStructure(0).getValues(String.class, "format");
+        assertEquals(Arrays.asList("RGB", "BGR", "RGBx","BGRx"), formats);
+    }
+
+    @Test(expected = Structure.InvalidFieldException.class)
+    public void testValueListChecksType() {
+        Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
+        caps.getStructure(0).getValues(Integer.class, "format");
+    }
 }
