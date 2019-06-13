@@ -267,6 +267,15 @@ public class WebRTCBin extends Bin {
     }
 
     /**
+     * Retrieve ICE gathering state this {@link WebRTCBin} is currently in
+     *
+     * @return a {@link WebRTCICEGatheringState} describing gathering state
+     */
+    public WebRTCICEGatheringState getICEGatheringState() {
+        return NativeEnum.fromInt(WebRTCICEGatheringState.class, (Integer) get("ice-gathering-state"));
+    }
+
+    /**
      * Retrieve the local description for this {@link WebRTCBin}
      *
      * @return the local {@link WebRTCSessionDescription}

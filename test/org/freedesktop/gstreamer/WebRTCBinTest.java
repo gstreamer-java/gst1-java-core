@@ -1,6 +1,7 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.glib.NativeEnum;
+import org.freedesktop.gstreamer.webrtc.WebRTCICEGatheringState;
 import org.freedesktop.gstreamer.webrtc.WebRTCPeerConnectionState;
 import org.junit.Test;
 
@@ -15,5 +16,12 @@ public class WebRTCBinTest {
         assertEquals(NativeEnum.fromInt(WebRTCPeerConnectionState.class, 3), WebRTCPeerConnectionState.DISCONNECTED);
         assertEquals(NativeEnum.fromInt(WebRTCPeerConnectionState.class, 4), WebRTCPeerConnectionState.FAILED);
         assertEquals(NativeEnum.fromInt(WebRTCPeerConnectionState.class, 5), WebRTCPeerConnectionState.CLOSED);
+    }
+
+    @Test
+    public void iceGatheringStateTest() {
+        assertEquals(NativeEnum.fromInt(WebRTCICEGatheringState.class, 0), WebRTCICEGatheringState.NEW);
+        assertEquals(NativeEnum.fromInt(WebRTCICEGatheringState.class, 1), WebRTCICEGatheringState.GATHERING);
+        assertEquals(NativeEnum.fromInt(WebRTCICEGatheringState.class, 2), WebRTCICEGatheringState.COMPLETE);
     }
 }
