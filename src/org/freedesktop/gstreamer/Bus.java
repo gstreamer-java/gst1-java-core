@@ -35,6 +35,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import java.util.Locale;
+import java.util.logging.Level;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
@@ -834,9 +835,13 @@ public class Bus extends GstObject {
      */
     private void dispatchMessage(Message msg) {
         // Dispatch to listeners
-        for (Object listener : messageProxies) {
-            ((MessageProxy) listener).busMessage(this, msg);
-        }
+        messageProxies.forEach((listener) -> {
+            try {
+                ((MessageProxy) listener).busMessage(this, msg);
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "Exception thrown by bus message handler", t);
+            }
+        });
     }
 
     private static class MessageProxy implements MESSAGE {
