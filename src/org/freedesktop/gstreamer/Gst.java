@@ -630,30 +630,10 @@ public final class Gst {
     private static final ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger counter = new AtomicInteger(0);
 
-        /**
-         * Determines if Gst has been started from an applet and returns it's
-         * parent group.
-         *
-         * This is to avoid a problem where the service thread is killed when an
-         * applet is destroyed. If multiple applets are active simultaneously,
-         * this could be a problem.
-         *
-         * @return Applet's parent ("main") thread group or null, if not running
-         * inside an applet
-         */
-        private ThreadGroup getThreadGroup() {
-            ThreadGroup tg = Thread.currentThread().getThreadGroup();
-            try {
-                Class<?> atgClass = Class.forName("sun.applet.AppletThreadGroup");
-                return atgClass.isInstance(tg) ? tg.getParent() : null;
-            } catch (ClassNotFoundException ex) {
-                return null;
-            }
-        }
-        
+        @Override
         public Thread newThread(Runnable task) {
             final String name = "gstreamer service thread " + counter.incrementAndGet();
-            Thread t = new Thread(getThreadGroup(), task, name);
+            Thread t = new Thread(task, name);
             t.setDaemon(true);
             t.setPriority(Thread.NORM_PRIORITY);
             return t;
