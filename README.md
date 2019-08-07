@@ -14,17 +14,17 @@ and are functionally stable. Having now reached v1 they should also be considere
 API stable. This does not apply to the lowlevel package which is _effectively_ non-public
 and subject to change at any time.
 
-The current lead maintainer of the bindings is Neil C Smith on behalf of the
-[PraxisLIVE / PraxisCORE][praxislive] projects. The bindings are a fork of the
-original [GStreamer-Java][gstreamer-java] bindings for GStreamer 0.10 started by
-Wayne Meissner, and numerous other people have made valuable contributions to the 
-original project and the 1.x fork over the years.
+The current lead maintainer of the bindings is Neil C Smith at
+[Codelerity Ltd.][codelerity]. The bindings were initially created for [PraxisLIVE][praxislive],
+and are a fork of the original [GStreamer-Java][gstreamer-java] bindings for 
+GStreamer 0.10 started by Wayne Meissner. Numerous other people have made valuable
+contributions to the original project and the 1.x fork over the years.
 
 Initial help on getting started, and support for open-source projects, can be obtained
 from the [GStreamer-Java Google Group][gstreamer-java-group].
 
-Commercial support is available, and sponsorship of features is welcome - please
-email support@praxislive.org to discuss.
+Commercial support is available, and sponsorship of additional features is welcome - please
+email info@codelerity.com to discuss.
 
 ## Requirements
 
@@ -85,5 +85,6 @@ of integration and support time would be appreciated.
 [gst1-releases]: https://github.com/gstreamer-java/gst1-java-core/releases
 [gstreamer-java-group]: https://groups.google.com/forum/#!forum/gstreamer-java
 [jna]: https://github.com/java-native-access/jna
+[codelerity]: https://www.codelerity.com
 [praxislive]: https://www.praxislive.org
 [praxiscore-gstreamer]: https://github.com/praxis-live/praxis/blob/master/praxis.video.gstreamer/src/org/praxislive/video/gstreamer/components/GStreamerLibrary.java#L45
