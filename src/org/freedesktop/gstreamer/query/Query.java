@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Christophe Lafolet
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2008 Wayne Meissner
  *
@@ -52,6 +53,7 @@ public class Query extends MiniObject {
     static {
         TYPE_MAP.put(QueryType.ALLOCATION, AllocationQuery::new);
         TYPE_MAP.put(QueryType.CONVERT, ConvertQuery::new);
+        TYPE_MAP.put(QueryType.CONTEXT, ContextQuery::new);
         TYPE_MAP.put(QueryType.DURATION, DurationQuery::new);
         TYPE_MAP.put(QueryType.FORMATS, FormatsQuery::new);
         TYPE_MAP.put(QueryType.LATENCY, LatencyQuery::new);

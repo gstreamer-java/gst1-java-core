@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Christophe Lafolet
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
@@ -756,6 +757,24 @@ public class Element extends GstObject {
         return GSTELEMENT_API.gst_element_query(this, query);
     }
     
+    /**
+     * Sets the context of the element. Increases the refcount of the context.
+     *
+     * @param context the Context to set.
+     */
+    public void setContext(Context context) {
+        GSTELEMENT_API.gst_element_set_context(this, context);
+    }
+
+    /**
+     * Gets the context with the context_type set on the element or NULL.
+     * @param context_type
+     * @return a context or NULL
+     */
+    public Context getContext(String context_type) {
+        return GSTELEMENT_API.gst_element_get_context(this, context_type);
+    }
+
     static class Handle extends GstObject.Handle {
         
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {

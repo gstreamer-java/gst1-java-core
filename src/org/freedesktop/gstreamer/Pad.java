@@ -36,6 +36,7 @@ import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
 
 import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
 import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
+import org.freedesktop.gstreamer.query.Query;
 
 /**
  * Object contained by elements that allows links to other elements.
@@ -599,7 +600,15 @@ public class Pad extends GstObject {
         return GSTPAD_API.gst_pad_has_current_caps(this);
     }
     
-
+    public synchronized void setQueryListener(QUERY listener) {
+    	GstPadAPI.PadQueryCallback callback = new GstPadAPI.PadQueryCallback() {
+			public boolean callback(Pad pad, GstObject parent, Query query) {
+				return listener.queryReceived(pad, query);
+			}
+    	};
+    	GSTPAD_API.gst_pad_set_query_function_full(this, callback, null, null);
+    }
+    
     /**
      * Signal emitted when new this {@link Pad} is linked to another {@link Pad}
      *
@@ -655,6 +664,11 @@ public class Pad extends GstObject {
     public static interface DATA_PROBE {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
+    }
+    
+    public static interface QUERY {
+
+        public boolean queryReceived(Pad pad, Query query);
     }
     
     private static class Handle extends GstObject.Handle {

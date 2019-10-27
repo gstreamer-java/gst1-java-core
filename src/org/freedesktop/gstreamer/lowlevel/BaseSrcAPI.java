@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.ClockTime;
 import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Format;
@@ -267,7 +268,7 @@ public interface BaseSrcAPI extends Library {
 
     void gst_base_src_set_format(BaseSrc src, Format format);
 
-    boolean gst_base_src_query_latency(BaseSrc src, boolean[] live, long[] min_latency, long[] max_latency);
+    boolean gst_base_src_query_latency(BaseSrc src, boolean[] live, ClockTime[] min_latency, ClockTime[] max_latency);
 
     void gst_base_src_set_blocksize(BaseSrc src, long blocksize);
     long gst_base_src_get_blocksize(BaseSrc src);

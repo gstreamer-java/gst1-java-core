@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -102,6 +103,11 @@ public interface GstQueryAPI extends com.sun.jna.Library {
     void gst_query_add_allocation_meta(Query query, GType api, Structure params);
     void gst_query_add_allocation_pool(Query query, BufferPool pool, /* guint */ int size, /* guint */ int min_buffers, /* guint */ int max_buffers);
     int gst_query_get_n_allocation_pools(Query query);
+    
+    /* context query */
+    @CallerOwnsReturn Query gst_query_new_context(String context_type);
+    Pointer ptr_gst_query_new_context(String context_type);
+    boolean gst_query_parse_context_type(Query query, String[] context_type);
 
     
     public static final class QueryStruct extends com.sun.jna.Structure {

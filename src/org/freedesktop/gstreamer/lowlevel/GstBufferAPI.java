@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.freedesktop.gstreamer.Buffer;
+import org.freedesktop.gstreamer.Memory;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
@@ -103,6 +104,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     boolean gst_buffer_map(Buffer buffer, MapInfoStruct info, int flags);
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
+    Memory gst_buffer_peek_memory(Buffer buffer, int idx);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
     
     // re-introduces in gstreamer 1.9

@@ -647,6 +647,7 @@ public final class Gst {
                 new Event.Types(),
                 new Message.Types(),
                 new Query.Types(),
+                new org.freedesktop.gstreamer.Memory.Types(),
                 new Controllers(),
                 new Elements(),
                 new WebRTC.Types())
@@ -675,6 +676,7 @@ public final class Gst {
                     registration(Bus.class, Bus.GTYPE_NAME, Bus::new),
                     registration(Caps.class, Caps.GTYPE_NAME, Caps::new),
                     registration(Clock.class, Clock.GTYPE_NAME, Clock::new),
+                    registration(Context.class, Context.GTYPE_NAME, Context::new),
                     registration(DateTime.class, DateTime.GTYPE_NAME, DateTime::new),
                     registration(Element.class, Element.GTYPE_NAME, Element::new),
                     registration(ElementFactory.class, ElementFactory.GTYPE_NAME, ElementFactory::new),
@@ -687,6 +689,7 @@ public final class Gst {
                     registration(Promise.class, Promise.GTYPE_NAME, Promise::new),
                     registration(Registry.class, Registry.GTYPE_NAME, Registry::new),
                     registration(SDPMessage.class, SDPMessage.GTYPE_NAME, SDPMessage::new),
+                    registration(SysmemAllocator.class, SysmemAllocator.GTYPE_NAME, SysmemAllocator::new),
                     registration(Sample.class, Sample.GTYPE_NAME, Sample::new),
                     registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );

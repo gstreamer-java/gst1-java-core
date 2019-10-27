@@ -93,6 +93,7 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     void gst_message_parse_duration(Message message, Format[] format, long[] position);
     void gst_message_parse_async_start(Message message, boolean[] new_base_time);
     
+    boolean gst_message_parse_context_type(Message message, String[] context_type);
     @CallerOwnsReturn Message gst_message_new_eos(GstObject src);
     Pointer ptr_gst_message_new_eos(GstObject src);
     @CallerOwnsReturn Message gst_message_new_error(GstObject src, GErrorStruct error, String debug);
@@ -121,4 +122,6 @@ public interface GstMessageAPI extends com.sun.jna.Library {
     Pointer ptr_gst_message_new_latency(GstObject source);
     @CallerOwnsReturn Message gst_message_new_custom(MessageType type, GstObject src, @Invalidate Structure structure);
     @ConstReturn Structure gst_message_get_structure(Message message);
+    Pointer ptr_gst_message_new_need_context(GstObject source, String context_type);
+    @CallerOwnsReturn Message gst_message_new_need_context(GstObject source, String context_type);
 }

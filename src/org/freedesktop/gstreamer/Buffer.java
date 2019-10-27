@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2019 Christophe Lafolet
  * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
@@ -113,6 +114,23 @@ public class Buffer extends MiniObject {
      */
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
+    }
+
+    /**
+     * Get the memory block at index
+     * @param idx block index
+     * @return
+     */
+    public <T extends Memory> T peekMemory(int idx) {
+    	return (T) GSTBUFFER_API.gst_buffer_peek_memory(this, idx);
+    }
+    
+    /**
+     * Get the amount of memory blocks that this buffer has.
+     * @return
+     */
+    public int getMemoryCount() {
+    	return GSTBUFFER_API.gst_buffer_n_memory(this);
     }
 
     /**
