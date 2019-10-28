@@ -640,14 +640,12 @@ public final class Gst {
         }
     };
     
-    @SuppressWarnings("unchecked")
     private static synchronized void loadAllClasses() {
         Stream.of(new GLib.Types(),
                 new Types(),
                 new Event.Types(),
                 new Message.Types(),
                 new Query.Types(),
-                new org.freedesktop.gstreamer.Memory.Types(),
                 new Controllers(),
                 new Elements(),
                 new WebRTC.Types())
@@ -689,7 +687,6 @@ public final class Gst {
                     registration(Promise.class, Promise.GTYPE_NAME, Promise::new),
                     registration(Registry.class, Registry.GTYPE_NAME, Registry::new),
                     registration(SDPMessage.class, SDPMessage.GTYPE_NAME, SDPMessage::new),
-                    registration(SysmemAllocator.class, SysmemAllocator.GTYPE_NAME, SysmemAllocator::new),
                     registration(Sample.class, Sample.GTYPE_NAME, Sample::new),
                     registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );

@@ -26,7 +26,6 @@ import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.FlowReturn;
-import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.PadLinkReturn;
@@ -37,7 +36,6 @@ import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 import org.freedesktop.gstreamer.lowlevel.annotations.FreeReturnValue;
 import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
-import org.freedesktop.gstreamer.query.Query;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -142,11 +140,6 @@ public interface GstPadAPI extends com.sun.jna.Library {
 //    public static interface PadEventProbe extends GstCallback {
 //        boolean callback(Pad pad, Event ev, Pointer user_data);
 //    }
-    void gst_pad_set_query_function_full(Pad pad, PadQueryCallback callback, Pointer user_data, GDestroyNotify destroy_data);
-    
-    public static interface PadQueryCallback extends GstCallback {
-    	public boolean callback(Pad pad, GstObject parent, Query query);
-    }
     
     public static interface PadProbeCallback extends GstCallback {
         public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data);

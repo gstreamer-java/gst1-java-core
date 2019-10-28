@@ -20,9 +20,6 @@ package org.freedesktop.gstreamer.lowlevel;
 import java.util.Arrays;
 import java.util.List;
 
-import org.freedesktop.gstreamer.Allocator;
-import org.freedesktop.gstreamer.Memory;
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 
 import com.sun.jna.NativeLong;
@@ -36,7 +33,7 @@ public interface GstMemoryAPI extends com.sun.jna.Library {
 
 		public volatile MiniObjectStruct mini_object;
 
-        public volatile Allocator /* GstAllocator */ allocator;
+        public volatile Pointer /* GstAllocator */ allocator;
 		public volatile Pointer /* GstMemory */ parent;
 
 		public volatile NativeLong maxSize;
@@ -65,10 +62,4 @@ public interface GstMemoryAPI extends com.sun.jna.Library {
 	}
 
 	GType gst_memory_get_type();
-
-	boolean gst_memory_is_type(Memory mem, String mem_type);
-
-	boolean gst_memory_map(Memory mem, MapInfoStruct info, int flags);
-
-	void gst_memory_unmap(Memory mem, MapInfoStruct info);
 }

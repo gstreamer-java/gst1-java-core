@@ -102,10 +102,10 @@ public interface GstElementAPI extends com.sun.jna.Library {
     void gst_element_set_start_time(Element element, long time);
     long gst_element_get_start_time(Element element);
     /* context */
-	void gst_element_set_context(Element element, Context context);
-	GList gst_element_get_contexts(Element element);
-	Context gst_element_get_context(Element element, String context_type);
-	Context gst_element_get_context_unlocked(Element element, String context_type);
+    void gst_element_set_context(Element element, Context context);
+    GList gst_element_get_contexts(Element element);
+    Context gst_element_get_context(Element element, String context_type);
+    Context gst_element_get_context_unlocked(Element element, String context_type);
     
     /**
     * GstElement:

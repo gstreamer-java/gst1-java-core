@@ -115,15 +115,6 @@ public class Buffer extends MiniObject {
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
     }
-
-    /**
-     * Get the memory block at index
-     * @param idx block index
-     * @return
-     */
-    public <T extends Memory> T peekMemory(int idx) {
-    	return (T) GSTBUFFER_API.gst_buffer_peek_memory(this, idx);
-    }
     
     /**
      * Get the amount of memory blocks that this buffer has.
