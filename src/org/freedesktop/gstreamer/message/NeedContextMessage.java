@@ -20,18 +20,18 @@ package org.freedesktop.gstreamer.message;
 
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
+import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.glib.Natives;
 
-import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
-
 /**
- * A Need-Context Message.
+ * Message indicating that an element wants a specific context.
  */
+@Gst.Since(major = 1, minor = 2)
 public class NeedContextMessage extends Message {
 
 	/**
-     * Creates a new Need-Context message.
+	 * Creates a new Need-Context message.
 	 * 
 	 * @param init internal initialization data.
 	 */
@@ -42,7 +42,7 @@ public class NeedContextMessage extends Message {
 	/**
 	 * Creates a new Need-Context message.
 	 *
-	 * @param src The object originating the message.
+	 * @param src the object originating the message.
 	 */
 	public NeedContextMessage(GstObject src, String context_type) {
 		this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_need_context(src, context_type)));
@@ -58,4 +58,5 @@ public class NeedContextMessage extends Message {
 		boolean isOk = GSTMESSAGE_API.gst_message_parse_context_type(this, context_type);
 		return isOk ? context_type[0] : null;
 	}
+
 }

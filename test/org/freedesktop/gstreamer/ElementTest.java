@@ -19,16 +19,17 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.message.Message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.message.TagMessage;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -119,5 +120,18 @@ public class ElementTest {
         pipe.sink.postMessage(message);
         pipe.run();
         assertTrue("Message not posted", signalFired.get());
+    }
+    @Test public void testContext() {
+		Element element = ElementFactory.make("fakesrc", "fs");
+
+		Context context = new Context("test");
+		element.setContext(context);
+		
+		Context anotherContext = element.getContext("test");
+		Assert.assertNotNull(anotherContext);
+		Assert.assertNotSame(context, anotherContext);
+		Assert.assertEquals(context.getContextType(), anotherContext.getContextType());
+		
+		Assert.assertNull(element.getContext("test-something-else"));
     }
 }

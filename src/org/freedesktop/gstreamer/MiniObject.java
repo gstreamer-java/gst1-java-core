@@ -105,7 +105,7 @@ public abstract class MiniObject extends RefCountedObject {
         return (Integer) struct.readField("refcount");
     }
 
-    private static final class Handle extends RefCountedObject.Handle {
+    public static class Handle extends RefCountedObject.Handle {
 
         public Handle(GstMiniObjectPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);

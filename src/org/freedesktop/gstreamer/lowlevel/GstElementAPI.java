@@ -26,7 +26,6 @@ import java.util.List;
 import org.freedesktop.gstreamer.Bus;
 import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Clock;
-import org.freedesktop.gstreamer.Context;
 import org.freedesktop.gstreamer.Element;
 import org.freedesktop.gstreamer.ElementFactory;
 import org.freedesktop.gstreamer.event.Event;
@@ -102,10 +101,10 @@ public interface GstElementAPI extends com.sun.jna.Library {
     void gst_element_set_start_time(Element element, long time);
     long gst_element_get_start_time(Element element);
     /* context */
-    void gst_element_set_context(Element element, Context context);
+    void gst_element_set_context(Element element, GstContextPtr context);
     GList gst_element_get_contexts(Element element);
-    Context gst_element_get_context(Element element, String context_type);
-    Context gst_element_get_context_unlocked(Element element, String context_type);
+    GstContextPtr gst_element_get_context(Element element, String context_type);
+    GstContextPtr gst_element_get_context_unlocked(Element element, String context_type);
     
     /**
     * GstElement:

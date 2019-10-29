@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
@@ -763,7 +764,8 @@ public class Element extends GstObject {
      * @param context the Context to set.
      */
     public void setContext(Context context) {
-        GSTELEMENT_API.gst_element_set_context(this, context);
+    	GstContextPtr gstContextPtr = Natives.getPointer(context).as(GstContextPtr.class, GstContextPtr::new);
+        GSTELEMENT_API.gst_element_set_context(this, gstContextPtr);
     }
 
     /**
@@ -772,7 +774,8 @@ public class Element extends GstObject {
      * @return a context or NULL
      */
     public Context getContext(String context_type) {
-        return GSTELEMENT_API.gst_element_get_context(this, context_type);
+		GstContextPtr gstContextPtr = GSTELEMENT_API.gst_element_get_context(this, context_type);
+		return gstContextPtr != null ? new Context(Natives.initializer(gstContextPtr.getPointer())) : null;
     }
 
     static class Handle extends GstObject.Handle {

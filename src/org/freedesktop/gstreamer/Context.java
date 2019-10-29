@@ -17,37 +17,91 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstContextAPI.GSTCONTEXT_API;
-
 import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstContextAPI;
+import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
 
+/**
+ * Lightweight objects to represent element contexts.
+ *
+ * Context is a container object used to store contexts like a device context, a
+ * display server connection and similar concepts that should be shared between
+ * multiple elements.
+ *
+ * Applications can set a context on a complete pipeline by using
+ * {@link Element#setContext(Context)}, which will then be propagated to all
+ * child elements. Elements can handle these in
+ * {@link Element#setContext(Context)} and merge them with the context
+ * information they already have.
+ *
+ * When an element needs a context it will do the following actions in this
+ * order until one step succeeds:
+ * <ol>
+ * <li>Check if the element already has a context</li>
+ * <li>Query downstream with GST_QUERY_CONTEXT for the context</li>
+ * <li>Query upstream* with GST_QUERY_CONTEXT for the context</li>
+ * <li>Post a GST_MESSAGE_NEED_CONTEXT message on the bus with the required
+ * context types and afterwards check if a usable context was set now</li>
+ * <li>Create a context by itself and post a GST_MESSAGE_HAVE_CONTEXT message on
+ * the bus.</li>
+ * </ol>
+ *
+ * Bins will catch GST_MESSAGE_NEED_CONTEXT messages and will set any previously
+ * known context on the element that asks for it if possible. Otherwise the
+ * application should provide one if it can.
+ *
+ * Contexts can be persistent. A persistent context is kept in elements when
+ * they reach {@lin State#NULL}, non-persistent ones will be removed. Also, a
+ * non-persistent context won't override a previous persistent context set to an
+ * element.
+ */
+@Gst.Since(major = 1, minor = 2)
 public class Context extends MiniObject {
 
 	public static final String GTYPE_NAME = "GstContext";
 
-	private static final GstContextAPI gst = GstContextAPI.GSTCONTEXT_API;
+	private final Handle handle;
+
+	public Context(String contextType) {
+		this(contextType, true);
+	}
+
+	public Context(String context_type, boolean persistent) {
+		this(Natives.initializer(GstContextAPI.GSTCONTEXT_API.gst_context_new(context_type, persistent).getPointer()));
+	}
+
+	protected Context(Handle handle, boolean needRef) {
+		super(handle, needRef);
+		this.handle = handle;
+	}
 
 	protected Context(Initializer init) {
-		super(init);
+		this(new Handle(init.ptr.as(GstContextPtr.class, GstContextPtr::new), init.ownsHandle), init.needRef);
 	}
 
-	public Context(String context_type) {
-		this(Natives.initializer(gst.ptr_gst_context_new(context_type, true)));
-	}
-
-	public void set(final String field, final String contextTypeName, final GObject aContext) {
-		final GType gtype = GType.valueOf(contextTypeName);
-		GSTCONTEXT_API.gst_context_writable_structure(this).setValue(field, gtype, aContext);
+	public void set(final String field, final String contextTypeName, final GObject context) {
+		final GType gType = GType.valueOf(contextTypeName);
+		Structure structure = GstContextAPI.GSTCONTEXT_API.gst_context_writable_structure(handle.getPointer());
+		structure.setValue(field, gType, context);
 	}
 
 	public String getContextType() {
-		return GSTCONTEXT_API.gst_context_get_context_type(this);
+		return GstContextAPI.GSTCONTEXT_API.gst_context_get_context_type(handle.getPointer());
 	}
 
-	public boolean isPersistent() {
-		return GSTCONTEXT_API.gst_context_is_persistent(this);
+	protected static class Handle extends MiniObject.Handle {
+
+		public Handle(GstContextPtr ptr, boolean ownsHandle) {
+			super(ptr, ownsHandle);
+		}
+
+		@Override
+		protected GstContextPtr getPointer() {
+			return (GstContextPtr) super.getPointer();
+		}
+
 	}
+
 }
