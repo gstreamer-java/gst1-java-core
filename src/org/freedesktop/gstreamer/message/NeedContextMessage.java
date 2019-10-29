@@ -20,14 +20,12 @@ package org.freedesktop.gstreamer.message;
 
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
 
-import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.glib.Natives;
 
 /**
  * Message indicating that an element wants a specific context.
  */
-@Gst.Since(major = 1, minor = 2)
 public class NeedContextMessage extends Message {
 
 	/**

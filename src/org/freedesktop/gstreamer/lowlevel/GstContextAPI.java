@@ -2,6 +2,14 @@ package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Structure;
 
+/**
+ * GstContext API
+ * 
+ * https://gstreamer.freedesktop.org/documentation/gstreamer/gstcontext.html
+ * 
+ * https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/gst/gstcontext.h
+ * https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/gst/gstcontext.c
+ */
 public interface GstContextAPI extends com.sun.jna.Library {
 
 	GstContextAPI GSTCONTEXT_API = GstNative.load(GstContextAPI.class);
