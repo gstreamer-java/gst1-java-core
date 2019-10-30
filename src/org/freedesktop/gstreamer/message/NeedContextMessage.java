@@ -28,33 +28,33 @@ import org.freedesktop.gstreamer.glib.Natives;
  */
 public class NeedContextMessage extends Message {
 
-	/**
-	 * Creates a new Need-Context message.
-	 * 
-	 * @param init internal initialization data.
-	 */
-	NeedContextMessage(Initializer init) {
-		super(init);
-	}
+    /**
+     * Creates a new Need-Context message.
+     * 
+     * @param init internal initialization data.
+     */
+    NeedContextMessage(Initializer init) {
+        super(init);
+    }
 
-	/**
-	 * Creates a new Need-Context message.
-	 *
-	 * @param src the object originating the message.
-	 */
-	public NeedContextMessage(GstObject src, String context_type) {
-		this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_need_context(src, context_type)));
-	}
+    /**
+     * Creates a new Need-Context message.
+     *
+     * @param src the object originating the message.
+     */
+    public NeedContextMessage(GstObject src, String context_type) {
+        this(Natives.initializer(GSTMESSAGE_API.ptr_gst_message_new_need_context(src, context_type)));
+    }
 
-	/**
-	 * Gets the context type contained in this message.
-	 * 
-	 * @return the context type.
-	 */
-	public String getContextType() {
-		String context_type[] = new String[1];
-		boolean isOk = GSTMESSAGE_API.gst_message_parse_context_type(this, context_type);
-		return isOk ? context_type[0] : null;
-	}
+    /**
+     * Gets the context type contained in this message.
+     * 
+     * @return the context type.
+     */
+    public String getContextType() {
+        String context_type[] = new String[1];
+        boolean isOk = GSTMESSAGE_API.gst_message_parse_context_type(this, context_type);
+        return isOk ? context_type[0] : null;
+    }
 
 }

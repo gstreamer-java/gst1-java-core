@@ -17,14 +17,15 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.glib.GObject;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstContextAPI;
 import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
 
 /**
  * Lightweight objects to represent element contexts.
+ * <p>
+ * See upstream documentation at <a href=
+ * "https://gstreamer.freedesktop.org/documentation/gstreamer/gstcontext.html"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstcontext.html</a>
  * <p>
  * Context is a container object used to store contexts like a device context, a
  * display server connection and similar concepts that should be shared between
@@ -56,58 +57,74 @@ import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
  * they reach {@lin State#NULL}, non-persistent ones will be removed. Also, a
  * non-persistent context won't override a previous persistent context set to an
  * element.
- * <p>
- * See upstream documentation at <a href=
- * "https://gstreamer.freedesktop.org/documentation/gstreamer/gstcontext.html">https://gstreamer.freedesktop.org/documentation/gstreamer/gstcontext.html</a>
  */
 public class Context extends MiniObject {
 
-	public static final String GTYPE_NAME = "GstContext";
+    public static final String GTYPE_NAME = "GstContext";
 
-	private final Handle handle;
+    private final Handle handle;
 
-	public Context(String contextType) {
-		this(contextType, true);
-	}
+    public Context(String contextType) {
+        this(contextType, true);
+    }
 
-	public Context(String context_type, boolean persistent) {
-		this(Natives.initializer(GstContextAPI.GSTCONTEXT_API.gst_context_new(context_type, persistent).getPointer()));
-	}
+    /**
+     * Create a new context.
+     */
+    public Context(String context_type, boolean persistent) {
+        this(new Handle(GstContextAPI.GSTCONTEXT_API.gst_context_new(context_type, persistent), true), true);
+    }
 
-	Context(Handle handle, boolean needRef) {
-		super(handle, needRef);
-		this.handle = handle;
-	}
+    Context(Handle handle, boolean needRef) {
+        super(handle, needRef);
+        this.handle = handle;
+    }
 
-	Context(Initializer init) {
-		this(new Handle(init.ptr.as(GstContextPtr.class, GstContextPtr::new), init.ownsHandle), init.needRef);
-	}
+    Context(Initializer init) {
+        this(new Handle(init.ptr.as(GstContextPtr.class, GstContextPtr::new), init.ownsHandle), init.needRef);
+    }
 
-	public void set(final String field, final String contextTypeName, final GObject context) {
-		final GType gType = GType.valueOf(contextTypeName);
-		if (gType != GType.INVALID) {
-			Structure structure = GstContextAPI.GSTCONTEXT_API.gst_context_writable_structure(handle.getPointer());
-			structure.setValue(field, gType, context);
-		} else {
-			throw new IllegalArgumentException("Unknown GType: " + contextTypeName);
-		}
-	}
+    /**
+     * Access the structure of the context.
+     *
+     * @return The structure of this context. The structure is still owned by this
+     *         context, which means that you should not modify it and not dispose of
+     *         it.
+     */
+    public Structure getStructure() {
+        return GstContextAPI.GSTCONTEXT_API.gst_context_get_structure(handle.getPointer());
+    }
 
-	public String getContextType() {
-		return GstContextAPI.GSTCONTEXT_API.gst_context_get_context_type(handle.getPointer());
-	}
+    /**
+     * Get a writable version of the structure.
+     *
+     * @return The structure of this context. The structure is still owned by the
+     *         context, which means that you should not dispose of it.
+     */
+    public Structure getWritableStructure() {
+        return GstContextAPI.GSTCONTEXT_API.gst_context_writable_structure(handle.getPointer());
+    }
 
-	protected static class Handle extends MiniObject.Handle {
+    /**
+     * Get the type of this context.
+     *
+     * @return The type of this context.
+     */
+    public String getContextType() {
+        return GstContextAPI.GSTCONTEXT_API.gst_context_get_context_type(handle.getPointer());
+    }
 
-		public Handle(GstContextPtr ptr, boolean ownsHandle) {
-			super(ptr, ownsHandle);
-		}
+    protected static class Handle extends MiniObject.Handle {
 
-		@Override
-		protected GstContextPtr getPointer() {
-			return (GstContextPtr) super.getPointer();
-		}
+        public Handle(GstContextPtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
 
-	}
+        @Override
+        protected GstContextPtr getPointer() {
+            return (GstContextPtr) super.getPointer();
+        }
+
+    }
 
 }

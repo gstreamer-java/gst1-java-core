@@ -4,11 +4,11 @@ import com.sun.jna.Pointer;
 
 public class GstContextPtr extends GstMiniObjectPtr {
 
-	public GstContextPtr() {
-	}
+    public GstContextPtr() {
+    }
 
-	public GstContextPtr(Pointer ptr) {
-		super(ptr);
-	}
+    public GstContextPtr(Pointer ptr) {
+        super(ptr);
+    }
 
 }

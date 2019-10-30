@@ -115,15 +115,15 @@ public class Buffer extends MiniObject {
     public void unmap() {
         GSTBUFFER_API.gst_buffer_unmap(this, mapInfo);
     }
-    
-	/**
-	 * Get the amount of memory blocks that this buffer has. This amount is never
-	 * larger than what {@code gst_buffer_get_max_memory()} returns.
-	 *
-	 * @return the number of memory blocks this buffer is made of.
-	 */
+
+    /**
+     * Get the amount of memory blocks that this buffer has. This amount is never
+     * larger than what {@code gst_buffer_get_max_memory()} returns.
+     *
+     * @return the number of memory blocks this buffer is made of.
+     */
     public int getMemoryCount() {
-    	return GSTBUFFER_API.gst_buffer_n_memory(this);
+        return GSTBUFFER_API.gst_buffer_n_memory(this);
     }
 
     /**

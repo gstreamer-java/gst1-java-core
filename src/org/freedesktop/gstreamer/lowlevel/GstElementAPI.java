@@ -103,8 +103,8 @@ public interface GstElementAPI extends com.sun.jna.Library {
     /* context */
     void gst_element_set_context(Element element, GstContextPtr context);
     GList gst_element_get_contexts(Element element);
-    GstContextPtr gst_element_get_context(Element element, String context_type);
-    GstContextPtr gst_element_get_context_unlocked(Element element, String context_type);
+    @CallerOwnsReturn GstContextPtr gst_element_get_context(Element element, String context_type);
+    @CallerOwnsReturn GstContextPtr gst_element_get_context_unlocked(Element element, String context_type);
     
     /**
     * GstElement:

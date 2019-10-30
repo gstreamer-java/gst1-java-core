@@ -757,9 +757,9 @@ public class Element extends GstObject {
     public boolean query(Query query) {
         return GSTELEMENT_API.gst_element_query(this, query);
     }
-    
+
     /**
-     * Sets the context of the element. Increases the refcount of the context.
+     * Sets the context of the element.
      *
      * @param context the Context to set.
      */
@@ -774,8 +774,8 @@ public class Element extends GstObject {
      * @return a context or NULL
      */
     public Context getContext(String context_type) {
-		GstContextPtr gstContextPtr = GSTELEMENT_API.gst_element_get_context(this, context_type);
-		return gstContextPtr != null ? new Context(Natives.initializer(gstContextPtr.getPointer())) : null;
+        GstContextPtr gstContextPtr = GSTELEMENT_API.gst_element_get_context(this, context_type);
+        return gstContextPtr != null ? new Context(Natives.initializer(gstContextPtr.getPointer())) : null;
     }
 
     static class Handle extends GstObject.Handle {

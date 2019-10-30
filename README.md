@@ -1,10 +1,3 @@
-**Work in progress**
-
-Add a minimal change set to the core to allow the binding of OpenGL features from the native
-[gst-plugins-base](https://gitlab.freedesktop.org/gstreamer/gst-plugins-base) project.
-The [gst1-java-plugins-base](https://github.com/Chatanga/gst1-java-plugins-base) contains
-the actual binding for the OpenGL part of gst-plugins-base with an example using Swing and JOGL.
-
 GStreamer 1.x Java Core (gst1-java-core)
 ========================================
 

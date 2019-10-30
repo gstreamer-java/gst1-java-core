@@ -122,16 +122,15 @@ public class ElementTest {
         assertTrue("Message not posted", signalFired.get());
     }
     @Test public void testContext() {
-		Element element = ElementFactory.make("fakesrc", "fs");
-
-		Context context = new Context("test");
-		element.setContext(context);
-		
-		Context anotherContext = element.getContext("test");
-		Assert.assertNotNull(anotherContext);
-		Assert.assertNotSame(context, anotherContext);
-		Assert.assertEquals(context.getContextType(), anotherContext.getContextType());
-		
-		Assert.assertNull(element.getContext("test-something-else"));
+        Element element = ElementFactory.make("fakesrc", "fs");
+        
+        Context context = new Context("test");
+        element.setContext(context);
+        
+        Context anotherContext = element.getContext("test");
+        Assert.assertNotNull(anotherContext);
+        Assert.assertEquals(context.getContextType(), anotherContext.getContextType());
+        
+        Assert.assertNull(element.getContext("test-something-else"));
     }
 }
