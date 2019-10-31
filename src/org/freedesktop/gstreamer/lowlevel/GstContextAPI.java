@@ -1,7 +1,6 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Structure;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 /**
  * GstContext API
@@ -15,7 +14,7 @@ public interface GstContextAPI extends com.sun.jna.Library {
 
     GstContextAPI GSTCONTEXT_API = GstNative.load(GstContextAPI.class);
 
-    @CallerOwnsReturn GstContextPtr gst_context_new(String context_type, boolean persistent);
+    /*@CallerOwnsReturn*/ GstContextPtr gst_context_new(String context_type, boolean persistent);
 
     String gst_context_get_context_type(GstContextPtr context);
 

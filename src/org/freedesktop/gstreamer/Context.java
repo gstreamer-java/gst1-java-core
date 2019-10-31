@@ -72,7 +72,7 @@ public class Context extends MiniObject {
      * Create a new context.
      */
     public Context(String context_type, boolean persistent) {
-        this(new Handle(GstContextAPI.GSTCONTEXT_API.gst_context_new(context_type, persistent), true), true);
+        this(new Handle(GstContextAPI.GSTCONTEXT_API.gst_context_new(context_type, persistent), true), false);
     }
 
     Context(Handle handle, boolean needRef) {
