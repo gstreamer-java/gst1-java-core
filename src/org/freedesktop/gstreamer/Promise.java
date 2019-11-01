@@ -66,7 +66,7 @@ public class Promise extends MiniObject {
             public void callback(Promise promise, Pointer userData) {
                 listener.onChange(promise);
             }
-        }), false, false));
+        }, null, null)));
     }
 
     /**

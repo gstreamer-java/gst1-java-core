@@ -96,4 +96,28 @@ public class PromiseTest {
         Structure result = promise.getReply();
         assertTrue("result of promise does not match reply", result.isEqual(data));
     }
+
+    @Test
+    public void testDispose() {
+        if (!Gst.testVersion(1, 14)) {
+            return;
+        }
+        Promise promise = new Promise();
+        promise.interrupt();
+        promise.dispose();
+    }
+
+    @Test
+    public void testDisposeWithChangeFunc() {
+        if (!Gst.testVersion(1, 14)) {
+            return;
+        }
+        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
+            @Override
+            public void onChange(Promise promise) {
+            }
+        });
+        promise.interrupt();
+        promise.dispose();
+    }
 }
