@@ -28,6 +28,7 @@ import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.annotations.Invalidate;
 
 /**
  * GstPromise methods and structures
@@ -65,7 +66,7 @@ public interface GstPromiseAPI extends com.sun.jna.Library {
 
   PromiseResult gst_promise_wait(Promise promise);
 
-  void gst_promise_reply(Promise promise, Structure s);
+  void gst_promise_reply(Promise promise, @Invalidate Structure s);
   void gst_promise_interrupt(Promise promise);
   void gst_promise_expire(Promise promise);
 

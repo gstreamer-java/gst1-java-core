@@ -19,6 +19,7 @@ package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstPromiseAPI.GSTPROMISE_API;
 
+import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 import com.sun.jna.Pointer;
@@ -86,7 +87,9 @@ public class Promise extends MiniObject {
      * {@link PromiseResult} state. If the promise has already been interrupted
      * than the replied will not be visible to any waiters
      *
-     * @param structure the {@link Structure} to reply the promise with
+     * @param structure the {@link Structure} to reply the promise with, caller
+     * should not use this structure afterward as it is invalidated through
+     * {@link NativeObject#invalidate()}
      */
     public void reply(final Structure structure) {
         GSTPROMISE_API.gst_promise_reply(this, structure);
