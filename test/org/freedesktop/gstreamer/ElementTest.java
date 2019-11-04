@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.message.TagMessage;
@@ -123,14 +124,23 @@ public class ElementTest {
     }
     @Test public void testContext() {
         Element element = ElementFactory.make("fakesrc", "fs");
+        Assert.assertEquals(1, element.getRefCount());
         
         Context context = new Context("test");
+        Assert.assertEquals(1, context.getRefCount());
         element.setContext(context);
+        Assert.assertEquals(2, context.getRefCount());
         
         Context anotherContext = element.getContext("test");
+        Assert.assertEquals(2, anotherContext.getRefCount());
         Assert.assertNotNull(anotherContext);
         Assert.assertEquals(context.getContextType(), anotherContext.getContextType());
         
         Assert.assertNull(element.getContext("test-something-else"));
+        
+        element.dispose();
+        Assert.assertEquals(0, element.getRefCount());
+        Assert.assertEquals(1, context.getRefCount());
+        Assert.assertEquals(1, anotherContext.getRefCount());
     }
 }

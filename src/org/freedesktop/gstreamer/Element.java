@@ -764,18 +764,19 @@ public class Element extends GstObject {
      * @param context the Context to set.
      */
     public void setContext(Context context) {
-    	GstContextPtr gstContextPtr = Natives.getPointer(context).as(GstContextPtr.class, GstContextPtr::new);
+        GstContextPtr gstContextPtr = Natives.getPointer(context).as(GstContextPtr.class, GstContextPtr::new);
         GSTELEMENT_API.gst_element_set_context(this, gstContextPtr);
     }
 
     /**
      * Gets the context with the context_type set on the element or NULL.
+     * 
      * @param context_type
      * @return a context or NULL
      */
     public Context getContext(String context_type) {
         GstContextPtr gstContextPtr = GSTELEMENT_API.gst_element_get_context(this, context_type);
-        return gstContextPtr != null ? new Context(Natives.initializer(gstContextPtr.getPointer())) : null;
+        return gstContextPtr != null ? Natives.callerOwnsReturn(gstContextPtr, Context.class) : null;
     }
 
     static class Handle extends GstObject.Handle {
