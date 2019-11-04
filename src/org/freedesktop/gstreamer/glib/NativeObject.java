@@ -158,7 +158,9 @@ public abstract class NativeObject implements AutoCloseable {
         NativeObject obj = NativeObject.instanceFor(gptr.getPointer());
 
         if (obj != null && cls.isInstance(obj)) {
-            if (refAdjust < 0) {
+            if (ownsHandle && !obj.handle.ownsReference()) {
+                obj.handle.ownsReference.set(true);
+            } else if (refAdjust < 0) {
                 ((RefCountedObject.Handle) obj.handle).unref(); // Lose the extra ref added by gstreamer
             }
             return cls.cast(obj);
