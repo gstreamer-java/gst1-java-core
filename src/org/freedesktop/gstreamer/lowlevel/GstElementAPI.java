@@ -36,6 +36,7 @@ import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.event.SeekType;
 import org.freedesktop.gstreamer.State;
 import org.freedesktop.gstreamer.StateChangeReturn;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI.GList;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectClass;
 import org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GstObjectStruct;
@@ -99,6 +100,11 @@ public interface GstElementAPI extends com.sun.jna.Library {
     long gst_element_get_base_time(Element element);
     void gst_element_set_start_time(Element element, long time);
     long gst_element_get_start_time(Element element);
+    /* context */
+    void gst_element_set_context(Element element, GstContextPtr context);
+    GList gst_element_get_contexts(Element element);
+    @CallerOwnsReturn GstContextPtr gst_element_get_context(Element element, String context_type);
+    @CallerOwnsReturn GstContextPtr gst_element_get_context_unlocked(Element element, String context_type);
     
     /**
     * GstElement:

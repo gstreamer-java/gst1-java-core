@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Structure;
-import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
@@ -80,6 +79,7 @@ public class Message extends MiniObject {
         TYPE_MAP.put(MessageType.STATE_CHANGED, StateChangedMessage::new);
         TYPE_MAP.put(MessageType.TAG, TagMessage::new);
         TYPE_MAP.put(MessageType.WARNING, WarningMessage::new);
+        TYPE_MAP.put(MessageType.NEED_CONTEXT, NeedContextMessage::new);
     }
 
     private final GstMessageAPI.MessageStruct messageStruct;

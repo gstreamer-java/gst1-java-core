@@ -21,6 +21,8 @@ package org.freedesktop.gstreamer;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+
+import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
@@ -32,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstStructureAPI.GSTSTRUCTURE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
 
@@ -610,6 +611,34 @@ public class Structure extends NativeObject {
                 GSTVALUE_API.gst_int_range_get_type(), min, max);
     }
     
+    /**
+     * Set an object field in the structure.
+     * 
+     * @param field the name of the field to set.
+     * @param typeName a type into which the provided object could be coerced into.
+     * @param object the value to set for the field (must not be {@code null}).
+     */
+    public void setObject(String field, String typeName, GObject object) {
+        GType type = GType.valueOf(typeName);
+        if (type != GType.INVALID) {
+            if (object != null) {
+                GType realType = GType.valueOf(object.getTypeName());
+                while (realType != GType.OBJECT && realType != type) {
+                    realType = realType.getParentType();
+                }
+                if (realType != type) {
+                    throw new IllegalArgumentException(
+                            "Provided instance of " + object.getTypeName() + " is not a " + typeName);
+                }
+                setValue(field, type, object);
+            } else {
+                throw new IllegalArgumentException("Null object provided");
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown GType name: " + typeName);
+        }
+    }
+
     void setPointer(String field, Pointer value) {
         GSTSTRUCTURE_API.gst_structure_set(this, field, GType.POINTER, value);
     }

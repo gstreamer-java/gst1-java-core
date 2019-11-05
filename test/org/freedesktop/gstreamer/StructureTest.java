@@ -1,8 +1,10 @@
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.GCancellable;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -172,5 +174,32 @@ public class StructureTest {
     public void testValueListChecksType() {
         Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
         caps.getStructure(0).getValues(Integer.class, "format");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetMistypedObject() {
+        GCancellable notACapsInstance = new GCancellable();
+        structure.setObject("whatever", Caps.GTYPE_NAME, notACapsInstance);
+    }
+
+    public void testSetUntypedObject() {
+        GCancellable anyKindOfObject = new GCancellable();
+        structure.setObject("whatever", GType.OBJECT.getTypeName(), anyKindOfObject);
+        Object value = structure.getValue("whatever");
+        Assert.assertSame(anyKindOfObject, value);
+    }
+
+    public void testSetObject() {
+        GCancellable anyKindOfObject = new GCancellable();
+        structure.setObject("whatever", GCancellable.GTYPE_NAME, anyKindOfObject);
+        Object value = structure.getValue("whatever");
+        Assert.assertSame(anyKindOfObject, value);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetNullObject() {
+        structure.setObject("whatever", GCancellable.GTYPE_NAME, null);
+        Object value = structure.getValue("whatever");
+        Assert.assertNull(value);
     }
 }
