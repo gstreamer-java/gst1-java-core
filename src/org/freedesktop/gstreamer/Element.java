@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2019 Christophe Lafolet
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
@@ -755,7 +757,28 @@ public class Element extends GstObject {
     public boolean query(Query query) {
         return GSTELEMENT_API.gst_element_query(this, query);
     }
-    
+
+    /**
+     * Sets the context of the element.
+     *
+     * @param context the Context to set.
+     */
+    public void setContext(Context context) {
+        GstContextPtr gstContextPtr = Natives.getPointer(context).as(GstContextPtr.class, GstContextPtr::new);
+        GSTELEMENT_API.gst_element_set_context(this, gstContextPtr);
+    }
+
+    /**
+     * Gets the context with the context_type set on the element or NULL.
+     * 
+     * @param context_type
+     * @return a context or NULL
+     */
+    public Context getContext(String context_type) {
+        GstContextPtr gstContextPtr = GSTELEMENT_API.gst_element_get_context(this, context_type);
+        return gstContextPtr != null ? Natives.callerOwnsReturn(gstContextPtr, Context.class) : null;
+    }
+
     static class Handle extends GstObject.Handle {
         
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {

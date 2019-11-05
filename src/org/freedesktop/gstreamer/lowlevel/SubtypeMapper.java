@@ -25,6 +25,7 @@ import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.event.EventType;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.message.MessageType;
+import org.freedesktop.gstreamer.message.NeedContextMessage;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.event.BufferSizeEvent;
@@ -130,6 +131,7 @@ public class SubtypeMapper {
                 put(MessageType.STATE_CHANGED, StateChangedMessage.class);
                 put(MessageType.TAG, TagMessage.class);
                 put(MessageType.WARNING, WarningMessage.class);
+                put(MessageType.NEED_CONTEXT, NeedContextMessage.class);
             }};
             public static Class<? extends NativeObject> subtypeFor(Pointer ptr) {
                 GstMessageAPI.MessageStruct struct = new GstMessageAPI.MessageStruct(ptr);
