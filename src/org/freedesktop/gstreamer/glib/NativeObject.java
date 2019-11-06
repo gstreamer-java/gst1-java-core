@@ -161,7 +161,13 @@ public abstract class NativeObject implements AutoCloseable {
             if (ownsHandle && !obj.handle.ownsReference()) {
                 obj.handle.ownsReference.set(true);
             } else if (refAdjust < 0) {
-                ((RefCountedObject.Handle) obj.handle).unref(); // Lose the extra ref added by gstreamer
+                try {
+                    // Lose the extra ref added by gstreamer
+                    ((RefCountedObject.Handle) obj.handle).unref();
+                } catch (ClassCastException ex) {
+                    // A none ref-counted object should not get here!
+                    LOG.log(LIFECYCLE, "None ref-counted object returned again from caller owns return.", ex);
+                }
             }
             return cls.cast(obj);
         }
