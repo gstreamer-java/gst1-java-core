@@ -66,7 +66,7 @@ public abstract class NativeObject implements AutoCloseable {
         // is stale or not
         //
         this.ptr = handle.ptrRef.get().getPointer();
-        if (handle.isCacheable()) {
+        if (handle.isCacheable() && handle.ownsReference()) {
             // need to put all nativeRef in map now so WeakReference doesn't go out of scope
             INSTANCES.put(this.ptr, new NativeRef(this, handle));
         }
@@ -80,7 +80,9 @@ public abstract class NativeObject implements AutoCloseable {
      */
     public void disown() {
         LOG.log(LIFECYCLE, "Disowning " + getRawPointer());
-        handle.ownsReference.set(false);
+        if (handle.ownsReference.compareAndSet(true, false)) {
+            INSTANCES.remove(ptr);
+        }
     }
 
     /**
@@ -308,8 +310,7 @@ public abstract class NativeObject implements AutoCloseable {
          */
         public void invalidate() {
             GPointer ptr = ptrRef.getAndSet(null);
-            ownsReference.set(false);
-            if (ptr != null) {
+            if (ptr != null && ownsReference.compareAndSet(true, false)) {
                 INSTANCES.remove(ptr.getPointer());
             }
         }
@@ -324,8 +325,8 @@ public abstract class NativeObject implements AutoCloseable {
         public void dispose() {
             GPointer ptr = ptrRef.getAndSet(null);
             if (ptr != null) {
-                INSTANCES.remove(ptr.getPointer());
                 if (ownsReference.compareAndSet(true, false)) {
+                    INSTANCES.remove(ptr.getPointer());
                     disposeNativeHandle(ptr);
                 }
             }
