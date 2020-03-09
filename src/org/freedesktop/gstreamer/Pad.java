@@ -81,6 +81,7 @@ public class Pad extends GstObject {
 
     public static final String GTYPE_NAME = "GstPad";
     
+    private static final int EVENT_HAS_INFO_MASK = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
     private final Handle handle;
 
     /**
@@ -395,7 +396,10 @@ public class Pad extends GstObject {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
 //        	    System.out.println("CALLBACK " + probeInfo.padProbeType);
                 if ((probeInfo.padProbeType & mask) != 0) {
-                    Event event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
+                    Event event = null;
+                    if ((probeInfo.padProbeType & EVENT_HAS_INFO_MASK) != 0) {
+                        event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
+                    }
                     return listener.eventReceived(pad, event);
                 }
 
