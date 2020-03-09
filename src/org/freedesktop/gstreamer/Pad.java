@@ -319,7 +319,7 @@ public class Pad extends GstObject {
             public PadProbeReturn eventReceived(Pad pad, Event event) {
                 callback.run();
                 pad.removeCallback(EVENT_PROBE.class, this);
-                return PadProbeReturn.DROP;
+                return PadProbeReturn.OK;
             }
         }, GstPadAPI.GST_PAD_PROBE_TYPE_BLOCKING | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM);
     }
