@@ -590,7 +590,7 @@ public abstract class GObject extends RefCountedObject {
         protected GCallback(NativeLong id, Callback cb) {
             this.id = id != null ? id : new NativeLong(0);
             this.cb = cb;
-            this.connected = this.id.intValue() != 0;
+            this.connected = this.id.longValue() != 0;
         }
 
         void remove() {
