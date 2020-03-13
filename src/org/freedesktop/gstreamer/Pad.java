@@ -28,6 +28,11 @@ import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -310,7 +315,9 @@ public class Pad extends GstObject {
     }
 
     /**
-     * Run a runnable under a blocked state
+     * Run a runnable under a blocked state.
+     * The pad will remain blocked for as long as the callback is active.
+     * The callback may be called from this thread or another thread.
      *
      * @param callback The code to run when pad is blocked
      */
@@ -322,6 +329,42 @@ public class Pad extends GstObject {
                 return PadProbeReturn.REMOVE;
             }
         }, GstPadAPI.GST_PAD_PROBE_TYPE_IDLE);
+    }
+
+    /**
+     * Run a supplier (a callback which returns a value) under a blocked state and wait for the runnable to complete. Return the value to
+     * the waiting thread.
+     * The pad will remain blocked for as long as the callback is active.
+     * The callback may be called from this thread or another thread.
+     *
+     * @param supplier The code to run when pad is blocked
+     */
+    public <T> T blockAndWait(final Supplier<T> supplier) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        block(() -> {
+            T result = supplier.get();
+            future.complete(result);
+        });
+
+        try {
+            return future.get(1, TimeUnit.MINUTES);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Run a runnable under a blocked state and wait for the runnable to complete.
+     * The pad will remain blocked for as long as the callback is active.
+     * The callback may be called from this thread or another thread.
+     *
+     * @param callback The code to run when pad is blocked
+     */
+    public void blockAndWait(final Runnable callback) {
+        blockAndWait(() -> {
+            callback.run();
+            return null;
+        });
     }
 
     /**
