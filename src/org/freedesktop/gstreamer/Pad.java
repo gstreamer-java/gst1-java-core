@@ -26,7 +26,9 @@ package org.freedesktop.gstreamer;
 import com.sun.jna.NativeLong;
 import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -450,7 +452,7 @@ public class Pad extends GstObject {
             }
         };
 
-        NativeLong id = handle.addProbe(mask, probe);
+        NativeLong id = handle.addProbe(mask, probe, this);
         if (id.longValue() == 0) {
             // the Probe was an IDLE-Probe and it was already handled synchronously in handle.addProbe,
             // so no Callback needs to be registered
@@ -484,7 +486,7 @@ public class Pad extends GstObject {
             }
         };
 
-        GCallback cb = new GCallback(handle.addProbe(GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER, probe), probe) {
+        GCallback cb = new GCallback(handle.addProbe(GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER, probe, this), probe) {
             @Override
             protected void disconnect() {
                 handle.removeProbe(id);
@@ -713,27 +715,34 @@ public class Pad extends GstObject {
     private static class Handle extends GstObject.Handle {
         
         private final Set<NativeLong> probes;
-        
+
+        // The Pads are stored here, so that they are not GC'ed while the Probe still exists
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+        private final Map<NativeLong, Pad> probePads;
+
         private Handle(GstPadPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
             probes = new HashSet<>();
+            probePads = new HashMap<>();
         }
 
         @Override
         protected GstPadPtr getPointer() {
             return (GstPadPtr) super.getPointer();
         }
-        
-        private synchronized NativeLong addProbe(int mask, GstPadAPI.PadProbeCallback probe) {
+
+        private synchronized NativeLong addProbe(int mask, GstPadAPI.PadProbeCallback probe, Pad pad) {
             NativeLong id = GSTPAD_API.gst_pad_add_probe(getPointer(), mask, probe, null, null);
             if (id.longValue() != 0) {
                 probes.add(id);
+                probePads.put(id, pad);
             }
             return id;
         }
         
         private synchronized void removeProbe(NativeLong id) {
             if (probes.remove(id)) {
+                probePads.remove(id);
                 GSTPAD_API.gst_pad_remove_probe(getPointer(), id);
             }
         }
@@ -741,6 +750,7 @@ public class Pad extends GstObject {
         private synchronized void clearProbes() {
             probes.forEach(id -> GSTPAD_API.gst_pad_remove_probe(getPointer(), id));
             probes.clear();
+            probePads.clear();
         }
 
         @Override
