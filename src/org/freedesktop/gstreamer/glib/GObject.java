@@ -22,40 +22,24 @@
  */
 package org.freedesktop.gstreamer.glib;
 
-import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
-import static org.freedesktop.gstreamer.lowlevel.GSignalAPI.GSIGNAL_API;
-import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
+import com.sun.jna.*;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.lowlevel.*;
+import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
-import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.GstTypes;
-import org.freedesktop.gstreamer.lowlevel.IntPtr;
-
-import com.sun.jna.Callback;
-import com.sun.jna.CallbackThreadInitializer;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
+import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GSignalAPI.GSIGNAL_API;
+import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstEnumAPI.GSTENUM_API;
 
 /**
  * GObject is the fundamental type providing the common attributes and methods
@@ -354,6 +338,20 @@ public abstract class GObject extends RefCountedObject {
                 GVALUE_API.g_value_set_string(propValue, null);
             } else {
                 GVALUE_API.g_value_set_string(propValue, data.toString());
+            }
+        } else if (GOBJECT_API.g_type_is_a(propType, GType.ENUM)) {
+            if (data instanceof String) {
+                String enumNick = (String) data;
+                GObjectAPI.GTypeClass klass = GOBJECT_API.g_type_class_ref(propType);
+                GEnumValue enumValue = GSTENUM_API.g_enum_get_value_by_nick(klass, enumNick);
+                if (enumValue == null) {
+                    throw new IllegalArgumentException(String.format("The String-Value %s is not valid for the Enum-Property %s", enumNick, property));
+                }
+                GVALUE_API.g_value_set_enum(propValue, enumValue.value);
+            } else if (data instanceof Number) {
+                GVALUE_API.g_value_set_enum(propValue, ((Number) data).intValue());
+            } else {
+                throw new IllegalArgumentException(String.format("The %s is not applicable to an Enum-Property", data));
             }
         } else if (propType.equals(GType.OBJECT)) {
             GVALUE_API.g_value_set_object(propValue, (GObject) data);

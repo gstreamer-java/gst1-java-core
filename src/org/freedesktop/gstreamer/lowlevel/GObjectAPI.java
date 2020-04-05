@@ -118,7 +118,10 @@ public interface GObjectAPI extends Library {
     GType g_type_register_static_simple(GType parent_type, Pointer type_name,
         int class_size, GClassInitFunc class_init, int instance_size,
         GInstanceInitFunc instance_init, /* GTypeFlags */ int flags);
-    /* 
+
+    GTypeClass g_type_class_ref(GType type);
+
+    /*
      * Basic Type Structures
      */
     public static class GTypeClass extends com.sun.jna.Structure {
