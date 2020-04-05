@@ -436,7 +436,7 @@ public class Pad extends GstObject {
         addEventProbe(listener, mask);
     }
 
-    void addEventProbe(final EVENT_PROBE listener, final int mask) {
+    synchronized void addEventProbe(final EVENT_PROBE listener, final int mask) {
         final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
                 if ((probeInfo.padProbeType & mask) != 0) {
