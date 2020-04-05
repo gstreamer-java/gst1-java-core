@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PropertyTypeTest {
 
@@ -108,7 +109,7 @@ public class PropertyTypeTest {
         assertEquals("", filesink.get("location"));
 
         filesink.set("location", null);
-        assertEquals(null, filesink.get("location"));
+        assertNull(filesink.get("location"));
 
         filesink.set("location", "foobar");
         assertEquals("foobar", filesink.get("location"));
