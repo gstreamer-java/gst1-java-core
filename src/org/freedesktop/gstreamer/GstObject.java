@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -22,13 +22,21 @@
  */
 package org.freedesktop.gstreamer;
 
+import com.sun.jna.Pointer;
 import java.util.logging.Logger;
 import org.freedesktop.gstreamer.glib.GObject;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
+import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstControlBindingPtr;
 import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
+import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
+import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstObjectAPI.GSTOBJECT_API;
+import static org.freedesktop.gstreamer.lowlevel.GstValueAPI.GSTVALUE_API;
 
 /**
  * Base class for the GStreamer object hierarchy
@@ -60,6 +68,76 @@ public class GstObject extends GObject {
     protected GstObject(Handle handle, boolean needRef) {
         super(handle, needRef);
         this.handle = handle;
+    }
+
+    /**
+     * Set the value of a GstObject property from a String representation.
+     * <p>
+     * The data value is deserialized using <code>gst_value_deserialize</code>.
+     *
+     * @param property the property to set
+     * @param data the value as a valid String representation
+     * @throws IllegalArgumentException if the data cannot be deserialized to
+     * the required type.
+     */
+    public void setAsString(String property, String data) {
+        GObjectAPI.GParamSpec propertySpec = findProperty(property);
+        if (propertySpec == null) {
+            throw new IllegalArgumentException("Unknown property: " + property);
+        }
+        final GType propType = propertySpec.value_type;
+
+        GValue propValue = new GValue();
+        GVALUE_API.g_value_init(propValue, propType);
+
+        boolean success = GSTVALUE_API.gst_value_deserialize(propValue, data);
+
+        if (success) {
+            GOBJECT_API.g_param_value_validate(propertySpec, propValue);
+            GOBJECT_API.g_object_set_property(this, property, propValue);
+        }
+
+        GVALUE_API.g_value_unset(propValue); // Release any memory
+
+        if (!success) {
+            throw new IllegalArgumentException(
+                    "Unable to deserialize data to required type: "
+                            + propType.getTypeName());
+        }
+
+    }
+
+    /**
+     * Get the value of a GstObject property as a serialized String
+     * representation of its value.
+     * <p>
+     * The data value is serialized using <code>gst_value_serialize</code>.
+     *
+     * @param property the property to get
+     * @return serialized String value of property
+     */
+    public String getAsString(String property) {
+        GObjectAPI.GParamSpec propertySpec = findProperty(property);
+        if (propertySpec == null) {
+            throw new IllegalArgumentException("Unknown property: " + property);
+        }
+        final GType propType = propertySpec.value_type;
+        GValue propValue = new GValue();
+        GVALUE_API.g_value_init(propValue, propType);
+        GOBJECT_API.g_object_get_property(this, property, propValue);
+        Pointer ptr = GSTVALUE_API.gst_value_serialize(propValue);
+        String ret = ptr.getString(0);
+        GLIB_API.g_free(ptr);
+        return ret;
+    }
+
+    private GObjectAPI.GParamSpec findProperty(String propertyName) {
+        Pointer ptr = GOBJECT_API.g_object_class_find_property(
+                getRawPointer().getPointer(0), propertyName);
+        if (ptr == null) {
+            return null;
+        }
+        return new GObjectAPI.GParamSpec(ptr);
     }
 
     /**

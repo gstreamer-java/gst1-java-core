@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -19,10 +20,11 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 /**
- * GstStructure functions
+ * GstValue functions
  */
 public interface GstValueAPI extends com.sun.jna.Library {
 	GstValueAPI GSTVALUE_API = GstNative.load(GstValueAPI.class);
@@ -44,4 +46,8 @@ public interface GstValueAPI extends com.sun.jna.Library {
     int gst_value_get_int_range_max(GValue value);
     int gst_value_list_get_size(GValue value);
     GValue gst_value_list_get_value(GValue value, int index);
+    
+    boolean gst_value_deserialize(GValue value, String src);
+    Pointer gst_value_serialize(GValue value);
+    
 }
