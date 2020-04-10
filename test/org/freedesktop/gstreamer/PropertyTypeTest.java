@@ -54,7 +54,7 @@ public class PropertyTypeTest {
 
         audiotestsrc.set("do-timestamp", false);
         assertEquals(false, audiotestsrc.get("do-timestamp"));
-        
+
         audiotestsrc.setAsString("do-timestamp", "true");
         assertEquals("true", audiotestsrc.getAsString("do-timestamp"));
     }
@@ -66,7 +66,7 @@ public class PropertyTypeTest {
 
         audiotestsrc.set("freq", 5_000_000.);
         assertEquals(5_000_000., audiotestsrc.get("freq"));
-        
+
         audiotestsrc.setAsString("freq", "42.23");
         assertEquals(42.23, audiotestsrc.get("freq"));
     }
@@ -122,7 +122,7 @@ public class PropertyTypeTest {
         long maxUnsignedLong = Long.parseUnsignedLong("18446744073709551615");
         filesink.set("max-bitrate", maxUnsignedLong);
         assertEquals(maxUnsignedLong, filesink.get("max-bitrate"));
-        
+
         filesink.set("max-bitrate", 42L);
         assertEquals(42L, filesink.get("max-bitrate"));
 
@@ -150,30 +150,33 @@ public class PropertyTypeTest {
         audiotestsrc.setAsString("wave", "Silence");
         assertEquals(4, audiotestsrc.get("wave"));
         assertEquals("Silence", audiotestsrc.getAsString("wave"));
-        
+
         audiotestsrc.setAsString("wave", "square");
         assertEquals(1, audiotestsrc.get("wave"));
         assertEquals("Square", audiotestsrc.getAsString("wave"));
-        
+
         audiotestsrc.setAsString("wave", "red-noise");
         assertEquals(10, audiotestsrc.get("wave"));
         String redNoise = audiotestsrc.getAsString("wave");
         assertEquals("Red (brownian) noise", redNoise);
         audiotestsrc.setAsString("wave", redNoise);
         assertEquals(10, audiotestsrc.get("wave"));
-        
+
         // invalid value
         audiotestsrc.set("wave", -256);
         assertEquals(0, audiotestsrc.get("wave"));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void setEnumInvalidString() {
         audiotestsrc.setAsString("wave", "FOO");
     }
-    
+
     @Test
     public void setValueArrayFromString() {
+        if (!Gst.testVersion(1, 14)) {
+            return;
+        }
         Element convert = ElementFactory.make("audioconvert", null);
         convert.setAsString("mix-matrix", "<<(float)0.25, (float)0.45>,<(float)0.65, (float)0.85>>");
         String matrix = convert.getAsString("mix-matrix");
@@ -184,4 +187,3 @@ public class PropertyTypeTest {
         convert.dispose();
     }
 }
-
