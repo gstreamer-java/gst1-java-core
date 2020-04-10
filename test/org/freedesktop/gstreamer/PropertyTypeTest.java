@@ -24,8 +24,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class PropertyTypeTest {
 
@@ -162,11 +161,27 @@ public class PropertyTypeTest {
         assertEquals("Red (brownian) noise", redNoise);
         audiotestsrc.setAsString("wave", redNoise);
         assertEquals(10, audiotestsrc.get("wave"));
+        
+        // invalid value
+        audiotestsrc.set("wave", -256);
+        assertEquals(0, audiotestsrc.get("wave"));
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void setEnumInvalid() {
-        audiotestsrc.set("wave", "FOO");
+    public void setEnumInvalidString() {
+        audiotestsrc.setAsString("wave", "FOO");
+    }
+    
+    @Test
+    public void setValueArrayFromString() {
+        Element convert = ElementFactory.make("audioconvert", null);
+        convert.setAsString("mix-matrix", "<<(float)0.25, (float)0.45>,<(float)0.65, (float)0.85>>");
+        String matrix = convert.getAsString("mix-matrix");
+        assertTrue(matrix.contains("0.2"));
+        assertTrue(matrix.contains("0.4"));
+        assertTrue(matrix.contains("0.6"));
+        assertTrue(matrix.contains("0.8"));
+        convert.dispose();
     }
 }
 
