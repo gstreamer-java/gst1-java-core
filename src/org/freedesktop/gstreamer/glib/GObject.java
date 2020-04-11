@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2009 Levente Farkas
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
@@ -350,6 +350,8 @@ public abstract class GObject extends RefCountedObject {
                     uriString = "file://" + path;
                 }
                 GVALUE_API.g_value_set_string(propValue, uriString);
+            } else if (data == null) {
+                GVALUE_API.g_value_set_string(propValue, null);
             } else {
                 GVALUE_API.g_value_set_string(propValue, data.toString());
             }
