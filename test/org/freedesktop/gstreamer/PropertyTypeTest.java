@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.util.TestAssumptions;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -31,6 +32,7 @@ public class PropertyTypeTest {
 
     private Element audiotestsrc;
     private Element filesink;
+    private Element convert;
 
     @BeforeClass
     public static void setUpClass() {
@@ -43,9 +45,17 @@ public class PropertyTypeTest {
     }
 
     @Before
-    public void before() {
+    public void createElements() {
         audiotestsrc = ElementFactory.make("audiotestsrc", null);
         filesink = ElementFactory.make("filesink", null);
+        convert = ElementFactory.make("audioconvert", null);
+    }
+
+    @After
+    public void disposeElements() {
+        audiotestsrc.dispose();
+        filesink.dispose();
+        convert.dispose();
     }
 
     @Test
@@ -178,11 +188,10 @@ public class PropertyTypeTest {
         TestAssumptions.requireGstVersion(1, 14);
 
         convert.setAsString("mix-matrix", "<<(float)0.25, (float)0.45>,<(float)0.65, (float)0.85>>");
-        String matrix = convert.getAsString("mix-matrix");
-        assertTrue(matrix.contains("0.2"));
-        assertTrue(matrix.contains("0.4"));
-        assertTrue(matrix.contains("0.6"));
-        assertTrue(matrix.contains("0.8"));
-        convert.dispose();
+        String mixMatrix = convert.getAsString("mix-matrix");
+        assertTrue(mixMatrix.contains("0.2"));
+        assertTrue(mixMatrix.contains("0.4"));
+        assertTrue(mixMatrix.contains("0.6"));
+        assertTrue(mixMatrix.contains("0.8"));
     }
 }
