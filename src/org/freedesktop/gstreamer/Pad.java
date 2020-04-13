@@ -318,7 +318,7 @@ public class Pad extends GstObject {
             public PadProbeReturn eventReceived(Pad pad, Event event) {
                 callback.run();
                 pad.removeCallback(EVENT_PROBE.class, this);
-                return PadProbeReturn.DROP;
+                return PadProbeReturn.REMOVE;
             }
         }, GstPadAPI.GST_PAD_PROBE_TYPE_BLOCKING | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM);
     }
@@ -404,7 +404,14 @@ public class Pad extends GstObject {
             }
         };
 
-        GCallback cb = new GCallback(handle.addProbe(mask, probe), probe) {
+        NativeLong id = handle.addProbe(mask, probe);
+        if (id.longValue() == 0) {
+            // the Probe was an IDLE-Probe and it was already handled synchronously in handle.addProbe,
+            // so no Callback needs to be registered
+            return;
+        }
+
+        GCallback cb = new GCallback(id, probe) {
             @Override
             protected void disconnect() {
                 handle.removeProbe(id);
