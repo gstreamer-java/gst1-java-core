@@ -19,6 +19,7 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -174,10 +175,8 @@ public class PropertyTypeTest {
 
     @Test
     public void setValueArrayFromString() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
-        Element convert = ElementFactory.make("audioconvert", null);
+        TestAssumptions.requireGstVersion(1, 14);
+
         convert.setAsString("mix-matrix", "<<(float)0.25, (float)0.45>,<(float)0.65, (float)0.85>>");
         String matrix = convert.getAsString("mix-matrix");
         assertTrue(matrix.contains("0.2"));
