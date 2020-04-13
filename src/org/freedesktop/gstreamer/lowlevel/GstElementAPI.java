@@ -74,7 +74,7 @@ public interface GstElementAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Pad gst_element_get_pad(Element elem, String name);
     @CallerOwnsReturn Pad gst_element_get_static_pad(Element element, String name);
     // pads returned from get_request have to be freed via release_request_pad
-    Pad gst_element_get_request_pad(Element element, String name);
+    @CallerOwnsReturn Pad gst_element_get_request_pad(Element element, String name);
     void gst_element_release_request_pad(Element element, Pad pad);
     boolean gst_element_add_pad(Element elem, Pad pad);
     boolean gst_element_remove_pad(Element elem, @IncRef Pad pad);
