@@ -36,7 +36,7 @@ public class PropertyTypeTest {
 
     @BeforeClass
     public static void setUpClass() {
-        Gst.init("PropertyTypeTest");
+        Gst.init(Gst.getVersion(), "PropertyTypeTest");
     }
 
     @AfterClass
