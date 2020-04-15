@@ -188,6 +188,26 @@ public final class Natives {
     }
 
     /**
+     * Return whether underlying native pointer is owned by this object.
+     *
+     * @param obj native object which may hold a reference to native pointer
+     * @return whether underlying native pointer is owned by this object
+     */
+    public static boolean ownsReference(NativeObject obj) {
+        return obj.handle.ownsReference();
+    }
+
+    /**
+     * Returns whether this object is valid or not.
+     *
+     * @param obj native object
+     * @return whether this object is valid or not
+     */
+    public static boolean validReference(NativeObject obj) {
+        return obj.handle.getPointer() != null;
+    }
+
+    /**
      * Increase the reference count of a {@link RefCountedObject}
      *
      * @param <T> type of object

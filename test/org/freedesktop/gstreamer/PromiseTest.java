@@ -19,8 +19,11 @@
 package org.freedesktop.gstreamer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.junit.BeforeClass;
 import org.junit.AfterClass;
@@ -83,18 +86,33 @@ public class PromiseTest {
     }
 
     @Test
+    public void testInvalidateReply() {
+        if (!Gst.testVersion(1, 14)) {
+            return;
+        }
+        Promise promise = new Promise();
+        Structure data = new Structure("data");
+
+        assertTrue(Natives.ownsReference(data));
+        promise.reply(data);
+        assertFalse(Natives.ownsReference(data));
+        assertFalse(Natives.validReference(data));
+    }
+
+    @Test
     public void testReplyData() {
         if (!Gst.testVersion(1, 14)) {
             return;
         }
         Promise promise = new Promise();
         Structure data = new Structure("data", "test", GType.UINT, 1);
+        GPointer pointer = Natives.getPointer(data);
 
         promise.reply(data);
         assertEquals("promise state not in replied", promise.waitResult(), PromiseResult.REPLIED);
 
         Structure result = promise.getReply();
-        assertTrue("result of promise does not match reply", result.isEqual(data));
+        assertEquals("result of promise does not match reply", pointer, Natives.getPointer(result));
     }
 
     @Test
