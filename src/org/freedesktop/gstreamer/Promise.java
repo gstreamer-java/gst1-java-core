@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2018 Vinicius Tona
  * Copyright (c) 2018 Antonio Morales
  * 
@@ -38,6 +38,8 @@ public class Promise extends MiniObject {
 
     public static final String GTYPE_NAME = "GstPromise";
 
+    private GstCallback changeFunction;
+    
     /**
      * Creates a new instance of Promise. This constructor is used internally.
      *
@@ -62,12 +64,17 @@ public class Promise extends MiniObject {
      * {@link Promise} is changed
      */
     public Promise(final PROMISE_CHANGE listener) {
-        this(Natives.initializer(GSTPROMISE_API.ptr_gst_promise_new_with_change_func(new GstCallback() {
-            @SuppressWarnings("unused")
+        this(new GstCallback() {
             public void callback(Promise promise, Pointer userData) {
                 listener.onChange(promise);
             }
-        }, null, null)));
+        });
+    }
+    
+    private Promise(GstCallback callback) {
+        this(Natives.initializer(GSTPROMISE_API
+                .ptr_gst_promise_new_with_change_func(callback, null, null)));
+        this.changeFunction = callback;
     }
 
     /**
