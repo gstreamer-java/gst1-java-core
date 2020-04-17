@@ -1,4 +1,6 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
+ * Copyright (c) 2019 Kezhu Wang
  * Copyright (c) 2018 Antonio Morales
  * 
  * This file is part of gstreamer-java.
@@ -18,6 +20,8 @@
  */
 package org.freedesktop.gstreamer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -25,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.BeforeClass;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Test;
 
 public class PromiseTest {
@@ -37,7 +41,7 @@ public class PromiseTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init(Gst.getVersion(), "PromiseTest", new String[] {});
+        Gst.init(Gst.getVersion(), "PromiseTest");
     }
 
     @AfterClass
@@ -47,9 +51,8 @@ public class PromiseTest {
     
     @Test
     public void testReply() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
 
         promise.reply(null);
@@ -61,9 +64,8 @@ public class PromiseTest {
 
     @Test
     public void testInterrupt() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
         promise.interrupt();
 
@@ -74,9 +76,8 @@ public class PromiseTest {
 
     @Test
     public void testExpire() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
         promise.expire();
 
@@ -87,9 +88,8 @@ public class PromiseTest {
 
     @Test
     public void testInvalidateReply() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
         Structure data = new Structure("data");
 
@@ -101,9 +101,8 @@ public class PromiseTest {
 
     @Test
     public void testReplyData() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
         Structure data = new Structure("data", "test", GType.UINT, 1);
         GPointer pointer = Natives.getPointer(data);
@@ -117,9 +116,8 @@ public class PromiseTest {
 
     @Test
     public void testDispose() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise();
         promise.interrupt();
         promise.dispose();
@@ -127,15 +125,33 @@ public class PromiseTest {
 
     @Test
     public void testDisposeWithChangeFunc() {
-        if (!Gst.testVersion(1, 14)) {
-            return;
-        }
+        TestAssumptions.requireGstVersion(1, 14);
+        
         Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
             @Override
             public void onChange(Promise promise) {
             }
         });
         promise.interrupt();
+        promise.dispose();
+    }
+    
+    @Test
+    public void testChangeFunctionGC() {
+        TestAssumptions.requireGstVersion(1, 14);
+        
+        final AtomicBoolean onChangeFired = new AtomicBoolean(false);
+        
+        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
+            @Override
+            public void onChange(Promise promise) {
+                onChangeFired.set(true);
+            }
+        });
+        System.gc();
+        System.gc();
+        promise.interrupt();
+        assertTrue("Promise Change callback GC'd", onChangeFired.get());
         promise.dispose();
     }
 }
