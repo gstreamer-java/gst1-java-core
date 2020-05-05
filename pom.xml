@@ -5,11 +5,11 @@
 
   <groupId>org.freedesktop.gstreamer</groupId>
   <artifactId>gst1-java-core</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
 
   <name>GStreamer 1.x Java Core</name>
-  <description>Unofficial Java binding for the Gstreamer framework</description>
+  <description>Unofficial Java binding for the GStreamer framework</description>
   <url>https://github.com/gstreamer-java/gst1-java-core</url>
 
   <organization>
@@ -46,12 +46,13 @@
     <developer>
       <id>neilcsmith-net</id>
       <name>Neil C Smith</name>
-      <email>neilcsmith.net[at]googlemail[dot]com</email>
+      <organization>Codelerity Ltd.</organization>
+      <email>neil@codelerity.com</email>
       <roles>
         <role>lead maintainer</role>
         <role>developer</role>
       </roles>
-      <url>http://www.neilcsmith.net</url>
+      <url>https://www.codelerity.com</url>
     </developer>
     <developer>
       <id>wmeissner</id>
