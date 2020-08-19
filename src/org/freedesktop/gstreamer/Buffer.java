@@ -5,16 +5,16 @@
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -22,18 +22,19 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
-
-import java.nio.ByteBuffer;
-
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
-import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-
 import com.sun.jna.Pointer;
+import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GNative;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
+import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
+import org.freedesktop.gstreamer.lowlevel.GstNative;
+import org.freedesktop.gstreamer.meta.GstMetaData;
+import org.freedesktop.gstreamer.meta.GstVideoTimeCodeMeta;
+import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 /**
  * Buffers are the basic unit of data transfer in GStreamer. They contain the
@@ -251,6 +252,37 @@ public class Buffer extends MiniObject {
         int nativeInt = GstBufferAPI.GSTBUFFER_API.gst_buffer_get_flags(this);
         return NativeFlags.fromInt(BufferFlags.class, nativeInt);
     }
+
+    /**
+     * Get the time code metadata for buffer. When there is no such metadata, NULL is returned.
+     *
+     * @return return time code (SMPTE) for current buffer
+     */
+    public GstVideoTimeCodeMeta getVideoTimeCodeMeta() {
+        return new GstVideoTimeCodeMeta(GSTBUFFER_API.gst_buffer_get_meta(this, GstMetaData.VIDEO_TIME_CODE_META.getType()));
+    }
+
+
+    /**
+     * Check if buffer contains selected type of metadata
+     *
+     * @param gstMetaData type of metadata
+     * @return return true only if buffer contains selected type of metadata
+     */
+    public boolean containsMetadata(GstMetaData gstMetaData) {
+        return getNumberOfMeta(gstMetaData) > 0;
+    }
+
+    /**
+     * Check number of metadata for selected type. There can be more metadata in case multiple video/audio layer
+     *
+     * @param gstMetaData type of metadata
+     * @return return number of metadata
+     */
+    public int getNumberOfMeta(GstMetaData gstMetaData) {
+        return GSTBUFFER_API.gst_buffer_get_n_meta(this, gstMetaData.getType());
+    }
+
 
     /**
      * Set some of the GstBufferFlags describing this buffer. This is a union
