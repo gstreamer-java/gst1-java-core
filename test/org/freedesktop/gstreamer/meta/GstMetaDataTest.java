@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.Version;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class GstMetaDataTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Stream.of(GstMetaData.values()).filter(gstMeta -> Gst.testVersion(1, gstMeta.getMinorVersion())).map(gstMeta -> new Object[]{gstMeta}).collect(Collectors.toList());
+        return Stream.of(GstMetaData.values()).filter(gstMeta -> Version.BASELINE.getMinor() == gstMeta.getMinorVersion()).map(gstMeta -> new Object[]{gstMeta}).collect(Collectors.toList());
 
     }
 
@@ -27,7 +28,7 @@ public class GstMetaDataTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Gst.init();
+        Gst.init(new Version(1, 8));
     }
 
     @AfterClass
@@ -43,6 +44,5 @@ public class GstMetaDataTest {
     @Test
     public void testGetType() {
         assertNotNull(gstMetaData.getType());
-        System.out.println(gstMetaData.getType());
     }
 }
