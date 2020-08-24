@@ -14,6 +14,9 @@ public class GstMeta implements NativeObject.TypeProvider {
         return Stream.of(
                 registration(GstVideoTimeCodeMeta.class,
                         GstVideoTimeCodeMeta.GTYPE_NAME,
-                        GstVideoTimeCodeMeta::new));
+                        GstVideoTimeCodeMeta::new),
+                registration(GstMetaInfo.class,
+                        GstMetaInfo.GTYPE_NAME,
+                        GstMetaInfo::new));
     }
 }

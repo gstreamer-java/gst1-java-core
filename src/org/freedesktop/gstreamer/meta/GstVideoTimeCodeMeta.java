@@ -4,7 +4,7 @@ import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfo;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMetaStruct;
 
 /**
@@ -18,7 +18,7 @@ public class GstVideoTimeCodeMeta extends MiniObject {
     private final GstVideoTimeCode timeCode;
 
     public GstVideoTimeCodeMeta(Pointer pointer) {
-        this(Natives.initializer(pointer,false,false));
+        this(Natives.initializer(pointer, false, false));
     }
 
     GstVideoTimeCodeMeta(Initializer init) {
@@ -36,8 +36,13 @@ public class GstVideoTimeCodeMeta extends MiniObject {
         return timeCode;
     }
 
+    /**
+     * Information about metadata
+     *
+     * @return return structure with information about metadata
+     */
     public GstMetaInfo getMetaInfo() {
-        return metaStruct.meta.info;
+        return GST_META_API.gst_video_time_code_meta_get_info();
     }
 
     @Override

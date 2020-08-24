@@ -3,6 +3,7 @@ package org.freedesktop.gstreamer.lowlevel;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import org.freedesktop.gstreamer.meta.GstMetaInfo;
 import org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags;
 
 /**
@@ -62,12 +63,20 @@ public interface GstMetaApi extends Library {
         }
 
         public long flags;
-        public GstMetaInfo.ByReference info;
+        public GstMetaInfoStruct.ByReference info;
     }
 
     @Structure.FieldOrder({"api", "type", "size"})
-    class GstMetaInfo extends Structure {
-        public static class ByReference extends GstMetaInfo implements Structure.ByReference {
+    class GstMetaInfoStruct extends Structure {
+        public static class ByReference extends GstMetaInfoStruct implements Structure.ByReference {
+        }
+
+        public GstMetaInfoStruct() {
+        }
+
+        public GstMetaInfoStruct(Pointer p) {
+            super(p);
+            read();
         }
 
         public GType api;
