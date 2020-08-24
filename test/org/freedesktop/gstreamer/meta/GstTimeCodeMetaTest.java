@@ -83,6 +83,8 @@ public class GstTimeCodeMetaTest {
 
     @Test
     public void testVideoTimeCodeMetaPal() {
+        // timecodestamper is available since 1.10
+        TestAssumptions.requireGstVersion(1,10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {

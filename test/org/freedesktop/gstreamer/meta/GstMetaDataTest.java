@@ -19,7 +19,8 @@ public class GstMetaDataTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Stream.of(GstMetaData.values()).map(gstMetaData -> new Object[]{gstMetaData}).collect(Collectors.toList());
+        return Stream.of(GstMetaData.values()).filter(gstMeta -> Gst.testVersion(1, gstMeta.getMinorVersion())).map(gstMeta -> new Object[]{gstMeta}).collect(Collectors.toList());
+
     }
 
     private final GstMetaData gstMetaData;
