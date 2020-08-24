@@ -5,3 +5,4 @@ addons:
     apt:
         packages:
             - gstreamer1.0-plugins-good
+            - gstreamer1.0-plugins-bad

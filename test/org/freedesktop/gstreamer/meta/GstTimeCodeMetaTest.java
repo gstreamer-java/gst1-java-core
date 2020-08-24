@@ -34,6 +34,7 @@ public class GstTimeCodeMetaTest {
 
     @Test
     public void testVideoWithoutMeta() {
+        // method containsMetadata is available since 1.14
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
@@ -50,6 +51,7 @@ public class GstTimeCodeMetaTest {
      */
     @Test
     public void testVideoMeta() {
+        // method containsMetadata is available since 1.14
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
@@ -66,6 +68,7 @@ public class GstTimeCodeMetaTest {
      */
     @Test
     public void testVideoCropMeta() {
+        // method containsMetadata is available since 1.14
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
@@ -108,6 +111,8 @@ public class GstTimeCodeMetaTest {
 
     @Test
     public void testVideoTimeCodeNTSCDrop() {
+        // timecodestamper is available since 1.10
+        TestAssumptions.requireGstVersion(1,10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
@@ -139,6 +144,8 @@ public class GstTimeCodeMetaTest {
      */
     @Test
     public void testVideoTimeCodeNTSCDropFrame() {
+        // timecodestamper is available since 1.10
+        TestAssumptions.requireGstVersion(1,10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
@@ -164,6 +171,8 @@ public class GstTimeCodeMetaTest {
 
     @Test
     public void testVideoTimeCodeNTSCNonDrop() {
+        // timecodestamper is available since 1.10
+        TestAssumptions.requireGstVersion(1,10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
