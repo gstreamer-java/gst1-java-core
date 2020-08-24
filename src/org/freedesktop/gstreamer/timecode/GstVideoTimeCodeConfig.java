@@ -1,6 +1,7 @@
 package org.freedesktop.gstreamer.timecode;
 
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeConfigStruct;
@@ -27,6 +28,7 @@ import org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags;
  *
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeConfig">GstVideoTimeCodeConfig</a>
  */
+@Gst.Since(minor = 10)
 public class GstVideoTimeCodeConfig extends MiniObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCodeConfig";

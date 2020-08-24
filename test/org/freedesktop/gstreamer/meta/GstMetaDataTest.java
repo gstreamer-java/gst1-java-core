@@ -1,8 +1,8 @@
 package org.freedesktop.gstreamer.meta;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.freedesktop.gstreamer.Gst;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,7 +34,11 @@ public class GstMetaDataTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Stream.of(GstMetaData.values()).map(gstMetaData -> new Object[]{gstMetaData}).collect(Collectors.toList());
+        return  // remove unsupported api for baseline 1.8
+                EnumSet.complementOf(EnumSet.of(GstMetaData.VIDEO_TIME_CODE_META))
+                        .stream()
+                        .map(gstMetaData -> new Object[]{gstMetaData})
+                        .collect(Collectors.toList());
     }
 
     private final GstMetaData gstMetaData;
@@ -57,6 +61,5 @@ public class GstMetaDataTest {
     @Test
     public void testGetType() {
         assertNotNull(gstMetaData.getType());
-        System.out.println(gstMetaData.getType());
     }
 }
