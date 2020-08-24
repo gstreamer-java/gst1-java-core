@@ -11,6 +11,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStru
 /**
  * A representation of a SMPTE time code.
  * @author Jokertwo
+ * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCode">GstVideoTimeCode</a>
  */
 public class GstVideoTimeCode extends MiniObject {
 

@@ -9,6 +9,7 @@ import org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags;
 /**
  * The configuration of the time code.
  * @author Jokertwo
+ * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeConfig">GstVideoTimeCodeConfig</a>
  */
 public class GstVideoTimeCodeConfig extends MiniObject {
 

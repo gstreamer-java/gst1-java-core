@@ -6,6 +6,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  * Flags related to the time code information. For drop frame, only 30000/1001 and 60000/1001 frame rates are supported.
  *
  * @author Jokertwo
+ * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeFlags">GstVideoTimeCodeFlags</a>
  */
 public enum GstVideoTimeCodeFlags implements NativeFlags<GstVideoTimeCodeFlags> {
     /**

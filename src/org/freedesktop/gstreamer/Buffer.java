@@ -27,11 +27,9 @@ import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GNative;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-import org.freedesktop.gstreamer.lowlevel.GstNative;
 import org.freedesktop.gstreamer.meta.GstMetaData;
 import org.freedesktop.gstreamer.meta.GstVideoTimeCodeMeta;
 import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
@@ -63,7 +61,7 @@ public class Buffer extends MiniObject {
      * Creates a newly allocated buffer with data of the given size. The buffer
      * memory is not cleared. If the requested amount of memory cannot be
      * allocated, an exception will be thrown.
-     *
+     * <p>
      * Note that when size == 0, the buffer data pointer will be NULL.
      *
      * @param size
@@ -143,7 +141,7 @@ public class Buffer extends MiniObject {
      * Set the decode timestamp of the Buffer
      *
      * @param val a long representing the timestamp or
-     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *            {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
     public void setDecodeTimestamp(long val) {
         this.struct.writeField("dts", val);
@@ -165,7 +163,7 @@ public class Buffer extends MiniObject {
      * Set the presentation timestamp of the Buffer
      *
      * @param val a long representing the timestamp or
-     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *            {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
     public void setPresentationTimestamp(long val) {
         this.struct.writeField("pts", val);
@@ -185,7 +183,7 @@ public class Buffer extends MiniObject {
      * Set the duration of this buffer.
      *
      * @param val a long representing the duration or
-     * {@link ClockTime#NONE} when the timestamp is not known or relevant.
+     *            {@link ClockTime#NONE} when the timestamp is not known or relevant.
      */
     public void setDuration(long val) {
         this.struct.writeField("duration", val);
@@ -207,9 +205,9 @@ public class Buffer extends MiniObject {
      * Set the offset (media-specific) of this buffer
      *
      * @param val a media specific offset for the buffer data. For video frames,
-     * this is the frame number of this buffer. For audio samples, this is the
-     * offset of the first sample in this buffer. For file data or compressed
-     * data this is the byte offset of the first byte in this buffer.
+     *            this is the frame number of this buffer. For audio samples, this is the
+     *            offset of the first sample in this buffer. For file data or compressed
+     *            data this is the byte offset of the first byte in this buffer.
      */
     public void setOffset(long val) {
         this.struct.writeField("offset", val);
@@ -231,9 +229,9 @@ public class Buffer extends MiniObject {
      * Set the offset (media-specific) of this buffer
      *
      * @param val a media specific offset for the buffer data. For video frames,
-     * this is the frame number of this buffer. For audio samples, this is the
-     * offset of the first sample in this buffer. For file data or compressed
-     * data this is the byte offset of the first byte in this buffer.
+     *            this is the frame number of this buffer. For audio samples, this is the
+     *            offset of the first sample in this buffer. For file data or compressed
+     *            data this is the byte offset of the first byte in this buffer.
      */
     public void setOffsetEnd(long val) {
         this.struct.writeField("offset_end", val);
@@ -241,7 +239,7 @@ public class Buffer extends MiniObject {
 
     /**
      * Get the GstBufferFlags describing this buffer.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @return an EnumSet of {@link BufferFlags}
@@ -265,21 +263,29 @@ public class Buffer extends MiniObject {
 
     /**
      * Check if buffer contains selected type of metadata
+     * <p>
+     * Since GStreamer 1.14
      *
      * @param gstMetaData type of metadata
      * @return return true only if buffer contains selected type of metadata
      */
+    @Gst.Since(minor = 14)
     public boolean containsMetadata(GstMetaData gstMetaData) {
+        Gst.checkVersion(1, 14);
         return getNumberOfMeta(gstMetaData) > 0;
     }
 
     /**
      * Check number of metadata for selected type. There can be more metadata in case multiple video/audio layer
+     * <p>
+     * Since GStreamer 1.14
      *
      * @param gstMetaData type of metadata
      * @return return number of metadata
      */
+    @Gst.Since(minor = 14)
     public int getNumberOfMeta(GstMetaData gstMetaData) {
+        Gst.checkVersion(1, 14);
         return GSTBUFFER_API.gst_buffer_get_n_meta(this, gstMetaData.getType());
     }
 
@@ -287,7 +293,7 @@ public class Buffer extends MiniObject {
     /**
      * Set some of the GstBufferFlags describing this buffer. This is a union
      * operation and does not clear flags that are not mentioned.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @param flags an EnumSet of {@link BufferFlags} to be set on the buffer.
@@ -302,12 +308,11 @@ public class Buffer extends MiniObject {
     /**
      * unset the GstBufferFlags describing this buffer. This is a difference
      * operation and does not clear flags that are not mentioned.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @param flags an EnumSet of {@link BufferFlags} to be cleared on the buffer.
      * @return true if flags were successfully cleared on this buffer
-     *
      */
     @Gst.Since(minor = 10)
     public boolean unsetFlags(EnumSet<BufferFlags> flags) {

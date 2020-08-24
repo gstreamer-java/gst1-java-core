@@ -10,6 +10,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMeta
 /**
  * Extra buffer metadata describing the GstVideoTimeCode of the frame.
  * @author Jokertwo
+ * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideometa.html?gi-language=c#GstVideoTimeCodeMeta">GstVideoTimeCodeMeta</a>
  */
 public class GstVideoTimeCodeMeta extends MiniObject {
 

@@ -5,6 +5,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /**
  * @author Jokertwo
+ * @see <a href="https://docs.gstreamer.com/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaFlags">GstMetaFlags</a>
  */
 public enum GstMetaFlags implements NativeEnum<GstMetaFlags> {
 
