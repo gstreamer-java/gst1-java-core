@@ -25,7 +25,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
  * Gst meta data GTypes
  *
  */
-public enum GstMetaData {
+public enum MetaData {
 
     VIDEO_CROP_META(GST_META_API::gst_video_crop_meta_api_get_type),
     VIDEO_GL_TEXTURE_META(GST_META_API::gst_video_gl_texture_upload_meta_api_get_type),
@@ -36,7 +36,7 @@ public enum GstMetaData {
 
     private final Supplier<GType> gTypeMetaSup;
 
-    GstMetaData(Supplier<GType> gTypeMetaSup) {
+    MetaData(Supplier<GType> gTypeMetaSup) {
         this.gTypeMetaSup = gTypeMetaSup;
     }
 

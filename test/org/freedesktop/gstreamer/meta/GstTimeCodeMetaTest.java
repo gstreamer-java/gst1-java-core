@@ -1,17 +1,21 @@
 package org.freedesktop.gstreamer.meta;
 
+import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.Buffer;
+import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.Pipeline;
+import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.SampleTester;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCodeConfig;
+import org.freedesktop.gstreamer.elements.AppSink;
+import org.freedesktop.gstreamer.timecode.VideoTimeCode;
+import org.freedesktop.gstreamer.timecode.VideoTimeCodeConfig;
 import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME;
-import static org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_NONE;
+import static org.freedesktop.gstreamer.timecode.VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME;
+import static org.freedesktop.gstreamer.timecode.VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_NONE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -53,11 +57,11 @@ public class GstTimeCodeMetaTest {
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
-            assertFalse("Default video not contains region metadata", buffer.containsMetadata(GstMetaData.VIDEO_REGION_OF_INTEREST));
-            assertFalse("Default video not contains metadata", buffer.containsMetadata(GstMetaData.VIDEO_META));
-            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(GstMetaData.VIDEO_GL_TEXTURE_META));
-            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(GstMetaData.VIDEO_CROP_META));
+            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
+            assertFalse("Default video not contains region metadata", buffer.containsMetadata(MetaData.VIDEO_REGION_OF_INTEREST));
+            assertFalse("Default video not contains metadata", buffer.containsMetadata(MetaData.VIDEO_META));
+            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(MetaData.VIDEO_GL_TEXTURE_META));
+            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(MetaData.VIDEO_CROP_META));
         }, "videotestsrc do-timestamp=true ! x264enc  ! mxfmux ! decodebin ! appsink name=myappsink");
     }
 
@@ -70,11 +74,11 @@ public class GstTimeCodeMetaTest {
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
-            assertFalse("Default video not contains region metadata", buffer.containsMetadata(GstMetaData.VIDEO_REGION_OF_INTEREST));
-            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(GstMetaData.VIDEO_GL_TEXTURE_META));
-            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(GstMetaData.VIDEO_CROP_META));
-            assertTrue(buffer.containsMetadata(GstMetaData.VIDEO_META));
+            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
+            assertFalse("Default video not contains region metadata", buffer.containsMetadata(MetaData.VIDEO_REGION_OF_INTEREST));
+            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(MetaData.VIDEO_GL_TEXTURE_META));
+            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(MetaData.VIDEO_CROP_META));
+            assertTrue(buffer.containsMetadata(MetaData.VIDEO_META));
         }, "videotestsrc ! videocrop top=42 left=1 right=4 bottom=0 ! appsink name=myappsink");
     }
 
@@ -87,11 +91,11 @@ public class GstTimeCodeMetaTest {
         TestAssumptions.requireGstVersion(1,14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
-            assertFalse("Default video not contains region metadata", buffer.containsMetadata(GstMetaData.VIDEO_REGION_OF_INTEREST));
-            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(GstMetaData.VIDEO_GL_TEXTURE_META));
-            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(GstMetaData.VIDEO_CROP_META));
-            assertFalse("Default video not contains metadata", buffer.containsMetadata(GstMetaData.VIDEO_META));
+            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
+            assertFalse("Default video not contains region metadata", buffer.containsMetadata(MetaData.VIDEO_REGION_OF_INTEREST));
+            assertFalse("Default video not contains gl texture metadata", buffer.containsMetadata(MetaData.VIDEO_GL_TEXTURE_META));
+            assertFalse("Default video not contains crop metadata", buffer.containsMetadata(MetaData.VIDEO_CROP_META));
+            assertFalse("Default video not contains metadata", buffer.containsMetadata(MetaData.VIDEO_META));
         }, "videotestsrc ! videoscale !" +
                 " appsink name=myappsink");
     }
@@ -103,11 +107,11 @@ public class GstTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
-                assertTrue("Video should contains timecode meta", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
+                assertTrue("Video should contains timecode meta", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
             }
-            GstVideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
+            VideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
             assertNotNull(meta);
-            GstVideoTimeCode timeCode = meta.getTimeCode();
+            VideoTimeCode timeCode = meta.getTimeCode();
 
             //first frame 00:00:00:00
             assertEquals(0, timeCode.getHours());
@@ -115,7 +119,7 @@ public class GstTimeCodeMetaTest {
             assertEquals(0, timeCode.getSeconds());
             assertEquals(0, timeCode.getFrames());
 
-            GstVideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
+            VideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
             // PAL standard 25/1
             assertEquals(25, timeCodeConfig.getFramerateNumerator());
             assertEquals(1, timeCodeConfig.getFramerateDenominator());
@@ -131,11 +135,11 @@ public class GstTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
-                assertTrue("Video should contains timecode meta", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
+                assertTrue("Video should contains timecode meta", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
             }
-            GstVideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
+            VideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
             assertNotNull(meta);
-            GstVideoTimeCode timeCode = meta.getTimeCode();
+            VideoTimeCode timeCode = meta.getTimeCode();
 
             //first frame 00:00:00;00
             assertEquals(0, timeCode.getHours());
@@ -143,7 +147,7 @@ public class GstTimeCodeMetaTest {
             assertEquals(0, timeCode.getSeconds());
             assertEquals(0, timeCode.getFrames());
 
-            GstVideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
+            VideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
             // NTSC drop standard 30000/1001
             assertEquals(30000, timeCodeConfig.getFramerateNumerator());
             assertEquals(1001, timeCodeConfig.getFramerateDenominator());
@@ -162,11 +166,11 @@ public class GstTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
-                assertTrue("Video should contains timecode meta", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
+                assertTrue("Video should contains timecode meta", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
             }
-            GstVideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
+            VideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
             assertNotNull(meta);
-            GstVideoTimeCode timeCode = meta.getTimeCode();
+            VideoTimeCode timeCode = meta.getTimeCode();
 
             //first frame 00:00:00;29
             assertEquals(0, timeCode.getHours());
@@ -174,7 +178,7 @@ public class GstTimeCodeMetaTest {
             assertEquals(0, timeCode.getSeconds());
             assertEquals(29, timeCode.getFrames());
 
-            GstVideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
+            VideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
             // NTSC drop standard 30000/1001
             assertEquals(30000, timeCodeConfig.getFramerateNumerator());
             assertEquals(1001, timeCodeConfig.getFramerateDenominator());
@@ -189,11 +193,11 @@ public class GstTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if(Gst.testVersion(1,14)) {
-                assertTrue("Video should contains timecode meta", buffer.containsMetadata(GstMetaData.VIDEO_TIME_CODE_META));
+                assertTrue("Video should contains timecode meta", buffer.containsMetadata(MetaData.VIDEO_TIME_CODE_META));
             }
-            GstVideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
+            VideoTimeCodeMeta meta = buffer.getVideoTimeCodeMeta();
             assertNotNull(meta);
-            GstVideoTimeCode timeCode = meta.getTimeCode();
+            VideoTimeCode timeCode = meta.getTimeCode();
 
             //first frame 00:00:00:00
             assertEquals(0, timeCode.getHours());
@@ -201,7 +205,7 @@ public class GstTimeCodeMetaTest {
             assertEquals(0, timeCode.getSeconds());
             assertEquals(0, timeCode.getFrames());
 
-            GstVideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
+            VideoTimeCodeConfig timeCodeConfig = timeCode.getTCConfig();
             // NTSC drop standard 30/1
             assertEquals(30, timeCodeConfig.getFramerateNumerator());
             assertEquals(1, timeCodeConfig.getFramerateDenominator());

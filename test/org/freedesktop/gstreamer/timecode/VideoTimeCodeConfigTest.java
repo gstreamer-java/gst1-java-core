@@ -1,10 +1,7 @@
 package org.freedesktop.gstreamer.timecode;
 
-import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.lowlevel.GstMetaApi;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -26,9 +23,9 @@ import static org.junit.Assert.assertEquals;
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-public class GstVideoTimeCodeConfigTest {
+public class VideoTimeCodeConfigTest {
     private GstMetaApi.GstVideoTimeCodeConfigStruct origStruct;
-    private GstVideoTimeCodeConfig codeConfig;
+    private VideoTimeCodeConfig codeConfig;
 
 
     @Before
@@ -36,10 +33,10 @@ public class GstVideoTimeCodeConfigTest {
         origStruct = new GstMetaApi.GstVideoTimeCodeConfigStruct();
         origStruct.fps_d = 25;
         origStruct.fps_n = 1;
-        origStruct.flags = GstVideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME;
+        origStruct.flags = VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME;
         origStruct.write();
 
-        codeConfig = new GstVideoTimeCodeConfig(origStruct.getPointer());
+        codeConfig = new VideoTimeCodeConfig(origStruct.getPointer());
     }
 
     @Test

@@ -30,26 +30,26 @@ import org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeConfigStruc
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeConfig">GstVideoTimeCodeConfig</a>
  */
 @Gst.Since(minor = 10)
-public class GstVideoTimeCodeConfig extends NativeObject {
+public class VideoTimeCodeConfig extends NativeObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCodeConfig";
     private final GstVideoTimeCodeConfigStruct timeCodeConfig;
 
-    GstVideoTimeCodeConfig(Pointer pointer) {
+    VideoTimeCodeConfig(Pointer pointer) {
         this(Natives.initializer(pointer, false, false));
     }
 
-    GstVideoTimeCodeConfig(NativeObject.Initializer init) {
+    VideoTimeCodeConfig(NativeObject.Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle));
         timeCodeConfig = new GstVideoTimeCodeConfigStruct(getRawPointer());
     }
 
     /**
-     * The corresponding {@link GstVideoTimeCodeFlags}
+     * The corresponding {@link VideoTimeCodeFlags}
      *
      * @return return flag for current timecode
      */
-    public GstVideoTimeCodeFlags getTimeCodeFlags() {
+    public VideoTimeCodeFlags getTimeCodeFlags() {
         return timeCodeConfig.flags;
     }
 

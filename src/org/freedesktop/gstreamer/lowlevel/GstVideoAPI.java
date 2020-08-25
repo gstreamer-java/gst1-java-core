@@ -22,7 +22,6 @@ import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
 
 public interface GstVideoAPI extends Library {
 	public final static GstVideoAPI GSTVIDEO_API = GstNative.load("gstvideo", GstVideoAPI.class);

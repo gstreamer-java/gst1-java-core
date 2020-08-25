@@ -1,7 +1,6 @@
 package org.freedesktop.gstreamer.meta;
 
 import org.freedesktop.gstreamer.glib.NativeEnum;
-import org.freedesktop.gstreamer.glib.NativeFlags;
 
 /*
  * Copyright (c) 2020 Petr Lastovka
@@ -23,7 +22,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  *
  * @see <a href="https://docs.gstreamer.com/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaFlags">GstMetaFlags</a>
  */
-public enum GstMetaFlags implements NativeEnum<GstMetaFlags> {
+public enum MetaFlags implements NativeEnum<MetaFlags> {
 
     GST_META_FLAG_NONE(0), // no flags
     GST_META_FLAG_READONLY(1), // metadata should not be modified
@@ -33,7 +32,7 @@ public enum GstMetaFlags implements NativeEnum<GstMetaFlags> {
 
     private final int value;
 
-    GstMetaFlags(int value) {
+    MetaFlags(int value) {
         this.value = value;
     }
 

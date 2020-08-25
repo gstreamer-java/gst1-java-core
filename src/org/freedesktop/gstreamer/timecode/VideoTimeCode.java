@@ -3,7 +3,6 @@ package org.freedesktop.gstreamer.timecode;
 import com.sun.jna.Pointer;
 import java.util.stream.Stream;
 import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
@@ -33,27 +32,27 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStru
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCode">GstVideoTimeCode</a>
  */
 @Gst.Since(minor = 10)
-public class GstVideoTimeCode extends NativeObject {
+public class VideoTimeCode extends NativeObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCode";
     private final GstVideoTimeCodeStruct timeCodeStruct;
-    private final GstVideoTimeCodeConfig timeCodeConfig;
+    private final VideoTimeCodeConfig timeCodeConfig;
 
-    public GstVideoTimeCode(){
+    public VideoTimeCode(){
         this(Natives.initializer(GstVideoAPI.GSTVIDEO_API.gst_video_time_code_new_empty()));
     }
 
-    public GstVideoTimeCode(Pointer pointer) {
+    public VideoTimeCode(Pointer pointer) {
         this(Natives.initializer(pointer,false,false));
     }
 
-    GstVideoTimeCode(Initializer init) {
+    VideoTimeCode(Initializer init) {
         super(new Handle(init.ptr,init.ownsHandle));
         timeCodeStruct = new GstVideoTimeCodeStruct(getRawPointer());
-        timeCodeConfig = new GstVideoTimeCodeConfig(timeCodeStruct.config.getPointer());
+        timeCodeConfig = new VideoTimeCodeConfig(timeCodeStruct.config.getPointer());
     }
 
-    public GstVideoTimeCodeConfig getTCConfig() {
+    public VideoTimeCodeConfig getTCConfig() {
         return timeCodeConfig;
     }
 
@@ -109,12 +108,12 @@ public class GstVideoTimeCode extends NativeObject {
         @Override
         public Stream<TypeRegistration<?>> types() {
             return Stream.of(
-                    registration(GstVideoTimeCode.class,
-                            GstVideoTimeCode.GTYPE_NAME,
-                            GstVideoTimeCode::new),
-                    registration(GstVideoTimeCodeConfig.class,
-                            GstVideoTimeCodeConfig.GTYPE_NAME,
-                            GstVideoTimeCodeConfig::new));
+                    registration(VideoTimeCode.class,
+                            VideoTimeCode.GTYPE_NAME,
+                            VideoTimeCode::new),
+                    registration(VideoTimeCodeConfig.class,
+                            VideoTimeCodeConfig.GTYPE_NAME,
+                            VideoTimeCodeConfig::new));
         }
     }
 

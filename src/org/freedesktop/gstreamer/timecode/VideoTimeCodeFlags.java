@@ -23,7 +23,7 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  *
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeFlags">GstVideoTimeCodeFlags</a>
  */
-public enum GstVideoTimeCodeFlags implements NativeFlags<GstVideoTimeCodeFlags> {
+public enum VideoTimeCodeFlags implements NativeFlags<VideoTimeCodeFlags> {
     /**
      * No flags
      */
@@ -40,7 +40,7 @@ public enum GstVideoTimeCodeFlags implements NativeFlags<GstVideoTimeCodeFlags> 
 
     private final int value;
 
-    GstVideoTimeCodeFlags(int value) {
+    VideoTimeCodeFlags(int value) {
         this.value = value;
     }
 

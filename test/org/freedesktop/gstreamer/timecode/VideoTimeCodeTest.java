@@ -24,13 +24,13 @@ import static org.junit.Assert.assertNotNull;
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-public class GstVideoTimeCodeTest {
+public class VideoTimeCodeTest {
 
 
     private GstMetaApi.GstVideoTimeCodeStruct timeCodeStruct;
     private GstMetaApi.GstVideoTimeCodeConfigStruct.ByValue configStruct;
 
-    private GstVideoTimeCode timeCode;
+    private VideoTimeCode timeCode;
 
     @Before
     public void setUp() {
@@ -49,7 +49,7 @@ public class GstVideoTimeCodeTest {
         timeCodeStruct.config = configStruct;
 
         timeCodeStruct.write();
-        timeCode = new GstVideoTimeCode(timeCodeStruct.getPointer());
+        timeCode = new VideoTimeCode(timeCodeStruct.getPointer());
 
 
     }

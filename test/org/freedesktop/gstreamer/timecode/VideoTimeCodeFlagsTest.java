@@ -1,15 +1,12 @@
-package org.freedesktop.gstreamer.meta;
+package org.freedesktop.gstreamer.timecode;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.stream.Collectors;
-import org.freedesktop.gstreamer.Gst;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /*
  * Copyright (c) 2020 Petr Lastovka
@@ -30,36 +27,28 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 @RunWith(Parameterized.class)
-public class GstMetaDataTest {
+public class VideoTimeCodeFlagsTest {
+
+    private final VideoTimeCodeFlags flags;
+    private final int intValue;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return  // remove unsupported api for baseline 1.8
-                EnumSet.complementOf(EnumSet.of(GstMetaData.VIDEO_TIME_CODE_META))
-                        .stream()
-                        .map(gstMetaData -> new Object[]{gstMetaData})
-                        .collect(Collectors.toList());
+        return Arrays.asList(
+                new Object[][]{
+                        {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_NONE, 0},
+                        {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME, 1},
+                        {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_INTERLACED, 2}
+                });
     }
 
-    private final GstMetaData gstMetaData;
-
-    @BeforeClass
-    public static void beforeClass() {
-        Gst.init();
+    public VideoTimeCodeFlagsTest(VideoTimeCodeFlags flags, int intValue) {
+        this.flags = flags;
+        this.intValue = intValue;
     }
-
-    @AfterClass
-    public static void afterClass() {
-        Gst.deinit();
-    }
-
-    public GstMetaDataTest(GstMetaData gstMetaData) {
-        this.gstMetaData = gstMetaData;
-    }
-
 
     @Test
-    public void testGetType() {
-        assertNotNull(gstMetaData.getType());
+    public void testIntValue() {
+        assertEquals(intValue,flags.intValue());
     }
 }

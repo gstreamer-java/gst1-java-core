@@ -27,11 +27,11 @@ public class GstMeta implements NativeObject.TypeProvider {
     @Override
     public Stream<NativeObject.TypeRegistration<?>> types() {
         return Stream.of(
-                registration(GstVideoTimeCodeMeta.class,
-                        GstVideoTimeCodeMeta.GTYPE_NAME,
-                        GstVideoTimeCodeMeta::new),
-                registration(GstMetaInfo.class,
-                        GstMetaInfo.GTYPE_NAME,
-                        GstMetaInfo::new));
+                registration(VideoTimeCodeMeta.class,
+                        VideoTimeCodeMeta.GTYPE_NAME,
+                        VideoTimeCodeMeta::new),
+                registration(MetaInfo.class,
+                        MetaInfo.GTYPE_NAME,
+                        MetaInfo::new));
     }
 }

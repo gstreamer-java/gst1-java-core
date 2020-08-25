@@ -28,13 +28,13 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
  *
  * @see <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaInfo">GstMetaInfo</a>
  */
-public class GstMetaInfo extends NativeObject {
+public class MetaInfo extends NativeObject {
 
     public static final String GTYPE_NAME = "GstMetaInfo";
     private final GstMetaInfoStruct metaStruct;
 
 
-    GstMetaInfo(Initializer init) {
+    MetaInfo(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle));
         metaStruct = new GstMetaInfoStruct(getRawPointer());
     }

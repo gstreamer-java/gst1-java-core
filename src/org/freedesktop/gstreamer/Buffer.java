@@ -30,8 +30,8 @@ import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-import org.freedesktop.gstreamer.meta.GstMetaData;
-import org.freedesktop.gstreamer.meta.GstVideoTimeCodeMeta;
+import org.freedesktop.gstreamer.meta.MetaData;
+import org.freedesktop.gstreamer.meta.VideoTimeCodeMeta;
 import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 /**
@@ -256,8 +256,8 @@ public class Buffer extends MiniObject {
      *
      * @return return time code (SMPTE) for current buffer
      */
-    public GstVideoTimeCodeMeta getVideoTimeCodeMeta() {
-        return new GstVideoTimeCodeMeta(GSTBUFFER_API.gst_buffer_get_meta(this, GstMetaData.VIDEO_TIME_CODE_META.getType()));
+    public VideoTimeCodeMeta getVideoTimeCodeMeta() {
+        return new VideoTimeCodeMeta(GSTBUFFER_API.gst_buffer_get_meta(this, MetaData.VIDEO_TIME_CODE_META.getType()));
     }
 
 
@@ -266,13 +266,13 @@ public class Buffer extends MiniObject {
      * <p>
      * Since GStreamer 1.14
      *
-     * @param gstMetaData type of metadata
+     * @param metaData type of metadata
      * @return return true only if buffer contains selected type of metadata
      */
     @Gst.Since(minor = 14)
-    public boolean containsMetadata(GstMetaData gstMetaData) {
+    public boolean containsMetadata(MetaData metaData) {
         Gst.checkVersion(1, 14);
-        return getNumberOfMeta(gstMetaData) > 0;
+        return getNumberOfMeta(metaData) > 0;
     }
 
     /**
@@ -280,13 +280,13 @@ public class Buffer extends MiniObject {
      * <p>
      * Since GStreamer 1.14
      *
-     * @param gstMetaData type of metadata
+     * @param metaData type of metadata
      * @return return number of metadata
      */
     @Gst.Since(minor = 14)
-    public int getNumberOfMeta(GstMetaData gstMetaData) {
+    public int getNumberOfMeta(MetaData metaData) {
         Gst.checkVersion(1, 14);
-        return GSTBUFFER_API.gst_buffer_get_n_meta(this, gstMetaData.getType());
+        return GSTBUFFER_API.gst_buffer_get_n_meta(this, metaData.getType());
     }
 
 

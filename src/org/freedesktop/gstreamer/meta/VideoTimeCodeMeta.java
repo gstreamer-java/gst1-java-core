@@ -4,7 +4,7 @@ import com.sun.jna.Pointer;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
+import org.freedesktop.gstreamer.timecode.VideoTimeCode;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMetaStruct;
 
@@ -30,20 +30,20 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMeta
  *
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideometa.html?gi-language=c#GstVideoTimeCodeMeta">GstVideoTimeCodeMeta</a>
  */
-public class GstVideoTimeCodeMeta extends NativeObject {
+public class VideoTimeCodeMeta extends NativeObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCodeMeta";
     private final GstVideoTimeCodeMetaStruct metaStruct;
-    private final GstVideoTimeCode timeCode;
+    private final VideoTimeCode timeCode;
 
-    public GstVideoTimeCodeMeta(Pointer pointer) {
+    public VideoTimeCodeMeta(Pointer pointer) {
         this(Natives.initializer(pointer, false, false));
     }
 
-    GstVideoTimeCodeMeta(Initializer init) {
+    VideoTimeCodeMeta(Initializer init) {
         super(new Handle(init.ptr, init.ownsHandle));
         metaStruct = new GstVideoTimeCodeMetaStruct(getRawPointer());
-        timeCode = new GstVideoTimeCode(metaStruct.tc.getPointer());
+        timeCode = new VideoTimeCode(metaStruct.tc.getPointer());
     }
 
     /**
@@ -51,7 +51,7 @@ public class GstVideoTimeCodeMeta extends NativeObject {
      *
      * @return return time code
      */
-    public GstVideoTimeCode getTimeCode() {
+    public VideoTimeCode getTimeCode() {
         return timeCode;
     }
 
@@ -60,7 +60,7 @@ public class GstVideoTimeCodeMeta extends NativeObject {
      *
      * @return return structure with information about metadata
      */
-    public GstMetaInfo getMetaInfo() {
+    public MetaInfo getMetaInfo() {
         return GST_META_API.gst_video_time_code_meta_get_info();
     }
 
