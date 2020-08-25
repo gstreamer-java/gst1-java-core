@@ -1,8 +1,7 @@
 package org.freedesktop.gstreamer.meta;
 
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
 
@@ -29,18 +28,14 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
  *
  * @see <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaInfo">GstMetaInfo</a>
  */
-public class GstMetaInfo extends MiniObject {
+public class GstMetaInfo extends NativeObject {
 
     public static final String GTYPE_NAME = "GstMetaInfo";
-    private GstMetaInfoStruct metaStruct;
-
-    public GstMetaInfo(Pointer pointer) {
-        this(Natives.initializer(pointer, false, false));
-    }
+    private final GstMetaInfoStruct metaStruct;
 
 
     GstMetaInfo(Initializer init) {
-        super(init);
+        super(new Handle(init.ptr, init.ownsHandle));
         metaStruct = new GstMetaInfoStruct(getRawPointer());
     }
 
@@ -60,6 +55,25 @@ public class GstMetaInfo extends MiniObject {
      */
     public GType getApiType() {
         return this.metaStruct.api;
+    }
+
+
+    private static final class Handle extends NativeObject.Handle {
+
+        /**
+         * Construct a Handle for the supplied native reference.
+         *
+         * @param ptr           native reference
+         * @param ownsReference whether the Handle owns the native reference and
+         */
+        public Handle(GPointer ptr, boolean ownsReference) {
+            super(ptr, ownsReference);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            // Meta info is destructed by nested function
+        }
     }
 
 }

@@ -6,6 +6,8 @@ import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStruct;
 
@@ -31,18 +33,22 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStru
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCode">GstVideoTimeCode</a>
  */
 @Gst.Since(minor = 10)
-public class GstVideoTimeCode extends MiniObject {
+public class GstVideoTimeCode extends NativeObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCode";
     private final GstVideoTimeCodeStruct timeCodeStruct;
     private final GstVideoTimeCodeConfig timeCodeConfig;
+
+    public GstVideoTimeCode(){
+        this(Natives.initializer(GstVideoAPI.GSTVIDEO_API.gst_video_time_code_new_empty()));
+    }
 
     public GstVideoTimeCode(Pointer pointer) {
         this(Natives.initializer(pointer,false,false));
     }
 
     GstVideoTimeCode(Initializer init) {
-        super(init);
+        super(new Handle(init.ptr,init.ownsHandle));
         timeCodeStruct = new GstVideoTimeCodeStruct(getRawPointer());
         timeCodeConfig = new GstVideoTimeCodeConfig(timeCodeStruct.config.getPointer());
     }
@@ -109,6 +115,24 @@ public class GstVideoTimeCode extends MiniObject {
                     registration(GstVideoTimeCodeConfig.class,
                             GstVideoTimeCodeConfig.GTYPE_NAME,
                             GstVideoTimeCodeConfig::new));
+        }
+    }
+
+    public static final class Handle extends NativeObject.Handle{
+
+        /**
+         * Construct a Handle for the supplied native reference.
+         *
+         * @param ptr           native reference
+         * @param ownsReference whether the Handle owns the native reference and
+         */
+        public Handle(GPointer ptr, boolean ownsReference) {
+            super(ptr, ownsReference);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            GstVideoAPI.GSTVIDEO_API.gst_video_time_code_free(ptr.getPointer());
         }
     }
 }

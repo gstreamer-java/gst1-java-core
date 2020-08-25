@@ -121,8 +121,6 @@ public class GstTimeCodeMetaTest {
             assertEquals(1, timeCodeConfig.getFramerateDenominator());
             assertEquals(GST_VIDEO_TIME_CODE_FLAGS_NONE, timeCodeConfig.getTimeCodeFlags());
 
-
-            meta.disown();
         }, "videotestsrc ! video/x-raw,framerate=25/1 ! timecodestamper ! videoconvert ! appsink name=myappsink");
     }
 
@@ -150,8 +148,6 @@ public class GstTimeCodeMetaTest {
             assertEquals(30000, timeCodeConfig.getFramerateNumerator());
             assertEquals(1001, timeCodeConfig.getFramerateDenominator());
             assertEquals(GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME, timeCodeConfig.getTimeCodeFlags());
-
-            meta.disown();
 
         }, "videotestsrc ! video/x-raw,framerate=30000/1001 ! timecodestamper drop-frame=true ! videoconvert ! appsink name=myappsink");
     }
@@ -210,8 +206,6 @@ public class GstTimeCodeMetaTest {
             assertEquals(30, timeCodeConfig.getFramerateNumerator());
             assertEquals(1, timeCodeConfig.getFramerateDenominator());
             assertEquals(GST_VIDEO_TIME_CODE_FLAGS_NONE, timeCodeConfig.getTimeCodeFlags());
-
-            meta.disown();
 
         }, "videotestsrc ! video/x-raw,framerate=30/1 ! timecodestamper ! videoconvert ! appsink name=myappsink");
     }

@@ -1,8 +1,9 @@
 package org.freedesktop.gstreamer.meta;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.MiniObject;
+import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMetaStruct;
@@ -29,7 +30,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMeta
  *
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideometa.html?gi-language=c#GstVideoTimeCodeMeta">GstVideoTimeCodeMeta</a>
  */
-public class GstVideoTimeCodeMeta extends MiniObject {
+public class GstVideoTimeCodeMeta extends NativeObject {
 
     public static final String GTYPE_NAME = "GstVideoTimeCodeMeta";
     private final GstVideoTimeCodeMetaStruct metaStruct;
@@ -40,7 +41,7 @@ public class GstVideoTimeCodeMeta extends MiniObject {
     }
 
     GstVideoTimeCodeMeta(Initializer init) {
-        super(init);
+        super(new Handle(init.ptr, init.ownsHandle));
         metaStruct = new GstVideoTimeCodeMetaStruct(getRawPointer());
         timeCode = new GstVideoTimeCode(metaStruct.tc.getPointer());
     }
@@ -67,6 +68,25 @@ public class GstVideoTimeCodeMeta extends MiniObject {
     public void disown() {
         timeCode.disown();
         super.disown();
+    }
+
+    private static final class Handle extends NativeObject.Handle {
+
+        /**
+         * Construct a Handle for the supplied native reference.
+         *
+         * @param ptr           native reference
+         * @param ownsReference whether the Handle owns the native reference and
+         */
+        public Handle(GPointer ptr, boolean ownsReference) {
+            super(ptr, ownsReference);
+        }
+
+        @Override
+        protected void disposeNativeHandle(GPointer ptr) {
+            // structure will be released automatically by GStreamer
+            /** <a href="https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/blob/master/gst-libs/gst/video/gstvideometa.c#L1115"> by nested function</a>*/
+        }
     }
 
 }
