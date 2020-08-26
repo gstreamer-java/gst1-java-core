@@ -30,8 +30,8 @@ import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-import org.freedesktop.gstreamer.meta.MetaData;
-import org.freedesktop.gstreamer.meta.VideoTimeCodeMeta;
+import org.freedesktop.gstreamer.meta.Meta;
+import org.freedesktop.gstreamer.meta.MetaDataFactory;
 import static org.freedesktop.gstreamer.lowlevel.GstBufferAPI.GSTBUFFER_API;
 
 /**
@@ -252,12 +252,19 @@ public class Buffer extends MiniObject {
     }
 
     /**
-     * Get the time code metadata for buffer. When there is no such metadata, NULL is returned.
+     * Get metadata from buffer. In case that in buffer is not selected type of metadata return null
      *
-     * @return return time code (SMPTE) for current buffer
+     * @param clazz requested type of metadata
+     * @return return metadata from buffer. Return null if in buffer is not selected metadata type
      */
-    public VideoTimeCodeMeta getVideoTimeCodeMeta() {
-        return new VideoTimeCodeMeta(GSTBUFFER_API.gst_buffer_get_meta(this, MetaData.VIDEO_TIME_CODE_META.getType()));
+    public <M extends Meta> M getMetadata(Class<M> clazz) {
+        MetaDataFactory metaDataFactory = new MetaDataFactory();
+        Pointer pointer = GSTBUFFER_API.gst_buffer_get_meta(this, metaDataFactory.getGType(clazz));
+        // can not create metadata class from null pointer
+        if (pointer == null) {
+            return null;
+        }
+        return metaDataFactory.getInstance(clazz, pointer);
     }
 
 
@@ -266,13 +273,13 @@ public class Buffer extends MiniObject {
      * <p>
      * Since GStreamer 1.14
      *
-     * @param metaData type of metadata
+     * @param clazz type of metadata
      * @return return true only if buffer contains selected type of metadata
      */
     @Gst.Since(minor = 14)
-    public boolean containsMetadata(MetaData metaData) {
+    public boolean containsMetadata(Class<? extends Meta> clazz) {
         Gst.checkVersion(1, 14);
-        return getNumberOfMeta(metaData) > 0;
+        return getNumberOfMeta(clazz) > 0;
     }
 
     /**
@@ -280,13 +287,14 @@ public class Buffer extends MiniObject {
      * <p>
      * Since GStreamer 1.14
      *
-     * @param metaData type of metadata
+     * @param clazz type of metadata
      * @return return number of metadata
      */
     @Gst.Since(minor = 14)
-    public int getNumberOfMeta(MetaData metaData) {
+    public int getNumberOfMeta(Class<? extends Meta> clazz) {
         Gst.checkVersion(1, 14);
-        return GSTBUFFER_API.gst_buffer_get_n_meta(this, metaData.getType());
+        MetaDataFactory metaDataFactory = new MetaDataFactory();
+        return GSTBUFFER_API.gst_buffer_get_n_meta(this, metaDataFactory.getGType(clazz));
     }
 
 
