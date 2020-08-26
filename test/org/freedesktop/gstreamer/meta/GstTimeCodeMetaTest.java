@@ -1,13 +1,9 @@
 package org.freedesktop.gstreamer.meta;
 
-import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.FlowReturn;
 import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Pipeline;
-import org.freedesktop.gstreamer.Sample;
 import org.freedesktop.gstreamer.SampleTester;
-import org.freedesktop.gstreamer.elements.AppSink;
+import org.freedesktop.gstreamer.Version;
 import org.freedesktop.gstreamer.timecode.VideoTimeCode;
 import org.freedesktop.gstreamer.timecode.VideoTimeCodeConfig;
 import org.freedesktop.gstreamer.util.TestAssumptions;
@@ -52,41 +48,13 @@ public class GstTimeCodeMetaTest {
     }
 
     @Test
-    public void testVideoWithoutMeta() {
+    public void testVideoWithoutTimeCodeMeta() {
         // method containsMetadata is available since 1.14
-        TestAssumptions.requireGstVersion(1,14);
+        TestAssumptions.requireGstVersion(1, 14);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(VideoTimeCodeMeta.class));
         }, "videotestsrc do-timestamp=true ! x264enc  ! mxfmux ! decodebin ! appsink name=myappsink");
-    }
-
-    /**
-     * Contains video meta
-     */
-    @Test
-    public void testVideoMeta() {
-        // method containsMetadata is available since 1.14
-        TestAssumptions.requireGstVersion(1,14);
-        SampleTester.test(sample -> {
-            Buffer buffer = sample.getBuffer();
-            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(VideoTimeCodeMeta.class));
-          //  assertTrue(buffer.containsMetadata(MetaData.VIDEO_META));
-        }, "videotestsrc ! videocrop top=42 left=1 right=4 bottom=0 ! appsink name=myappsink");
-    }
-
-    /**
-     * Contains video meta
-     */
-    @Test
-    public void testVideoCropMeta() {
-        // method containsMetadata is available since 1.14
-        TestAssumptions.requireGstVersion(1,14);
-        SampleTester.test(sample -> {
-            Buffer buffer = sample.getBuffer();
-            assertFalse("Default video not contains timecode metadata", buffer.containsMetadata(VideoTimeCodeMeta.class));
-        }, "videotestsrc ! videoscale !" +
-                " appsink name=myappsink");
     }
 
     @Test
@@ -95,7 +63,7 @@ public class GstTimeCodeMetaTest {
         TestAssumptions.requireGstVersion(1,10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            if(Gst.testVersion(1,14)) {
+            if (Gst.testVersion(1, 14)) {
                 assertTrue("Video should contains timecode meta", buffer.containsMetadata(VideoTimeCodeMeta.class));
             }
             VideoTimeCodeMeta meta = buffer.getMetadata(VideoTimeCodeMeta.class);
@@ -120,10 +88,10 @@ public class GstTimeCodeMetaTest {
     @Test
     public void testVideoTimeCodeNTSCDrop() {
         // timecodestamper is available since 1.10
-        TestAssumptions.requireGstVersion(1,10);
+        TestAssumptions.requireGstVersion(1, 10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            if(Gst.testVersion(1,14)) {
+            if (Gst.testVersion(1, 14)) {
                 assertTrue("Video should contains timecode meta", buffer.containsMetadata(VideoTimeCodeMeta.class));
             }
             VideoTimeCodeMeta meta = buffer.getMetadata(VideoTimeCodeMeta.class);
@@ -151,10 +119,10 @@ public class GstTimeCodeMetaTest {
     @Test
     public void testVideoTimeCodeNTSCDropFrame() {
         // timecodestamper is available since 1.10
-        TestAssumptions.requireGstVersion(1,10);
+        TestAssumptions.requireGstVersion(1, 10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            if(Gst.testVersion(1,14)) {
+            if (Gst.testVersion(1, 14)) {
                 assertTrue("Video should contains timecode meta", buffer.containsMetadata(VideoTimeCodeMeta.class));
             }
             VideoTimeCodeMeta meta = buffer.getMetadata(VideoTimeCodeMeta.class);
@@ -178,10 +146,10 @@ public class GstTimeCodeMetaTest {
     @Test
     public void testVideoTimeCodeNTSCNonDrop() {
         // timecodestamper is available since 1.10
-        TestAssumptions.requireGstVersion(1,10);
+        TestAssumptions.requireGstVersion(1, 10);
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
-            if(Gst.testVersion(1,14)) {
+            if (Gst.testVersion(1, 14)) {
                 assertTrue("Video should contains timecode meta", buffer.containsMetadata(VideoTimeCodeMeta.class));
             }
             VideoTimeCodeMeta meta = buffer.getMetadata(VideoTimeCodeMeta.class);

@@ -104,7 +104,7 @@ public class MetaDataFactory {
         metaMapping.put(clazz, crate);
     }
 
-    public static final class Types implements NativeObject.TypeProvider{
+    public static final class Types implements NativeObject.TypeProvider {
 
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {

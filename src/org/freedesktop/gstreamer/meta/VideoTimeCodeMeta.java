@@ -32,7 +32,7 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMeta
  * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideometa.html?gi-language=c#GstVideoTimeCodeMeta">GstVideoTimeCodeMeta</a>
  */
 @Gst.Since(minor = 10)
-public class VideoTimeCodeMeta extends NativeObject implements Meta{
+public class VideoTimeCodeMeta extends NativeObject implements Meta {
 
     public static final String GTYPE_NAME = "GstVideoTimeCodeMeta";
     private final GstVideoTimeCodeMetaStruct metaStruct;

@@ -4,6 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.meta.MetaFlags;
 import org.freedesktop.gstreamer.meta.MetaInfo;
 import org.freedesktop.gstreamer.timecode.VideoTimeCodeFlags;
 
@@ -64,7 +65,7 @@ public interface GstMetaApi extends Library {
         public static final class ByValue extends GstMetaStruct implements Structure.ByValue {
         }
 
-        public long flags;
+        public MetaFlags flags;
         public GstMetaInfoStruct.ByReference info;
     }
 
