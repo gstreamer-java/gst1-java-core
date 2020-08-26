@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.lowlevel.GType;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
 import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
 
 /*
@@ -99,6 +102,20 @@ public class MetaDataFactory {
      */
     public static void registerMetadata(Class<? extends Meta> clazz, MetaDataCrate crate) {
         metaMapping.put(clazz, crate);
+    }
+
+    public static final class Types implements NativeObject.TypeProvider{
+
+        @Override
+        public Stream<NativeObject.TypeRegistration<?>> types() {
+            return Stream.of(
+                    registration(VideoTimeCodeMeta.class,
+                            VideoTimeCodeMeta.GTYPE_NAME,
+                            VideoTimeCodeMeta::new),
+                    registration(MetaInfo.class,
+                            MetaInfo.GTYPE_NAME,
+                            MetaInfo::new));
+        }
     }
 
 }

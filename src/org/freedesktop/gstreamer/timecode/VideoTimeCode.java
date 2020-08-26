@@ -103,7 +103,7 @@ public class VideoTimeCode extends NativeObject {
         super.disown();
     }
 
-    public static final class TimeTypes implements NativeObject.TypeProvider {
+    public static final class Types implements NativeObject.TypeProvider {
 
         @Override
         public Stream<TypeRegistration<?>> types() {

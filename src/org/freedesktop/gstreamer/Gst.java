@@ -19,7 +19,7 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.meta.GstMeta;
+import org.freedesktop.gstreamer.meta.MetaDataFactory;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
@@ -651,8 +651,8 @@ public final class Gst {
                 new Controllers(),
                 new Elements(),
                 new WebRTC.Types(),
-                new GstMeta(),
-                new VideoTimeCode.TimeTypes())
+                new MetaDataFactory.Types(),
+                new VideoTimeCode.Types())
                 .flatMap(NativeObject.TypeProvider::types)
                 .forEachOrdered(GstTypes::register);
         if (!DISABLE_EXTERNAL) {
