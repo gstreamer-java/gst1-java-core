@@ -19,7 +19,7 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.meta.GstMeta;
+import org.freedesktop.gstreamer.meta.MetaDataFactory;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
@@ -60,7 +60,7 @@ import org.freedesktop.gstreamer.glib.GMainContext;
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCode;
+import org.freedesktop.gstreamer.timecode.VideoTimeCode;
 import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
@@ -651,8 +651,8 @@ public final class Gst {
                 new Controllers(),
                 new Elements(),
                 new WebRTC.Types(),
-                new GstMeta(),
-                new GstVideoTimeCode.TimeTypes())
+                new MetaDataFactory.Types(),
+                new VideoTimeCode.Types())
                 .flatMap(NativeObject.TypeProvider::types)
                 .forEachOrdered(GstTypes::register);
         if (!DISABLE_EXTERNAL) {

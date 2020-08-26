@@ -3,8 +3,10 @@ package org.freedesktop.gstreamer.lowlevel;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import org.freedesktop.gstreamer.meta.GstMetaInfo;
-import org.freedesktop.gstreamer.timecode.GstVideoTimeCodeFlags;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.meta.MetaFlags;
+import org.freedesktop.gstreamer.meta.MetaInfo;
+import org.freedesktop.gstreamer.timecode.VideoTimeCodeFlags;
 
 /**
  * @author Jokertwo
@@ -22,7 +24,7 @@ public interface GstMetaApi extends Library {
 
     GType gst_video_region_of_interest_meta_api_get_type();
 
-    GstMetaInfo gst_video_time_code_meta_get_info();
+    MetaInfo gst_video_time_code_meta_get_info();
 
 
     @Structure.FieldOrder({"meta", "tc"})
@@ -37,6 +39,7 @@ public interface GstMetaApi extends Library {
     }
 
     @Structure.FieldOrder({"config", "hours", "minutes", "seconds", "frames", "field_count"})
+    @Gst.Since(minor = 10)
     class GstVideoTimeCodeStruct extends Structure {
         public static class ByValue extends GstVideoTimeCodeStruct implements Structure.ByValue {
         }
@@ -62,7 +65,7 @@ public interface GstMetaApi extends Library {
         public static final class ByValue extends GstMetaStruct implements Structure.ByValue {
         }
 
-        public long flags;
+        public MetaFlags flags;
         public GstMetaInfoStruct.ByReference info;
     }
 
@@ -85,13 +88,14 @@ public interface GstMetaApi extends Library {
     }
 
     @Structure.FieldOrder({"fps_n", "fps_d", "flags", "latest_daily_jam"})
+    @Gst.Since(minor = 10)
     class GstVideoTimeCodeConfigStruct extends Structure {
         public static class ByValue extends GstVideoTimeCodeConfigStruct implements Structure.ByValue {
         }
 
         public int fps_n;
         public int fps_d;
-        public GstVideoTimeCodeFlags flags;
+        public VideoTimeCodeFlags flags;
         public Pointer latest_daily_jam;
 
         public GstVideoTimeCodeConfigStruct() {

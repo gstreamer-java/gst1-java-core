@@ -6,16 +6,31 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Jokertwo
+/*
+ * Copyright (c) 2020 Petr Lastovka
+ *
+ * This file is part of gstreamer-java.
+ *
+ * This code is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3 only, as
+ * published by the Free Software Foundation.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * version 3 for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-public class GstVideoTimeCodeTest {
+public class VideoTimeCodeTest {
 
 
     private GstMetaApi.GstVideoTimeCodeStruct timeCodeStruct;
     private GstMetaApi.GstVideoTimeCodeConfigStruct.ByValue configStruct;
 
-    private GstVideoTimeCode timeCode;
+    private VideoTimeCode timeCode;
 
     @Before
     public void setUp() {
@@ -34,7 +49,7 @@ public class GstVideoTimeCodeTest {
         timeCodeStruct.config = configStruct;
 
         timeCodeStruct.write();
-        timeCode = new GstVideoTimeCode(timeCodeStruct.getPointer());
+        timeCode = new VideoTimeCode(timeCodeStruct.getPointer());
 
 
     }
