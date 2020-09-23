@@ -1,4 +1,4 @@
-/* 
+/*
  * This file is part of gstreamer-java.
  *
  * This code is free software: you can redistribute it and/or modify it under
@@ -21,13 +21,17 @@ import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 public interface GstVideoAPI extends Library {
 	public final static GstVideoAPI GSTVIDEO_API = GstNative.load("gstvideo", GstVideoAPI.class);
 
+    @CallerOwnsReturn
+    Pointer gst_video_time_code_new_empty();
+	void gst_video_time_code_free(Pointer gstVideoTimeCode);
     GValue gst_video_frame_rate(Pad pad);
     boolean gst_video_get_size(Pad pad, int [] width, int [] height);
-    
+
     /* */
     Pointer ptr_gst_video_event_new_downstream_force_key_unit(
             long timestamp, long stream_time, long running_time,

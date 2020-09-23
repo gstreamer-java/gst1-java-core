@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (c) 2020 John Cortell
- * 
+ *
  * This file is part of gstreamer-java.
  *
  * gstreamer-java is free software: you can redistribute it and/or modify
@@ -19,18 +19,17 @@
 
 package org.freedesktop.gstreamer;
 
+import java.util.ArrayList;
+import java.util.function.Consumer;
+import org.freedesktop.gstreamer.elements.AppSink;
+import org.freedesktop.gstreamer.glib.GError;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.function.Consumer;
-
-import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.glib.GError;
-
 /**
  * Utility class for unit testing API that operates on a Sample.
- *
+ * <p>
  * Call {@link SampleTester#test(Consumer)} and pass a callback which will
  * perform the test on a Sample it is supplied. The callback runs on the
  * AppSink.NEW_SAMPLE thread. The sample is produced by a simple, ephemeral
@@ -38,21 +37,42 @@ import org.freedesktop.gstreamer.glib.GError;
  */
 public class SampleTester {
     public static void test(Consumer<Sample> callback) {
-        new SampleTester(callback);
+        test(callback, "videotestsrc ! videoconvert ! appsink name=myappsink");
+    }
+
+    public static void test(Consumer<Sample> callback, String pipelineDescription) {
+        new SampleTester(callback, pipelineDescription, 0);
+    }
+
+    public static void test(Consumer<Sample> callback, String pipelineDescription, int skipFrames) {
+        new SampleTester(callback, pipelineDescription, skipFrames);
     }
 
     private static class NewSampleListener implements AppSink.NEW_SAMPLE {
         private Consumer<Sample> callback;
-        Throwable exception;
+        private final int skipFrames;
+        private Throwable exception;
+        private int counter = 0;
+
 
         NewSampleListener(Consumer<Sample> callback) {
+            this(callback, 0);
+        }
+
+        NewSampleListener(Consumer<Sample> callback, int skip) {
             this.callback = callback;
+            skipFrames = skip;
         }
 
         @Override
         public FlowReturn newSample(AppSink appSink) {
             if (callback != null) {
                 Sample sample = appSink.pullSample();
+                if (counter < skipFrames) {
+                    counter++;
+                    sample.dispose();
+                    return FlowReturn.OK;
+                }
                 try {
                     // Run the client's test logic on the sample (only once)
                     try {
@@ -74,16 +94,17 @@ public class SampleTester {
         }
     }
 
-    private SampleTester(Consumer<Sample> callback) {
+    private SampleTester(Consumer<Sample> callback, String pipelineDescription, int skipFrames) {
+        assertNotNull("Pipeline description can not be null", pipelineDescription);
+        assertFalse("Pipeline description can not be empty", pipelineDescription.isEmpty());
         ArrayList<GError> errors = new ArrayList<GError>();
-        String pipeline_descr = "videotestsrc ! videoconvert ! appsink name=myappsink";
-        Bin bin = Gst.parseBinFromDescription(pipeline_descr, false, errors);
+        Bin bin = Gst.parseBinFromDescription(pipelineDescription, false, errors);
         assertNotNull("Unable to create Bin from pipeline description: ", bin);
 
         AppSink appSink = (AppSink)bin.getElementByName("myappsink");
         appSink.set("emit-signals", true);
 
-        NewSampleListener sampleListener = new NewSampleListener(callback);
+        NewSampleListener sampleListener = new NewSampleListener(callback, skipFrames);
         appSink.connect(sampleListener);
 
         bin.play();
@@ -99,7 +120,7 @@ public class SampleTester {
         }
 
         bin.stop();
-        appSink.disconnect(sampleListener);        
+        appSink.disconnect(sampleListener);
 
         // If the test threw an exception on the sample listener thread, throw it here
         // (on the main thread)
