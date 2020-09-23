@@ -1,15 +1,3 @@
-package org.freedesktop.gstreamer.timecode;
-
-import com.sun.jna.Pointer;
-import java.util.stream.Stream;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
-import static org.freedesktop.gstreamer.glib.Natives.registration;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStruct;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -26,10 +14,24 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStru
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+package org.freedesktop.gstreamer.timecode;
+
+import com.sun.jna.Pointer;
+import java.util.stream.Stream;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeStruct;
+
+/**
  * A representation of a SMPTE time code.
  *
- * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCode">GstVideoTimeCode</a>
+ * See <a href="https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html"
+ * >https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html</a>
  */
 @Gst.Since(minor = 10)
 public class VideoTimeCode extends NativeObject {

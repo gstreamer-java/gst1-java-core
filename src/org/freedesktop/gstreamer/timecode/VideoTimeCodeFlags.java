@@ -1,7 +1,3 @@
-package org.freedesktop.gstreamer.timecode;
-
-import org.freedesktop.gstreamer.glib.NativeFlags;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -18,10 +14,18 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Flags related to the time code information. For drop frame, only 30000/1001 and 60000/1001 frame rates are supported.
- *
- * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideotimecode.html?gi-language=c#GstVideoTimeCodeFlags">GstVideoTimeCodeFlags</a>
+ */
+package org.freedesktop.gstreamer.timecode;
+
+import org.freedesktop.gstreamer.glib.NativeFlags;
+
+/**
+ * Flags related to the time code information. For drop frame, only 30000/1001
+ * and 60000/1001 frame rates are supported.
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html#GstVideoTimeCodeFlags"
+ * >https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html#GstVideoTimeCodeFlags</a>
  */
 public enum VideoTimeCodeFlags implements NativeFlags<VideoTimeCodeFlags> {
     /**

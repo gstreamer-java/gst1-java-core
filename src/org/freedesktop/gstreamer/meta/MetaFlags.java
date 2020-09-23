@@ -1,8 +1,3 @@
-package org.freedesktop.gstreamer.meta;
-
-import org.freedesktop.gstreamer.glib.NativeEnum;
-import org.freedesktop.gstreamer.glib.NativeFlags;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -19,9 +14,15 @@ import org.freedesktop.gstreamer.glib.NativeFlags;
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @see <a href="https://docs.gstreamer.com/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaFlags">GstMetaFlags</a>
+ */
+package org.freedesktop.gstreamer.meta;
+
+import org.freedesktop.gstreamer.glib.NativeFlags;
+
+ /**
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html#GstMetaFlags"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html#GstMetaFlags</a>
  */
 public enum MetaFlags implements NativeFlags<MetaFlags> {
 

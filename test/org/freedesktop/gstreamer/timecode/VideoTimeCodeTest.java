@@ -1,11 +1,3 @@
-package org.freedesktop.gstreamer.timecode;
-
-import org.freedesktop.gstreamer.lowlevel.GstMetaApi;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -24,6 +16,15 @@ import static org.junit.Assert.assertNotNull;
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.freedesktop.gstreamer.timecode;
+
+import org.freedesktop.gstreamer.lowlevel.GstMetaApi;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+
 public class VideoTimeCodeTest {
 
 

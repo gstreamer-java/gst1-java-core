@@ -20,13 +20,15 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
 import java.util.Arrays;
 import java.util.List;
+
 import org.freedesktop.gstreamer.Buffer;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
+
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_PADDING;
 
 /**

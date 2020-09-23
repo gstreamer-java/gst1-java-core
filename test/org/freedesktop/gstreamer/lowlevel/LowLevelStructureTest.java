@@ -1,25 +1,25 @@
 package org.freedesktop.gstreamer.lowlevel;
 
-import com.sun.jna.Structure;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.freedesktop.gstreamer.Gst;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 
-/**
- * @author Neil C Smith
- */
+import com.sun.jna.Structure;
+import java.util.Arrays;
+import org.freedesktop.gstreamer.Gst;
+
 public class LowLevelStructureTest {
 
     private final static Logger LOG = Logger.getLogger(LowLevelStructureTest.class.getName());

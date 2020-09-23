@@ -1,11 +1,3 @@
-package org.freedesktop.gstreamer.meta;
-
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
-
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -22,8 +14,16 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ */
+package org.freedesktop.gstreamer.meta;
+
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstMetaInfoStruct;
+
+
+ /**
  * The GstMetaInfo provides information about a specific metadata structure.
  *
  * @see <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html?gi-language=c#GstMetaInfo">GstMetaInfo</a>

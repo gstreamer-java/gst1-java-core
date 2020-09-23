@@ -28,7 +28,7 @@ public interface GstVideoAPI extends Library {
 
     @CallerOwnsReturn
     Pointer gst_video_time_code_new_empty();
-	void gst_video_time_code_free(Pointer gstVideoTimeCode);
+    void gst_video_time_code_free(Pointer gstVideoTimeCode);
     GValue gst_video_frame_rate(Pad pad);
     boolean gst_video_get_size(Pad pad, int [] width, int [] height);
 

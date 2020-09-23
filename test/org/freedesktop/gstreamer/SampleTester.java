@@ -19,13 +19,16 @@
 
 package org.freedesktop.gstreamer;
 
-import java.util.ArrayList;
-import java.util.function.Consumer;
-import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.glib.GError;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.function.Consumer;
+
+import org.freedesktop.gstreamer.elements.AppSink;
+import org.freedesktop.gstreamer.glib.GError;
+
 
 /**
  * Utility class for unit testing API that operates on a Sample.

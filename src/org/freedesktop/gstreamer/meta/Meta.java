@@ -1,4 +1,3 @@
-package org.freedesktop.gstreamer.meta;
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -15,8 +14,10 @@ package org.freedesktop.gstreamer.meta;
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ */
+package org.freedesktop.gstreamer.meta;
+
+ /**
  * Default interface for all metadata classes
  */
 public interface Meta {

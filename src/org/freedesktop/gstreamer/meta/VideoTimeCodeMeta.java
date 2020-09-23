@@ -1,14 +1,3 @@
-package org.freedesktop.gstreamer.meta;
-
-import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.timecode.VideoTimeCode;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMetaStruct;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -25,11 +14,24 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMeta
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+package org.freedesktop.gstreamer.meta;
+
+import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
+import org.freedesktop.gstreamer.timecode.VideoTimeCode;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeMetaStruct;
+
+ /**
  * Extra buffer metadata describing the GstVideoTimeCode of the frame.
- *
- *
- * @see <a href="https://docs.gstreamer.com/documentation/video/gstvideometa.html?gi-language=c#GstVideoTimeCodeMeta">GstVideoTimeCodeMeta</a>
+ * <p>
+ * See upstream documentation at
+ * <a href="https://gstreamer.freedesktop.org/documentation/video/gstvideometa.html#GstVideoTimeCodeMeta"
+ * >https://gstreamer.freedesktop.org/documentation/video/gstvideometa.html#GstVideoTimeCodeMeta</a>
  */
 @Gst.Since(minor = 10)
 public class VideoTimeCodeMeta extends NativeObject implements Meta {

@@ -1,13 +1,3 @@
-package org.freedesktop.gstreamer.timecode;
-
-import java.util.Arrays;
-import java.util.Collection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -26,6 +16,17 @@ import static org.junit.Assert.fail;
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.freedesktop.gstreamer.timecode;
+
+import java.util.Arrays;
+import java.util.Collection;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+
 @RunWith(Parameterized.class)
 public class VideoTimeCodeFlagsTest {
 

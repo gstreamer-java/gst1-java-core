@@ -1,16 +1,3 @@
-package org.freedesktop.gstreamer.meta;
-
-import com.sun.jna.Pointer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.lowlevel.GType;
-import static org.freedesktop.gstreamer.glib.Natives.registration;
-import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
-
 /*
  * Copyright (c) 2020 Petr Lastovka
  *
@@ -27,7 +14,22 @@ import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
  *
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+package org.freedesktop.gstreamer.meta;
+
+import com.sun.jna.Pointer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+import org.freedesktop.gstreamer.glib.NativeObject;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import static org.freedesktop.gstreamer.glib.Natives.registration;
+import static org.freedesktop.gstreamer.lowlevel.GstMetaApi.GST_META_API;
+
+
+/**
  * Factory for creating metadata
  */
 public class MetaDataFactory {
