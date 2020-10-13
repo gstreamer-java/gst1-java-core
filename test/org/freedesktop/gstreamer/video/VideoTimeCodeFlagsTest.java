@@ -16,15 +16,15 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.freedesktop.gstreamer.timecode;
+package org.freedesktop.gstreamer.video;
 
 import java.util.Arrays;
 import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 
 @RunWith(Parameterized.class)
@@ -37,7 +37,7 @@ public class VideoTimeCodeFlagsTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][]{
-                        {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_NONE, 0},
+//                        {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_NONE, 0},
                         {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME, 1},
                         {VideoTimeCodeFlags.GST_VIDEO_TIME_CODE_FLAGS_INTERLACED, 2}
                 });

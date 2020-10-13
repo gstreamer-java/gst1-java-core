@@ -59,12 +59,6 @@ public abstract class NativeObject implements AutoCloseable {
 //     */
     protected NativeObject(Handle handle) {
         this.handle = Objects.requireNonNull(handle);
-        //
-        // Only store this object in the map if we can tell when it has been disposed 
-        // (i.e. must be at least a GObject - MiniObject and other NativeObject subclasses
-        // don't signal destruction, so it is impossible to know if the instance 
-        // is stale or not
-        //
         this.ptr = handle.ptrRef.get().getPointer();
         if (handle.isCacheable()) {
             // need to put all nativeRef in map now so WeakReference doesn't go out of scope

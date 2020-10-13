@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2020 Petr Lastovka
  *
  * This file is part of gstreamer-java.
@@ -15,15 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer.timecode;
+package org.freedesktop.gstreamer.video;
 
-import com.sun.jna.Pointer;
+import java.util.EnumSet;
 import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.NativeObject;
-import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GlibAPI;
-import org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeConfigStruct;
+import org.freedesktop.gstreamer.lowlevel.GstVideoAPI.GstVideoTimeCodeConfigStruct;
 
 /**
  * The configuration of the time code.
@@ -35,51 +35,50 @@ import org.freedesktop.gstreamer.lowlevel.GstMetaApi.GstVideoTimeCodeConfigStruc
 @Gst.Since(minor = 10)
 public class VideoTimeCodeConfig extends NativeObject {
 
-    public static final String GTYPE_NAME = "GstVideoTimeCodeConfig";
     private final GstVideoTimeCodeConfigStruct timeCodeConfig;
 
-    VideoTimeCodeConfig(Pointer pointer) {
-        this(Natives.initializer(pointer, false, false));
+    VideoTimeCodeConfig(GstVideoTimeCodeConfigStruct struct) {
+        this(struct, new Handle(new GPointer(struct.getPointer()), false));
     }
 
-    VideoTimeCodeConfig(NativeObject.Initializer init) {
-        super(new Handle(init.ptr, init.ownsHandle));
-        timeCodeConfig = new GstVideoTimeCodeConfigStruct(getRawPointer());
-    }
-
-    /**
-     * The corresponding {@link VideoTimeCodeFlags}
-     *
-     * @return return flag for current timecode
-     */
-    public VideoTimeCodeFlags getTimeCodeFlags() {
-        return timeCodeConfig.flags;
+    private VideoTimeCodeConfig(GstVideoTimeCodeConfigStruct struct, Handle handle) {
+        super(handle);
+        timeCodeConfig = struct;
     }
 
     /**
-     * Numerator of the frame rate
+     * The corresponding {@link VideoTimeCodeFlags}.
      *
-     * @return return positive number
+     * @return return flags for current timecode
      */
-    public int getFramerateNumerator() {
+    public EnumSet<VideoTimeCodeFlags> getFlags() {
+        return NativeFlags.fromInt(VideoTimeCodeFlags.class, timeCodeConfig.flags);
+    }
+
+    /**
+     * Numerator of the frame rate.
+     *
+     * @return numerator
+     */
+    public int getNumerator() {
         return timeCodeConfig.fps_n;
     }
 
     /**
-     * Denominator of the frame rate
+     * Denominator of the frame rate.
      *
-     * @return return positive number
+     * @return denominator
      */
-    public int getFramerateDenominator() {
+    public int getDenominator() {
         return timeCodeConfig.fps_d;
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("GstVideoTimeCodeConfig{");
-        sb.append("flags=").append(getTimeCodeFlags())
-                .append(", numerator=").append(getFramerateNumerator())
-                .append(", denominator=").append(getFramerateDenominator())
+        sb.append("flags=").append(getFlags())
+                .append(", numerator=").append(getNumerator())
+                .append(", denominator=").append(getDenominator())
                 .append('}');
         return sb.toString();
     }
@@ -99,7 +98,13 @@ public class VideoTimeCodeConfig extends NativeObject {
         @Override
         protected void disposeNativeHandle(GPointer ptr) {
             // usually video timecode config will be released together with video timecode
-            GlibAPI.GLIB_API.g_free(ptr.getPointer());
+            //            GlibAPI.GLIB_API.g_free(ptr.getPointer());
         }
+
+        @Override
+        protected GPointer getPointer() {
+            return super.getPointer();
+        }
+        
     }
 }

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2020 Petr Lastovka
  *
  * This file is part of gstreamer-java.
@@ -15,53 +16,41 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.freedesktop.gstreamer.meta;
+package org.freedesktop.gstreamer.video;
 
 import org.freedesktop.gstreamer.glib.NativeFlags;
 
- /**
+/**
+ * Flags related to the time code information. For drop frame, only 30000/1001
+ * and 60000/1001 frame rates are supported.
+ * <p>
  * See upstream documentation at
- * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html#GstMetaFlags"
- * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html#GstMetaFlags</a>
+ * <a href="https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html#GstVideoTimeCodeFlags"
+ * >https://gstreamer.freedesktop.org/documentation/video/gstvideotimecode.html#GstVideoTimeCodeFlags</a>
  */
-public enum MetaFlags implements NativeFlags<MetaFlags> {
+public enum VideoTimeCodeFlags implements NativeFlags<VideoTimeCodeFlags> {
+//    /**
+//     * No flags
+//     */
+//    GST_VIDEO_TIME_CODE_FLAGS_NONE(0), // No flags
+    /**
+     * Whether we have drop frame rate
+     */
+    GST_VIDEO_TIME_CODE_FLAGS_DROP_FRAME(1),
+    /**
+     * Whether we have interlaced video
+     */
+    GST_VIDEO_TIME_CODE_FLAGS_INTERLACED(2);
 
-    /**
-     * no flags
-     */
-    GST_META_FLAG_NONE(0),
-    /**
-     * metadata should not be modified
-     */
-    GST_META_FLAG_READONLY(1 << 0),
-    /**
-     * metadata is managed by a bufferpool
-     */
-    GST_META_FLAG_POOLED(1 << 1),
-    /**
-     * metadata should not be removed
-     */
-    GST_META_FLAG_LOCKED(1 << 2),
-    /**
-     * additional flags can be added starting from this flag.
-     */
-    GST_META_FLAG_LAST(1 << 16);
 
     private final int value;
 
-    MetaFlags(int value) {
+    VideoTimeCodeFlags(int value) {
         this.value = value;
     }
 
-    /**
-     * Gets the integer value of the enum.
-     *
-     * @return The integer value for this enum.
-     */
     @Override
     public int intValue() {
         return value;
     }
-
-
 }

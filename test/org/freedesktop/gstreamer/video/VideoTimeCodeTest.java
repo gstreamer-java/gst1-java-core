@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2020 Petr Lastovka
  *
  * This file is part of gstreamer-java.
@@ -16,27 +17,30 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.freedesktop.gstreamer.timecode;
+package org.freedesktop.gstreamer.video;
 
-import org.freedesktop.gstreamer.lowlevel.GstMetaApi;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.freedesktop.gstreamer.lowlevel.GstMetaAPI;
+import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
 
 
 public class VideoTimeCodeTest {
 
 
-    private GstMetaApi.GstVideoTimeCodeStruct timeCodeStruct;
-    private GstMetaApi.GstVideoTimeCodeConfigStruct.ByValue configStruct;
+    private GstVideoAPI.GstVideoTimeCodeStruct timeCodeStruct;
+    private GstVideoAPI.GstVideoTimeCodeConfigStruct.ByValue configStruct;
 
     private VideoTimeCode timeCode;
 
     @Before
     public void setUp() {
-        timeCodeStruct = new GstMetaApi.GstVideoTimeCodeStruct();
-        configStruct = new GstMetaApi.GstVideoTimeCodeConfigStruct.ByValue();
+        timeCodeStruct = new GstVideoAPI.GstVideoTimeCodeStruct();
+        configStruct = new GstVideoAPI.GstVideoTimeCodeConfigStruct.ByValue();
 
         // 01:02:03:04
         timeCodeStruct.hours = 1;
@@ -50,14 +54,14 @@ public class VideoTimeCodeTest {
         timeCodeStruct.config = configStruct;
 
         timeCodeStruct.write();
-        timeCode = new VideoTimeCode(timeCodeStruct.getPointer());
+        timeCode = new VideoTimeCode(timeCodeStruct);
 
 
     }
 
     @Test
     public void testGetTCConfig() {
-        assertNotNull(timeCode.getTCConfig());
+        assertNotNull(timeCode.getConfig());
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2019 Christophe Lafolet
- * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -29,13 +29,13 @@ import java.nio.ByteBuffer;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
-import org.freedesktop.gstreamer.meta.Meta;
-import org.freedesktop.gstreamer.meta.MetaDataFactory;
 
 import com.sun.jna.Pointer;
 import java.util.EnumSet;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GstMetaPtr;
 
 /**
  * Buffers are the basic unit of data transfer in GStreamer. They contain the
@@ -255,49 +255,58 @@ public class Buffer extends MiniObject {
     }
 
     /**
-     * Get metadata from buffer. In case that in buffer is not selected type of metadata return null
+     * Get the metadata for api on buffer. When there is no such metadata, NULL
+     * is returned.
      *
-     * @param clazz requested type of metadata
-     * @return return metadata from buffer. Return null if in buffer is not selected metadata type
+     * @param <T> implementation type of metadata
+     * @param api api type of metadata
+     * @return meta or null
      */
-    public <M extends Meta> M getMetadata(Class<M> clazz) {
-        MetaDataFactory metaDataFactory = new MetaDataFactory();
-        Pointer pointer = GSTBUFFER_API.gst_buffer_get_meta(this, metaDataFactory.getGType(clazz));
-        // can not create metadata class from null pointer
-        if (pointer == null) {
+    public <T extends Meta> T getMeta(Meta.API<T> api) {
+        GType apiType = api.getAPIGType();
+        if (apiType == GType.INVALID) {
             return null;
         }
-        return metaDataFactory.getInstance(clazz, pointer);
+        GstMetaPtr ptr = GSTBUFFER_API.gst_buffer_get_meta(this, apiType);
+        // can not create metadata class from null pointer
+        if (ptr == null) {
+            return null;
+        }
+        return Natives.objectFor(ptr, api.getImplClass(), false, false);
     }
 
-
     /**
-     * Check if buffer contains selected type of metadata
+     * Check if buffer contains metadata for api.
      * <p>
      * Since GStreamer 1.14
      *
-     * @param clazz type of metadata
+     * @param <T> implementation type of metadata
+     * @param api type of metadata
      * @return return true only if buffer contains selected type of metadata
      */
     @Gst.Since(minor = 14)
-    public boolean containsMetadata(Class<? extends Meta> clazz) {
-        Gst.checkVersion(1, 14);
-        return getNumberOfMeta(clazz) > 0;
+    public <T extends Meta> boolean hasMeta(Meta.API<T> api) {
+        return getMetaCount(api) > 0;
     }
 
     /**
-     * Check number of metadata for selected type. There can be more metadata in case multiple video/audio layer
+     * Check number of metadata for api. There can be more than one metadata in
+     * case of multiple video/audio layer.
      * <p>
      * Since GStreamer 1.14
      *
-     * @param clazz type of metadata
-     * @return return number of metadata
+     * @param <T> implementation type of metadata
+     * @param api type of metadata
+     * @return count of metadata of provided api type
      */
     @Gst.Since(minor = 14)
-    public int getNumberOfMeta(Class<? extends Meta> clazz) {
+    public <T extends Meta> int getMetaCount(Meta.API<T> api) {
         Gst.checkVersion(1, 14);
-        MetaDataFactory metaDataFactory = new MetaDataFactory();
-        return GSTBUFFER_API.gst_buffer_get_n_meta(this, metaDataFactory.getGType(clazz));
+        GType apiType = api.getAPIGType();
+        if (apiType == GType.INVALID) {
+            return 0;
+        }
+        return GSTBUFFER_API.gst_buffer_get_n_meta(this, apiType);
     }
 
 

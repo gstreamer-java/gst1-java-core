@@ -112,7 +112,7 @@ public class LowLevelStructureTest {
     }
 
     private static void initStructList() {
-        structs = new ArrayList<Class<? extends Structure>>();
+        structs = new ArrayList<>();
 
         structs.add(BaseSinkAPI.GstBaseSinkStruct.class);
         structs.add(BaseSinkAPI.GstBaseSinkClass.class);
@@ -166,10 +166,10 @@ public class LowLevelStructureTest {
         structs.add(GstElementAPI.GstElementClass.class);
 
         structs.add(GstEventAPI.EventStruct.class);
-        structs.add(GstMetaApi.GstVideoTimeCodeMetaStruct.class);
-        structs.add(GstMetaApi.GstVideoTimeCodeStruct.class);
-        structs.add(GstMetaApi.GstMetaInfoStruct.class);
-        structs.add(GstMetaApi.GstMetaStruct.class);
+        structs.add(GstVideoAPI.GstVideoTimeCodeMetaStruct.class);
+        structs.add(GstVideoAPI.GstVideoTimeCodeStruct.class);
+        structs.add(GstMetaAPI.GstMetaInfoStruct.class);
+        structs.add(GstMetaAPI.GstMetaStruct.class);
 
 //        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
 //        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);

@@ -104,7 +104,7 @@ public interface GstBufferAPI extends com.sun.jna.Library {
     void gst_buffer_unmap(Buffer buffer, MapInfoStruct info);
     int gst_buffer_n_memory(Buffer buffer);
     boolean gst_buffer_map_range(Buffer buffer, int idx, int length, MapInfoStruct info, int flags);
-    Pointer gst_buffer_get_meta(Buffer buffer, GType gType);
+    GstMetaPtr gst_buffer_get_meta(Buffer buffer, GType gType);
     int gst_buffer_get_n_meta(Buffer buffer,GType gType);
     // re-introduces in gstreamer 1.9
     int gst_buffer_get_flags(Buffer buffer);
