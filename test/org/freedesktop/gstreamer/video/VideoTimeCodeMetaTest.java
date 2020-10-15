@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer.video;
 
 import org.freedesktop.gstreamer.Buffer;
+import org.freedesktop.gstreamer.BufferProbeTester;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.SampleTester;
 import org.freedesktop.gstreamer.util.TestAssumptions;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class GstTimeCodeMetaTest {
+public class VideoTimeCodeMetaTest {
 
     @BeforeClass
     public static void beforeClass() {

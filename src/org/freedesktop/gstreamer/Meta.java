@@ -31,7 +31,7 @@ import org.freedesktop.gstreamer.lowlevel.GstMetaPtr;
  * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstmeta.html</a>
  * <p>
  */
-public abstract class Meta extends NativeObject {
+public class Meta extends NativeObject {
 
     /**
      * Create Meta from Initializer.

@@ -31,7 +31,10 @@ import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GType;
@@ -274,6 +277,15 @@ public class Buffer extends MiniObject {
         }
         return Natives.objectFor(ptr, api.getImplClass(), false, false);
     }
+    
+    /**
+     * Iterate all Meta on buffer.
+     * 
+     * @return iterator of meta
+     */
+    public Iterator<Meta> iterateMeta() {
+        return new MetaIterator(this);
+    }
 
     /**
      * Check if buffer contains metadata for api.
@@ -339,6 +351,47 @@ public class Buffer extends MiniObject {
     public boolean unsetFlags(EnumSet<BufferFlags> flags) {
         Gst.checkVersion(1, 10);
         return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, NativeFlags.toInt(flags));
+    }
+
+    private static class MetaIterator implements Iterator<Meta> {
+
+        private final PointerByReference state;
+        private final Buffer buffer;
+        private Meta next;
+
+        MetaIterator(final Buffer buffer) {
+            state = new PointerByReference();
+            this.buffer = buffer;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (next == null) {
+                next = getNext();
+            }
+            return next != null;
+        }
+        
+        @Override
+        public Meta next() {
+            if (!hasNext() || next == null) {
+                throw new NoSuchElementException();
+            }
+            Meta m = next;
+            next = null;
+            return m;
+        }
+
+        private Meta getNext() {
+            return Natives.objectFor(
+                    GSTBUFFER_API.gst_buffer_iterate_meta(this.buffer, this.state),
+                    Meta.class,
+                    false,
+                    false
+            );
+        }
+
+
     }
 
 }
