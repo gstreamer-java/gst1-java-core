@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Christophe Lafolet
  * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2007, 2008 Wayne Meissner
@@ -20,7 +21,7 @@
  */
 package org.freedesktop.gstreamer;
 
-import static org.freedesktop.gstreamer.lowlevel.GstSampleAPI.GSTMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstSampleAPI.GSTSAMPLE_API;
 
 /**
  * A Sample is a small object containing data, a type, timing and extra
@@ -40,24 +41,52 @@ public class Sample extends MiniObject {
     }
 
     /**
-     * Get the {@link Caps} associated with sample, or NULL when there is no
-     * caps. The caps remain valid as long as sample is valid.
+     * Get the {@link Caps} associated with sample, or NULL when there is no caps. 
+     * The caps remain valid as long as sample is valid.
+     * If you need to hold on to the caps for longer than that, take a ref to the caps 
      *
      * @return caps of sample or NULL when there is no caps.
      */
     public Caps getCaps() {
-        return GSTMESSAGE_API.gst_sample_get_caps(this);
+        return GSTSAMPLE_API.gst_sample_get_caps(this);
+    }
+    
+    /**
+     * Set the {@link Caps} associated with sample. 
+     * This sample must be writable.
+     * 
+     * Since GStreamer 1.16
+     * 
+     * @param caps
+     */
+    @Gst.Since(minor = 16)
+    public void setCaps(Caps caps) {
+    	GSTSAMPLE_API.gst_sample_set_caps(this, caps);
     }
 
     /**
      * Get the {@link Buffer} associated with sample, or NULL when there is no
      * buffer.
-     * <b>The buffer remains valid as long as sample is valid.</b>
+     * The buffer remains valid as long as sample is valid.
+     * If you need to hold on to it for longer than that, take a ref to the buffer.
      *
      * @return buffer of sample or NULL when there is no buffer.
      */
     public Buffer getBuffer() {
-        return GSTMESSAGE_API.gst_sample_get_buffer(this);
+        return GSTSAMPLE_API.gst_sample_get_buffer(this);
     }
-
+    
+    /**
+     * Set the {@link Buffer} associated with sample. 
+     * This sample must be writable.
+     * 
+     * Since GStreamer 1.16
+     * 
+     * @param buffer
+     */
+    @Gst.Since(minor = 16)
+    public void setBuffer(Buffer buffer) {
+    	GSTSAMPLE_API.gst_sample_set_buffer(this, buffer);
+    }
+    
 }

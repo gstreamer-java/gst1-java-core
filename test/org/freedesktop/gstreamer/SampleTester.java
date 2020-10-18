@@ -76,7 +76,7 @@ public class SampleTester {
 
     private SampleTester(Consumer<Sample> callback) {
         ArrayList<GError> errors = new ArrayList<GError>();
-        String pipeline_descr = "videotestsrc ! videoconvert ! appsink name=myappsink";
+        String pipeline_descr = "videotestsrc is-live=true ! videoconvert ! appsink name=myappsink";
         Bin bin = Gst.parseBinFromDescription(pipeline_descr, false, errors);
         assertNotNull("Unable to create Bin from pipeline description: ", bin);
 

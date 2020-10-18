@@ -21,6 +21,7 @@ package org.freedesktop.gstreamer;
 
 import static org.junit.Assert.assertEquals;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class SampleTest {
     		Caps caps = sample.getCaps();
     		Structure struct = caps.getStructure(0);
     		String name = struct.getName();
-    		assertEquals(name, "video/x-raw");
+    		assertEquals("video/x-raw", name);
     	});
     }
 
@@ -54,7 +55,34 @@ public class SampleTest {
     public void testGetBuffer() {
     	SampleTester.test((Sample sample) -> {
     		Buffer buffer = sample.getBuffer();
-    		assertEquals(buffer.getMemoryCount(), 1);
+    		assertEquals(1, buffer.getMemoryCount());
     	});
     }
+    
+    @Test
+    public void testSetBuffer() {
+    	// since gst 1.16, sample is recycled and keep a reference on the last buffer received  
+    	SampleTester.test((Sample sample) -> {
+    		Buffer buffer = sample.getBuffer();
+
+    		int refCount = buffer.getRefCount();
+    		    		
+    		if (Gst.getVersion().checkSatisfies(new Version(1, 16))) {
+        		assertEquals(2, sample.getRefCount());
+
+        		// make sample writable
+        		Natives.unref(sample);
+        		
+        		// force sample to release the buffer
+        		sample.setBuffer(null);
+        		
+        		Natives.ref(sample);
+        		
+        		assertEquals(2, sample.getRefCount());
+        		
+        		assertEquals(refCount-1, buffer.getRefCount());
+    		}
+    	});
+    }
+    
 }
