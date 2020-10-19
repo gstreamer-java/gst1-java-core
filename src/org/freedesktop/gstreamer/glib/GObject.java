@@ -358,7 +358,7 @@ public abstract class GObject extends RefCountedObject {
         } else if (propType.equals(GType.OBJECT)) {
             GVALUE_API.g_value_set_object(propValue, (GObject) data);
         } else if (GVALUE_API.g_value_type_transformable(GType.ENUM, propType)) {
-    		transform(enumValue(data), GType.INT64, propValue);
+    		transform(new NativeLong(enumValue(data)), GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.INT64, propType)) {
             transform(data, GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.LONG, propType)) {
