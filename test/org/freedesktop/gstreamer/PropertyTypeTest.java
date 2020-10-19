@@ -19,14 +19,17 @@
  */
 package org.freedesktop.gstreamer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class PropertyTypeTest {
 
@@ -172,10 +175,19 @@ public class PropertyTypeTest {
         assertEquals("Red (brownian) noise", redNoise);
         audiotestsrc.setAsString("wave", redNoise);
         assertEquals(10, audiotestsrc.get("wave"));
-
+        
         // invalid value
         audiotestsrc.set("wave", -256);
         assertEquals(0, audiotestsrc.get("wave"));
+
+        audiotestsrc.set("wave", AudioTestSrcWave.GAUSSIAN_NOISE);
+        assertEquals(AudioTestSrcWave.GAUSSIAN_NOISE.intValue(), audiotestsrc.get("wave"));
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setEnumInvalidType() {
+    	audiotestsrc.set("wave", Boolean.TRUE);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -193,5 +205,32 @@ public class PropertyTypeTest {
         assertTrue(mixMatrix.contains("0.4"));
         assertTrue(mixMatrix.contains("0.6"));
         assertTrue(mixMatrix.contains("0.8"));
+    }
+    
+    private static enum AudioTestSrcWave implements NativeEnum<AudioTestSrcWave>{
+        SINE(0),
+        SQUARE(1),
+        SAW(2),
+        TRIANGLE(3),
+        SILENCE(4),
+        WHITE_NOISE(5),
+        PINK_NOISE(6),
+        SINE_TABLE(7),
+        TICKS(8),
+        GAUSSIAN_NOISE(9),
+        RED_NOISE(10),
+        BLUE_NOISE(11),
+        VIOLET_NOISE(12);
+        
+        private final int value;
+        
+        private AudioTestSrcWave(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int intValue() {
+            return value;
+        }
     }
 }

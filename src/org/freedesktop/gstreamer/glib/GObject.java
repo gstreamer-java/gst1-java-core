@@ -28,17 +28,24 @@ import static org.freedesktop.gstreamer.lowlevel.GValueAPI.GVALUE_API;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI;
 import org.freedesktop.gstreamer.lowlevel.GObjectAPI.GParamSpec;
+import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
+import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
+import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
 import org.freedesktop.gstreamer.lowlevel.IntPtr;
 
@@ -49,13 +56,6 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import org.freedesktop.gstreamer.MiniObject;
-import org.freedesktop.gstreamer.lowlevel.GObjectPtr;
-import org.freedesktop.gstreamer.lowlevel.GPointer;
-import org.freedesktop.gstreamer.lowlevel.GstMiniObjectPtr;
 
 /**
  * GObject is the fundamental type providing the common attributes and methods
@@ -357,6 +357,8 @@ public abstract class GObject extends RefCountedObject {
             }
         } else if (propType.equals(GType.OBJECT)) {
             GVALUE_API.g_value_set_object(propValue, (GObject) data);
+        } else if (GVALUE_API.g_value_type_transformable(GType.ENUM, propType)) {
+    		transform(enumValue(data), GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.INT64, propType)) {
             transform(data, GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.LONG, propType)) {
@@ -536,6 +538,15 @@ public abstract class GObject extends RefCountedObject {
             return Long.parseLong((String) value);
         }
         throw new IllegalArgumentException("Expected long value, not " + value.getClass());
+    }
+    
+    private static long enumValue(Object value) {
+    	if (value instanceof NativeEnum) {
+    		return ((NativeEnum<?>)value).intValue();
+    	} else if (value instanceof Number) { 
+    		return ((Number)value).longValue();
+    	} 
+    	throw new IllegalArgumentException("Expected enum value, not " + value.getClass());
     }
 
     private static boolean setGValue(GValue value, GType type, Object data) {

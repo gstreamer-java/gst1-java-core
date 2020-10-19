@@ -18,29 +18,30 @@
  */
 package org.freedesktop.gstreamer.glib;
 
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.sun.jna.Pointer;
-import java.lang.ref.ReferenceQueue;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.lowlevel.GPointer;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GTypedPtr;
 import org.freedesktop.gstreamer.lowlevel.GstTypes;
+
+import com.sun.jna.Pointer;
 
 /**
  *
@@ -139,7 +140,7 @@ public abstract class NativeObject implements AutoCloseable {
      * After calling this method this object should not be used.
      */
     public void invalidate() {
-        LOG.log(LIFECYCLE, () -> "Invalidating object " + this + " = " + getRawPointer());
+        LOG.log(LIFECYCLE, () -> "Invalidating object " + getClass().getName() + " = " + getRawPointer());
         handle.invalidate();
     }
 
