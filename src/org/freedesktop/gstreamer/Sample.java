@@ -42,7 +42,7 @@ public class Sample extends MiniObject {
 
     /**
      * Get the {@link Caps} associated with sample, or NULL when there is no caps. 
-     * The caps remain valid as long as sample is valid.
+     * <b>The caps remains valid as long as sample is valid.</b>
      * If you need to hold on to the caps for longer than that, take a ref to the caps 
      *
      * @return caps of sample or NULL when there is no caps.
@@ -61,13 +61,14 @@ public class Sample extends MiniObject {
      */
     @Gst.Since(minor = 16)
     public void setCaps(Caps caps) {
+    	Gst.checkVersion(1, 16);
     	GSTSAMPLE_API.gst_sample_set_caps(this, caps);
     }
 
     /**
      * Get the {@link Buffer} associated with sample, or NULL when there is no
      * buffer.
-     * The buffer remains valid as long as sample is valid.
+     * <b>The buffer remains valid as long as sample is valid.</b>
      * If you need to hold on to it for longer than that, take a ref to the buffer.
      *
      * @return buffer of sample or NULL when there is no buffer.
@@ -86,6 +87,7 @@ public class Sample extends MiniObject {
      */
     @Gst.Since(minor = 16)
     public void setBuffer(Buffer buffer) {
+    	Gst.checkVersion(1, 16);
     	GSTSAMPLE_API.gst_sample_set_buffer(this, buffer);
     }
     

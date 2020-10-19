@@ -22,6 +22,7 @@ package org.freedesktop.gstreamer;
 import static org.junit.Assert.assertEquals;
 
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class SampleTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("SampleTest", new String[] {});
+    	Gst.init(Gst.getVersion(), "SampleTest");
     }
     
     @AfterClass
@@ -60,28 +61,29 @@ public class SampleTest {
     }
     
     @Test
-    public void testSetBuffer() {
-    	// since gst 1.16, sample is recycled and keep a reference on the last buffer received  
+    public void testSetBuffer() {    	
+    	// since gst 1.16, the sample is recycled and keep a reference on the last buffer received
+		TestAssumptions.requireGstVersion(1, 16);
+
     	SampleTester.test((Sample sample) -> {
+    		
     		Buffer buffer = sample.getBuffer();
 
     		int refCount = buffer.getRefCount();
     		    		
-    		if (Gst.getVersion().checkSatisfies(new Version(1, 16))) {
-        		assertEquals(2, sample.getRefCount());
+    		assertEquals(2, sample.getRefCount());
 
-        		// make sample writable
-        		Natives.unref(sample);
-        		
-        		// force sample to release the buffer
-        		sample.setBuffer(null);
-        		
-        		Natives.ref(sample);
-        		
-        		assertEquals(2, sample.getRefCount());
-        		
-        		assertEquals(refCount-1, buffer.getRefCount());
-    		}
+    		// make sample writable
+    		Natives.unref(sample);
+    		
+    		// force sample to release the buffer
+    		sample.setBuffer(null);
+    		
+    		Natives.ref(sample);
+    		
+    		assertEquals(2, sample.getRefCount());
+    		
+    		assertEquals(refCount-1, buffer.getRefCount());
     	});
     }
     
