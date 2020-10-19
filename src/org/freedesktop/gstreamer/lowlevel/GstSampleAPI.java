@@ -72,5 +72,4 @@ public interface GstSampleAPI extends com.sun.jna.Library {
     void gst_sample_set_buffer(Sample sample, Buffer buffer);
     void gst_sample_set_caps(Sample sample, Caps caps);
     
-    
 }
