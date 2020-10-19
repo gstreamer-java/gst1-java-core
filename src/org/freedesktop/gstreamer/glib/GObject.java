@@ -537,16 +537,15 @@ public abstract class GObject extends RefCountedObject {
         } else if (value instanceof String) {
             return Long.parseLong((String) value);
         }
-        throw new IllegalArgumentException("Expected long value, not " + value.getClass());
+        throw new IllegalArgumentException("Expected long value, not " + value.getClass() + " " + value.getClass().getName());
     }
     
     private static long enumValue(Object value) {
     	if (value instanceof NativeEnum) {
     		return ((NativeEnum<?>)value).intValue();
-    	} else if (value instanceof Number) { 
-    		return ((Number)value).longValue();
-    	} 
-    	throw new IllegalArgumentException("Expected enum value, not " + value.getClass());
+    	} else {
+    		return longValue(value);
+    	}
     }
 
     private static boolean setGValue(GValue value, GType type, Object data) {
