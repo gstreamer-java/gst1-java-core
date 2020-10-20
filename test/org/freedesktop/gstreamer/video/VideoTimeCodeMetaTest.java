@@ -60,6 +60,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeMetaPal() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1,10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -88,6 +89,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCDrop() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -119,6 +121,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCDropFrame() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -147,6 +150,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCNonDrop() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
