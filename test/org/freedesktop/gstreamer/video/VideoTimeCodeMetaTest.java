@@ -53,7 +53,7 @@ public class VideoTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             assertFalse("Default video not contains timecode metadata", buffer.hasMeta(VideoTimeCodeMeta.API));
-        }, "videotestsrc do-timestamp=true ! x264enc  ! mxfmux ! decodebin ! appsink name=myappsink");
+        }, "videotestsrc do-timestamp=true ! appsink name=myappsink");
     }
 
     @Test
