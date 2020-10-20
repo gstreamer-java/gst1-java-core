@@ -158,12 +158,21 @@ public class PropertyTypeTest {
 
     @Test
     public void setEnum() {
-        audiotestsrc.set("wave", 8);
-        assertEquals(8, audiotestsrc.get("wave"));
+        audiotestsrc.set("wave", 1);
+        assertEquals(1, audiotestsrc.get("wave"));
+        
+        audiotestsrc.set("wave", 2L);
+        assertEquals(2, audiotestsrc.get("wave"));
 
-        audiotestsrc.setAsString("wave", "Silence");
+        audiotestsrc.set("wave", "3");
+        assertEquals(3, audiotestsrc.get("wave"));
+
+        audiotestsrc.set("wave", AudioTestSrcWave.SILENCE);
         assertEquals(4, audiotestsrc.get("wave"));
-        assertEquals("Silence", audiotestsrc.getAsString("wave"));
+
+        audiotestsrc.setAsString("wave", "white-noise");
+        assertEquals(5, audiotestsrc.get("wave"));
+	    assertEquals("White uniform noise", audiotestsrc.getAsString("wave"));
 
         audiotestsrc.setAsString("wave", "square");
         assertEquals(1, audiotestsrc.get("wave"));
@@ -171,18 +180,16 @@ public class PropertyTypeTest {
 
         audiotestsrc.setAsString("wave", "red-noise");
         assertEquals(10, audiotestsrc.get("wave"));
+        
         String redNoise = audiotestsrc.getAsString("wave");
         assertEquals("Red (brownian) noise", redNoise);
+        
         audiotestsrc.setAsString("wave", redNoise);
         assertEquals(10, audiotestsrc.get("wave"));
         
         // invalid value
         audiotestsrc.set("wave", -256);
-        assertEquals(0, audiotestsrc.get("wave"));
-
-        audiotestsrc.set("wave", AudioTestSrcWave.GAUSSIAN_NOISE);
-        assertEquals(AudioTestSrcWave.GAUSSIAN_NOISE.intValue(), audiotestsrc.get("wave"));
-
+        assertEquals(0, audiotestsrc.get("wave"));        
     }
 
     @Test(expected = IllegalArgumentException.class)

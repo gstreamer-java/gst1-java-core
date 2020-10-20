@@ -357,14 +357,12 @@ public abstract class GObject extends RefCountedObject {
             }
         } else if (propType.equals(GType.OBJECT)) {
             GVALUE_API.g_value_set_object(propValue, (GObject) data);
-        } else if (GVALUE_API.g_value_type_transformable(GType.ENUM, propType)) {
-    		transform(new NativeLong(enumValue(data)), GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.INT64, propType)) {
-            transform(data, GType.INT64, propValue);
+    		transform(enumValue(data), GType.INT64, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.LONG, propType)) {
             transform(data, GType.LONG, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.INT, propType)) {
-            transform(data, GType.INT, propValue);
+    		transform(enumValue(data), GType.INT, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.DOUBLE, propType)) {
             transform(data, GType.DOUBLE, propValue);
         } else if (GVALUE_API.g_value_type_transformable(GType.FLOAT, propType)) {
@@ -537,14 +535,14 @@ public abstract class GObject extends RefCountedObject {
         } else if (value instanceof String) {
             return Long.parseLong((String) value);
         }
-        throw new IllegalArgumentException("Expected long value, not " + value.getClass() + " " + value.getClass().getName());
+        throw new IllegalArgumentException("Expected long value, not " + value.getClass());
     }
     
-    private static long enumValue(Object value) {
+    private static int enumValue(Object value) {
     	if (value instanceof NativeEnum) {
     		return ((NativeEnum<?>)value).intValue();
     	} else {
-    		return longValue(value);
+    		return intValue(value);
     	}
     }
 
