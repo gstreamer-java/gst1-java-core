@@ -53,13 +53,14 @@ public class VideoTimeCodeMetaTest {
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             assertFalse("Default video not contains timecode metadata", buffer.hasMeta(VideoTimeCodeMeta.API));
-        }, "videotestsrc do-timestamp=true ! x264enc  ! mxfmux ! decodebin ! appsink name=myappsink");
+        }, "videotestsrc do-timestamp=true ! appsink name=myappsink");
     }
 
     @Test
     public void testVideoTimeCodeMetaPal() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1,10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -88,6 +89,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCDrop() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -119,6 +121,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCDropFrame() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
@@ -147,6 +150,7 @@ public class VideoTimeCodeMetaTest {
     public void testVideoTimeCodeNTSCNonDrop() {
         // timecodestamper is available since 1.10
         TestAssumptions.requireGstVersion(1, 10);
+        TestAssumptions.requireElement("timecodestamper");
         SampleTester.test(sample -> {
             Buffer buffer = sample.getBuffer();
             if (Gst.testVersion(1, 14)) {
