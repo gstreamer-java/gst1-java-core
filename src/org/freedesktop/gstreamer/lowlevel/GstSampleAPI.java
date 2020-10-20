@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Christophe Lafolet
  * Copyright (c) 2015 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
@@ -21,22 +22,23 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.freedesktop.gstreamer.Buffer;
+import org.freedesktop.gstreamer.Caps;
 import org.freedesktop.gstreamer.Sample;
+import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 import org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.MiniObjectStruct;
 
 import com.sun.jna.Pointer;
-import java.util.Arrays;
-import java.util.List;
-import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.Caps;
-import org.freedesktop.gstreamer.lowlevel.GstAPI.GstSegmentStruct;
 
 /**
  * GstSampleAPI functions and structure
  * @see https://cgit.freedesktop.org/gstreamer/gstreamer/tree/gst/gstsample.c?h=1.8
  */
 public interface GstSampleAPI extends com.sun.jna.Library {
-    GstSampleAPI GSTMESSAGE_API = GstNative.load(GstSampleAPI.class);
+    GstSampleAPI GSTSAMPLE_API = GstNative.load(GstSampleAPI.class);
 
     public static final class SampleStruct extends com.sun.jna.Structure {
     	public volatile MiniObjectStruct mini_object;
@@ -66,5 +68,8 @@ public interface GstSampleAPI extends com.sun.jna.Library {
     
     /*@CallerOwnsReturn*/ Caps gst_sample_get_caps(Sample sample);
     /*@CallerOwnsReturn*/ Buffer gst_sample_get_buffer(Sample sample);
+    
+    void gst_sample_set_buffer(Sample sample, Buffer buffer);
+    void gst_sample_set_caps(Sample sample, Caps caps);
     
 }

@@ -1,20 +1,20 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2019 Christophe Lafolet
- * Copyright (c) 2019 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
  *                    2000 Wim Taymans <wtay@chello.be>
- * 
+ *
  * This file is part of gstreamer-java.
  *
- * This code is free software: you can redistribute it and/or modify it under 
+ * This code is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3 only, as
  * published by the Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * version 3 for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
@@ -31,9 +31,14 @@ import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.BufferStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBufferAPI.MapInfoStruct;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GType;
+import org.freedesktop.gstreamer.lowlevel.GstMetaPtr;
 
 /**
  * Buffers are the basic unit of data transfer in GStreamer. They contain the
@@ -62,7 +67,7 @@ public class Buffer extends MiniObject {
      * Creates a newly allocated buffer with data of the given size. The buffer
      * memory is not cleared. If the requested amount of memory cannot be
      * allocated, an exception will be thrown.
-     *
+     * <p>
      * Note that when size == 0, the buffer data pointer will be NULL.
      *
      * @param size
@@ -240,7 +245,7 @@ public class Buffer extends MiniObject {
 
     /**
      * Get the GstBufferFlags describing this buffer.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @return an EnumSet of {@link BufferFlags}
@@ -253,9 +258,74 @@ public class Buffer extends MiniObject {
     }
 
     /**
+     * Get the metadata for api on buffer. When there is no such metadata, NULL
+     * is returned.
+     *
+     * @param <T> implementation type of metadata
+     * @param api api type of metadata
+     * @return meta or null
+     */
+    public <T extends Meta> T getMeta(Meta.API<T> api) {
+        GType apiType = api.getAPIGType();
+        if (apiType == GType.INVALID) {
+            return null;
+        }
+        GstMetaPtr ptr = GSTBUFFER_API.gst_buffer_get_meta(this, apiType);
+        // can not create metadata class from null pointer
+        if (ptr == null) {
+            return null;
+        }
+        return Natives.objectFor(ptr, api.getImplClass(), false, false);
+    }
+    
+    /**
+     * Iterate all Meta on buffer.
+     * 
+     * @return iterator of meta
+     */
+    public Iterator<Meta> iterateMeta() {
+        return new MetaIterator(this);
+    }
+
+    /**
+     * Check if buffer contains metadata for api.
+     * <p>
+     * Since GStreamer 1.14
+     *
+     * @param <T> implementation type of metadata
+     * @param api type of metadata
+     * @return return true only if buffer contains selected type of metadata
+     */
+    @Gst.Since(minor = 14)
+    public <T extends Meta> boolean hasMeta(Meta.API<T> api) {
+        return getMetaCount(api) > 0;
+    }
+
+    /**
+     * Check number of metadata for api. There can be more than one metadata in
+     * case of multiple video/audio layer.
+     * <p>
+     * Since GStreamer 1.14
+     *
+     * @param <T> implementation type of metadata
+     * @param api type of metadata
+     * @return count of metadata of provided api type
+     */
+    @Gst.Since(minor = 14)
+    public <T extends Meta> int getMetaCount(Meta.API<T> api) {
+        Gst.checkVersion(1, 14);
+        GType apiType = api.getAPIGType();
+        if (apiType == GType.INVALID) {
+            return 0;
+        }
+        return GSTBUFFER_API.gst_buffer_get_n_meta(this, apiType);
+    }
+
+
+    /**
      * Set some of the GstBufferFlags describing this buffer. This is a union
      * operation and does not clear flags that are not mentioned.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @param flags an EnumSet of {@link BufferFlags} to be set on the buffer.
@@ -270,7 +340,7 @@ public class Buffer extends MiniObject {
     /**
      * unset the GstBufferFlags describing this buffer. This is a difference
      * operation and does not clear flags that are not mentioned.
-     *
+     * <p>
      * Since GStreamer 1.10
      *
      * @param flags an EnumSet of {@link BufferFlags} to be cleared on the buffer.
@@ -281,6 +351,47 @@ public class Buffer extends MiniObject {
     public boolean unsetFlags(EnumSet<BufferFlags> flags) {
         Gst.checkVersion(1, 10);
         return GstBufferAPI.GSTBUFFER_API.gst_buffer_unset_flags(this, NativeFlags.toInt(flags));
+    }
+
+    private static class MetaIterator implements Iterator<Meta> {
+
+        private final PointerByReference state;
+        private final Buffer buffer;
+        private Meta next;
+
+        MetaIterator(final Buffer buffer) {
+            state = new PointerByReference();
+            this.buffer = buffer;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (next == null) {
+                next = getNext();
+            }
+            return next != null;
+        }
+        
+        @Override
+        public Meta next() {
+            if (!hasNext() || next == null) {
+                throw new NoSuchElementException();
+            }
+            Meta m = next;
+            next = null;
+            return m;
+        }
+
+        private Meta getNext() {
+            return Natives.objectFor(
+                    GSTBUFFER_API.gst_buffer_iterate_meta(this.buffer, this.state),
+                    Meta.class,
+                    false,
+                    false
+            );
+        }
+
+
     }
 
 }

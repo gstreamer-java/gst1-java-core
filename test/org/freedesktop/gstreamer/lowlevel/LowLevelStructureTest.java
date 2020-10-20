@@ -17,12 +17,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sun.jna.Structure;
+import java.util.Arrays;
 import org.freedesktop.gstreamer.Gst;
 
-/**
- *
- * @author Neil C Smith
- */
 public class LowLevelStructureTest {
 
     private final static Logger LOG = Logger.getLogger(LowLevelStructureTest.class.getName());
@@ -88,9 +85,14 @@ public class LowLevelStructureTest {
 
         }
         try {
-            Method getFieldOrder = inst.getClass().getDeclaredMethod("getFieldOrder");
-            getFieldOrder.setAccessible(true);
-            fields = (List<String>) getFieldOrder.invoke(inst);
+            Structure.FieldOrder fieldOrder = inst.getClass().getAnnotation(Structure.FieldOrder.class);
+            if (fieldOrder != null) {
+                fields = Arrays.asList(fieldOrder.value());
+            } else {
+                Method getFieldOrder = inst.getClass().getDeclaredMethod("getFieldOrder");
+                getFieldOrder.setAccessible(true);
+                fields = (List<String>) getFieldOrder.invoke(inst);
+            }
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Can't find getFieldOrder() method", ex);
             assertTrue(false);
@@ -110,7 +112,7 @@ public class LowLevelStructureTest {
     }
 
     private static void initStructList() {
-        structs = new ArrayList<Class<? extends Structure>>();
+        structs = new ArrayList<>();
 
         structs.add(BaseSinkAPI.GstBaseSinkStruct.class);
         structs.add(BaseSinkAPI.GstBaseSinkClass.class);
@@ -164,6 +166,10 @@ public class LowLevelStructureTest {
         structs.add(GstElementAPI.GstElementClass.class);
 
         structs.add(GstEventAPI.EventStruct.class);
+        structs.add(GstVideoAPI.GstVideoTimeCodeMetaStruct.class);
+        structs.add(GstVideoAPI.GstVideoTimeCodeStruct.class);
+        structs.add(GstMetaAPI.GstMetaInfoStruct.class);
+        structs.add(GstMetaAPI.GstMetaStruct.class);
 
 //        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceStruct.class);
 //        structs.add(GstInterpolationControlSourceAPI.GstInterpolationControlSourceClass.class);
