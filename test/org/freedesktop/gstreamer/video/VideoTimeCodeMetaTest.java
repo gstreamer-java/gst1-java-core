@@ -20,7 +20,6 @@
 package org.freedesktop.gstreamer.video;
 
 import org.freedesktop.gstreamer.Buffer;
-import org.freedesktop.gstreamer.BufferProbeTester;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.SampleTester;
 import org.freedesktop.gstreamer.util.TestAssumptions;

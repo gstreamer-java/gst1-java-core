@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2020 John Cortell
  *
  * This file is part of gstreamer-java.

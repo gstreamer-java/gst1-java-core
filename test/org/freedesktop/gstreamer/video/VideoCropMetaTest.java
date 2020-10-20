@@ -55,5 +55,4 @@ public class VideoCropMetaTest {
         }, "videotestsrc ! videocrop top=10 left=10 bottom=50 right=50 ! fakevideosink name=sink");
     }
     
-    
 }
