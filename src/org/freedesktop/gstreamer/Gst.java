@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2007 Wayne Meissner
  * 
@@ -23,6 +23,7 @@ import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.event.Event;
 import org.freedesktop.gstreamer.glib.GError;
+
 import static org.freedesktop.gstreamer.lowlevel.GstAPI.GST_API;
 
 import java.util.ArrayList;
@@ -56,9 +57,12 @@ import org.freedesktop.gstreamer.controller.Controllers;
 import org.freedesktop.gstreamer.elements.Elements;
 import org.freedesktop.gstreamer.glib.GLib;
 import org.freedesktop.gstreamer.glib.GMainContext;
+import org.freedesktop.gstreamer.video.Video;
+
 import static org.freedesktop.gstreamer.lowlevel.GstParseAPI.GSTPARSE_API;
 import static org.freedesktop.gstreamer.glib.Natives.registration;
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
+
 import org.freedesktop.gstreamer.webrtc.WebRTC;
 
 /**
@@ -648,7 +652,8 @@ public final class Gst {
                 new Query.Types(),
                 new Controllers(),
                 new Elements(),
-                new WebRTC.Types())
+                new WebRTC.Types(),
+                new Video.Types())
                 .flatMap(NativeObject.TypeProvider::types)
                 .forEachOrdered(GstTypes::register);
         if (!DISABLE_EXTERNAL) {
