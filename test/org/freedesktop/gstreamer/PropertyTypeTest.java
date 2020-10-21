@@ -19,6 +19,7 @@
  */
 package org.freedesktop.gstreamer;
 
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -176,6 +177,12 @@ public class PropertyTypeTest {
         // invalid value
         audiotestsrc.set("wave", -256);
         assertEquals(0, audiotestsrc.get("wave"));
+        
+        // native enum
+        audiotestsrc.set("wave", AudioTestSrcWave.SILENCE);
+        assertEquals(AudioTestSrcWave.SILENCE.intValue(), audiotestsrc.get("wave"));
+        assertEquals("Silence", audiotestsrc.getAsString("wave"));
+        
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -194,4 +201,32 @@ public class PropertyTypeTest {
         assertTrue(mixMatrix.contains("0.6"));
         assertTrue(mixMatrix.contains("0.8"));
     }
+    
+     private static enum AudioTestSrcWave implements NativeEnum<AudioTestSrcWave>{
+        SINE(0),
+        SQUARE(1),
+        SAW(2),
+        TRIANGLE(3),
+        SILENCE(4),
+        WHITE_NOISE(5),
+        PINK_NOISE(6),
+        SINE_TABLE(7),
+        TICKS(8),
+        GAUSSIAN_NOISE(9),
+        RED_NOISE(10),
+        BLUE_NOISE(11),
+        VIOLET_NOISE(12);
+
+        private final int value;
+
+        private AudioTestSrcWave(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int intValue() {
+            return value;
+        }
+    }
+    
 }

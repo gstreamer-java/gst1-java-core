@@ -303,13 +303,17 @@ public abstract class GObject extends RefCountedObject {
      *
      * @param property The property to set.
      * @param data The value for the property. This must be of the type expected
-     * by gstreamer.
+     * by gstreamer. As a convenience, NativeEnums will be converted to their
+     * int value.
      */
     public void set(String property, Object data) {
         LOG.entering("GObject", "set", new Object[]{property, data});
         GObjectAPI.GParamSpec propertySpec = findProperty(property);
         if (propertySpec == null /*|| data == null*/) {
             throw new IllegalArgumentException("Unknown property: " + property);
+        }
+        if (data instanceof NativeEnum) {
+            data = ((NativeEnum<?>) data).intValue();
         }
         final GType propType = propertySpec.value_type;
 
