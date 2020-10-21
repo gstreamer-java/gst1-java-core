@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -90,10 +90,10 @@ import static org.freedesktop.gstreamer.lowlevel.GstClockAPI.GSTCLOCK_API;
  * "window-threshold" defines the minimum number of samples before the 
  * calibration is performed.
  */
-// @TODO finish off API after removing ClockTime from mappings.
 public class Clock extends GstObject {
     public static final String GTYPE_NAME = "GstClock";
 
+    @Deprecated // should be package private
     public Clock(Initializer init) {
         super(init); 
     }
@@ -191,8 +191,26 @@ public class Clock extends GstObject {
      * @param rateNumerator the numerator of the rate of the clock relative to its internal time
      * @param rateDenominator the denominator of the rate of the clock
      */
+    @Deprecated
     public void getCalibration(long internal, long external, long rateNumerator, long rateDenominator) {
         GSTCLOCK_API.gst_clock_set_calibration(this, internal, external, rateNumerator, rateDenominator);
+    }
+    
+    /**
+     * Gets the internal rate and reference time of clock. See
+     * {@link #setCalibration} for more information.
+     *
+     * @return calibration
+     */
+    public Calibration getCalibration() {
+        long[] internalPtr = new long[1];
+        long[] externalPtr = new long[1];
+        long[] rateNumPtr = new long[1];
+        long[] rateDenomPtr = new long[1];
+        GSTCLOCK_API.gst_clock_get_calibration(this, internalPtr,
+                externalPtr, rateNumPtr, rateDenomPtr);
+        return new Calibration(internalPtr[0], externalPtr[0],
+                rateNumPtr[0], rateDenomPtr[0]);
     }
     
     /**
@@ -255,4 +273,105 @@ public class Clock extends GstObject {
     public ClockID newPeriodicID(long startTime, long interval) {
         return GSTCLOCK_API.gst_clock_new_periodic_id(this, startTime, interval);
     }
+    
+    /**
+     * Data storage for clock calibration.
+     */
+    public static final class Calibration {
+        
+        private final long internal;
+        private final long external;
+        private final long rateNum;
+        private final long rateDenom;
+
+        private Calibration(long internal, long external, long rateNum, long rateDenom) {
+            this.internal = internal;
+            this.external = external;
+            this.rateNum = rateNum;
+            this.rateDenom = rateDenom;
+        }
+
+        /**
+         * The internal time.
+         * 
+         * @return internal time
+         */
+        public long internal() {
+            return internal;
+        }
+
+        /**
+         * The external time.
+         * 
+         * @return external time
+         */
+        public long external() {
+            return external;
+        }
+
+        /**
+         * The rate numerator.
+         * 
+         * @return rate numerator
+         */
+        public long rateNum() {
+            return rateNum;
+        }
+
+        /**
+         * The rate denominator.
+         * 
+         * @return rate denominator
+         */
+        public long rateDenom() {
+            return rateDenom;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 59 * hash + (int) (this.internal ^ (this.internal >>> 32));
+            hash = 59 * hash + (int) (this.external ^ (this.external >>> 32));
+            hash = 59 * hash + (int) (this.rateNum ^ (this.rateNum >>> 32));
+            hash = 59 * hash + (int) (this.rateDenom ^ (this.rateDenom >>> 32));
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Calibration other = (Calibration) obj;
+            if (this.internal != other.internal) {
+                return false;
+            }
+            if (this.external != other.external) {
+                return false;
+            }
+            if (this.rateNum != other.rateNum) {
+                return false;
+            }
+            if (this.rateDenom != other.rateDenom) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Calibration{" + "internal=" + internal + ", external=" + external
+                    + ", rateNum=" + rateNum + ", rateDenom=" + rateDenom + '}';
+        }
+        
+        
+    }
+    
+    
 }
