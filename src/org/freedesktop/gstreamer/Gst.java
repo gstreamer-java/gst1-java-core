@@ -693,6 +693,7 @@ public final class Gst {
                     registration(Registry.class, Registry.GTYPE_NAME, Registry::new),
                     registration(SDPMessage.class, SDPMessage.GTYPE_NAME, SDPMessage::new),
                     registration(Sample.class, Sample.GTYPE_NAME, Sample::new),
+                    registration(Structure.class, Structure.GTYPE_NAME, Structure::new),
                     registration(TagList.class, TagList.GTYPE_NAME, TagList::new)
             );
         }

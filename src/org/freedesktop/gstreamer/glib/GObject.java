@@ -201,10 +201,7 @@ public abstract class GObject extends RefCountedObject {
             Class<? extends NativeObject> cls = GstTypes.classFor(propType);
             if (cls != null) {
                 Pointer ptr = GVALUE_API.g_value_get_boxed(propValue);
-                final GPointer gptr = GObject.class.isAssignableFrom(cls) ? new GObjectPtr(ptr)
-                        : MiniObject.class.isAssignableFrom(cls) ? new GstMiniObjectPtr(ptr)
-                        : new GPointer(ptr);
-                return objectFor(gptr, cls, -1, true);
+                return Natives.objectFor(ptr, cls, true, true);
             }
         }
         throw new IllegalArgumentException("Unknown conversion from GType=" + propType);
