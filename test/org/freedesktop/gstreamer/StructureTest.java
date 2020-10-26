@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 Neil C Smith
+ * Copyright (c) 2009 Levente Farkas
+ * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm> 
+ * Copyright (C) 2007 Wayne Meissner
+ * 
+ * This code is free software: you can redistribute it and/or modify it under 
+ * the terms of the GNU Lesser General Public License version 3 only, as
+ * published by the Free Software Foundation.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License 
+ * version 3 for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.glib.GCancellable;
@@ -11,17 +29,19 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import org.freedesktop.gstreamer.util.TestAssumptions;
 
 import static org.junit.Assert.*;
 
 public class StructureTest {
-	private Structure structure;
-	
+
+    private Structure structure;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("StructureTest", new String[] {});
+        Gst.init(Gst.getVersion(), "StructureTest");
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
@@ -29,32 +49,33 @@ public class StructureTest {
 
     @Before
     public void setUp() {
-    	structure = new Structure("nazgul");
+        structure = new Structure("nazgul");
     }
-    
-	@Test
-	public void testGetName() {
-		assertEquals("nazgul", structure.getName());
-	}
 
-	@Test
-	public void testGetValue() {
-		structure.setValue("uint", GType.UINT, 9); 
-		assertEquals(9, structure.getValue("uint"));	
-		
-		try {
-			structure.getValue("noexist");
-			fail("Structure.InvalidFieldException should have been thrown");
-		} catch (Structure.InvalidFieldException e) {}
-		
-		structure.setDouble("double", 9.0);		
-		assertEquals(9.0, structure.getValue("double"));		
+    @Test
+    public void testGetName() {
+        assertEquals("nazgul", structure.getName());
+    }
 
-		structure.setValue("bool", GType.BOOLEAN, true); 
-		assertEquals(true, structure.getValue("bool"));
-		
-	}
-    
+    @Test
+    public void testGetValue() {
+        structure.setValue("uint", GType.UINT, 9);
+        assertEquals(9, structure.getValue("uint"));
+
+        try {
+            structure.getValue("noexist");
+            fail("Structure.InvalidFieldException should have been thrown");
+        } catch (Structure.InvalidFieldException e) {
+        }
+
+        structure.setDouble("double", 9.0);
+        assertEquals(9.0, structure.getValue("double"));
+
+        structure.setValue("bool", GType.BOOLEAN, true);
+        assertEquals(true, structure.getValue("bool"));
+
+    }
+
     @Test
     public void testGetValues() {
         GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
@@ -75,16 +96,16 @@ public class StructureTest {
         } catch (Structure.InvalidFieldException ex) {
         }
     }
-    
-	@Test
-	public void testGetInteger() {
-		structure.setInteger("int", 9);		
-		assertEquals(9, structure.getInteger("int"));
-		
-		structure.setInteger("int", -9);		
-		assertEquals(-9, structure.getInteger("int"));				
-	}
-    
+
+    @Test
+    public void testGetInteger() {
+        structure.setInteger("int", 9);
+        assertEquals(9, structure.getInteger("int"));
+
+        structure.setInteger("int", -9);
+        assertEquals(-9, structure.getInteger("int"));
+    }
+
     @Test
     public void testGetIntegers() {
         GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
@@ -96,28 +117,28 @@ public class StructureTest {
         assertTrue(in == ints);
         assertEquals(32, ints[0]);
         assertEquals(-49, ints[1]);
-        
+
         in = new int[1];
         ints = structure.getIntegers("integers", in);
         assertFalse(in == ints);
         assertEquals(32, ints[0]);
         assertEquals(-49, ints[1]);
-        
+
         structure.setInteger("single_integer", 18);
         int[] single = structure.getIntegers("single_integer", in);
         assertTrue(in == single);
         assertEquals(18, single[0]);
     }
 
-	@Test
-	public void testGetDouble() {
-		structure.setDouble("double", 9.0);		
-		assertEquals(9.0, structure.getDouble("double"), 0);
-		
-		structure.setDouble("double", -9.0);		
-		assertEquals(-9.0, structure.getDouble("double"), 0);				
-	}
-    
+    @Test
+    public void testGetDouble() {
+        structure.setDouble("double", 9.0);
+        assertEquals(9.0, structure.getDouble("double"), 0);
+
+        structure.setDouble("double", -9.0);
+        assertEquals(-9.0, structure.getDouble("double"), 0);
+    }
+
     @Test
     public void testGetDoubles() {
         GValueAPI.GValueArray ar = new GValueAPI.GValueArray(2);
@@ -129,32 +150,32 @@ public class StructureTest {
         assertTrue(in == doubles);
         assertEquals(3.25, doubles[0], 0.001);
         assertEquals(79.6, doubles[1], 0.001);
-        
+
         in = new double[1];
         doubles = structure.getDoubles("doubles", in);
         assertFalse(in == doubles);
         assertEquals(3.25, doubles[0], 0.001);
         assertEquals(79.6, doubles[1], 0.001);
-        
+
         structure.setDouble("single_double", 18.2);
         double[] single = structure.getDoubles("single_double", in);
         assertTrue(in == single);
         assertEquals(18.2, single[0], 0.001);
     }
 
-	@Test
-	public void testFraction() {
-		structure.setFraction("fraction", 10, 1);
+    @Test
+    public void testFraction() {
+        structure.setFraction("fraction", 10, 1);
 
-		assertEquals(true, structure.hasField("fraction"));
+        assertEquals(true, structure.hasField("fraction"));
 
-		assertEquals(10, structure.getFraction("fraction").getNumerator());
-		assertEquals(1, structure.getFraction("fraction").getDenominator());
+        assertEquals(10, structure.getFraction("fraction").getNumerator());
+        assertEquals(1, structure.getFraction("fraction").getDenominator());
 
-		structure.setFraction("fraction", 17, 10);
-		assertEquals(17, structure.getFraction("fraction").getNumerator());
-		assertEquals(10, structure.getFraction("fraction").getDenominator());
-	}
+        structure.setFraction("fraction", 17, 10);
+        assertEquals(17, structure.getFraction("fraction").getNumerator());
+        assertEquals(10, structure.getFraction("fraction").getDenominator());
+    }
 
     @Test
     public void testValueListInteger() {
@@ -167,7 +188,7 @@ public class StructureTest {
     public void testValueListStrings() {
         Caps caps = Caps.fromString("video/x-raw,format={RGB, BGR, RGBx, BGRx}");
         List<String> formats = caps.getStructure(0).getValues(String.class, "format");
-        assertEquals(Arrays.asList("RGB", "BGR", "RGBx","BGRx"), formats);
+        assertEquals(Arrays.asList("RGB", "BGR", "RGBx", "BGRx"), formats);
     }
 
     @Test(expected = Structure.InvalidFieldException.class)
@@ -182,6 +203,7 @@ public class StructureTest {
         structure.setObject("whatever", Caps.GTYPE_NAME, notACapsInstance);
     }
 
+    @Test
     public void testSetUntypedObject() {
         GCancellable anyKindOfObject = new GCancellable();
         structure.setObject("whatever", GType.OBJECT.getTypeName(), anyKindOfObject);
@@ -189,6 +211,7 @@ public class StructureTest {
         Assert.assertSame(anyKindOfObject, value);
     }
 
+    @Test
     public void testSetObject() {
         GCancellable anyKindOfObject = new GCancellable();
         structure.setObject("whatever", GCancellable.GTYPE_NAME, anyKindOfObject);
@@ -201,5 +224,16 @@ public class StructureTest {
         structure.setObject("whatever", GCancellable.GTYPE_NAME, null);
         Object value = structure.getValue("whatever");
         Assert.assertNull(value);
+    }
+    
+    @Test
+    public void testIssue173() {
+        TestAssumptions.requireGstVersion(1, 16);
+        TestAssumptions.requireElement("srtsink");
+        
+        Element srtsink = ElementFactory.make("srtsink", "srtsink");
+        srtsink.set("uri", "srt://:8888/");
+        Object stats = srtsink.get("stats");
+        assertTrue(stats instanceof Structure);
     }
 }
