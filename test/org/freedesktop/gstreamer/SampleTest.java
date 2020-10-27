@@ -17,16 +17,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SampleTest {
@@ -36,59 +34,71 @@ public class SampleTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-    	Gst.init(Gst.getVersion(), "SampleTest");
+        Gst.init(Gst.getVersion(), "SampleTest");
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
     }
 
     @Test
-    @Ignore
-    // @TODO for some reason this test is unreliable on GitHub Actions.
     public void testGetCaps() {
-    	SampleTester.test((Sample sample) -> {
-    		Caps caps = sample.getCaps();
-    		Structure struct = caps.getStructure(0);
-    		String name = struct.getName();
-    		assertEquals("video/x-raw", name);
-    	});
+        SampleTester.test((Sample sample) -> {
+            Caps caps = sample.getCaps();
+            Structure struct = caps.getStructure(0);
+            String name = struct.getName();
+            assertEquals("video/x-raw", name);
+        });
     }
 
     @Test
     public void testGetBuffer() {
-    	SampleTester.test((Sample sample) -> {
-    		Buffer buffer = sample.getBuffer();
-    		assertEquals(1, buffer.getMemoryCount());
-    	});
+        SampleTester.test((Sample sample) -> {
+            Buffer buffer = sample.getBuffer();
+            assertEquals(1, buffer.getMemoryCount());
+        });
     }
-    
+
     @Test
-    public void testSetBuffer() {    	
-    	// since gst 1.16, the sample is recycled and keep a reference on the last buffer received
-		TestAssumptions.requireGstVersion(1, 16);
+    public void testSetBuffer() {
+        // since gst 1.16, the sample is recycled and keep a reference on the last buffer received
+        TestAssumptions.requireGstVersion(1, 16);
 
-    	SampleTester.test((Sample sample) -> {
-    		
-    		Buffer buffer = sample.getBuffer();
+        SampleTester.test((Sample sample) -> {
 
-    		int refCount = buffer.getRefCount();
-    		    		
-    		assertEquals(2, sample.getRefCount());
+            Buffer buffer = sample.getBuffer();
 
-    		// make sample writable
-    		Natives.unref(sample);
-    		
-    		// force sample to release the buffer
-    		sample.setBuffer(null);
-    		
-    		Natives.ref(sample);
-    		
-    		assertEquals(2, sample.getRefCount());
-    		
-    		assertEquals(refCount-1, buffer.getRefCount());
-    	});
+            int refCount = buffer.getRefCount();
+
+            assertEquals(2, sample.getRefCount());
+
+            // make sample writable
+            Natives.unref(sample);
+
+            // force sample to release the buffer
+            sample.setBuffer(null);
+
+            Natives.ref(sample);
+
+            assertEquals(2, sample.getRefCount());
+
+            assertEquals(refCount - 1, buffer.getRefCount());
+        });
     }
-    
+
+    @Test
+    public void testSampleTester() {
+        try {
+            SampleTester.test(sample -> {
+                throw new IllegalStateException();
+            });
+        } catch (Throwable t) {
+            assertTrue(t instanceof AssertionError);
+            assertTrue(t.getCause() instanceof IllegalStateException);
+            return;
+        }
+        fail("No exception thrown");
+    }
+
 }
