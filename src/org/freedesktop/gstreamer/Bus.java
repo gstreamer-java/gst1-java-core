@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -855,7 +855,7 @@ public class Bus extends GstObject {
         }
 
         public void busMessage(final Bus bus, final Message msg) {
-            if ((type.intValue() & msg.getType().intValue()) != 0) {
+            if (type == MessageType.ANY || type == msg.getType()) {
                 callback.callback(bus, msg, null);
             }
         }
