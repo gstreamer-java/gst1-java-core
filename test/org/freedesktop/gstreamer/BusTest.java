@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -16,23 +17,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.message.Message;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.sun.jna.Platform;
+import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 import org.freedesktop.gstreamer.message.EOSMessage;
+import org.freedesktop.gstreamer.message.MessageType;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,20 +41,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
-import org.freedesktop.gstreamer.message.DurationChangedMessage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class BusTest {    
+public class BusTest {
+
     public BusTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("BusTest", new String[] {});
+        Gst.init("BusTest", new String[]{});
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
@@ -67,10 +65,11 @@ public class BusTest {
     @After
     public void tearDown() throws Exception {
     }
+
     @Test
     public void endOfStream() {
-        final TestPipe pipe  = new TestPipe("endOfStream");
-        
+        final TestPipe pipe = new TestPipe("endOfStream");
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.EOS eosSignal = new Bus.EOS() {
@@ -95,34 +94,35 @@ public class BusTest {
         assertTrue("EOS signal not received", signalFired.get());
         pipe.dispose();
     }
+
     @Test
     public void stateChanged() {
         final TestPipe pipe = new TestPipe("stateChanged");
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        
+
         Bus.STATE_CHANGED stateChanged = new Bus.STATE_CHANGED() {
-           
+
             public void stateChanged(GstObject source, State old, State current, State pending) {
                 if (pending == State.PLAYING || current == State.PLAYING) {
                     signalFired.set(true);
                     pipe.quit();
                 }
             }
-            
+
         };
         pipe.getBus().connect(stateChanged);
-        GSTELEMENT_API.gst_element_post_message(pipe.pipe, 
+        GSTELEMENT_API.gst_element_post_message(pipe.pipe,
                 new StateChangedMessage(pipe.pipe, State.READY, State.PLAYING, State.VOID_PENDING));
         pipe.run();
         pipe.getBus().disconnect(stateChanged);
         assertTrue("STATE_CHANGED signal not received", signalFired.get());
         pipe.dispose();
     }
-    
+
     @Test
     public void errorMessage() {
         final TestPipe pipe = new TestPipe("errorMessage");
-       
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.ERROR errorSignal = new Bus.ERROR() {
@@ -134,7 +134,7 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(errorSignal);
-        
+
         GErrorStruct msg = new GErrorStruct();
         GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_error(pipe.src, msg, "testing error messages"));
         pipe.play().run();
@@ -143,10 +143,11 @@ public class BusTest {
         assertTrue("ERROR signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
+
     @Test
     public void warningMessage() {
         final TestPipe pipe = new TestPipe("warningMessage");
-       
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.WARNING signal = new Bus.WARNING() {
@@ -158,7 +159,7 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(signal);
-        
+
         GErrorStruct msg = new GErrorStruct();
         pipe.play();
         GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_warning(pipe.src, msg, "testing warning messages"));
@@ -168,13 +169,14 @@ public class BusTest {
         assertTrue("WARNING signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
+
     @Test
     public void infoMessage() {
         if (Platform.isWindows()) {
             return; // This test does not work on windows - gst_message_new_info() doesn't exist.
         }
         final TestPipe pipe = new TestPipe("infoMessage");
-       
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.INFO signal = new Bus.INFO() {
@@ -186,7 +188,7 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(signal);
-        
+
         GErrorStruct msg = new GErrorStruct();
         pipe.play();
         GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_info(pipe.src, msg, "testing warning messages"));
@@ -196,10 +198,11 @@ public class BusTest {
         assertTrue("INFO signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
+
     @Test
     public void bufferingData() {
         final TestPipe pipe = new TestPipe("bufferingData");
-       
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicInteger signalValue = new AtomicInteger(-1);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
@@ -222,10 +225,11 @@ public class BusTest {
         assertEquals("Wrong percent value received for signal", PERCENT, signalValue.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
+
     @Test
     public void tagsFound() {
         final TestPipe pipe = new TestPipe("tagsFound");
-       
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.TAG signal = new Bus.TAG() {
@@ -237,7 +241,7 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(signal);
-        
+
         TagList tagList = new TagList();
         GSTELEMENT_API.gst_element_post_message(pipe.src, GstMessageAPI.GSTMESSAGE_API.gst_message_new_tag(pipe.src, tagList));
         pipe.play().run();
@@ -246,8 +250,9 @@ public class BusTest {
         assertTrue("TAG signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
-    
-    @Test public void durationChanged() {
+
+    @Test
+    public void durationChanged() {
         final TestPipe pipe = new TestPipe("testDurationChanged");
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<>(null);
@@ -267,11 +272,11 @@ public class BusTest {
         assertTrue("DURATION signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
     }
-    
-    @Test public void anyMessage() {
+
+    @Test
+    public void anyMessage() {
         final TestPipe pipe = new TestPipe("anyMessage");
-       
-        
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.MESSAGE listener = new Bus.MESSAGE() {
@@ -295,10 +300,11 @@ public class BusTest {
         assertTrue("EOS signal not received", signalFired.get());
         pipe.dispose();
     }
-    @Test public void postMessage() {
+
+    @Test
+    public void postMessage() {
         final TestPipe pipe = new TestPipe();
-       
-        
+
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
         Bus.MESSAGE listener = new Bus.MESSAGE() {
@@ -315,4 +321,46 @@ public class BusTest {
         assertTrue("Message not posted", signalFired.get());
         assertEquals("Wrong source in message", pipe.src, signalSource.get());
     }
+
+    @Test
+    public void extendedMessageIssue202() {
+        final TestPipe pipe = new TestPipe("issue202");
+
+        final AtomicBoolean signalFired = new AtomicBoolean(false);
+        
+        Bus.MESSAGE msgListener = new Bus.MESSAGE() {
+
+            public void busMessage(Bus bus, Message msg) {
+                signalFired.set(true);
+            }
+        };
+        
+        Bus.ERROR errListener = new Bus.ERROR() {
+            @Override
+            public void errorMessage(GstObject source, int code, String message) {
+                // @TODO If used as flags, DEVICE_REMOVED and ERROR overlap.
+                // but an exception will be thrown in the executor and logged
+                // rather than this method being called - need a way to fail with
+                // executor exceptions in tests?
+            }
+        };
+        
+        pipe.getBus().connect(errListener);
+        pipe.getBus().connect(msgListener);
+
+        for (Element elem : pipe.pipe.getSources()) {
+            GSTELEMENT_API.gst_element_post_message(elem,
+                    GstMessageAPI.GSTMESSAGE_API
+                            .gst_message_new_custom(MessageType.DEVICE_REMOVED,
+                                    elem, null)
+                    );
+        }
+        pipe.play().run();
+        pipe.getBus().disconnect(msgListener);
+        pipe.getBus().disconnect(errListener);
+
+        assertTrue("Custom message not received", signalFired.get());
+        pipe.dispose();
+    }
+    
 }

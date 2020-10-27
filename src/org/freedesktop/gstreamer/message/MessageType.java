@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2019 Neil C Smith
+ * Copyright (C) 2020 Neil C Smith
  * Copyright (C) 2009 Levente Farkas
  * Copyright (C) 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
@@ -20,8 +20,10 @@
  */
 package org.freedesktop.gstreamer.message;
 
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.device.Device;
+import org.freedesktop.gstreamer.device.DeviceProvider;
 import org.freedesktop.gstreamer.glib.NativeEnum;
-
 
 /**
  * The different message types that are available.
@@ -31,7 +33,6 @@ import org.freedesktop.gstreamer.glib.NativeEnum;
  * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstMessage.html#GstMessageType</a>
  * <p>
  */
-
 // use NativeEnum not NativeFlags - from upstream definition
 // FIXME: 2.0: Make it NOT flags, just a regular 1,2,3,4.. enumeration
 public enum MessageType implements NativeEnum<MessageType> {
@@ -47,17 +48,17 @@ public enum MessageType implements NativeEnum<MessageType> {
      */
     EOS(1 << 0),
     /**
-     * An error occured. Whe the application receives an error message it should
-     * stop playback of the pipeline and not assume that more data will be
-     * played.
+     * An error occurred. When the application receives an error message it
+     * should stop playback of the pipeline and not assume that more data will
+     * be played.
      */
     ERROR(1 << 1),
     /**
-     * A warning occured.
+     * A warning occurred.
      */
     WARNING(1 << 2),
     /**
-     * An info message occured.
+     * An info message occurred.
      */
     INFO(1 << 3),
     /**
@@ -215,30 +216,47 @@ public enum MessageType implements NativeEnum<MessageType> {
     /**
      * Message indicating a {@link GObject} property has changed (Since 1.10)
      */
+    @Gst.Since(minor = 10)
     PROPERTY_NOTIFY(EXTENDED.intValue() + 3),
     /**
      * Message indicating a new {@link GstStreamCollection} is available (Since
      * 1.10)
      */
+    @Gst.Since(minor = 10)
     STREAM_COLLECTION(EXTENDED.intValue() + 4),
     /**
      * Message indicating the active selection of {@link GstStreams} has changed
      * (Since 1.10)
      */
+    @Gst.Since(minor = 10)
     STREAMS_SELECTED(EXTENDED.intValue() + 5),
     /**
      * Message indicating to request the application to try to play the given
      * URL(s). Useful if for example a HTTP 302/303 response is received with a
      * non-HTTP URL inside. (Since 1.10)
      */
+    @Gst.Since(minor = 10)
     REDIRECT(EXTENDED.intValue() + 6),
+    /**
+     * Message indicating a {@link Device} was changed by a
+     * {@link DeviceProvider} (Since 1.16)
+     */
+    @Gst.Since(minor = 16)
+    DEVICE_CHANGED(EXTENDED.intValue() + 7),
+    /**
+     * Message sent by elements to request the running time from the pipeline
+     * when an instant rate change should be applied (which may be in the past
+     * when the answer arrives). (Since 1.18)
+     */
+    @Gst.Since(minor = 18)
+    INSTANT_RATE_REQUEST(EXTENDED.intValue() + 8),
     /**
      * mask for all of the above messages.
      */
     ANY(~0);
 
     private final int type;
-    
+
     private MessageType(int type) {
         this.type = type;
     }
