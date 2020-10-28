@@ -55,7 +55,7 @@ public class QueryProbeTester {
         try {
             probe.await(5000);
         } catch (Throwable t) {
-            fail("Unexpected exception waiting for buffer\n" + t);
+            fail("Unexpected exception waiting for query\n" + t);
         } finally {
             pipe.stop();
         }
@@ -88,7 +88,7 @@ public class QueryProbeTester {
         	
             if (type == expectedQueryType) {
                 try {
-                    // Run the client's test logic on the buffer (only once)
+                    // Run the client's test logic on the query (only once)
                     try {
                     	if (callback != null)
                     		callback.accept(query);
