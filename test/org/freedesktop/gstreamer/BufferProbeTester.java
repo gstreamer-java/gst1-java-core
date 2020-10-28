@@ -23,18 +23,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
-
-import org.freedesktop.gstreamer.glib.GError;
 
 /**
  * Utility class for unit testing API that operates on a Buffer.
  * <p>
  * Call {@link BufferTester#test(Consumer)} and pass a callback which will
- * perform the test on a Buffer it is supplied. The callback runs on the
- * AppSink.NEW_SAMPLE thread. The sample is produced by a simple, ephemeral
- * pipeline that is fed by a video test source.
+ * perform the test on a Buffer it is supplied. The callback runs in a Pad data
+ * probe. The buffer is produced by a simple, ephemeral pipeline that is fed by
+ * a video test source.
  */
 public class BufferProbeTester {
 
@@ -49,28 +49,25 @@ public class BufferProbeTester {
     public static void test(Consumer<Buffer> callback, String pipelineDescription, int skipFrames) {
         assertNotNull("Pipeline description can not be null", pipelineDescription);
         assertFalse("Pipeline description can not be empty", pipelineDescription.isEmpty());
-        ArrayList<GError> errors = new ArrayList<>();
-        Bin bin = Gst.parseBinFromDescription(pipelineDescription, false, errors);
-        assertNotNull("Unable to create Bin from pipeline description: ", bin);
+        Pipeline pipe = (Pipeline) Gst.parseLaunch(pipelineDescription);
+        assertNotNull("Unable to create Pipeline from pipeline description: ", pipe);
 
-        Element sink = bin.getElementByName("sink");
+        Element sink = pipe.getElementByName("sink");
         Pad pad = sink.getStaticPad("sink");
         BufferProbe probe = new BufferProbe(callback, skipFrames);
         pad.addDataProbe(probe);
 
-        bin.play();
+        pipe.play();
 
         // Wait for the sample to arrive and for the client supplied test function to
         // complete
         try {
-            synchronized (probe) {
-                probe.wait();
-            }
-        } catch (InterruptedException e) {
-            fail("Unexpected interruption waiting for sample");
+            probe.await(5000);
+        } catch (Exception ex) {
+            fail("Unexpected exception waiting for buffer\n" + ex);
+        } finally {
+            pipe.stop();
         }
-
-        bin.stop();
 
         // If the test threw an exception on the sample listener thread, throw it here
         // (on the main thread)
@@ -81,8 +78,10 @@ public class BufferProbeTester {
 
     private static class BufferProbe implements Pad.DATA_PROBE {
 
-        private Consumer<Buffer> callback;
         private final int skipFrames;
+        private final CountDownLatch latch;
+        private final Consumer<Buffer> callback;
+
         private Throwable exception;
         private int counter = 0;
 
@@ -93,11 +92,12 @@ public class BufferProbeTester {
         BufferProbe(Consumer<Buffer> callback, int skip) {
             this.callback = callback;
             skipFrames = skip;
+            latch = new CountDownLatch(1);
         }
 
         @Override
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer) {
-            if (callback != null) {
+            if (latch.getCount() > 0) {
                 if (counter < skipFrames) {
                     counter++;
                     return PadProbeReturn.OK;
@@ -109,14 +109,17 @@ public class BufferProbeTester {
                     } catch (Throwable exc) {
                         exception = exc;
                     }
-                    callback = null;
                 } finally {
-                    synchronized (this) {
-                        notify();
-                    }
+                    latch.countDown();
                 }
             }
             return PadProbeReturn.OK;
+        }
+
+        void await(long millis) throws InterruptedException, TimeoutException {
+            if (!latch.await(millis, TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException();
+            }
         }
     }
 

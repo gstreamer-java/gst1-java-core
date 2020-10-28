@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2020 John Cortell
  *
  * This file is part of gstreamer-java.
@@ -16,19 +17,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import org.freedesktop.gstreamer.elements.AppSink;
-import org.freedesktop.gstreamer.glib.GError;
-
 
 /**
  * Utility class for unit testing API that operates on a Sample.
@@ -39,24 +39,55 @@ import org.freedesktop.gstreamer.glib.GError;
  * pipeline that is fed by a video test source.
  */
 public class SampleTester {
+
     public static void test(Consumer<Sample> callback) {
         test(callback, "videotestsrc ! videoconvert ! appsink name=myappsink");
     }
 
     public static void test(Consumer<Sample> callback, String pipelineDescription) {
-        new SampleTester(callback, pipelineDescription, 0);
+        test(callback, pipelineDescription, 0);
     }
 
     public static void test(Consumer<Sample> callback, String pipelineDescription, int skipFrames) {
-        new SampleTester(callback, pipelineDescription, skipFrames);
+        assertNotNull("Pipeline description can not be null", pipelineDescription);
+        assertFalse("Pipeline description can not be empty", pipelineDescription.isEmpty());
+        Pipeline pipe = (Pipeline) Gst.parseLaunch(pipelineDescription);
+        assertNotNull("Unable to create Pipeline from pipeline description: ", pipe);
+
+        AppSink appSink = (AppSink) pipe.getElementByName("myappsink");
+        appSink.set("emit-signals", true);
+
+        NewSampleListener sampleListener = new NewSampleListener(callback, skipFrames);
+        appSink.connect(sampleListener);
+
+        pipe.play();
+
+        // Wait for the sample to arrive and for the client supplied test function to
+        // complete
+        try {
+            sampleListener.await(5000);
+        } catch (Exception ex) {
+            fail("Unexpected exception waiting for sample\n" + ex);
+        } finally {
+            pipe.stop();
+            appSink.disconnect(sampleListener);
+        }
+
+        // If the test threw an exception on the sample listener thread, throw it here
+        // (on the main thread)
+        if (sampleListener.exception != null) {
+            throw new AssertionError(sampleListener.exception);
+        }
     }
 
     private static class NewSampleListener implements AppSink.NEW_SAMPLE {
-        private Consumer<Sample> callback;
+
+        private final Consumer<Sample> callback;
         private final int skipFrames;
+        private final CountDownLatch latch;
+
         private Throwable exception;
         private int counter = 0;
-
 
         NewSampleListener(Consumer<Sample> callback) {
             this(callback, 0);
@@ -65,11 +96,12 @@ public class SampleTester {
         NewSampleListener(Consumer<Sample> callback, int skip) {
             this.callback = callback;
             skipFrames = skip;
+            latch = new CountDownLatch(1);
         }
 
         @Override
         public FlowReturn newSample(AppSink appSink) {
-            if (callback != null) {
+            if (latch.getCount() > 0) {
                 Sample sample = appSink.pullSample();
                 if (counter < skipFrames) {
                     counter++;
@@ -80,55 +112,22 @@ public class SampleTester {
                     // Run the client's test logic on the sample (only once)
                     try {
                         callback.accept(sample);
-                    }
-                    catch (Throwable exc) {
+                    } catch (Throwable exc) {
                         exception = exc;
                     }
-                    callback = null;
-                }
-                finally {
-                    synchronized (this) {
-                        notify();
-                    }
+                } finally {
+                    latch.countDown();
                     sample.dispose();
                 }
             }
             return FlowReturn.OK;
         }
-    }
 
-    private SampleTester(Consumer<Sample> callback, String pipelineDescription, int skipFrames) {
-        assertNotNull("Pipeline description can not be null", pipelineDescription);
-        assertFalse("Pipeline description can not be empty", pipelineDescription.isEmpty());
-        ArrayList<GError> errors = new ArrayList<GError>();
-        Bin bin = Gst.parseBinFromDescription(pipelineDescription, false, errors);
-        assertNotNull("Unable to create Bin from pipeline description: ", bin);
-
-        AppSink appSink = (AppSink)bin.getElementByName("myappsink");
-        appSink.set("emit-signals", true);
-
-        NewSampleListener sampleListener = new NewSampleListener(callback, skipFrames);
-        appSink.connect(sampleListener);
-
-        bin.play();
-
-        // Wait for the sample to arrive and for the client supplied test function to
-        // complete
-        try {
-            synchronized (sampleListener) {
-                sampleListener.wait();
+        void await(long millis) throws InterruptedException, TimeoutException {
+            if (!latch.await(millis, TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException();
             }
-        } catch (InterruptedException e) {
-            fail("Unexpected interruption waiting for sample");
-        }
-
-        bin.stop();
-        appSink.disconnect(sampleListener);
-
-        // If the test threw an exception on the sample listener thread, throw it here
-        // (on the main thread)
-        if (sampleListener.exception != null) {
-            throw new AssertionError(sampleListener.exception);
         }
     }
+
 }
