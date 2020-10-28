@@ -40,7 +40,6 @@ import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.query.SeekingQuery;
 import org.freedesktop.gstreamer.query.SegmentQuery;
-import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -250,7 +249,6 @@ public class QueryTest {
     }
     @Test
     public void testAllocationQueryReception() {
-        TestAssumptions.requireElement("fakevideosink");
         QueryProbeTester.test(query -> {
         	assertTrue("Returned query not instance of AllocationQuery", query instanceof AllocationQuery);
         }, QueryType.ALLOCATION);
