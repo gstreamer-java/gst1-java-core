@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Christophe Lafolet 
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Wayne Meissner
  * 
@@ -20,9 +21,6 @@
 
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.query.QueryType;
-import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,16 +28,19 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.freedesktop.gstreamer.glib.Natives;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 import org.freedesktop.gstreamer.query.AllocationQuery;
 import org.freedesktop.gstreamer.query.DurationQuery;
 import org.freedesktop.gstreamer.query.FormatsQuery;
 import org.freedesktop.gstreamer.query.LatencyQuery;
 import org.freedesktop.gstreamer.query.PositionQuery;
+import org.freedesktop.gstreamer.query.Query;
+import org.freedesktop.gstreamer.query.QueryType;
 import org.freedesktop.gstreamer.query.SeekingQuery;
 import org.freedesktop.gstreamer.query.SegmentQuery;
+import org.freedesktop.gstreamer.util.TestAssumptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -247,4 +248,12 @@ public class QueryTest {
     	query = new AllocationQuery(caps, false);
         assertEquals(false, query.isPoolNeeded());
     }
+    @Test
+    public void testAllocationQueryReception() {
+        TestAssumptions.requireElement("fakevideosink");
+        QueryProbeTester.test(query -> {
+        	assertTrue("Returned query not instance of AllocationQuery", query instanceof AllocationQuery);
+        }, QueryType.ALLOCATION);
+    }
+
 }

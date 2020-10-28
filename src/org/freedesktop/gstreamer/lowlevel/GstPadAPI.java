@@ -31,6 +31,7 @@ import org.freedesktop.gstreamer.PadDirection;
 import org.freedesktop.gstreamer.PadLinkReturn;
 import org.freedesktop.gstreamer.PadProbeReturn;
 import org.freedesktop.gstreamer.PadTemplate;
+import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.lowlevel.GlibAPI.GDestroyNotify;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
@@ -161,6 +162,8 @@ public interface GstPadAPI extends com.sun.jna.Library {
     Event gst_pad_probe_info_get_event(GstPadProbeInfo probeInfo);
 
     Buffer gst_pad_probe_info_get_buffer(GstPadProbeInfo probeInfo);
+    
+    Query gst_pad_probe_info_get_query(GstPadProbeInfo probeInfo);
 
 //    NativeLong /* gulong */ gst_pad_add_data_probe(Pad pad, PadDataProbe handler, Pointer data);
 //

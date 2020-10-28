@@ -1,4 +1,5 @@
 /* 
+ * Copyright (C) 2020 Christophe Lafolet
  * Copyright (C) 2019 Neil C Smith
  * Copyright (C) 2018 Antonio Morales
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
@@ -33,6 +34,7 @@ import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstPadProbeInfo;
 import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
+import org.freedesktop.gstreamer.query.Query;
 
 import static org.freedesktop.gstreamer.lowlevel.GstPadAPI.GSTPAD_API;
 import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
@@ -81,7 +83,6 @@ public class Pad extends GstObject {
 
     public static final String GTYPE_NAME = "GstPad";
     
-    private static final int EVENT_HAS_INFO_MASK = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
     private final Handle handle;
 
     /**
@@ -397,7 +398,7 @@ public class Pad extends GstObject {
 //        	    System.out.println("CALLBACK " + probeInfo.padProbeType);
                 if ((probeInfo.padProbeType & mask) != 0) {
                     Event event = null;
-                    if ((probeInfo.padProbeType & EVENT_HAS_INFO_MASK) != 0) {
+                    if ((probeInfo.padProbeType & GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_BOTH) != 0) {
                         event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
                     }
                     return listener.eventReceived(pad, event);
@@ -454,6 +455,47 @@ public class Pad extends GstObject {
 
     public void removeDataProbe(DATA_PROBE listener) {
         removeCallback(DATA_PROBE.class, listener);
+    }
+
+    public void addQueryProbe(final QUERY_PROBE listener) {
+        final int mask = GstPadAPI.GST_PAD_PROBE_TYPE_QUERY_BOTH;
+        addQueryProbe(listener, mask);
+    }
+    
+    public void removeQueryProbe(QUERY_PROBE listener) {
+        removeCallback(QUERY_PROBE.class, listener);
+    }
+    
+    synchronized void addQueryProbe(final QUERY_PROBE listener, final int mask) {
+        final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
+            public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
+                if ((probeInfo.padProbeType & mask) != 0) {
+                    Query query = null;
+                    if ((probeInfo.padProbeType & GstPadAPI.GST_PAD_PROBE_TYPE_QUERY_BOTH) != 0) {
+                        query = GSTPAD_API.gst_pad_probe_info_get_query(probeInfo);
+                    }
+                    return listener.queryReceived(pad, query);
+                }
+
+                //We have to negate the return value to keep consistency with gstreamer's API
+                return PadProbeReturn.OK;
+            }
+        };
+
+        NativeLong id = handle.addProbe(mask, probe);
+        if (id.longValue() == 0) {
+            // the Probe was an IDLE-Probe and it was already handled synchronously in handle.addProbe,
+            // so no Callback needs to be registered
+            return;
+        }
+
+        GCallback cb = new GCallback(id, probe) {
+            @Override
+            protected void disconnect() {
+                handle.removeProbe(id);
+            }
+        };
+        addCallback(QUERY_PROBE.class, listener, cb);
     }
 
     /**
@@ -667,6 +709,18 @@ public class Pad extends GstObject {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
     }
+    
+    /**
+     * Signal emitted when new query is available on the {@link Pad}
+     *
+     * @see #addQueryProbe(QUERY_PROBE)
+     * @see #removeQueryProbe(QUERY_PROBE)
+     */
+    public static interface QUERY_PROBE {
+
+        public PadProbeReturn queryReceived(Pad pad, Query query);
+    }
+
     
     private static class Handle extends GstObject.Handle {
         
