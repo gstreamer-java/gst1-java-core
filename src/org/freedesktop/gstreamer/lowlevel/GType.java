@@ -141,7 +141,6 @@ public class GType extends IntegerType {
     }
     
     public String getTypeName() {
-    	if (this == INVALID) return "invalid";    
     	if (this.name == null) {
     		this.name = GOBJECT_API.g_type_name(this);
     		gTypeByNames.put(this.name, this);
@@ -150,7 +149,8 @@ public class GType extends IntegerType {
     }
     
     @Override
-	public String toString() {
-    	return "[" + this.getTypeName() + ":" + super.longValue() + "]";
+    public String toString() {
+        String gtypeName = this.equals(INVALID) ? "invalid" : this.getTypeName();
+    	return "[" + gtypeName + ":" + super.longValue() + "]";
     }
 }
