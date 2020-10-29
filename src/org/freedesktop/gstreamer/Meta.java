@@ -52,6 +52,12 @@ public class Meta extends NativeObject {
         super(handle);
     }
 
+    @Override
+    public String toString() {
+        GstMetaPtr pointer = (GstMetaPtr)this.getPointer();
+        return "[meta : gType=" + pointer.getGType() + "]";
+    }
+
     /**
      * NativeObject.Handle implementation.
      */
