@@ -20,6 +20,7 @@
 package org.freedesktop.gstreamer;
 
 import org.freedesktop.gstreamer.event.Event;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -125,6 +126,36 @@ public class PadTest {
         sink.sendEvent(ev2);
         assertNotSame("event_prober.probeEvent() should not have been called", ev2, e.get());
     }
+    
+    @Test
+    public void addProbe_Event() {
+        Element elem = ElementFactory.make("identity", "src");
+        Event ev = new TagEvent(new TagList());
+
+        Pad sink = elem.getStaticPad("sink");
+
+        final AtomicReference<Event> e = new AtomicReference<>();
+
+        Pad.PROBE probe = (Pad pad, PadProbeInfo info) -> {
+            assertTrue("Info type does not include event downstream",
+                    info.getType().contains(PadProbeType.EVENT_DOWNSTREAM));
+            e.set(info.getEvent());
+            return PadProbeReturn.OK;
+        };
+
+        sink.setActive(true);
+        sink.sendEvent(new FlushStopEvent());
+
+        sink.addProbe(PadProbeType.EVENT_BOTH, probe);
+        sink.sendEvent(ev);
+        assertEquals("Probe (Event) was not called", ev, e.get());
+
+        sink.removeProbe(probe);
+
+        Event ev2 = new TagEvent(new TagList());
+        sink.sendEvent(ev2);
+        assertNotSame("Probe (Event) should not have been called", ev2, e.get());
+    }
 
     @Test
     public void addDataProbe() {
@@ -152,13 +183,50 @@ public class PadTest {
 
         // push data
         FlowReturn res = src.push(buf);
-        assertEquals("event_prober.probeEvent() was not called", buf, b.get());
+        assertEquals("data_prober.probeData() was not called", buf, b.get());
 
         // remove the dataprobe
         src.removeDataProbe(data_probe);
 
         // push data
         res = src.push(buf2);
-        assertNotSame("event_prober.probeEvent() should not have been called", buf2, b.get());
+        assertNotSame("data_prober.probeData() should not have been called", buf2, b.get());
     }
+    
+    @Test
+    public void addProbe_Data() {
+
+        Element elem = ElementFactory.make("identity", "src");
+        Buffer buf = new Buffer(3);
+        Buffer buf2 = new Buffer(2);
+        final AtomicReference<Buffer> b = new AtomicReference<>();
+
+        Pad src = elem.getStaticPad("src");
+
+        Pad.PROBE probe = (Pad pad, PadProbeInfo info) -> {
+            assertTrue("Info type does not include buffer",
+                    info.getType().contains(PadProbeType.BUFFER));
+            assertTrue(info.getEvent() == null);
+            assertTrue(info.getQuery() == null);
+            b.set(info.getBuffer());
+            return PadProbeReturn.OK;
+        };
+
+        elem.play();
+
+        // add a dataprobe
+        src.addProbe(PadProbeType.BUFFER, probe);
+
+        // push data
+        FlowReturn res = src.push(buf);
+        assertEquals("Probe (Data) was not called", buf, b.get());
+
+        // remove the dataprobe
+        src.removeProbe(probe);
+
+        // push data
+        res = src.push(buf2);
+        assertNotSame("Probe (Data) should not have been called", buf2, b.get());
+    }
+    
 }
