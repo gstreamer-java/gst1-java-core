@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Christophe Lafolet
+ * Copyright (c) 2020 Christophe Lafolet
  * Copyright (c) 2007 Wayne Meissner
  *
  * This file is part of gstreamer-java.
@@ -149,7 +149,8 @@ public class GType extends IntegerType {
     }
     
     @Override
-	public String toString() {
-    	return "[" + this.getTypeName() + ":" + super.longValue() + "]";
+    public String toString() {
+        String gtypeName = this.equals(INVALID) ? "invalid" : this.getTypeName();
+    	return "[" + gtypeName + ":" + super.longValue() + "]";
     }
 }
