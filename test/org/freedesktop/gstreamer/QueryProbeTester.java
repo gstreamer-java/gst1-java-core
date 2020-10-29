@@ -34,10 +34,10 @@ import org.freedesktop.gstreamer.query.QueryType;
 
 public class QueryProbeTester {
     public static void test(Consumer<Query> callback, QueryType queryType) {
-        test(callback, "videotestsrc ! fakesink name=sink", queryType);
+        test(callback, queryType, "videotestsrc ! fakesink name=sink");
     }
 
-    public static void test(Consumer<Query> callback, String pipelineDescription, QueryType queryType) {
+    public static void test(Consumer<Query> callback, QueryType queryType, String pipelineDescription) {
         assertNotNull("Pipeline description can not be null", pipelineDescription);
         assertFalse("Pipeline description can not be empty", pipelineDescription.isEmpty());
         Pipeline pipe = (Pipeline) Gst.parseLaunch(pipelineDescription);
@@ -58,6 +58,7 @@ public class QueryProbeTester {
             fail("Unexpected exception waiting for query\n" + t);
         } finally {
             pipe.stop();
+            pad.removeQueryProbe(probe);
         }
 
         // If the test threw an exception on the sample listener thread, throw it here
