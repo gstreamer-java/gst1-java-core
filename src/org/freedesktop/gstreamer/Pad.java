@@ -431,6 +431,12 @@ public class Pad extends GstObject {
                 PadProbeInfo info = new PadProbeInfo(probeInfo);
                 PadProbeReturn ret = callback.probeCallback(pad, info);
                 info.invalidate();
+                if (ret == PadProbeReturn.REMOVE) {
+                    // don't want handle to try and remove in GCallback::disconnect
+                    // @TODO move to Map<PROBE, NativeLong> of probes over callback
+                    handle.probes.remove(probeInfo.id);
+                    removeCallback(PROBE.class, callback);
+                }
                 return ret;
             }
         };
@@ -468,16 +474,20 @@ public class Pad extends GstObject {
     synchronized void addEventProbe(final EVENT_PROBE listener, final int mask) {
         final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
-//        	    System.out.println("CALLBACK " + probeInfo.padProbeType);
                 if ((probeInfo.padProbeType & mask) != 0) {
                     Event event = null;
                     if ((probeInfo.padProbeType & EVENT_HAS_INFO_MASK) != 0) {
                         event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
                     }
-                    return listener.eventReceived(pad, event);
+                    PadProbeReturn ret = listener.eventReceived(pad, event);
+                    if (ret == PadProbeReturn.REMOVE) {
+                        // don't want handle to try and remove in GCallback::disconnect
+                        handle.probes.remove(probeInfo.id);
+                        removeCallback(EVENT_PROBE.class, listener);
+                    }
+                    return ret;
                 }
 
-                //We have to negate the return value to keep consistency with gstreamer's API
                 return PadProbeReturn.OK;
             }
         };
@@ -508,10 +518,15 @@ public class Pad extends GstObject {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
                 if ((probeInfo.padProbeType & GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER) != 0) {
                     Buffer buffer = GSTPAD_API.gst_pad_probe_info_get_buffer(probeInfo);
-                    return listener.dataReceived(pad, buffer);
+                    PadProbeReturn ret = listener.dataReceived(pad, buffer);
+                    if (ret == PadProbeReturn.REMOVE) {
+                        // don't want handle to try and remove in GCallback::disconnect
+                        handle.probes.remove(probeInfo.id);
+                        removeCallback(DATA_PROBE.class, listener);
+                    }
+                    return ret;
                 }
 
-                //We have to negate the return value to keep consistency with gstreamer's API
                 return PadProbeReturn.OK;
             }
         };
@@ -742,7 +757,7 @@ public class Pad extends GstObject {
     }
 
     /**
-     * Signal emitted when an event passes through this <tt>Pad</tt>.
+     * Probe for listening when an event passes through this Pad.
      *
      * @see #addEventProbe(EVENT_PROBE)
      * @see #removeEventProbe(EVENT_PROBE)
@@ -750,10 +765,11 @@ public class Pad extends GstObject {
     public static interface EVENT_PROBE {
 
         public PadProbeReturn eventReceived(Pad pad, Event event);
+        
     }
 
     /**
-     * Signal emitted when new data is available on the {@link Pad}
+     * Probe for listening when new data is available on the Pad.
      *
      * @see #addDataProbe(DATA_PROBE)
      * @see #removeDataProbe(DATA_PROBE)
@@ -761,6 +777,7 @@ public class Pad extends GstObject {
     public static interface DATA_PROBE {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
+        
     }
 
     private static class Handle extends GstObject.Handle {

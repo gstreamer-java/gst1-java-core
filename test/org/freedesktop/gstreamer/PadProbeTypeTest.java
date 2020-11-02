@@ -21,17 +21,10 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.lowlevel.GstPadAPI;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- *
- */
 public class PadProbeTypeTest {
     
 
