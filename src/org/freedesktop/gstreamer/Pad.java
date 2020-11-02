@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2019 Neil C Smith
+ * Copyright (C) 2020 Neil C Smith
  * Copyright (C) 2018 Antonio Morales
  * Copyright (C) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (C) 2009 Tamas Korodi <kotyo@zamba.fm>
@@ -28,6 +28,7 @@ import org.freedesktop.gstreamer.event.Event;
 import com.sun.jna.Pointer;
 import java.util.HashSet;
 import java.util.Set;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
@@ -80,7 +81,7 @@ import org.freedesktop.gstreamer.lowlevel.GstPadPtr;
 public class Pad extends GstObject {
 
     public static final String GTYPE_NAME = "GstPad";
-    
+
     private static final int EVENT_HAS_INFO_MASK = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_UPSTREAM;
     private final Handle handle;
 
@@ -95,7 +96,7 @@ public class Pad extends GstObject {
         super(handle, needRef);
         this.handle = handle;
     }
-    
+
     /**
      * Creates a new pad with the given name in the given direction. If name is
      * null, a guaranteed unique name (across all pads) will be assigned.
@@ -190,7 +191,7 @@ public class Pad extends GstObject {
      * filter contains the caps accepted by downstream in the preferred order.
      * filter might be NULL but if it is not NULL the returned caps will be a
      * subset of filter .
-     * 
+     *
      * @param filter Caps to filter by, or null
      * @return the {@link Caps} of the peer pad, or null if there is no peer
      * pad.
@@ -386,6 +387,85 @@ public class Pad extends GstObject {
         disconnect(UNLINKED.class, listener);
     }
 
+    /**
+     * Be notified of different states of pads. The provided callback is called
+     * for every state that matches mask.
+     * <p>
+     * Probes are called in groups: First {@link PadProbeType#BLOCK} probes are
+     * called, then others, then finally {@link PadProbeType#IDLE}. The only
+     * exception here are IDLE probes that are called immediately if the pad is
+     * already idle while calling addProbe(). In each of the groups, probes are
+     * called in the order in which they were added.
+     *
+     * @param mask set of mask flags for probe - common options are fields of
+     * {@link PadProbeType}
+     * @param callback callback that will be called with notifications of the
+     * pad state
+     */
+    public void addProbe(final Set<PadProbeType> mask, PROBE callback) {
+        addProbe(NativeFlags.toInt(mask), callback);
+    }
+    
+    /**
+     * Be notified of different states of pads. The provided callback is called
+     * for every state that matches mask.
+     * <p>
+     * Probes are called in groups: First {@link PadProbeType#BLOCK} probes are
+     * called, then others, then finally {@link PadProbeType#IDLE}. The only
+     * exception here are IDLE probes that are called immediately if the pad is
+     * already idle while calling addProbe(). In each of the groups, probes are
+     * called in the order in which they were added.
+     *
+     * @param mask mask flag for probe
+     * @param callback callback that will be called with notifications of the
+     * pad state
+     */
+    public void addProbe(PadProbeType mask, PROBE callback) {
+        addProbe(mask.intValue(), callback);
+    }
+    
+    synchronized void addProbe(int mask, PROBE callback) {
+        final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
+            @Override
+            public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
+                PadProbeInfo info = new PadProbeInfo(probeInfo);
+                PadProbeReturn ret = callback.probeCallback(pad, info);
+                info.invalidate();
+                if (ret == PadProbeReturn.REMOVE) {
+                    // don't want handle to try and remove in GCallback::disconnect
+                    // @TODO move to Map<PROBE, NativeLong> of probes over callback
+                    handle.probes.remove(probeInfo.id);
+                    removeCallback(PROBE.class, callback);
+                }
+                return ret;
+            }
+        };
+
+        NativeLong id = handle.addProbe(mask, probe);
+        if (id.longValue() == 0) {
+            // the Probe was an IDLE-Probe and it was already handled synchronously in handle.addProbe,
+            // so no Callback needs to be registered
+            return;
+        }
+
+        GCallback cb = new GCallback(id, probe) {
+            @Override
+            protected void disconnect() {
+                handle.removeProbe(id);
+            }
+        };
+        addCallback(PROBE.class, callback, cb);
+    }
+    
+    /**
+     * Remove the provided probe callback from the Pad.
+     * 
+     * @param callback callback to remove
+     */
+    public synchronized void removeProbe(PROBE callback) {
+        removeCallback(PROBE.class, callback);
+    }
+
     public void addEventProbe(final EVENT_PROBE listener) {
         final int mask = GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_BOTH | GstPadAPI.GST_PAD_PROBE_TYPE_EVENT_FLUSH;
         addEventProbe(listener, mask);
@@ -394,16 +474,20 @@ public class Pad extends GstObject {
     synchronized void addEventProbe(final EVENT_PROBE listener, final int mask) {
         final GstPadAPI.PadProbeCallback probe = new GstPadAPI.PadProbeCallback() {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
-//        	    System.out.println("CALLBACK " + probeInfo.padProbeType);
                 if ((probeInfo.padProbeType & mask) != 0) {
                     Event event = null;
                     if ((probeInfo.padProbeType & EVENT_HAS_INFO_MASK) != 0) {
                         event = GSTPAD_API.gst_pad_probe_info_get_event(probeInfo);
                     }
-                    return listener.eventReceived(pad, event);
+                    PadProbeReturn ret = listener.eventReceived(pad, event);
+                    if (ret == PadProbeReturn.REMOVE) {
+                        // don't want handle to try and remove in GCallback::disconnect
+                        handle.probes.remove(probeInfo.id);
+                        removeCallback(EVENT_PROBE.class, listener);
+                    }
+                    return ret;
                 }
 
-                //We have to negate the return value to keep consistency with gstreamer's API
                 return PadProbeReturn.OK;
             }
         };
@@ -434,10 +518,15 @@ public class Pad extends GstObject {
             public PadProbeReturn callback(Pad pad, GstPadProbeInfo probeInfo, Pointer user_data) {
                 if ((probeInfo.padProbeType & GstPadAPI.GST_PAD_PROBE_TYPE_BUFFER) != 0) {
                     Buffer buffer = GSTPAD_API.gst_pad_probe_info_get_buffer(probeInfo);
-                    return listener.dataReceived(pad, buffer);
+                    PadProbeReturn ret = listener.dataReceived(pad, buffer);
+                    if (ret == PadProbeReturn.REMOVE) {
+                        // don't want handle to try and remove in GCallback::disconnect
+                        handle.probes.remove(probeInfo.id);
+                        removeCallback(DATA_PROBE.class, listener);
+                    }
+                    return ret;
                 }
 
-                //We have to negate the return value to keep consistency with gstreamer's API
                 return PadProbeReturn.OK;
             }
         };
@@ -609,7 +698,6 @@ public class Pad extends GstObject {
     public boolean hasCurrentCaps() {
         return GSTPAD_API.gst_pad_has_current_caps(this);
     }
-    
 
     /**
      * Signal emitted when new this {@link Pad} is linked to another {@link Pad}
@@ -647,7 +735,29 @@ public class Pad extends GstObject {
     }
 
     /**
-     * Signal emitted when an event passes through this <tt>Pad</tt>.
+     * Callback used by
+     * {@link #addProbe(java.util.EnumSet, org.freedesktop.gstreamer.Pad.PROBE)}
+     */
+    public static interface PROBE {
+
+        /**
+         * Callback used by
+         * {@link #addProbe(java.util.EnumSet, org.freedesktop.gstreamer.Pad.PROBE)}.
+         * Gets called to notify about the current blocking type.
+         * <p>
+         * <b>The PadProbeInfo and any Buffer, Event or Query referenced from
+         * it, is only valid for the duration of the callback.</b>
+         *
+         * @param pad Pad that is blocked
+         * @param info PadProbeInfo with access to underlying data
+         * @return PadProbeReturn value
+         */
+        public PadProbeReturn probeCallback(Pad pad, PadProbeInfo info);
+
+    }
+
+    /**
+     * Probe for listening when an event passes through this Pad.
      *
      * @see #addEventProbe(EVENT_PROBE)
      * @see #removeEventProbe(EVENT_PROBE)
@@ -655,10 +765,11 @@ public class Pad extends GstObject {
     public static interface EVENT_PROBE {
 
         public PadProbeReturn eventReceived(Pad pad, Event event);
+        
     }
 
     /**
-     * Signal emitted when new data is available on the {@link Pad}
+     * Probe for listening when new data is available on the Pad.
      *
      * @see #addDataProbe(DATA_PROBE)
      * @see #removeDataProbe(DATA_PROBE)
@@ -666,12 +777,13 @@ public class Pad extends GstObject {
     public static interface DATA_PROBE {
 
         public PadProbeReturn dataReceived(Pad pad, Buffer buffer);
+        
     }
-    
+
     private static class Handle extends GstObject.Handle {
-        
+
         private final Set<NativeLong> probes;
-        
+
         private Handle(GstPadPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
             probes = new HashSet<>();
@@ -681,7 +793,7 @@ public class Pad extends GstObject {
         protected GstPadPtr getPointer() {
             return (GstPadPtr) super.getPointer();
         }
-        
+
         private synchronized NativeLong addProbe(int mask, GstPadAPI.PadProbeCallback probe) {
             NativeLong id = GSTPAD_API.gst_pad_add_probe(getPointer(), mask, probe, null, null);
             if (id.longValue() != 0) {
@@ -689,13 +801,13 @@ public class Pad extends GstObject {
             }
             return id;
         }
-        
+
         private synchronized void removeProbe(NativeLong id) {
             if (probes.remove(id)) {
                 GSTPAD_API.gst_pad_remove_probe(getPointer(), id);
             }
         }
-        
+
         private synchronized void clearProbes() {
             probes.forEach(id -> GSTPAD_API.gst_pad_remove_probe(getPointer(), id));
             probes.clear();
@@ -712,7 +824,6 @@ public class Pad extends GstObject {
             clearProbes();
             super.dispose();
         }
-        
-        
+
     }
 }

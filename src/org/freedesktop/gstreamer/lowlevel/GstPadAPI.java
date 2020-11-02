@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2018 Antonio Morales
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
@@ -39,6 +40,7 @@ import org.freedesktop.gstreamer.lowlevel.annotations.IncRef;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import org.freedesktop.gstreamer.query.Query;
 
 /**
  * GstPad functions
@@ -161,6 +163,8 @@ public interface GstPadAPI extends com.sun.jna.Library {
     Event gst_pad_probe_info_get_event(GstPadProbeInfo probeInfo);
 
     Buffer gst_pad_probe_info_get_buffer(GstPadProbeInfo probeInfo);
+    
+    Query gst_pad_probe_info_get_query(GstPadProbeInfo probeInfo);
 
 //    NativeLong /* gulong */ gst_pad_add_data_probe(Pad pad, PadDataProbe handler, Pointer data);
 //
