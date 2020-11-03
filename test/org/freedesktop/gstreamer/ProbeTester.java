@@ -28,24 +28,54 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Utility class for unit testing API that operates on a Probe.
  * <p>
  * Call {@link ProbeTester#test(Consumer)} and pass a callback which will
  * perform the test on a PadProbeInfo it is supplied. The callback runs in a Pad
- * probe. The buffer is produced by a simple, ephemeral pipeline that is fed by
- * a video test source.
+ * probe. The test uses a simple, ephemeral pipeline that is fed by a video test
+ * source (or custom pipeline).
+ * <p>
+ * The callback is a {@link Predicate} and should return false if the input info
+ * doesn't match that required by the test. Test exceptions should be thrown as
+ * normal. This is to allow the probe to be called repeatedly until the input
+ * info matches that expected. If the probe never matches the test will time
+ * out.
  */
 public class ProbeTester {
 
-    public static void test(Set<PadProbeType> mask, Function<PadProbeInfo, Boolean> callback) {
-        test("videotestsrc ! videoconvert ! fakesink name=sink", mask, callback);
+    /**
+     * Run a probe test on a simple test pipeline. The callback will be called
+     * by the probe until it returns true, allowing for probe callbacks to be
+     * ignored. If the callback never returns true the test will timeout and
+     * fail.
+     * <p>
+     * The pipeline is <code>videotestsrc ! fakesink name=sink</code>. The probe
+     * will be attached to the sink pad of the sink element.
+     *
+     * @param mask PadProbeType mask to use when attaching probe to sink pad
+     * @param callback probe callback
+     */
+    public static void test(Set<PadProbeType> mask, Predicate<PadProbeInfo> callback) {
+        test("videotestsrc ! fakesink name=sink", mask, callback);
     }
 
-    public static void test(String pipeline, Set<PadProbeType> mask, Function<PadProbeInfo, Boolean> callback) {
+    /**
+     * Run a probe test on a simple test pipeline. The callback will be called
+     * by the probe until it returns true, allowing for probe callbacks to be
+     * ignored. If the callback never returns true the test will timeout and
+     * fail.
+     * <p>
+     * The pipeline must have a sink element named sink. The probe will be
+     * attached to the sink pad of the sink element.
+     *
+     * @param pipeline custom pipeline with named sink element
+     * @param mask PadProbeType mask to use when attaching probe to sink pad
+     * @param callback probe callback
+     */
+    public static void test(String pipeline, Set<PadProbeType> mask, Predicate<PadProbeInfo> callback) {
         assertNotNull("Pipeline description can not be null", pipeline);
         assertFalse("Pipeline description can not be empty", pipeline.isEmpty());
         Pipeline pipe = (Pipeline) Gst.parseLaunch(pipeline);
@@ -53,17 +83,18 @@ public class ProbeTester {
 
         Element sink = pipe.getElementByName("sink");
         Pad pad = sink.getStaticPad("sink");
-        PadProbe probe = new PadProbe(callback, 0);
+        PadProbe probe = new PadProbe(callback);
         pad.addProbe(mask, probe);
 
         pipe.play();
 
-        // Wait for the sample to arrive and for the client supplied test function to
-        // complete
+        // Wait for the probe to complete
         try {
             probe.await(5000);
+        } catch (TimeoutException ex) {
+            fail("Timed out waiting for probe condition\n" + ex);
         } catch (Exception ex) {
-            fail("Unexpected exception waiting for buffer\n" + ex);
+            fail("Unexpected exception waiting for probe\n" + ex);
         } finally {
             pipe.stop();
         }
@@ -75,46 +106,27 @@ public class ProbeTester {
         }
     }
 
-    public static void test(Consumer<Buffer> callback, String pipelineDescription, int skipFrames) {
-
-    }
-
     private static class PadProbe implements Pad.PROBE {
 
-        private final int skipFrames;
         private final CountDownLatch latch;
-        private final Function<PadProbeInfo, Boolean> callback;
+        private final Predicate<PadProbeInfo> callback;
 
         private Throwable exception;
-        private int counter = 0;
 
-        PadProbe(Function<PadProbeInfo, Boolean> callback) {
-            this(callback, 0);
-        }
-
-        PadProbe(Function<PadProbeInfo, Boolean> callback, int skip) {
+        PadProbe(Predicate<PadProbeInfo> callback) {
             this.callback = callback;
-            skipFrames = skip;
             latch = new CountDownLatch(1);
         }
 
         @Override
         public PadProbeReturn probeCallback(Pad pad, PadProbeInfo info) {
             if (latch.getCount() > 0) {
-                if (counter < skipFrames) {
-                    counter++;
-                    return PadProbeReturn.OK;
-                }
                 try {
-                    // Run the client's test logic on the buffer (only once)
-                    try {
-                        if (!callback.apply(info)) {
-                            return PadProbeReturn.OK;
-                        }
-                    } catch (Throwable exc) {
-                        exception = exc;
+                    if (callback.test(info)) {
+                        latch.countDown();
                     }
-                } finally {
+                } catch (Throwable exc) {
+                    exception = exc;
                     latch.countDown();
                 }
             }
