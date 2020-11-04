@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.freedesktop.gstreamer.event.FlushStopEvent;
 
 import org.freedesktop.gstreamer.event.TagEvent;
+import org.freedesktop.gstreamer.query.AllocationQuery;
+import org.freedesktop.gstreamer.query.Query;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -321,6 +323,16 @@ public class PadTest {
         probe = null;
         
         assertTrue("Idle probe not collected", GCTracker.waitGC(probeRef));
+        
+    }
+    
+    @Test
+    public void addProbe_Query() {
+        ProbeTester.test(PadProbeType.QUERY_BOTH, info -> {
+            Query q = info.getQuery();
+//            System.out.println(q.getStructure());
+            return q instanceof AllocationQuery;
+        });
         
     }
     
