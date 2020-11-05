@@ -38,8 +38,8 @@ public final class Video {
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {
             return Stream.of(
-                    registration(VideoTimeCodeMeta.class, VideoTimeCodeMeta.GTYPE_NAME,
-                            VideoTimeCodeMeta::new)
+                    registration(VideoMeta.class, VideoMeta.GTYPE_NAME, VideoMeta::new),
+                    registration(VideoTimeCodeMeta.class, VideoTimeCodeMeta.GTYPE_NAME, VideoTimeCodeMeta::new)
             );
         }
 

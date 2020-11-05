@@ -85,7 +85,7 @@ public class AllocationQuery extends Query {
     }
 
     // @TODO how best not to expose GType?
-    void addAllocationMeta(GType api, Structure params) {
+    public void addAllocationMeta(GType api, Structure params) {
         GstQueryAPI.GSTQUERY_API.gst_query_add_allocation_meta(this, api, params);
     }
 
