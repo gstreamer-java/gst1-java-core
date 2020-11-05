@@ -16,14 +16,14 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.Pad;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValue;
-import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import org.freedesktop.gstreamer.Gst;
+import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 public interface GstVideoAPI extends Library {
 	public final static GstVideoAPI GSTVIDEO_API = GstNative.load("gstvideo", GstVideoAPI.class);
@@ -105,13 +105,13 @@ public interface GstVideoAPI extends Library {
 
         public GstVideoTimeCodeConfigStruct(Pointer p) {
             super(p);
+            read();
         }
     }
     
     @Structure.FieldOrder({
     	"meta", "buffer", "flags",
     	"videoFormat", "id", "width", "height", "n_planes", 
-//    	"padding0", "padding1",
         "offset", "stride", 
         "map", "unmap",
         "alignment"})
@@ -124,8 +124,6 @@ public interface GstVideoAPI extends Library {
     	public volatile int width;
     	public volatile int height;
     	public volatile int n_planes;
-//    	public volatile int padding0;
-//    	public volatile int padding1;
     	public volatile long offset[] = new long[4];
     	public volatile int stride[] = new int[4];
     	public volatile Pointer map; // to map the video plane
