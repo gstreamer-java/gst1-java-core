@@ -20,12 +20,12 @@ package org.freedesktop.gstreamer.query;
 
 import org.freedesktop.gstreamer.BufferPool;
 import org.freedesktop.gstreamer.Caps;
+import org.freedesktop.gstreamer.Meta;
 import org.freedesktop.gstreamer.Structure;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 
 /**
@@ -84,9 +84,15 @@ public class AllocationQuery extends Query {
         return Natives.objectFor(ptr[0], Caps.class, false, true);
     }
 
-    // @TODO how best not to expose GType?
-    public void addAllocationMeta(GType api, Structure params) {
-        GstQueryAPI.GSTQUERY_API.gst_query_add_allocation_meta(this, api, params);
+    /**
+     * Add api with params as one of the supported metadata API to query .
+     *
+     * @param api the metadata API
+     * @param params API specific parameters. 
+     */
+    public void addAllocationMeta(Meta.API<?> api, Structure params) {
+        GType type = GType.valueOf(api.getAPITypeName());
+        GstQueryAPI.GSTQUERY_API.gst_query_add_allocation_meta(this, type, params);
     }
 
     /**

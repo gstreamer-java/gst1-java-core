@@ -74,7 +74,7 @@ public class VideoMeta extends Meta {
     
     /**
      * Returns the identifier of the frame
-     * @return 
+     * @return the identifier
      */
     public int getFrameId() {
     	return Integer.class.cast(this.struct.readField("id")).intValue();
@@ -82,7 +82,7 @@ public class VideoMeta extends Meta {
     
     /**
      * Return additional video flags
-     * @return 
+     * @return flags
      */
     public int getFrameFlags() {
     	return Integer.class.cast(this.struct.readField("flags")).intValue();
@@ -90,8 +90,8 @@ public class VideoMeta extends Meta {
     
     /**
      * Return the stride of a plane
-     * @param index select plane in range 0..3
-     * @return 
+     * @param index for plane in range 0..3
+     * @return the stride of the plane
      */
     public int getStride(int index) {
     	int[] strides = (int[])this.struct.readField("stride");
@@ -100,8 +100,8 @@ public class VideoMeta extends Meta {
 
     /**
      * Return the offset of a plane
-     * @param index select plane in range 0..3
-     * @return 
+     * @param index for plane in range 0..3
+     * @return the offset of the plane
      */
     public long getOffset(int index) {
     	long[] offsets = (long[])this.struct.readField("offset");

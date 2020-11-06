@@ -40,6 +40,9 @@ public class VideoMetaTest {
     @BeforeClass
     public static void beforeClass() {
         Gst.init(Gst.getVersion());
+        
+        // Force registration of the GType of the VideoMeta api
+        GSTVIDEO_API.gst_video_meta_api_get_type();
     }
 
     @AfterClass
@@ -60,7 +63,7 @@ public class VideoMetaTest {
                     Query q = info.getQuery();
                     if (q instanceof AllocationQuery) {
                         AllocationQuery allocationQuery = (AllocationQuery)q;
-                        allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
+                        allocationQuery.addAllocationMeta(VideoMeta.API, null);
                     }
                 }
         
@@ -97,7 +100,7 @@ public class VideoMetaTest {
                     Query q = info.getQuery();
                     if (q instanceof AllocationQuery) {
                         AllocationQuery allocationQuery = (AllocationQuery)q;
-                        allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
+                        allocationQuery.addAllocationMeta(VideoMeta.API, null);
                      }
                 }
         

@@ -166,6 +166,7 @@ public class LowLevelStructureTest {
         structs.add(GstElementAPI.GstElementClass.class);
 
         structs.add(GstEventAPI.EventStruct.class);
+        structs.add(GstVideoAPI.GstVideoMetaStruct.class);
         structs.add(GstVideoAPI.GstVideoTimeCodeMetaStruct.class);
         structs.add(GstVideoAPI.GstVideoTimeCodeStruct.class);
         structs.add(GstMetaAPI.GstMetaInfoStruct.class);
