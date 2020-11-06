@@ -50,75 +50,75 @@ public class VideoMetaTest {
     @Test
     public void test_RGB_format() {
 
-    	Set<PadProbeType> padProbeTypes = EnumSet.of(PadProbeType.QUERY_DOWNSTREAM, PadProbeType.BUFFER);
-    	
+        Set<PadProbeType> padProbeTypes = EnumSet.of(PadProbeType.QUERY_DOWNSTREAM, PadProbeType.BUFFER);
+    
         ProbeTester.test(
-        	"videotestsrc ! video/x-raw,format=RGB,width=320,height=240 ! appsink name=sink",
-        	padProbeTypes, info -> {
-        		
-        		if (info.getType().contains(PadProbeType.QUERY_DOWNSTREAM)) {
-            		Query q = info.getQuery();
-            		if (q instanceof AllocationQuery) {
-            			AllocationQuery allocationQuery = (AllocationQuery)q;
-            			allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
-            		}
-        		}
-        		
-        		if (info.getType().contains(PadProbeType.BUFFER)) {
-            		Buffer buffer = info.getBuffer();
-        			VideoMeta meta = buffer.getMeta(VideoMeta.API);
-        			assertNotNull(meta);
+            "videotestsrc ! video/x-raw,format=RGB,width=320,height=240 ! appsink name=sink",
+            padProbeTypes, info -> {
+        
+                if (info.getType().contains(PadProbeType.QUERY_DOWNSTREAM)) {
+                    Query q = info.getQuery();
+                    if (q instanceof AllocationQuery) {
+                        AllocationQuery allocationQuery = (AllocationQuery)q;
+                        allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
+                    }
+                }
+        
+                if (info.getType().contains(PadProbeType.BUFFER)) {
+                    Buffer buffer = info.getBuffer();
+                    VideoMeta meta = buffer.getMeta(VideoMeta.API);
+                    assertNotNull(meta);
                 
-        			// format : 1 plane of RGB pixels (3 bytes)
-        			assertEquals(320, meta.getWidth());
-        			assertEquals(240, meta.getHeight());
-        			assertEquals(0,   meta.getFrameId());
-        			assertEquals(1,   meta.getNumberOfPlanes());
-        			assertEquals(0,   meta.getOffset(0)); // plane RGB : size=320*3
-        			assertEquals(320*3, meta.getStride(0));
+                    // format : 1 plane of RGB pixels (3 bytes)
+                    assertEquals(320, meta.getWidth());
+                    assertEquals(240, meta.getHeight());
+                    assertEquals(0,   meta.getFrameId());
+                    assertEquals(1,   meta.getNumberOfPlanes());
+                    assertEquals(0,   meta.getOffset(0)); // plane RGB : size=320*3
+                    assertEquals(320*3, meta.getStride(0));
 
-        			return true;
-        		}
-        		return false;
-        	}
+                    return true;
+                }
+                return false;
+            }
         );
     }
 
     @Test
     public void test_I420_format() {
 
-    	Set<PadProbeType> padProbeTypes = EnumSet.of(PadProbeType.QUERY_DOWNSTREAM, PadProbeType.BUFFER);
-    	
+        Set<PadProbeType> padProbeTypes = EnumSet.of(PadProbeType.QUERY_DOWNSTREAM, PadProbeType.BUFFER);
+    
         ProbeTester.test(
-        	"videotestsrc ! video/x-raw,format=I420,width=320,height=240 ! appsink name=sink",
-        	padProbeTypes, info -> {
-        		
-        		if (info.getType().contains(PadProbeType.QUERY_DOWNSTREAM)) {
-            		Query q = info.getQuery();
-            		if (q instanceof AllocationQuery) {
-            			AllocationQuery allocationQuery = (AllocationQuery)q;
-            			allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
-            		}
-        		}
-        		
-        		if (info.getType().contains(PadProbeType.BUFFER)) {
-            		Buffer buffer = info.getBuffer();
-        			VideoMeta meta = buffer.getMeta(VideoMeta.API);
-        			assertNotNull(meta);
+            "videotestsrc ! video/x-raw,format=I420,width=320,height=240 ! appsink name=sink",
+            padProbeTypes, info -> {
+        
+                if (info.getType().contains(PadProbeType.QUERY_DOWNSTREAM)) {
+                    Query q = info.getQuery();
+                    if (q instanceof AllocationQuery) {
+                        AllocationQuery allocationQuery = (AllocationQuery)q;
+                        allocationQuery.addAllocationMeta(GSTVIDEO_API.gst_video_meta_api_get_type(), null);
+                     }
+                }
+        
+                if (info.getType().contains(PadProbeType.BUFFER)) {
+                    Buffer buffer = info.getBuffer();
+                    VideoMeta meta = buffer.getMeta(VideoMeta.API);
+                    assertNotNull(meta);
                 
-        			// format : 3 planes for Y,U,V planes
-        			assertEquals(320, meta.getWidth());
-        			assertEquals(240, meta.getHeight());
-        			assertEquals(0,   meta.getFrameId());
-        			assertEquals(3,   meta.getNumberOfPlanes());
-        			assertEquals(0,   meta.getOffset(0)); // plane Y : size 320x240
-        			assertEquals(320*240, meta.getOffset(1)); // plane U : size : 160x120
-        			assertEquals(320*240*5/4, meta.getOffset(2)); // plane V : size : 160x120
-        			assertEquals(320, meta.getStride(0)); // plane Y
-        			assertEquals(160, meta.getStride(1)); // plane U
-        			assertEquals(160, meta.getStride(2)); // plane V
+                    // format : 3 planes for Y,U,V planes
+                    assertEquals(320, meta.getWidth());
+                    assertEquals(240, meta.getHeight());
+                    assertEquals(0,   meta.getFrameId());
+                    assertEquals(3,   meta.getNumberOfPlanes());
+                    assertEquals(0,   meta.getOffset(0)); // plane Y : size 320x240
+                    assertEquals(320*240, meta.getOffset(1)); // plane U : size : 160x120
+                    assertEquals(320*240*5/4, meta.getOffset(2)); // plane V : size : 160x120
+                    assertEquals(320, meta.getStride(0)); // plane Y
+                    assertEquals(160, meta.getStride(1)); // plane U
+                    assertEquals(160, meta.getStride(2)); // plane V
 
-        			return true;
+                    return true;
         		}
         		return false;
         	}
