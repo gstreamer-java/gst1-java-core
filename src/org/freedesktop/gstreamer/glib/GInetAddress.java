@@ -30,7 +30,7 @@ public class GInetAddress extends GObject{
 	}
 
 	public String getAddress() {
-		return GioAPI.g_inet_address_to_string(getRawPointer());
+		return GioAPI.GIO_API.g_inet_address_to_string(getRawPointer());
 	}
 	
 }

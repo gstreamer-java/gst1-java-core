@@ -44,7 +44,7 @@ public class GInetSocketAddress extends GSocketAddress {
 	}
         
         private static Initializer createRawAddress(String address, int port) {
-            Pointer nativePointer = GioAPI.g_inet_socket_address_new_from_string(address, port);
+            Pointer nativePointer = GioAPI.GIO_API.g_inet_socket_address_new_from_string(address, port);
             if (nativePointer == null) {
                 throw new GLibException("Can not create "+GInetSocketAddress.class.getSimpleName()+" for "+address+":"+port+", please check that the IP address is valid, with format x.x.x.x");
             }

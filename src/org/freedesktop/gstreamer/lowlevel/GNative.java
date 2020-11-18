@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -34,28 +35,45 @@ import com.sun.jna.Platform;
 public final class GNative {
     // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
     // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
-            
+
     private final static String[] nameFormats;
-    
+    private final static Logger LOG = Logger.getLogger(GNative.class.getName());
+
     static {
         String defFormats = "%s";
         if (Platform.isWindows()) {
-            defFormats = "%s|lib%s|lib%s-0";
+            defFormats = "%s|lib%s|lib%s-0|%s-0";
         } else if (Platform.isMac()) {
             defFormats = "%s.0|%s";
         }
         nameFormats = System.getProperty("gstreamer.GNative.nameFormats", defFormats).split("\\|");
     }
 
+    private static String fixedNameFormat = null;
+
     private GNative() {}
 
-    public static synchronized <T extends Library> T loadLibrary(String name, Class<T> interfaceClass, Map<String, ?> options) {
-        for (String format : nameFormats)
+    public static synchronized <T extends Library> T loadLibrary(String name, Class<T> interfaceClass,
+            Map<String, ?> options) {
+        if (fixedNameFormat != null) {
             try {
-                return loadNativeLibrary(String.format(format, name), interfaceClass, options);
+                return loadNativeLibrary(String.format(fixedNameFormat, name), interfaceClass, options);
+            } catch (UnsatisfiedLinkError ex) {
+                LOG.warning("Expected: " + String.format(fixedNameFormat, name)
+                        + " as library name... trying other formats.");
+            }
+        }
+        for (String format : nameFormats) {
+            try {
+                T lib = loadNativeLibrary(String.format(format, name), interfaceClass, options);
+                if (fixedNameFormat == null) {
+                    fixedNameFormat = format;
+                }
+                return lib;
             } catch (UnsatisfiedLinkError ex) {
                 continue;
             }
+        }
         throw new UnsatisfiedLinkError("Could not load library: " + name);
     }
 
@@ -117,7 +135,7 @@ public final class GNative {
         public Object toNative(Object value) {
             return value != null ? Boolean.TRUE.equals(value) ? 1 : 0 : 0;
         }
-        
+
         @SuppressWarnings("rawtypes")
         public Object fromNative(Object value, Class javaType) {
             return value != null ? ((Integer) value).intValue() != 0 : 0;
@@ -137,12 +155,12 @@ public final class GNative {
         private final InvocationHandler proxy;
         @SuppressWarnings("unused") // Keep a reference to stop underlying Library being GC'd
         private final T library;
-        
+
         public Handler(T library, Map<String, ?> options) {
             this.library = library;
             this.proxy = Proxy.getInvocationHandler(library);
         }
-        
+
         @SuppressWarnings("null")
         public Object invoke(Object self, Method method, Object[] args) throws Throwable {
             int lastArg = args != null ? args.length : 0;
@@ -182,7 +200,7 @@ public final class GNative {
                 postInvoke[i].run();
             return retval;
         }
-        
+
         @SuppressWarnings("unused")
         Class<?> getNativeClass(Class<?> cls) {
             if (cls == Integer.class)

@@ -40,7 +40,7 @@ public class GSocket extends GObject {
         GInetSocketAddress boundAddress = new GInetSocketAddress(address, port);
         GErrorStruct reference = new GErrorStruct();
         GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
-        if (!GioAPI.g_socket_bind(getRawPointer(),
+        if (!GioAPI.GIO_API.g_socket_bind(getRawPointer(),
                 Natives.getRawPointer(boundAddress),
                 true,
                 reference.getPointer())) {
@@ -53,7 +53,7 @@ public class GSocket extends GObject {
         GInetSocketAddress connectedAddress = new GInetSocketAddress(address, port);
         GErrorStruct reference = new GErrorStruct();
         GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
-        if (!GioAPI.g_socket_connect(getRawPointer(),
+        if (!GioAPI.GIO_API.g_socket_connect(getRawPointer(),
                 Natives.getRawPointer(connectedAddress),
                 Natives.getRawPointer(new GCancellable()),
                 reference.getPointer())) {
@@ -99,7 +99,7 @@ public class GSocket extends GObject {
     private static Initializer makeRawSocket(GSocketFamily family, GSocketType type, GSocketProtocol protocol) throws GLibException {
         GErrorStruct reference = new GErrorStruct();
         GErrorStruct[] errorArray = (GErrorStruct[]) reference.toArray(1);
-        Pointer socketPointer = GioAPI.g_socket_new(family.toGioValue(), type.toGioValue(), protocol.toGioValue(), reference.getPointer());
+        Pointer socketPointer = GioAPI.GIO_API.g_socket_new(family.toGioValue(), type.toGioValue(), protocol.toGioValue(), reference.getPointer());
         if (socketPointer == null) {
             throw new GLibException(extractAndClearError(errorArray[0]));
         }
