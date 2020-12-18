@@ -1,7 +1,5 @@
 /* 
- * Copyright (c) 2016 Neil C Smith
- * Copyright (c) 2009 Levente Farkas
- * Copyright (c) 2007, 2008 Wayne Meissner
+ * Copyright (c) 2021 Neil C Smith
  * 
  * This file is part of gstreamer-java.
  *
@@ -20,15 +18,14 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
-import com.sun.jna.Pointer;
-
 /**
  * GstIterator functions
  */
 public interface GstIteratorAPI extends com.sun.jna.Library {
+    
     GstIteratorAPI GSTITERATOR_API = GstNative.load(GstIteratorAPI.class);
 
-    void gst_iterator_free(Pointer iter);
-    int gst_iterator_next(Pointer iter, GValueAPI.GValue next);
-    void gst_iterator_resync(Pointer iter);
+    void gst_iterator_free(GstIteratorPtr iter);
+    int gst_iterator_next(GstIteratorPtr iter, GValueAPI.GValue next);
+    void gst_iterator_resync(GstIteratorPtr iter);
 }

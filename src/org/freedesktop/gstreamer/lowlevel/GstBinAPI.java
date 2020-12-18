@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -43,12 +44,12 @@ public interface GstBinAPI extends com.sun.jna.Library {
     @CallerOwnsReturn Element gst_bin_get_by_name(Bin bin, String name);
     @CallerOwnsReturn Element gst_bin_get_by_name_recurse_up(Bin bin, String name);
     @CallerOwnsReturn Element gst_bin_get_by_interface(Bin bin, GType iface);
-    Pointer gst_bin_iterate_elements(Bin bin);
-    Pointer gst_bin_iterate_sorted(Bin bin);
-    Pointer gst_bin_iterate_recurse(Bin bin);
-    Pointer gst_bin_iterate_sinks(Bin bin);
-    Pointer gst_bin_iterate_sources(Bin bin);
-    Pointer gst_bin_iterate_all_by_interface(Bin bin, GType iface);
+    GstIteratorPtr gst_bin_iterate_elements(Bin bin);
+    GstIteratorPtr gst_bin_iterate_sorted(Bin bin);
+    GstIteratorPtr gst_bin_iterate_recurse(Bin bin);
+    GstIteratorPtr gst_bin_iterate_sinks(Bin bin);
+    GstIteratorPtr gst_bin_iterate_sources(Bin bin);
+    GstIteratorPtr gst_bin_iterate_all_by_interface(Bin bin, GType iface);
 
     //Debugging
     void gst_debug_bin_to_dot_file (Bin bin, int details, String file_name);

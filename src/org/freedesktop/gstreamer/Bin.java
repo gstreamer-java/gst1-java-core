@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
@@ -24,12 +24,12 @@ package org.freedesktop.gstreamer;
 
 import static org.freedesktop.gstreamer.lowlevel.GstBinAPI.GSTBIN_API;
 
-import com.sun.jna.Pointer;
 import java.util.EnumSet;
 import java.util.List;
 import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
+import org.freedesktop.gstreamer.lowlevel.GstIteratorPtr;
 import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
@@ -145,8 +145,8 @@ public class Bin extends Element {
         GSTBIN_API.gst_bin_remove_many(this, elements);
     }
 
-    private List<Element> elementList(Pointer iter) {
-        return new GstIterator<Element>(iter, Element.class).asList();
+    private List<Element> elementList(GstIteratorPtr iter) {
+        return GstIterator.asList(iter, Element.class);
     }
 
     /**

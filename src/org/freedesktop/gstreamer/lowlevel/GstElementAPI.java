@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
  * 
@@ -83,9 +84,9 @@ public interface GstElementAPI extends com.sun.jna.Library {
     boolean gst_element_link_pads_filtered(Element src, String srcpadname, Element dest, String destpadname,
             Caps filter);
     
-    Pointer gst_element_iterate_pads(Element element);
-    Pointer gst_element_iterate_src_pads(Element element);
-    Pointer gst_element_iterate_sink_pads(Element element);
+    GstIteratorPtr gst_element_iterate_pads(Element element);
+    GstIteratorPtr gst_element_iterate_src_pads(Element element);
+    GstIteratorPtr gst_element_iterate_sink_pads(Element element);
     /* factory management */
     ElementFactory gst_element_get_factory(Element element);
     @CallerOwnsReturn Bus gst_element_get_bus(Element element);
