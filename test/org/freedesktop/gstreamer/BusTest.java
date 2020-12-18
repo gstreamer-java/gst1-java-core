@@ -277,28 +277,28 @@ public class BusTest {
     public void anyMessage() {
         final TestPipe pipe = new TestPipe("anyMessage");
 
-        final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<GstObject> signalSource = new AtomicReference<GstObject>();
+        final AtomicReference<Message> firstMessage = new AtomicReference<>();
+
         Bus.MESSAGE listener = new Bus.MESSAGE() {
 
+            @Override
             public void busMessage(Bus bus, Message msg) {
-                signalFired.set(true);
-                signalSource.set(msg.getSource());
+                firstMessage.compareAndSet(null, msg);
                 pipe.quit();
             }
         };
+
         pipe.getBus().connect(listener);
-        //
-        // For the pipeline to post an EOS message, all sink elements must post it
-        //
-        for (Element elem : pipe.pipe.getSinks()) {
-            GSTELEMENT_API.gst_element_post_message(elem, GstMessageAPI.GSTMESSAGE_API.gst_message_new_eos(elem));
-        }
         pipe.play().run();
         pipe.getBus().disconnect(listener);
-
-        assertTrue("EOS signal not received", signalFired.get());
         pipe.dispose();
+
+        Message message = firstMessage.getAndSet(null);
+        assertNotNull("No message received", message);
+        GCTracker gc = new GCTracker(message);
+        message = null;
+        assertTrue("Message not garbage collected", gc.waitGC());
+        assertTrue("Message not destroyed", gc.waitDestroyed());
     }
 
     @Test
@@ -316,10 +316,17 @@ public class BusTest {
             }
         };
         pipe.getBus().connect(listener);
-        pipe.getBus().post(new EOSMessage(pipe.src));
+        Message message = new EOSMessage(pipe.src);
+        pipe.getBus().post(message);
         pipe.run();
         assertTrue("Message not posted", signalFired.get());
         assertEquals("Wrong source in message", pipe.src, signalSource.get());
+        pipe.dispose();
+        
+        GCTracker gc = new GCTracker(message);
+        message = null;
+        assertTrue("Message not garbage collected", gc.waitGC());
+        assertTrue("Message not destroyed", gc.waitDestroyed());
     }
 
     @Test

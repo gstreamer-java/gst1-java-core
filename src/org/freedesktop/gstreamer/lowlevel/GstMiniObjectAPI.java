@@ -21,6 +21,7 @@
 
 package org.freedesktop.gstreamer.lowlevel;
 
+import com.sun.jna.Callback;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +42,10 @@ public interface GstMiniObjectAPI extends com.sun.jna.Library {
     void gst_mini_object_ref(GstMiniObjectPtr ptr);
     void gst_mini_object_unref(GstMiniObjectPtr ptr);
     void gst_mini_object_unref(Pointer ptr);
+    void gst_mini_object_weak_ref(GstMiniObjectPtr ptr, GstMiniObjectNotify notify,
+            IntPtr data);
+    void gst_mini_object_weak_unref(GstMiniObjectPtr ptr, GstMiniObjectNotify notify,
+            IntPtr data);
 
     @CallerOwnsReturn MiniObject gst_mini_object_make_writable(@Invalidate MiniObject mini_object);
     @CallerOwnsReturn MiniObject gst_mini_object_copy(MiniObject mini_object);
@@ -49,6 +54,12 @@ public interface GstMiniObjectAPI extends com.sun.jna.Library {
     void gst_mini_object_set_qdata(MiniObject mini_object, GQuark quark, Object data, GDestroyNotify destroyCallback);
     Pointer gst_mini_object_get_qdata(MiniObject mini_object, GQuark quark);
     Pointer gst_mini_object_steal_qdata(MiniObject mini_object, GQuark quark);
+
+    public static interface GstMiniObjectNotify extends Callback {
+
+        public void callback(IntPtr userData, Pointer obj);
+
+    }
 
     public static final class MiniObjectStruct extends com.sun.jna.Structure {
         public volatile GType type; 
