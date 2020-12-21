@@ -20,13 +20,13 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.message.MessageType;
-import org.freedesktop.gstreamer.message.Message;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
@@ -34,13 +34,13 @@ import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Locale;
-import java.util.logging.Level;
-import org.freedesktop.gstreamer.glib.Natives;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.message.MessageType;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
@@ -59,18 +59,9 @@ import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
  * threads. This is important since the actual streaming of media is done in
  * another thread than the application.
  * <p>
- * A message is posted on the bus with the gst_bus_post() method. With the
- * gst_bus_peek() and gst_bus_pop() methods one can look at or retrieve a
- * previously posted message.
- * <p>
- * The bus can be polled with the gst_bus_poll() method. This methods blocks up
- * to the specified timeout value until one of the specified messages types is
- * posted on the bus. The application can then _pop() the messages from the bus
- * to handle them.
- * <p>
  * It is also possible to get messages from the bus without any thread
- * marshaling with the {@link #setSyncHandler} method. This makes it possible to
- * react to a message in the same thread that posted the message on the bus.
+ * marshalling with the {@link #setSyncHandler} method. This makes it possible
+ * to react to a message in the same thread that posted the message on the bus.
  * This should only be used if the application is able to deal with messages
  * from different threads.
  * <p>
@@ -84,11 +75,17 @@ public class Bus extends GstObject {
     public static final String GTYPE_NAME = "GstBus";
 
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
-    
+    private static final SyncCallback SYNC_CALLBACK = new SyncCallback();
+
     private final Object lock = new Object();
     private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
-    private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<MessageProxy>();
+    private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<>();
     private boolean watchAdded = false;
+    private BusSyncHandler syncHandler = new BusSyncHandler() {
+        public BusSyncReply syncMessage(Message msg) {
+            return BusSyncReply.PASS;
+        }
+    };
 
     /**
      * This constructor is used internally by gstreamer-java
@@ -98,7 +95,7 @@ public class Bus extends GstObject {
     Bus(Initializer init) {
         super(init);
         GSTBUS_API.gst_bus_set_sync_handler(this, null, null, null);
-        GSTBUS_API.gst_bus_set_sync_handler(this, syncCallback, null, null);
+        GSTBUS_API.gst_bus_set_sync_handler(this, SYNC_CALLBACK, null, null);
     }
 
     /**
@@ -111,251 +108,6 @@ public class Bus extends GstObject {
      */
     public void setFlushing(boolean flushing) {
         GSTBUS_API.gst_bus_set_flushing(this, flushing ? 1 : 0);
-    }
-
-    /**
-     * Signal emitted when end-of-stream is reached in a pipeline.
-     *
-     * The application will only receive this message in the PLAYING state and
-     * every time it sets a pipeline to PLAYING that is in the EOS state. The
-     * application can perform a flushing seek in the pipeline, which will undo
-     * the EOS state again.
-     *
-     * @see #connect(EOS)
-     * @see #disconnect(EOS)
-     */
-    public static interface EOS {
-
-        /**
-         * Called when a {@link Pipeline} element posts a end-of-stream message.
-         *
-         * @param source the element which posted the message.
-         */
-        public void endOfStream(GstObject source);
-    }
-
-    /**
-     * Signal emitted when an error occurs.
-     * <p>
-     * When the application receives an error message it should stop playback of
-     * the pipeline and not assume that more data will be played.
-     *
-     * @see #connect(ERROR)
-     * @see #disconnect(ERROR)
-     */
-    public static interface ERROR {
-
-        /**
-         * Called when a {@link Pipeline} element posts an error message.
-         *
-         * @param source the element which posted the message.
-         * @param code a numeric code representing the error.
-         * @param message a string representation of the error.
-         */
-        public void errorMessage(GstObject source, int code, String message);
-    }
-
-    /**
-     * Signal emitted when a warning message is delivered.
-     *
-     * @see #connect(WARNING)
-     * @see #disconnect(WARNING)
-     */
-    public static interface WARNING {
-
-        /**
-         * Called when a {@link Pipeline} element posts an warning message.
-         *
-         * @param source the element which posted the message.
-         * @param code a numeric code representing the warning.
-         * @param message a string representation of the warning.
-         */
-        public void warningMessage(GstObject source, int code, String message);
-    }
-
-    /**
-     * Signal emitted when an informational message is delivered.
-     *
-     * @see #connect(INFO)
-     * @see #disconnect(INFO)
-     */
-    public static interface INFO {
-
-        /**
-         * Called when a {@link Pipeline} element posts an informational
-         * message.
-         *
-         * @param source the element which posted the message.
-         * @param code a numeric code representing the informational message.
-         * @param message a string representation of the informational message.
-         */
-        public void infoMessage(GstObject source, int code, String message);
-    }
-
-    /**
-     * Signal emitted when a new tag is identified on the stream.
-     *
-     * @see #connect(TAG)
-     * @see #disconnect(TAG)
-     */
-    public static interface TAG {
-
-        /**
-         * Called when a {@link Pipeline} element finds media meta-data.
-         *
-         * @param source the element which posted the message.
-         * @param tagList a list of media meta-data.
-         */
-        public void tagsFound(GstObject source, TagList tagList);
-    }
-
-    /**
-     * Signal emitted when a state change happens.
-     *
-     * @see #connect(STATE_CHANGED)
-     * @see #disconnect(STATE_CHANGED)
-     */
-    public static interface STATE_CHANGED {
-
-        /**
-         * Called when a {@link Pipeline} element executes a {@link State}
-         * change.
-         *
-         * @param source the element which posted the message.
-         * @param old the old state that the element is changing from.
-         * @param current the new (current) state the element is changing to.
-         * @param pending the pending (target) state.
-         */
-        public void stateChanged(GstObject source, State old, State current, State pending);
-    }
-
-    /**
-     * Signal emitted when the pipeline is buffering data.
-     *
-     * @see #connect(BUFFERING)
-     * @see #disconnect(BUFFERING)
-     */
-    public static interface BUFFERING {
-
-        /**
-         * Called when a {@link Pipeline} element needs to buffer data before it
-         * can continue processing.
-         * <p>
-         * {@code percent} is a value between 0 and 100. A value of 100 means
-         * that the buffering completed.
-         * <p>
-         * When {@code percent} is < 100 the application should PAUSE a PLAYING
-         * pipeline. When {@code percent} is 100, the application can set the
-         * pipeline (back) to PLAYING. <p>
-         * The application must be prepared to receive BUFFERING messages in the
-         * PREROLLING state and may only set the pipeline to PLAYING after
-         * receiving a message with {@code percent} set to 100, which can happen
-         * after the pipeline completed prerolling.
-         *
-         * @param source the element which posted the message.
-         * @param percent the percentage of buffering that has completed.
-         */
-        public void bufferingData(GstObject source, int percent);
-    }
-
-    /**
-     * Signal sent when a new duration message is posted by an element that know
-     * the duration of a stream in a specific format.
-     * <p>
-     * This message is received by bins and is used to calculate the total
-     * duration of a pipeline.
-     * <p>
-     * Elements may post a duration message with a duration of
-     * {@link ClockTime#NONE} to indicate that the duration has changed and the
-     * cached duration should be discarded. The new duration can then be
-     * retrieved via a query. The application can get the new duration with a
-     * duration query.
-     *
-     * @see #connect(DURATION)
-     * @see #disconnect(DURATION)
-     */
-    public static interface DURATION_CHANGED {
-
-        /**
-         * Called when a new duration message is posted on the Bus.
-         *
-         * @param source the element which posted the message.
-         */
-        public void durationChanged(GstObject source);
-    }
-
-    /**
-     * This message is posted by elements that start playback of a segment as a
-     * result of a segment seek.
-     * <p>
-     * This message is not received by the application but is used for
-     * maintenance reasons in container elements.
-     */
-    public static interface SEGMENT_START {
-
-        public void segmentStart(GstObject source, Format format, long position);
-    }
-
-    /**
-     * Signal emitted when the pipeline has completed playback of a segment.
-     * <p>
-     * This message is posted by elements that finish playback of a segment as a
-     * result of a segment seek. This message is received by the application
-     * after all elements that posted a {@link SEGMENT_START} have posted
-     * segment-done.
-     *
-     * @see #connect(SEGMENT_DONE)
-     * @see #disconnect(SEGMENT_DONE)
-     */
-    public static interface SEGMENT_DONE {
-
-        /**
-         * Called when a segment-done message has been posted.
-         *
-         * @param source the element which posted the message.
-         * @param format the format of the position being done.
-         * @param position the position of the segment being done.
-         */
-        public void segmentDone(GstObject source, Format format, long position);
-    }
-
-    /**
-     * Signal emitted by elements when they complete an ASYNC state change.
-     * <p>
-     * Applications will only receive this message from the top level pipeline.
-     * </p>
-     *
-     * @see #connect(ASYNC_DONE)
-     * @see #disconnect(ASYNC_DONE)
-     */
-    public static interface ASYNC_DONE {
-
-        /**
-         * Called when a segment-done message has been posted.
-         *
-         * @param source the element which posted the message.
-         */
-        public void asyncDone(GstObject source);
-    }
-
-    /**
-     * Catch all signals emitted on the Bus.
-     * <p>
-     * The signal handler will be called asynchronously from the thread that
-     * posted the message on the Bus.
-     *
-     * @see #connect(MESSAGE)
-     * @see #disconnect(MESSAGE)
-     */
-    public static interface MESSAGE {
-
-        /**
-         * Called when a {@link Element} posts a {@link Message} on the Bus.
-         *
-         * @param bus the Bus the message was posted on.
-         * @param message the message that was posted.
-         */
-        public void busMessage(Bus bus, Message message);
     }
 
     /**
@@ -703,12 +455,6 @@ public class Bus extends GstObject {
         return GSTBUS_API.gst_bus_post(this, message);
     }
 
-    private BusSyncHandler syncHandler = new BusSyncHandler() {
-        public BusSyncReply syncMessage(Message msg) {
-            return BusSyncReply.PASS;
-        }
-    };
-
     public BusSyncHandler getSyncHandler() {
         return syncHandler;
     }
@@ -716,37 +462,6 @@ public class Bus extends GstObject {
     public void setSyncHandler(BusSyncHandler handler) {
         syncHandler = handler;
     }
-    
-    private static final org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
-        
-        {
-            Native.setCallbackThreadInitializer(this,
-                    new CallbackThreadInitializer(true,
-                            Boolean.getBoolean("glib.detachCallbackThreads"),
-                            "GstBus"));
-        }
-
-        public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
-            if (bus.syncHandler != null) {
-                BusSyncReply reply = bus.syncHandler.syncMessage(msg);
-
-                if (reply != BusSyncReply.DROP) {
-                    Gst.getExecutor().execute(new Runnable() {
-                        public void run() {
-                            bus.dispatchMessage(msg);
-                        }
-                    });
-                }
-            }
-            //
-            // Unref the message, since we are dropping it.
-            // (the normal GC will drop other refs to it)
-            //
-//            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
-            Natives.unref(msg);
-            return BusSyncReply.DROP;
-        }
-    };
 
     /**
      * Connects to a signal.
@@ -844,23 +559,6 @@ public class Bus extends GstObject {
         });
     }
 
-    private static class MessageProxy implements MESSAGE {
-
-        private final MessageType type;
-        private final BusCallback callback;
-
-        public MessageProxy(MessageType type, BusCallback callback) {
-            this.type = type;
-            this.callback = callback;
-        }
-
-        public void busMessage(final Bus bus, final Message msg) {
-            if (type == MessageType.ANY || type == msg.getType()) {
-                callback.callback(bus, msg, null);
-            }
-        }
-    }
-
     private final Map<Class<?>, Map<Object, MessageProxy>> getListenerMap() {
         if (signalListeners == null) {
             signalListeners = new ConcurrentHashMap<Class<?>, Map<Object, MessageProxy>>();
@@ -899,6 +597,298 @@ public class Bus extends GstObject {
                 GSTBUS_API.gst_bus_remove_signal_watch(this);
                 watchAdded = false;
             }
+        }
+    }
+
+    /**
+     * Signal emitted when end-of-stream is reached in a pipeline.
+     *
+     * The application will only receive this message in the PLAYING state and
+     * every time it sets a pipeline to PLAYING that is in the EOS state. The
+     * application can perform a flushing seek in the pipeline, which will undo
+     * the EOS state again.
+     *
+     * @see #connect(EOS)
+     * @see #disconnect(EOS)
+     */
+    public static interface EOS {
+
+        /**
+         * Called when a {@link Pipeline} element posts a end-of-stream message.
+         *
+         * @param source the element which posted the message.
+         */
+        public void endOfStream(GstObject source);
+    }
+
+    /**
+     * Signal emitted when an error occurs.
+     * <p>
+     * When the application receives an error message it should stop playback of
+     * the pipeline and not assume that more data will be played.
+     *
+     * @see #connect(ERROR)
+     * @see #disconnect(ERROR)
+     */
+    public static interface ERROR {
+
+        /**
+         * Called when a {@link Pipeline} element posts an error message.
+         *
+         * @param source the element which posted the message.
+         * @param code a numeric code representing the error.
+         * @param message a string representation of the error.
+         */
+        public void errorMessage(GstObject source, int code, String message);
+    }
+
+    /**
+     * Signal emitted when a warning message is delivered.
+     *
+     * @see #connect(WARNING)
+     * @see #disconnect(WARNING)
+     */
+    public static interface WARNING {
+
+        /**
+         * Called when a {@link Pipeline} element posts an warning message.
+         *
+         * @param source the element which posted the message.
+         * @param code a numeric code representing the warning.
+         * @param message a string representation of the warning.
+         */
+        public void warningMessage(GstObject source, int code, String message);
+    }
+
+    /**
+     * Signal emitted when an informational message is delivered.
+     *
+     * @see #connect(INFO)
+     * @see #disconnect(INFO)
+     */
+    public static interface INFO {
+
+        /**
+         * Called when a {@link Pipeline} element posts an informational
+         * message.
+         *
+         * @param source the element which posted the message.
+         * @param code a numeric code representing the informational message.
+         * @param message a string representation of the informational message.
+         */
+        public void infoMessage(GstObject source, int code, String message);
+    }
+
+    /**
+     * Signal emitted when a new tag is identified on the stream.
+     *
+     * @see #connect(TAG)
+     * @see #disconnect(TAG)
+     */
+    public static interface TAG {
+
+        /**
+         * Called when a {@link Pipeline} element finds media meta-data.
+         *
+         * @param source the element which posted the message.
+         * @param tagList a list of media meta-data.
+         */
+        public void tagsFound(GstObject source, TagList tagList);
+    }
+
+    /**
+     * Signal emitted when a state change happens.
+     *
+     * @see #connect(STATE_CHANGED)
+     * @see #disconnect(STATE_CHANGED)
+     */
+    public static interface STATE_CHANGED {
+
+        /**
+         * Called when a {@link Pipeline} element executes a {@link State}
+         * change.
+         *
+         * @param source the element which posted the message.
+         * @param old the old state that the element is changing from.
+         * @param current the new (current) state the element is changing to.
+         * @param pending the pending (target) state.
+         */
+        public void stateChanged(GstObject source, State old, State current, State pending);
+    }
+
+    /**
+     * Signal emitted when the pipeline is buffering data.
+     *
+     * @see #connect(BUFFERING)
+     * @see #disconnect(BUFFERING)
+     */
+    public static interface BUFFERING {
+
+        /**
+         * Called when a {@link Pipeline} element needs to buffer data before it
+         * can continue processing.
+         * <p>
+         * {@code percent} is a value between 0 and 100. A value of 100 means
+         * that the buffering completed.
+         * <p>
+         * When {@code percent} is < 100 the application should PAUSE a PLAYING
+         * pipeline. When {@code percent} is 100, the application can set the
+         * pipeline (back) to PLAYING. <p>
+         * The application must be prepared to receive BUFFERING messages in the
+         * PREROLLING state and may only set the pipeline to PLAYING after
+         * receiving a message with {@code percent} set to 100, which can happen
+         * after the pipeline completed prerolling.
+         *
+         * @param source the element which posted the message.
+         * @param percent the percentage of buffering that has completed.
+         */
+        public void bufferingData(GstObject source, int percent);
+    }
+
+    /**
+     * Signal sent when a new duration message is posted by an element that know
+     * the duration of a stream in a specific format.
+     * <p>
+     * This message is received by bins and is used to calculate the total
+     * duration of a pipeline.
+     * <p>
+     * Elements may post a duration message with a duration of
+     * {@link ClockTime#NONE} to indicate that the duration has changed and the
+     * cached duration should be discarded. The new duration can then be
+     * retrieved via a query. The application can get the new duration with a
+     * duration query.
+     *
+     * @see #connect(DURATION)
+     * @see #disconnect(DURATION)
+     */
+    public static interface DURATION_CHANGED {
+
+        /**
+         * Called when a new duration message is posted on the Bus.
+         *
+         * @param source the element which posted the message.
+         */
+        public void durationChanged(GstObject source);
+    }
+
+    /**
+     * This message is posted by elements that start playback of a segment as a
+     * result of a segment seek.
+     * <p>
+     * This message is not received by the application but is used for
+     * maintenance reasons in container elements.
+     */
+    public static interface SEGMENT_START {
+
+        public void segmentStart(GstObject source, Format format, long position);
+    }
+
+    /**
+     * Signal emitted when the pipeline has completed playback of a segment.
+     * <p>
+     * This message is posted by elements that finish playback of a segment as a
+     * result of a segment seek. This message is received by the application
+     * after all elements that posted a {@link SEGMENT_START} have posted
+     * segment-done.
+     *
+     * @see #connect(SEGMENT_DONE)
+     * @see #disconnect(SEGMENT_DONE)
+     */
+    public static interface SEGMENT_DONE {
+
+        /**
+         * Called when a segment-done message has been posted.
+         *
+         * @param source the element which posted the message.
+         * @param format the format of the position being done.
+         * @param position the position of the segment being done.
+         */
+        public void segmentDone(GstObject source, Format format, long position);
+    }
+
+    /**
+     * Signal emitted by elements when they complete an ASYNC state change.
+     * <p>
+     * Applications will only receive this message from the top level pipeline.
+     * </p>
+     *
+     * @see #connect(ASYNC_DONE)
+     * @see #disconnect(ASYNC_DONE)
+     */
+    public static interface ASYNC_DONE {
+
+        /**
+         * Called when a segment-done message has been posted.
+         *
+         * @param source the element which posted the message.
+         */
+        public void asyncDone(GstObject source);
+    }
+
+    /**
+     * Catch all signals emitted on the Bus.
+     * <p>
+     * The signal handler will be called asynchronously from the thread that
+     * posted the message on the Bus.
+     *
+     * @see #connect(MESSAGE)
+     * @see #disconnect(MESSAGE)
+     */
+    public static interface MESSAGE {
+
+        /**
+         * Called when a {@link Element} posts a {@link Message} on the Bus.
+         *
+         * @param bus the Bus the message was posted on.
+         * @param message the message that was posted.
+         */
+        public void busMessage(Bus bus, Message message);
+    }
+
+    private static class MessageProxy implements MESSAGE {
+
+        private final MessageType type;
+        private final BusCallback callback;
+
+        public MessageProxy(MessageType type, BusCallback callback) {
+            this.type = type;
+            this.callback = callback;
+        }
+
+        public void busMessage(final Bus bus, final Message msg) {
+            if (type == MessageType.ANY || type == msg.getType()) {
+                callback.callback(bus, msg, null);
+            }
+        }
+    }
+
+    private static class SyncCallback implements GstBusAPI.BusSyncHandler {
+
+        {
+            Native.setCallbackThreadInitializer(this,
+                    new CallbackThreadInitializer(true,
+                            Boolean.getBoolean("glib.detachCallbackThreads"),
+                            "GstBus"));
+        }
+
+        @Override
+        public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
+            if (bus.syncHandler != null) {
+                BusSyncReply reply = bus.syncHandler.syncMessage(msg);
+
+                if (reply != BusSyncReply.DROP) {
+                    Gst.getExecutor().execute(() -> bus.dispatchMessage(msg));
+                }
+            } else {
+                Gst.getExecutor().execute(() -> bus.dispatchMessage(msg));
+            }
+            //
+            // Unref the message, since we are dropping it.
+            // (the normal GC will drop other refs to it)
+            //
+//            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
+            Natives.unref(msg);
+            return BusSyncReply.DROP;
         }
     }
 
