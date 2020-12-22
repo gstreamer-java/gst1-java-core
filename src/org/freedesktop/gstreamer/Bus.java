@@ -20,11 +20,8 @@
  */
 package org.freedesktop.gstreamer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,14 +75,9 @@ public class Bus extends GstObject {
     private static final SyncCallback SYNC_CALLBACK = new SyncCallback();
 
     private final Object lock = new Object();
-    private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
-    private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<>();
+    private final List<MessageProxy<?>> messageProxies = new CopyOnWriteArrayList<>();
     private boolean watchAdded = false;
-    private BusSyncHandler syncHandler = new BusSyncHandler() {
-        public BusSyncReply syncMessage(Message msg) {
-            return BusSyncReply.PASS;
-        }
-    };
+    private BusSyncHandler syncHandler = null;
 
     /**
      * This constructor is used internally by gstreamer-java
@@ -473,8 +465,14 @@ public class Bus extends GstObject {
      * @param callback The callback to call when the signal is emitted.
      */
     private <T> void connect(Class<T> listenerClass, T listener, BusCallback callback) {
-        final String signal = listenerClass.getSimpleName().toLowerCase(Locale.ROOT).replace('_', '-');
-        connect(signal, listenerClass, listener, callback);
+        String className = listenerClass.getSimpleName();
+        MessageType type;
+        if ("MESSAGE".equals(className)) {
+            type = MessageType.ANY;
+        } else {
+            type = MessageType.valueOf(listenerClass.getSimpleName());
+        }
+        addMessageProxy(type, listenerClass, listener, callback);
     }
 
     /**
@@ -483,87 +481,69 @@ public class Bus extends GstObject {
      * This differs to {@link GObject#connect} in that it hooks up Bus signals
      * to the sync callback, not the generic GObject signal mechanism.
      *
+     * @param <T> listener type
      * @param signal the name of the signal to connect to.
      * @param listenerClass the class of the {@code listener}
      * @param listener the listener to associate with the {@code callback}
      * @param callback the callback to call when the signal is emitted.
      */
     @Override
-    public synchronized <T> void connect(String signal, Class<T> listenerClass, T listener,
+    public <T> void connect(String signal, Class<T> listenerClass, T listener,
             final Callback callback) {
         if (listenerClass.getEnclosingClass() != Bus.class) {
             super.connect(signal, listenerClass, listener, callback);
-            return;
-        }
-        MessageType type;
-        if ("message".equals(signal)) {
-            type = MessageType.ANY;
         } else {
-            //@TODO refactor to stop unnecessary String operations
-            type = MessageType.valueOf(signal.toUpperCase(Locale.ROOT).replace('-', '_'));
+            MessageType type;
+            if ("message".equals(signal)) {
+                type = MessageType.ANY;
+            } else {
+                type = MessageType.valueOf(signal.toUpperCase(Locale.ROOT).replace('-', '_'));
+            }
+            addMessageProxy(type, listenerClass, listener, (BusCallback) callback);
         }
-        final Map<Class<?>, Map<Object, MessageProxy>> signals = getListenerMap();
-        // @TODO this was using type so doubtful ever worked
-        // these maps needs relooking at!
-        Map<Object, MessageProxy> m = signals.get(listenerClass);
-        if (m == null) {
-            m = new HashMap<Object, MessageProxy>();
-            signals.put(listenerClass, m);
-        }
-        MessageProxy proxy = new MessageProxy(type, (BusCallback) callback);
-        m.put(listener, proxy);
-        messageProxies.add(proxy);
-
+    }
+    
+    private synchronized <T> void addMessageProxy(MessageType type,
+            Class<T> listenerClass,
+            T listener,
+            BusCallback callback) {
+        messageProxies.add(new MessageProxy(type, listenerClass, listener, callback));
         addWatch();
     }
 
     @Override
-    public synchronized <T> void disconnect(Class<T> listenerClass, T listener) {
+    public <T> void disconnect(Class<T> listenerClass, T listener) {
         if (listenerClass.getEnclosingClass() != Bus.class) {
             super.disconnect(listenerClass, listener);
-            return;
+        } else {
+            removeMessageProxy(listenerClass, listener);
         }
-        final Map<Class<?>, Map<Object, MessageProxy>> signals = getListenerMap();
-        Map<Object, MessageProxy> m = signals.get(listenerClass);
-        if (m != null) {
-            MessageProxy proxy = m.remove(listener);
-            if (proxy != null) {
-                messageProxies.remove(proxy);
-            }
-            if (m.isEmpty()) {
-                removeWatch();
-                signals.remove(listenerClass);
-            }
+    }
+    
+    private synchronized <T> void removeMessageProxy(Class<T> listenerClass, T listener) {
+        messageProxies.removeIf(p -> p.listener == listener);
+        if (messageProxies.isEmpty()) {
+            removeWatch();
         }
     }
 
     /**
      * Dispatches a message to all interested listeners.
-     *
      * <p>
      * We do this here from a sync callback, because the default gstbus dispatch
      * uses the default main context to signal that there are messages waiting
      * on the bus. Since that is used by the GTK L&F under swing, we never get
      * those notifications, and the messages just queue up.
      *
-     * @param message
      */
     private void dispatchMessage(Message msg) {
-        // Dispatch to listeners
-        messageProxies.forEach((listener) -> {
+        messageProxies.forEach(p -> {
             try {
-                ((MessageProxy) listener).busMessage(this, msg);
+                p.busMessage(this, msg);
             } catch (Throwable t) {
                 LOG.log(Level.SEVERE, "Exception thrown by bus message handler", t);
             }
         });
-    }
-
-    private final Map<Class<?>, Map<Object, MessageProxy>> getListenerMap() {
-        if (signalListeners == null) {
-            signalListeners = new ConcurrentHashMap<Class<?>, Map<Object, MessageProxy>>();
-        }
-        return signalListeners;
     }
 
     @Override
@@ -845,17 +825,21 @@ public class Bus extends GstObject {
         public void busMessage(Bus bus, Message message);
     }
 
-    private static class MessageProxy implements MESSAGE {
+    private static class MessageProxy<T> {
 
         private final MessageType type;
+        private final Class<T> listenerClass;
+        private final Object listener;
         private final BusCallback callback;
 
-        public MessageProxy(MessageType type, BusCallback callback) {
+        MessageProxy(MessageType type, Class<T> listenerClass, T listener, BusCallback callback) {
             this.type = type;
+            this.listenerClass = listenerClass;
+            this.listener = listener;
             this.callback = callback;
         }
 
-        public void busMessage(final Bus bus, final Message msg) {
+        void busMessage(final Bus bus, final Message msg) {
             if (type == MessageType.ANY || type == msg.getType()) {
                 callback.callback(bus, msg, null);
             }
