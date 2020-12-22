@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2007, 2008 Wayne Meissner
  * Copyright (C) 2004 Wim Taymans <wim@fluendo.com>
  * 
@@ -26,8 +26,9 @@ import java.util.stream.Stream;
 import org.freedesktop.gstreamer.GstObject;
 import org.freedesktop.gstreamer.MiniObject;
 import org.freedesktop.gstreamer.Structure;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
+import org.freedesktop.gstreamer.lowlevel.GstMessagePtr;
 import org.freedesktop.gstreamer.lowlevel.ReferenceManager;
 import org.freedesktop.gstreamer.lowlevel.annotations.HasSubtype;
 
@@ -82,7 +83,7 @@ public class Message extends MiniObject {
         TYPE_MAP.put(MessageType.NEED_CONTEXT, NeedContextMessage::new);
     }
 
-    private final GstMessageAPI.MessageStruct messageStruct;
+    private final Handle handle;
 
     /**
      * Creates a new instance of Message.
@@ -90,8 +91,12 @@ public class Message extends MiniObject {
      * @param init internal initialization data.
      */
     Message(Initializer init) {
-        super(init);
-        messageStruct = new GstMessageAPI.MessageStruct(init.ptr.getPointer());
+        this(new Handle(init.ptr.as(GstMessagePtr.class, GstMessagePtr::new), init.ownsHandle), init.needRef);
+    }
+
+    Message(Handle handle, boolean needRef) {
+        super(handle, needRef);
+        this.handle = handle;
     }
 
     /**
@@ -100,7 +105,7 @@ public class Message extends MiniObject {
      * @return the element that posted the message.
      */
     public GstObject getSource() {
-        return (GstObject) messageStruct.readField("src");
+        return Natives.objectFor(handle.getPointer().getSource(), GstObject.class, true, true);
     }
 
     /**
@@ -118,16 +123,18 @@ public class Message extends MiniObject {
      * @return the message type.
      */
     public MessageType getType() {
-        MessageType type = (MessageType) messageStruct.readField("type");
-        return type;
+        return NativeEnum.fromInt(MessageType.class, MessageType.UNKNOWN,
+                handle.getPointer().getMessageType());
     }
 
     private static Message create(Initializer init) {
-        GstMessageAPI.MessageStruct struct = new GstMessageAPI.MessageStruct(init.ptr.getPointer());
-        MessageType type = (MessageType) struct.readField("type");
+        MessageType type = NativeEnum.fromInt(MessageType.class,
+                MessageType.UNKNOWN,
+                init.ptr.as(GstMessagePtr.class, GstMessagePtr::new).getMessageType()
+        );
         return TYPE_MAP.getOrDefault(type, Message::new).apply(init);
     }
-    
+
     public static class Types implements TypeProvider {
 
         @Override
@@ -136,7 +143,20 @@ public class Message extends MiniObject {
                     Natives.registration(Message.class, GTYPE_NAME, Message::create)
             );
         }
-        
+
+    }
+
+    static class Handle extends MiniObject.Handle {
+
+        Handle(GstMessagePtr ptr, boolean ownsHandle) {
+            super(ptr, ownsHandle);
+        }
+
+        @Override
+        protected GstMessagePtr getPointer() {
+            return (GstMessagePtr) super.getPointer();
+        }
+
     }
 
 }
