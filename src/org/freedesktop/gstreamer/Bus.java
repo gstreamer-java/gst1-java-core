@@ -30,18 +30,24 @@ import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 
 import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
+import org.freedesktop.gstreamer.lowlevel.GstBusPtr;
+import org.freedesktop.gstreamer.lowlevel.GstMessagePtr;
 import org.freedesktop.gstreamer.message.Message;
 import org.freedesktop.gstreamer.message.MessageType;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 
 /**
  * The {@link Bus} is an object responsible for delivering {@link Message}s in a
@@ -110,8 +116,8 @@ public class Bus extends GstObject {
      */
     public void connect(final EOS listener) {
         connect(EOS.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.endOfStream(msg.getSource());
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.endOfStream(Natives.objectFor(msg.getSource(), GstObject.class, true, true));
                 return true;
             }
         });
@@ -134,11 +140,12 @@ public class Bus extends GstObject {
      */
     public void connect(final ERROR listener) {
         connect(ERROR.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_error(msg, err, null);
                 GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.errorMessage(msg.getSource(), error.getCode(), error.getMessage());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.errorMessage(source, error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
                 return true;
             }
@@ -162,11 +169,12 @@ public class Bus extends GstObject {
      */
     public void connect(final WARNING listener) {
         connect(WARNING.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_warning(msg, err, null);
                 GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.warningMessage(msg.getSource(), error.getCode(), error.getMessage());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.warningMessage(source, error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
                 return true;
             }
@@ -190,11 +198,12 @@ public class Bus extends GstObject {
      */
     public void connect(final INFO listener) {
         connect(INFO.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
                 PointerByReference err = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_info(msg, err, null);
                 GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.infoMessage(msg.getSource(), error.getCode(), error.getMessage());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.infoMessage(source, error.getCode(), error.getMessage());
                 GLIB_API.g_error_free(err.getValue());
                 return true;
             }
@@ -218,12 +227,16 @@ public class Bus extends GstObject {
      */
     public void connect(final STATE_CHANGED listener) {
         connect(STATE_CHANGED.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                State[] o = new State[1];
-                State[] n = new State[1];
-                State[] p = new State[1];
-                GSTMESSAGE_API.gst_message_parse_state_changed(msg, o, n, p);
-                listener.stateChanged(msg.getSource(), o[0], n[0], p[0]);
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference oldPtr = new IntByReference();
+                IntByReference currentPtr = new IntByReference();
+                IntByReference pendingPtr = new IntByReference();
+                GSTMESSAGE_API.gst_message_parse_state_changed(msg, oldPtr, currentPtr, pendingPtr);
+                State old = NativeEnum.fromInt(State.class, oldPtr.getValue());
+                State current = NativeEnum.fromInt(State.class, currentPtr.getValue());
+                State pending = NativeEnum.fromInt(State.class, pendingPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.stateChanged(source, old, current, pending);
                 return true;
             }
         });
@@ -245,11 +258,12 @@ public class Bus extends GstObject {
      */
     public void connect(final TAG listener) {
         connect(TAG.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
                 PointerByReference list = new PointerByReference();
                 GSTMESSAGE_API.gst_message_parse_tag(msg, list);
                 TagList tl = new TagList(Natives.initializer(list.getValue()));
-                listener.tagsFound(msg.getSource(), tl);
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.tagsFound(source, tl);
                 return true;
             }
         });
@@ -271,10 +285,11 @@ public class Bus extends GstObject {
      */
     public void connect(final BUFFERING listener) {
         connect(BUFFERING.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                int[] percent = {0};
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference percent = new IntByReference();
                 GSTMESSAGE_API.gst_message_parse_buffering(msg, percent);
-                listener.bufferingData(msg.getSource(), percent[0]);
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.bufferingData(source, percent.getValue());
                 return true;
             }
         });
@@ -296,8 +311,9 @@ public class Bus extends GstObject {
      */
     public void connect(final DURATION_CHANGED listener) {
         connect(DURATION_CHANGED.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.durationChanged(msg.getSource());
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.durationChanged(source);
                 return true;
             }
         });
@@ -320,11 +336,13 @@ public class Bus extends GstObject {
      */
     public void connect(final SEGMENT_START listener) {
         connect(SEGMENT_START.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                Format[] format = new Format[1];
-                long[] position = {0};
-                GSTMESSAGE_API.gst_message_parse_segment_start(msg, format, position);
-                listener.segmentStart(msg.getSource(), format[0], position[0]);
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference formatPtr = new IntByReference();
+                LongByReference positionPtr = new LongByReference();
+                GSTMESSAGE_API.gst_message_parse_segment_start(msg, formatPtr, positionPtr);
+                Format format = NativeEnum.fromInt(Format.class, formatPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.segmentStart(source, format, positionPtr.getValue());
                 return true;
             }
         });
@@ -347,11 +365,13 @@ public class Bus extends GstObject {
      */
     public void connect(final SEGMENT_DONE listener) {
         connect(SEGMENT_DONE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                Format[] format = new Format[1];
-                long[] position = {0};
-                GSTMESSAGE_API.gst_message_parse_segment_done(msg, format, position);
-                listener.segmentDone(msg.getSource(), format[0], position[0]);
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference formatPtr = new IntByReference();
+                LongByReference positionPtr = new LongByReference();
+                GSTMESSAGE_API.gst_message_parse_segment_done(msg, formatPtr, positionPtr);
+                Format format = NativeEnum.fromInt(Format.class, formatPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.segmentDone(source, format, positionPtr.getValue());
                 return true;
             }
         });
@@ -374,8 +394,9 @@ public class Bus extends GstObject {
      */
     public void connect(final ASYNC_DONE listener) {
         connect(ASYNC_DONE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.asyncDone(msg.getSource());
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.asyncDone(source);
                 return true;
             }
         });
@@ -398,8 +419,8 @@ public class Bus extends GstObject {
      */
     public void connect(final MESSAGE listener) {
         connect(MESSAGE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.busMessage(bus, msg);
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.busMessage(Bus.this, Natives.objectFor(msg, Message.class, true, true));
                 return true;
             }
         });
@@ -420,8 +441,8 @@ public class Bus extends GstObject {
             signal = signal.substring(signal.lastIndexOf("::") + 2);
         }
         connect(signal, MESSAGE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.busMessage(bus, msg);
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.busMessage(Bus.this, Natives.objectFor(msg, Message.class, true, true));
                 return true;
             }
         });
@@ -502,7 +523,7 @@ public class Bus extends GstObject {
             addMessageProxy(type, listenerClass, listener, (BusCallback) callback);
         }
     }
-    
+
     private synchronized <T> void addMessageProxy(MessageType type,
             Class<T> listenerClass,
             T listener,
@@ -519,7 +540,7 @@ public class Bus extends GstObject {
             removeMessageProxy(listenerClass, listener);
         }
     }
-    
+
     private synchronized <T> void removeMessageProxy(Class<T> listenerClass, T listener) {
         messageProxies.removeIf(p -> p.listener == listener);
         if (messageProxies.isEmpty()) {
@@ -536,14 +557,15 @@ public class Bus extends GstObject {
      * those notifications, and the messages just queue up.
      *
      */
-    private void dispatchMessage(Message msg) {
+    private void dispatchMessage(GstBusPtr busPtr, GstMessagePtr msgPtr) {
         messageProxies.forEach(p -> {
             try {
-                p.busMessage(this, msg);
+                p.busMessage(busPtr, msgPtr);
             } catch (Throwable t) {
                 LOG.log(Level.SEVERE, "Exception thrown by bus message handler", t);
             }
         });
+        GSTMINIOBJECT_API.gst_mini_object_unref(msgPtr);
     }
 
     @Override
@@ -839,8 +861,8 @@ public class Bus extends GstObject {
             this.callback = callback;
         }
 
-        void busMessage(final Bus bus, final Message msg) {
-            if (type == MessageType.ANY || type == msg.getType()) {
+        void busMessage(final GstBusPtr bus, final GstMessagePtr msg) {
+            if (type == MessageType.ANY || type.intValue() == msg.getMessageType()) {
                 callback.callback(bus, msg, null);
             }
         }
@@ -856,22 +878,20 @@ public class Bus extends GstObject {
         }
 
         @Override
-        public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
+        public BusSyncReply callback(final GstBusPtr busPtr, final GstMessagePtr msgPtr, Pointer userData) {
+            Bus bus = Natives.objectFor(busPtr, Bus.class, true, true);
             if (bus.syncHandler != null) {
+                Message msg = Natives.objectFor(msgPtr, Message.class, true, true);
                 BusSyncReply reply = bus.syncHandler.syncMessage(msg);
-
                 if (reply != BusSyncReply.DROP) {
-                    Gst.getExecutor().execute(() -> bus.dispatchMessage(msg));
+                    Gst.getExecutor().execute(() -> bus.dispatchMessage(busPtr, msgPtr));
+                } else {
+                    // not calling dispatch message so unref here
+                    GSTMINIOBJECT_API.gst_mini_object_unref(msgPtr);
                 }
             } else {
-                Gst.getExecutor().execute(() -> bus.dispatchMessage(msg));
+                Gst.getExecutor().execute(() -> bus.dispatchMessage(busPtr, msgPtr));
             }
-            //
-            // Unref the message, since we are dropping it.
-            // (the normal GC will drop other refs to it)
-            //
-//            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
-            Natives.unref(msg);
             return BusSyncReply.DROP;
         }
     }
