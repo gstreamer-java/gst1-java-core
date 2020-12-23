@@ -54,8 +54,8 @@ import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_
  * first-in first-out way from the streaming threads to the application.
  * <p>
  * See upstream documentation at
- * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBus.html"
- * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBus.html</a>
+ * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstbus.html"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstbus.html</a>
  * <p>
  * Since the application typically only wants to deal with delivery of these
  * messages from one thread, the Bus will marshal the messages between different
@@ -80,10 +80,11 @@ public class Bus extends GstObject {
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
     private static final SyncCallback SYNC_CALLBACK = new SyncCallback();
 
+    private volatile BusSyncHandler syncHandler = null;
+
     private final Object lock = new Object();
     private final List<MessageProxy<?>> messageProxies = new CopyOnWriteArrayList<>();
     private boolean watchAdded = false;
-    private BusSyncHandler syncHandler = null;
 
     /**
      * This constructor is used internally by gstreamer-java
@@ -468,12 +469,44 @@ public class Bus extends GstObject {
         return GSTBUS_API.gst_bus_post(this, message);
     }
 
-    public BusSyncHandler getSyncHandler() {
-        return syncHandler;
-    }
-
+    /**
+     * Sets the synchronous handler (message listener) on the bus. The handler
+     * will be called every time a new message is posted on the bus. Note that
+     * the handler will be called in the same thread context as the posting
+     * object. Applications should generally handle messages asynchronously
+     * using the other message listeners.
+     * <p>
+     * Only one handler may be attached to the bus at any one time. An attached
+     * sync handler forces creation of {@link Message} objects for all messages
+     * on the bus, so the handler should be removed if no longer required.
+     * <p>
+     * A single native sync handler is used at all times, with synchronous and
+     * asynchronous dispatch handled on the Java side, so the bindings do not
+     * inherit issues in clearing or replacing the sync handler with versions of
+     * GStreamer prior to 1.16.3.
+     *
+     * @param handler bus sync handler, or null to remove
+     */
     public void setSyncHandler(BusSyncHandler handler) {
         syncHandler = handler;
+    }
+
+    /**
+     * Clear the synchronous handler.
+     * <p>
+     * This is a convenience method equivalent to {@code setSyncHandler(null)}
+     */
+    public void clearSyncHandler() {
+        setSyncHandler(null);
+    }
+
+    /**
+     * Get the current synchronous handler.
+     *
+     * @return current sync handler, or null
+     */
+    public BusSyncHandler getSyncHandler() {
+        return syncHandler;
     }
 
     /**
@@ -880,9 +913,11 @@ public class Bus extends GstObject {
         @Override
         public BusSyncReply callback(final GstBusPtr busPtr, final GstMessagePtr msgPtr, Pointer userData) {
             Bus bus = Natives.objectFor(busPtr, Bus.class, true, true);
-            if (bus.syncHandler != null) {
+            // volatile - use local reference
+            BusSyncHandler syncHandler = bus.syncHandler;
+            if (syncHandler != null) {
                 Message msg = Natives.objectFor(msgPtr, Message.class, true, true);
-                BusSyncReply reply = bus.syncHandler.syncMessage(msg);
+                BusSyncReply reply = syncHandler.syncMessage(msg);
                 if (reply != BusSyncReply.DROP) {
                     Gst.getExecutor().execute(() -> bus.dispatchMessage(busPtr, msgPtr));
                 } else {
