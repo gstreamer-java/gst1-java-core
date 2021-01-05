@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2016 Isaac Raño Jares
  * 
  * This file is part of gstreamer-java.
@@ -19,14 +19,14 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.GioAPI;
+import static org.freedesktop.gstreamer.lowlevel.GioAPI.GIO_API;
 
 public class GCancellable extends GObject{
 
 	public static final String GTYPE_NAME = "GCancellable";
 
 	public GCancellable() {
-		this(Natives.initializer(GioAPI.g_cancellable_new()));
+		this(Natives.initializer(GIO_API.g_cancellable_new()));
 	}
 	
 	private GCancellable(Initializer init) {

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2007 Wayne Meissner
  *
  * This file is part of gstreamer-java.
@@ -32,15 +33,13 @@ import com.sun.jna.Platform;
  *
  */
 public final class GNative {
-    // gstreamer on win32 names the dll files one of foo.dll, libfoo.dll and libfoo-0.dll
-    // private static String[] windowsNameFormats = { "%s", "lib%s", "lib%s-0" };
             
     private final static String[] nameFormats;
     
     static {
         String defFormats = "%s";
         if (Platform.isWindows()) {
-            defFormats = "%s|lib%s|lib%s-0";
+            defFormats = "%s-0|%s|lib%s-0|lib%s";
         } else if (Platform.isMac()) {
             defFormats = "%s.0|%s";
         }

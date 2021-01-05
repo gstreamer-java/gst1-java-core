@@ -110,8 +110,8 @@
         <version>2.20</version>
         <configuration>
           <!--<skipTests>true</skipTests>-->
-            <forkCount>1</forkCount>
-            <reuseForks>false</reuseForks>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
           <argLine>-Djna.nosys=true ${maven.test.jvmargs}</argLine>
           <excludes>
             <exclude>**/Test*.java</exclude>
@@ -131,17 +131,41 @@
         </configuration>
       </plugin>
       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.4</version>
-          <configuration>
-              <excludePackageNames>org.freedesktop.gstreamer.lowlevel</excludePackageNames>
-          </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <configuration>
+          <excludePackageNames>org.freedesktop.gstreamer.lowlevel</excludePackageNames>
+        </configuration>
       </plugin>
     </plugins>
   </build>
 
   <profiles>
+    <profile>
+      <id>windows-gstreamer-path</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+        <property>
+          <name>gstreamer.path</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <environmentVariables>
+                <PATH>${gstreamer.path};${java.library.path}</PATH>
+              </environmentVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>release</id>
       <build>

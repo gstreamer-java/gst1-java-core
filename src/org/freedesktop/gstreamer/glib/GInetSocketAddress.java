@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2016 Isaac Raño Jares
  * 
  * This file is part of gstreamer-java.
@@ -19,7 +19,7 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.GioAPI;
+import static org.freedesktop.gstreamer.lowlevel.GioAPI.GIO_API;
 
 import com.sun.jna.Pointer;
 
@@ -44,7 +44,7 @@ public class GInetSocketAddress extends GSocketAddress {
 	}
         
         private static Initializer createRawAddress(String address, int port) {
-            Pointer nativePointer = GioAPI.g_inet_socket_address_new_from_string(address, port);
+            Pointer nativePointer = GIO_API.g_inet_socket_address_new_from_string(address, port);
             if (nativePointer == null) {
                 throw new GLibException("Can not create "+GInetSocketAddress.class.getSimpleName()+" for "+address+":"+port+", please check that the IP address is valid, with format x.x.x.x");
             }

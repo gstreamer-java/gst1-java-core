@@ -61,7 +61,7 @@ public class PluginTest {
 
     @Test
     public void testGetVersion() {
-        assertTrue(playbackPlugin.getVersion().matches("\\d+\\.\\d+\\.\\d+"));
+        assertTrue(playbackPlugin.getVersion().matches("^(?:\\d+\\.)*\\d+$"));
     }
 
     @Test
