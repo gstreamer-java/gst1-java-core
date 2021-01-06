@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2016 Isaac Raño Jares
  * 
  * This file is part of gstreamer-java.
@@ -19,7 +19,7 @@
 
 package org.freedesktop.gstreamer.glib;
 
-import org.freedesktop.gstreamer.lowlevel.GioAPI;
+import static org.freedesktop.gstreamer.lowlevel.GioAPI.GIO_API;
 
 public class GInetAddress extends GObject{
 
@@ -30,7 +30,7 @@ public class GInetAddress extends GObject{
 	}
 
 	public String getAddress() {
-		return GioAPI.g_inet_address_to_string(getRawPointer());
+		return GIO_API.g_inet_address_to_string(getRawPointer());
 	}
 	
 }
