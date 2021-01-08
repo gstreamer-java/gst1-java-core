@@ -22,7 +22,7 @@ jobs:
          java-version: 1.8
       
       - name: Install GStreamer
-        run: sudo apt-get install gstreamer1.0-plugins-good
+        run: sudo apt-get update && sudo apt-get install gstreamer1.0-plugins-good
       
       - name: Build with Maven
         run: mvn -B verify --file pom.xml
@@ -41,7 +41,7 @@ jobs:
          java-version: 1.8
       
       - name: Install GStreamer
-        run: sudo apt-get install gstreamer1.0-plugins-good
+        run: sudo apt-get update && sudo apt-get install gstreamer1.0-plugins-good
       
       - name: Build with Maven
         run: mvn -B verify --file pom.xml
@@ -60,7 +60,7 @@ jobs:
          java-version: 1.8
       
       - name: Install GStreamer
-        run: sudo apt-get install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad
+        run: sudo apt-get update && sudo apt-get install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad
       
       - name: Build with Maven
         run: mvn -B verify --file pom.xml
