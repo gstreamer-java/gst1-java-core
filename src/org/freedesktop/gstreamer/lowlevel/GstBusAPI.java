@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2014 Tom Greenwood <tgreenwood@cafex.com>
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2007, 2008 Wayne Meissner
@@ -54,10 +55,10 @@ public interface GstBusAPI extends com.sun.jna.Library {
 
     void gst_bus_set_flushing(Bus ptr, int flushing);
     interface BusCallback extends GstCallback {
-        boolean callback(Bus bus, Message msg, Pointer data);
+        boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer data);
     }
     public interface BusSyncHandler extends GstCallback {
-    	BusSyncReply callback(Bus bus, Message msg, Pointer userData);
+    	BusSyncReply callback(GstBusPtr bus, GstMessagePtr msg, Pointer userData);
     }
     NativeLong gst_bus_add_watch(Bus bus, BusCallback function, Pointer data);
     void gst_bus_set_sync_handler(Bus bus, BusSyncHandler function, Pointer data, GDestroyNotify destroyCallback);

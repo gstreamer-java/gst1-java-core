@@ -1,4 +1,5 @@
 /* 
+ * Copyright (c) 2020 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (c) 2008 Wayne Meissner
  * 
@@ -17,25 +18,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with gstreamer-java.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.freedesktop.gstreamer;
-
-import org.freedesktop.gstreamer.message.MessageType;
-import org.freedesktop.gstreamer.message.Message;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.freedesktop.gstreamer.lowlevel.GstMessageAPI;
-import org.freedesktop.gstreamer.lowlevel.GstElementAPI;
-import org.freedesktop.gstreamer.lowlevel.GstTagListAPI;
 import org.freedesktop.gstreamer.message.BufferingMessage;
 import org.freedesktop.gstreamer.message.DurationChangedMessage;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.LatencyMessage;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.message.MessageType;
 import org.freedesktop.gstreamer.message.SegmentDoneMessage;
 import org.freedesktop.gstreamer.message.StateChangedMessage;
 import org.freedesktop.gstreamer.message.TagMessage;
@@ -43,12 +35,17 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstTagListAPI.GSTTAGLIST_API;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
- * @author wayne
  */
 public class MessageTest {
 
@@ -57,9 +54,9 @@ public class MessageTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Gst.init("BusTest", new String[] {});
+        Gst.init("MessageTest");
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         Gst.deinit();
@@ -72,23 +69,29 @@ public class MessageTest {
     @After
     public void tearDown() {
     }
-      
-    @Test public void gst_message_new_eos() {
+
+    @Test
+    public void gst_message_new_eos() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_eos(fakesink);
+        Message msg = GSTMESSAGE_API.gst_message_new_eos(fakesink);
         assertTrue("gst_message_new_eos did not return an instance of EOSMessage", msg instanceof EOSMessage);
     }
-    @Test public void EOSMessage_getSource() {
+
+    @Test
+    public void EOSMessage_getSource() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_eos(fakesink);
+        Message msg = GSTMESSAGE_API.gst_message_new_eos(fakesink);
         assertEquals("Wrong source in message", fakesink, msg.getSource());
     }
-    @Test public void postEOS() {
+
+    @Test
+    public void postEOS() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
+        final AtomicReference<Message> signalMessage = new AtomicReference<>(null);
         pipe.getBus().connect("message::eos", new Bus.MESSAGE() {
 
+            @Override
             public void busMessage(Bus bus, Message msg) {
                 signalFired.set(true);
                 signalMessage.set(msg);
@@ -96,7 +99,7 @@ public class MessageTest {
             }
         });
         pipe.play();
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.sink, new EOSMessage(pipe.sink));
+        GSTELEMENT_API.gst_element_post_message(pipe.sink, new EOSMessage(pipe.sink));
         pipe.run();
 
         Message msg = signalMessage.get();
@@ -106,20 +109,26 @@ public class MessageTest {
         assertEquals("Wrong source in message", pipe.pipe, msg.getSource());
         pipe.dispose();
     }
-    @Test public void gst_message_new_percent() {
+
+    @Test
+    public void gst_message_new_percent() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_buffering(fakesink, 55);
+        Message msg = GSTMESSAGE_API.gst_message_new_buffering(fakesink, 55);
         assertTrue("gst_message_new_eos did not return an instance of BufferingMessage", msg instanceof BufferingMessage);
     }
-    @Test public void BufferingMessage_getPercent() {
+
+    @Test
+    public void BufferingMessage_getPercent() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        BufferingMessage msg = (BufferingMessage) GstMessageAPI.GSTMESSAGE_API.gst_message_new_buffering(fakesink, 55);
+        BufferingMessage msg = (BufferingMessage) GSTMESSAGE_API.gst_message_new_buffering(fakesink, 55);
         assertEquals("Wrong source in message", 55, msg.getPercent());
     }
-    @Test public void postBufferingMessage() {
+
+    @Test
+    public void postBufferingMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
+        final AtomicReference<Message> signalMessage = new AtomicReference<>(null);
         pipe.getBus().connect("message::buffering", new Bus.MESSAGE() {
 
             public void busMessage(Bus bus, Message msg) {
@@ -129,7 +138,7 @@ public class MessageTest {
             }
         });
         final int PERCENT = 55;
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.sink, new BufferingMessage(pipe.src, PERCENT));
+        GSTELEMENT_API.gst_element_post_message(pipe.sink, new BufferingMessage(pipe.src, PERCENT));
         pipe.run();
         Message msg = signalMessage.get();
         assertNotNull("No message available on bus", msg);
@@ -140,25 +149,28 @@ public class MessageTest {
         pipe.dispose();
     }
 
-    @Test public void gst_message_new_duration() {
+    @Test
+    public void gst_message_new_duration() {
         Element fakesink = ElementFactory.make("fakesink", "sink");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_duration_changed(fakesink);
+        Message msg = GSTMESSAGE_API.gst_message_new_duration_changed(fakesink);
         assertTrue("gst_message_new_duration did not return an instance of DurationMessage", msg instanceof DurationChangedMessage);
     }
 
-    @Test public void postDurationMessage() {
+    @Test
+    public void postDurationMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
+        final AtomicReference<Message> signalMessage = new AtomicReference<>(null);
         pipe.getBus().connect("message::duration-changed", new Bus.MESSAGE() {
 
+            @Override
             public void busMessage(Bus bus, Message msg) {
                 signalFired.set(true);
                 signalMessage.set(msg);
                 pipe.quit();
             }
         });
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, new DurationChangedMessage(pipe.src));
+        GSTELEMENT_API.gst_element_post_message(pipe.src, new DurationChangedMessage(pipe.src));
         pipe.play().run();
         Message msg = signalMessage.get();
         assertNotNull("No message available on bus", msg);
@@ -167,43 +179,53 @@ public class MessageTest {
         assertEquals("Wrong source in message", pipe.src, msg.getSource());
         pipe.dispose();
     }
-    @Test public void gst_message_new_tag() {
+
+    @Test
+    public void gst_message_new_tag() {
         Element src = ElementFactory.make("fakesrc", "src");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_tag(src, new TagList());
+        Message msg = GSTMESSAGE_API.gst_message_new_tag(src, new TagList());
         assertTrue("gst_message_new_tag did not return an instance of TagMessage", msg instanceof TagMessage);
     }
-    
-//    @Ignore
-    @Test public void TagMessage_getTagList() {
+
+    @Test
+    public void TagMessage_getTagList() {
         Element src = ElementFactory.make("fakesrc", "src");
         TagList tl = new TagList();
         final String MAGIC = "fubar";
-        GstTagListAPI.GSTTAGLIST_API.gst_tag_list_add(tl, TagMergeMode.APPEND, "artist", MAGIC);
-        TagMessage msg = (TagMessage) GstMessageAPI.GSTMESSAGE_API.gst_message_new_tag(src, tl);
+        GSTTAGLIST_API.gst_tag_list_add(tl, TagMergeMode.APPEND, "artist", MAGIC);
+        TagMessage msg = (TagMessage) GSTMESSAGE_API.gst_message_new_tag(src, tl);
         tl = msg.getTagList();
         assertEquals("Wrong artist in tag list", MAGIC, tl.getString("artist", 0));
     }
-    @Test public void gst_message_new_state_changed() {
+
+    @Test
+    public void gst_message_new_state_changed() {
         Element src = ElementFactory.make("fakesrc", "src");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_state_changed(src, State.READY, State.PLAYING, State.VOID_PENDING);
+        Message msg = GSTMESSAGE_API.gst_message_new_state_changed(src, State.READY, State.PLAYING, State.VOID_PENDING);
         assertTrue("gst_message_new_state_changed did not return an instance of StateChangedMessage", msg instanceof StateChangedMessage);
     }
-    @Test public void constructStateChanged() {
+
+    @Test
+    public void constructStateChanged() {
         Element src = ElementFactory.make("fakesrc", "src");
         new StateChangedMessage(src, State.READY, State.PLAYING, State.VOID_PENDING);
     }
-    @Test public void StateChanged_get() {
+
+    @Test
+    public void StateChanged_get() {
         Element src = ElementFactory.make("fakesrc", "src");
-        StateChangedMessage msg = (StateChangedMessage) GstMessageAPI.GSTMESSAGE_API.gst_message_new_state_changed(src, State.READY, State.PLAYING, State.VOID_PENDING);
+        StateChangedMessage msg = (StateChangedMessage) GSTMESSAGE_API.gst_message_new_state_changed(src, State.READY, State.PLAYING, State.VOID_PENDING);
         assertEquals("Wrong old state", State.READY, msg.getOldState());
         assertEquals("Wrong new state", State.PLAYING, msg.getNewState());
         assertEquals("Wrong pending state", State.VOID_PENDING, msg.getPendingState());
     }
-    @Test public void postStateChangedMessage() {
+
+    @Test
+    public void postStateChangedMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
         final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
-        
+
         pipe.getBus().connect("message::state-changed", new Bus.MESSAGE() {
 
             public void busMessage(Bus bus, Message msg) {
@@ -212,7 +234,7 @@ public class MessageTest {
                 pipe.quit();
             }
         });
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, 
+        GSTELEMENT_API.gst_element_post_message(pipe.src,
                 new StateChangedMessage(pipe.src, State.READY, State.PLAYING, State.VOID_PENDING));
         pipe.run();
         Message msg = signalMessage.get();
@@ -224,27 +246,35 @@ public class MessageTest {
         assertEquals("Wrong pending state", State.VOID_PENDING, smsg.getPendingState());
         pipe.dispose();
     }
-    @Test public void gst_message_new_segment_done() {
+
+    @Test
+    public void gst_message_new_segment_done() {
         Element src = ElementFactory.make("fakesrc", "src");
-        Message msg = GstMessageAPI.GSTMESSAGE_API.gst_message_new_segment_done(src, Format.TIME, 0xdeadbeef);
-        assertTrue("gst_message_new_segment_done did not return an instance of SegmentDoneMessage", 
+        Message msg = GSTMESSAGE_API.gst_message_new_segment_done(src, Format.TIME, 0xdeadbeef);
+        assertTrue("gst_message_new_segment_done did not return an instance of SegmentDoneMessage",
                 msg instanceof SegmentDoneMessage);
     }
-    @Test public void constructSegmentDone() {
+
+    @Test
+    public void constructSegmentDone() {
         Element src = ElementFactory.make("fakesrc", "src");
         new SegmentDoneMessage(src, Format.TIME, 0xdeadbeef);
     }
-    @Test public void parseSegmentDone() {
+
+    @Test
+    public void parseSegmentDone() {
         Element src = ElementFactory.make("fakesrc", "src");
-        SegmentDoneMessage msg = (SegmentDoneMessage) GstMessageAPI.GSTMESSAGE_API.gst_message_new_segment_done(src, Format.TIME, 0xdeadbeef);
+        SegmentDoneMessage msg = (SegmentDoneMessage) GSTMESSAGE_API.gst_message_new_segment_done(src, Format.TIME, 0xdeadbeef);
         assertEquals("Wrong format", Format.TIME, msg.getFormat());
         assertEquals("Wrong position", 0xdeadbeef, msg.getPosition());
     }
-    @Test public void postSegmentDoneMessage() {
+
+    @Test
+    public void postSegmentDoneMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
-        
+        final AtomicReference<Message> signalMessage = new AtomicReference<>(null);
+
         pipe.getBus().connect("message::segment-done", new Bus.MESSAGE() {
 
             public void busMessage(Bus bus, Message msg) {
@@ -254,7 +284,7 @@ public class MessageTest {
             }
         });
         final int POSITION = 0xdeadbeef;
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, 
+        GSTELEMENT_API.gst_element_post_message(pipe.src,
                 new SegmentDoneMessage(pipe.src, Format.TIME, POSITION));
         pipe.run();
         Message msg = signalMessage.get();
@@ -265,20 +295,23 @@ public class MessageTest {
         assertEquals("Wrong position", POSITION, smsg.getPosition());
         pipe.dispose();
     }
-    @Test public void postLatencyMessage() {
+
+    @Test
+    public void postLatencyMessage() {
         final TestPipe pipe = new TestPipe();
         final AtomicBoolean signalFired = new AtomicBoolean(false);
-        final AtomicReference<Message> signalMessage = new AtomicReference<Message>(null);
-        
+        final AtomicReference<Message> signalMessage = new AtomicReference<>(null);
+
         pipe.getBus().connect("message::latency", new Bus.MESSAGE() {
 
+            @Override
             public void busMessage(Bus bus, Message msg) {
                 signalFired.set(true);
                 signalMessage.set(msg);
                 pipe.quit();
             }
         });
-        GstElementAPI.GSTELEMENT_API.gst_element_post_message(pipe.src, 
+        GSTELEMENT_API.gst_element_post_message(pipe.src,
                 new LatencyMessage(pipe.src));
         pipe.run();
         Message msg = signalMessage.get();

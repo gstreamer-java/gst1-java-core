@@ -20,57 +20,51 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.message.MessageType;
-import org.freedesktop.gstreamer.message.Message;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackThreadInitializer;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Locale;
-import java.util.logging.Level;
-import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.glib.NativeEnum;
 
+import org.freedesktop.gstreamer.glib.Natives;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI;
 import org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusCallback;
+import org.freedesktop.gstreamer.lowlevel.GstBusPtr;
+import org.freedesktop.gstreamer.lowlevel.GstMessagePtr;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.message.MessageType;
 
 import static org.freedesktop.gstreamer.lowlevel.GlibAPI.GLIB_API;
 import static org.freedesktop.gstreamer.lowlevel.GstBusAPI.GSTBUS_API;
 import static org.freedesktop.gstreamer.lowlevel.GstMessageAPI.GSTMESSAGE_API;
+import static org.freedesktop.gstreamer.lowlevel.GstMiniObjectAPI.GSTMINIOBJECT_API;
 
 /**
  * The {@link Bus} is an object responsible for delivering {@link Message}s in a
  * first-in first-out way from the streaming threads to the application.
  * <p>
  * See upstream documentation at
- * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBus.html"
- * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstBus.html</a>
+ * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstbus.html"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstbus.html</a>
  * <p>
  * Since the application typically only wants to deal with delivery of these
  * messages from one thread, the Bus will marshal the messages between different
  * threads. This is important since the actual streaming of media is done in
  * another thread than the application.
  * <p>
- * A message is posted on the bus with the gst_bus_post() method. With the
- * gst_bus_peek() and gst_bus_pop() methods one can look at or retrieve a
- * previously posted message.
- * <p>
- * The bus can be polled with the gst_bus_poll() method. This methods blocks up
- * to the specified timeout value until one of the specified messages types is
- * posted on the bus. The application can then _pop() the messages from the bus
- * to handle them.
- * <p>
  * It is also possible to get messages from the bus without any thread
- * marshaling with the {@link #setSyncHandler} method. This makes it possible to
- * react to a message in the same thread that posted the message on the bus.
+ * marshalling with the {@link #setSyncHandler} method. This makes it possible
+ * to react to a message in the same thread that posted the message on the bus.
  * This should only be used if the application is able to deal with messages
  * from different threads.
  * <p>
@@ -84,10 +78,12 @@ public class Bus extends GstObject {
     public static final String GTYPE_NAME = "GstBus";
 
     private static final Logger LOG = Logger.getLogger(Bus.class.getName());
-    
+    private static final SyncCallback SYNC_CALLBACK = new SyncCallback();
+
+    private volatile BusSyncHandler syncHandler = null;
+
     private final Object lock = new Object();
-    private Map<Class<?>, Map<Object, MessageProxy>> signalListeners;
-    private List<MessageProxy> messageProxies = new CopyOnWriteArrayList<MessageProxy>();
+    private final List<MessageProxy<?>> messageProxies = new CopyOnWriteArrayList<>();
     private boolean watchAdded = false;
 
     /**
@@ -98,7 +94,7 @@ public class Bus extends GstObject {
     Bus(Initializer init) {
         super(init);
         GSTBUS_API.gst_bus_set_sync_handler(this, null, null, null);
-        GSTBUS_API.gst_bus_set_sync_handler(this, syncCallback, null, null);
+        GSTBUS_API.gst_bus_set_sync_handler(this, SYNC_CALLBACK, null, null);
     }
 
     /**
@@ -111,6 +107,532 @@ public class Bus extends GstObject {
      */
     public void setFlushing(boolean flushing) {
         GSTBUS_API.gst_bus_set_flushing(this, flushing ? 1 : 0);
+    }
+
+    /**
+     * Add a listener for end-of-stream messages.
+     *
+     * @param listener The listener to be called when end-of-stream is
+     * encountered.
+     */
+    public void connect(final EOS listener) {
+        connect(EOS.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.endOfStream(Natives.objectFor(msg.getSource(), GstObject.class, true, true));
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for end-of-stream messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(EOS listener) {
+        disconnect(EOS.class, listener);
+    }
+
+    /**
+     * Add a listener for error messages.
+     *
+     * @param listener The listener to be called when an error in the stream is
+     * encountered.
+     */
+    public void connect(final ERROR listener) {
+        connect(ERROR.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                PointerByReference err = new PointerByReference();
+                GSTMESSAGE_API.gst_message_parse_error(msg, err, null);
+                GErrorStruct error = new GErrorStruct(err.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.errorMessage(source, error.getCode(), error.getMessage());
+                GLIB_API.g_error_free(err.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for error messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(ERROR listener) {
+        disconnect(ERROR.class, listener);
+    }
+
+    /**
+     * Add a listener for warning messages.
+     *
+     * @param listener The listener to be called when an {@link Element} emits a
+     * warning.
+     */
+    public void connect(final WARNING listener) {
+        connect(WARNING.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                PointerByReference err = new PointerByReference();
+                GSTMESSAGE_API.gst_message_parse_warning(msg, err, null);
+                GErrorStruct error = new GErrorStruct(err.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.warningMessage(source, error.getCode(), error.getMessage());
+                GLIB_API.g_error_free(err.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for warning messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(WARNING listener) {
+        disconnect(WARNING.class, listener);
+    }
+
+    /**
+     * Add a listener for informational messages.
+     *
+     * @param listener The listener to be called when an {@link Element} emits a
+     * an informational message.
+     */
+    public void connect(final INFO listener) {
+        connect(INFO.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                PointerByReference err = new PointerByReference();
+                GSTMESSAGE_API.gst_message_parse_info(msg, err, null);
+                GErrorStruct error = new GErrorStruct(err.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.infoMessage(source, error.getCode(), error.getMessage());
+                GLIB_API.g_error_free(err.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for informational messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(INFO listener) {
+        disconnect(INFO.class, listener);
+    }
+
+    /**
+     * Add a listener for {@link State} changes in the Pipeline.
+     *
+     * @param listener The listener to be called when the Pipeline changes
+     * state.
+     */
+    public void connect(final STATE_CHANGED listener) {
+        connect(STATE_CHANGED.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference oldPtr = new IntByReference();
+                IntByReference currentPtr = new IntByReference();
+                IntByReference pendingPtr = new IntByReference();
+                GSTMESSAGE_API.gst_message_parse_state_changed(msg, oldPtr, currentPtr, pendingPtr);
+                State old = NativeEnum.fromInt(State.class, oldPtr.getValue());
+                State current = NativeEnum.fromInt(State.class, currentPtr.getValue());
+                State pending = NativeEnum.fromInt(State.class, pendingPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.stateChanged(source, old, current, pending);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for {@link State} change messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(STATE_CHANGED listener) {
+        disconnect(STATE_CHANGED.class, listener);
+    }
+
+    /**
+     * Add a listener for new media tags.
+     *
+     * @param listener The listener to be called when new media tags are found.
+     */
+    public void connect(final TAG listener) {
+        connect(TAG.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                PointerByReference list = new PointerByReference();
+                GSTMESSAGE_API.gst_message_parse_tag(msg, list);
+                TagList tl = new TagList(Natives.initializer(list.getValue()));
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.tagsFound(source, tl);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for tag messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(TAG listener) {
+        disconnect(TAG.class, listener);
+    }
+
+    /**
+     * Add a listener for {@link BUFFERING} messages in the Pipeline.
+     *
+     * @param listener The listener to be called when the Pipeline buffers data.
+     */
+    public void connect(final BUFFERING listener) {
+        connect(BUFFERING.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference percent = new IntByReference();
+                GSTMESSAGE_API.gst_message_parse_buffering(msg, percent);
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.bufferingData(source, percent.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for buffering messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(BUFFERING listener) {
+        disconnect(BUFFERING.class, listener);
+    }
+
+    /**
+     * Add a listener for duration changes.
+     *
+     * @param listener The listener to be called when the duration changes.
+     */
+    public void connect(final DURATION_CHANGED listener) {
+        connect(DURATION_CHANGED.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.durationChanged(source);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for duration change messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(DURATION_CHANGED listener) {
+        disconnect(DURATION_CHANGED.class, listener);
+    }
+
+    /**
+     * Add a listener for {@link SEGMENT_START} messages in the Pipeline.
+     *
+     * @param listener The listener to be called when the Pipeline has started a
+     * segment.
+     */
+    public void connect(final SEGMENT_START listener) {
+        connect(SEGMENT_START.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference formatPtr = new IntByReference();
+                LongByReference positionPtr = new LongByReference();
+                GSTMESSAGE_API.gst_message_parse_segment_start(msg, formatPtr, positionPtr);
+                Format format = NativeEnum.fromInt(Format.class, formatPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.segmentStart(source, format, positionPtr.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for segment-start messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(SEGMENT_START listener) {
+        disconnect(SEGMENT_START.class, listener);
+    }
+
+    /**
+     * Add a listener for {@link SEGMENT_DONE} messages in the Pipeline.
+     *
+     * @param listener The listener to be called when the Pipeline has finished
+     * a segment.
+     */
+    public void connect(final SEGMENT_DONE listener) {
+        connect(SEGMENT_DONE.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                IntByReference formatPtr = new IntByReference();
+                LongByReference positionPtr = new LongByReference();
+                GSTMESSAGE_API.gst_message_parse_segment_done(msg, formatPtr, positionPtr);
+                Format format = NativeEnum.fromInt(Format.class, formatPtr.getValue());
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.segmentDone(source, format, positionPtr.getValue());
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for segment-done messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(SEGMENT_DONE listener) {
+        disconnect(SEGMENT_DONE.class, listener);
+    }
+
+    /**
+     * Add a listener for {@link ASYNC_DONE} messages in the Pipeline.
+     *
+     * @param listener The listener to be called when the an element has
+     * finished an async state change.
+     */
+    public void connect(final ASYNC_DONE listener) {
+        connect(ASYNC_DONE.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                GstObject source = Natives.objectFor(msg.getSource(), GstObject.class, true, true);
+                listener.asyncDone(source);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for async-done messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(ASYNC_DONE listener) {
+        disconnect(ASYNC_DONE.class, listener);
+    }
+
+    /**
+     * Add a listener for all messages posted on the Bus.
+     *
+     * @param listener The listener to be called when a {@link Message} is
+     * posted.
+     */
+    public void connect(final MESSAGE listener) {
+        connect(MESSAGE.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.busMessage(Bus.this, Natives.objectFor(msg, Message.class, true, true));
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Add a listener for messages of type {@code signal} posted on the Bus.
+     *
+     * @param signal the signal to connect to.
+     * @param listener The listener to be called when a {@link Message} is
+     * posted.
+     */
+    public void connect(String signal, final MESSAGE listener) {
+        //
+        // Deal with being called as e.g. "message::eos"
+        //
+        if (signal.contains("::")) {
+            signal = signal.substring(signal.lastIndexOf("::") + 2);
+        }
+        connect(signal, MESSAGE.class, listener, new BusCallback() {
+            public boolean callback(GstBusPtr bus, GstMessagePtr msg, Pointer user_data) {
+                listener.busMessage(Bus.this, Natives.objectFor(msg, Message.class, true, true));
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Disconnect the listener for segment-done messages.
+     *
+     * @param listener The listener that was registered to receive the message.
+     */
+    public void disconnect(MESSAGE listener) {
+        disconnect(MESSAGE.class, listener);
+    }
+
+    /**
+     * Posts a {@link Message} on this Bus.
+     *
+     * @param message the message to post.
+     * @return <tt>true</tt> if the message could be posted, <tt>false</tt> if
+     * the bus is flushing.
+     */
+    public boolean post(Message message) {
+        return GSTBUS_API.gst_bus_post(this, message);
+    }
+
+    /**
+     * Sets the synchronous handler (message listener) on the bus. The handler
+     * will be called every time a new message is posted on the bus. Note that
+     * the handler will be called in the same thread context as the posting
+     * object. Applications should generally handle messages asynchronously
+     * using the other message listeners.
+     * <p>
+     * Only one handler may be attached to the bus at any one time. An attached
+     * sync handler forces creation of {@link Message} objects for all messages
+     * on the bus, so the handler should be removed if no longer required.
+     * <p>
+     * A single native sync handler is used at all times, with synchronous and
+     * asynchronous dispatch handled on the Java side, so the bindings do not
+     * inherit issues in clearing or replacing the sync handler with versions of
+     * GStreamer prior to 1.16.3.
+     *
+     * @param handler bus sync handler, or null to remove
+     */
+    public void setSyncHandler(BusSyncHandler handler) {
+        syncHandler = handler;
+    }
+
+    /**
+     * Clear the synchronous handler.
+     * <p>
+     * This is a convenience method equivalent to {@code setSyncHandler(null)}
+     */
+    public void clearSyncHandler() {
+        setSyncHandler(null);
+    }
+
+    /**
+     * Get the current synchronous handler.
+     *
+     * @return current sync handler, or null
+     */
+    public BusSyncHandler getSyncHandler() {
+        return syncHandler;
+    }
+
+    /**
+     * Connects to a signal.
+     *
+     * The signal name is deduced from the listenerClass name.
+     *
+     * @param listenerClass the class of the listener.
+     * @param listener the listener to associate with the {@code callback}
+     * @param callback The callback to call when the signal is emitted.
+     */
+    private <T> void connect(Class<T> listenerClass, T listener, BusCallback callback) {
+        String className = listenerClass.getSimpleName();
+        MessageType type;
+        if ("MESSAGE".equals(className)) {
+            type = MessageType.ANY;
+        } else {
+            type = MessageType.valueOf(listenerClass.getSimpleName());
+        }
+        addMessageProxy(type, listenerClass, listener, callback);
+    }
+
+    /**
+     * Connects a callback to a signal.
+     * <p>
+     * This differs to {@link GObject#connect} in that it hooks up Bus signals
+     * to the sync callback, not the generic GObject signal mechanism.
+     *
+     * @param <T> listener type
+     * @param signal the name of the signal to connect to.
+     * @param listenerClass the class of the {@code listener}
+     * @param listener the listener to associate with the {@code callback}
+     * @param callback the callback to call when the signal is emitted.
+     */
+    @Override
+    public <T> void connect(String signal, Class<T> listenerClass, T listener,
+            final Callback callback) {
+        if (listenerClass.getEnclosingClass() != Bus.class) {
+            super.connect(signal, listenerClass, listener, callback);
+        } else {
+            MessageType type;
+            if ("message".equals(signal)) {
+                type = MessageType.ANY;
+            } else {
+                type = MessageType.valueOf(signal.toUpperCase(Locale.ROOT).replace('-', '_'));
+            }
+            addMessageProxy(type, listenerClass, listener, (BusCallback) callback);
+        }
+    }
+
+    private synchronized <T> void addMessageProxy(MessageType type,
+            Class<T> listenerClass,
+            T listener,
+            BusCallback callback) {
+        messageProxies.add(new MessageProxy(type, listenerClass, listener, callback));
+        addWatch();
+    }
+
+    @Override
+    public <T> void disconnect(Class<T> listenerClass, T listener) {
+        if (listenerClass.getEnclosingClass() != Bus.class) {
+            super.disconnect(listenerClass, listener);
+        } else {
+            removeMessageProxy(listenerClass, listener);
+        }
+    }
+
+    private synchronized <T> void removeMessageProxy(Class<T> listenerClass, T listener) {
+        messageProxies.removeIf(p -> p.listener == listener);
+        if (messageProxies.isEmpty()) {
+            removeWatch();
+        }
+    }
+
+    /**
+     * Dispatches a message to all interested listeners.
+     * <p>
+     * We do this here from a sync callback, because the default gstbus dispatch
+     * uses the default main context to signal that there are messages waiting
+     * on the bus. Since that is used by the GTK L&F under swing, we never get
+     * those notifications, and the messages just queue up.
+     *
+     */
+    private void dispatchMessage(GstBusPtr busPtr, GstMessagePtr msgPtr) {
+        messageProxies.forEach(p -> {
+            try {
+                p.busMessage(busPtr, msgPtr);
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "Exception thrown by bus message handler", t);
+            }
+        });
+        GSTMINIOBJECT_API.gst_mini_object_unref(msgPtr);
+    }
+
+    @Override
+    public void dispose() {
+        removeWatch();
+        super.dispose();
+    }
+
+    /**
+     * Adds the bus signal watch. This will reference the bus until the signal
+     * watch is removed and so will stop the Bus being GC'd and disposed.
+     */
+    private void addWatch() {
+        synchronized (lock) {
+            if (!watchAdded) {
+                LOG.fine("Add watch");
+                GSTBUS_API.gst_bus_add_signal_watch(this);
+                watchAdded = true;
+            }
+        }
+    }
+
+    /**
+     * Removes the bus signal watch (which will remove the bus reference held by
+     * the signal watch).
+     */
+    private void removeWatch() {
+        synchronized (lock) {
+            if (watchAdded) {
+                LOG.fine("Remove watch");
+                GSTBUS_API.gst_bus_remove_signal_watch(this);
+                watchAdded = false;
+            }
+        }
     }
 
     /**
@@ -358,367 +880,29 @@ public class Bus extends GstObject {
         public void busMessage(Bus bus, Message message);
     }
 
-    /**
-     * Add a listener for end-of-stream messages.
-     *
-     * @param listener The listener to be called when end-of-stream is
-     * encountered.
-     */
-    public void connect(final EOS listener) {
-        connect(EOS.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.endOfStream(msg.getSource());
-                return true;
-            }
-        });
-    }
+    private static class MessageProxy<T> {
 
-    /**
-     * Disconnect the listener for end-of-stream messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(EOS listener) {
-        disconnect(EOS.class, listener);
-    }
+        private final MessageType type;
+        private final Class<T> listenerClass;
+        private final Object listener;
+        private final BusCallback callback;
 
-    /**
-     * Add a listener for error messages.
-     *
-     * @param listener The listener to be called when an error in the stream is
-     * encountered.
-     */
-    public void connect(final ERROR listener) {
-        connect(ERROR.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                PointerByReference err = new PointerByReference();
-                GSTMESSAGE_API.gst_message_parse_error(msg, err, null);
-                GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.errorMessage(msg.getSource(), error.getCode(), error.getMessage());
-                GLIB_API.g_error_free(err.getValue());
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for error messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(ERROR listener) {
-        disconnect(ERROR.class, listener);
-    }
-
-    /**
-     * Add a listener for warning messages.
-     *
-     * @param listener The listener to be called when an {@link Element} emits a
-     * warning.
-     */
-    public void connect(final WARNING listener) {
-        connect(WARNING.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                PointerByReference err = new PointerByReference();
-                GSTMESSAGE_API.gst_message_parse_warning(msg, err, null);
-                GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.warningMessage(msg.getSource(), error.getCode(), error.getMessage());
-                GLIB_API.g_error_free(err.getValue());
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for warning messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(WARNING listener) {
-        disconnect(WARNING.class, listener);
-    }
-
-    /**
-     * Add a listener for informational messages.
-     *
-     * @param listener The listener to be called when an {@link Element} emits a
-     * an informational message.
-     */
-    public void connect(final INFO listener) {
-        connect(INFO.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                PointerByReference err = new PointerByReference();
-                GSTMESSAGE_API.gst_message_parse_info(msg, err, null);
-                GErrorStruct error = new GErrorStruct(err.getValue());
-                listener.infoMessage(msg.getSource(), error.getCode(), error.getMessage());
-                GLIB_API.g_error_free(err.getValue());
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for informational messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(INFO listener) {
-        disconnect(INFO.class, listener);
-    }
-
-    /**
-     * Add a listener for {@link State} changes in the Pipeline.
-     *
-     * @param listener The listener to be called when the Pipeline changes
-     * state.
-     */
-    public void connect(final STATE_CHANGED listener) {
-        connect(STATE_CHANGED.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                State[] o = new State[1];
-                State[] n = new State[1];
-                State[] p = new State[1];
-                GSTMESSAGE_API.gst_message_parse_state_changed(msg, o, n, p);
-                listener.stateChanged(msg.getSource(), o[0], n[0], p[0]);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for {@link State} change messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(STATE_CHANGED listener) {
-        disconnect(STATE_CHANGED.class, listener);
-    }
-
-    /**
-     * Add a listener for new media tags.
-     *
-     * @param listener The listener to be called when new media tags are found.
-     */
-    public void connect(final TAG listener) {
-        connect(TAG.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                PointerByReference list = new PointerByReference();
-                GSTMESSAGE_API.gst_message_parse_tag(msg, list);
-                TagList tl = new TagList(Natives.initializer(list.getValue()));
-                listener.tagsFound(msg.getSource(), tl);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for tag messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(TAG listener) {
-        disconnect(TAG.class, listener);
-    }
-
-    /**
-     * Add a listener for {@link BUFFERING} messages in the Pipeline.
-     *
-     * @param listener The listener to be called when the Pipeline buffers data.
-     */
-    public void connect(final BUFFERING listener) {
-        connect(BUFFERING.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                int[] percent = {0};
-                GSTMESSAGE_API.gst_message_parse_buffering(msg, percent);
-                listener.bufferingData(msg.getSource(), percent[0]);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for buffering messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(BUFFERING listener) {
-        disconnect(BUFFERING.class, listener);
-    }
-
-    /**
-     * Add a listener for duration changes.
-     *
-     * @param listener The listener to be called when the duration changes.
-     */
-    public void connect(final DURATION_CHANGED listener) {
-        connect(DURATION_CHANGED.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.durationChanged(msg.getSource());
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for duration change messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(DURATION_CHANGED listener) {
-        disconnect(DURATION_CHANGED.class, listener);
-    }
-
-    /**
-     * Add a listener for {@link SEGMENT_START} messages in the Pipeline.
-     *
-     * @param listener The listener to be called when the Pipeline has started a
-     * segment.
-     */
-    public void connect(final SEGMENT_START listener) {
-        connect(SEGMENT_START.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                Format[] format = new Format[1];
-                long[] position = {0};
-                GSTMESSAGE_API.gst_message_parse_segment_start(msg, format, position);
-                listener.segmentStart(msg.getSource(), format[0], position[0]);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for segment-start messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(SEGMENT_START listener) {
-        disconnect(SEGMENT_START.class, listener);
-    }
-
-    /**
-     * Add a listener for {@link SEGMENT_DONE} messages in the Pipeline.
-     *
-     * @param listener The listener to be called when the Pipeline has finished
-     * a segment.
-     */
-    public void connect(final SEGMENT_DONE listener) {
-        connect(SEGMENT_DONE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                Format[] format = new Format[1];
-                long[] position = {0};
-                GSTMESSAGE_API.gst_message_parse_segment_done(msg, format, position);
-                listener.segmentDone(msg.getSource(), format[0], position[0]);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for segment-done messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(SEGMENT_DONE listener) {
-        disconnect(SEGMENT_DONE.class, listener);
-    }
-
-    /**
-     * Add a listener for {@link ASYNC_DONE} messages in the Pipeline.
-     *
-     * @param listener The listener to be called when the an element has
-     * finished an async state change.
-     */
-    public void connect(final ASYNC_DONE listener) {
-        connect(ASYNC_DONE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.asyncDone(msg.getSource());
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Disconnect the listener for async-done messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(ASYNC_DONE listener) {
-        disconnect(ASYNC_DONE.class, listener);
-    }
-
-    /**
-     * Add a listener for all messages posted on the Bus.
-     *
-     * @param listener The listener to be called when a {@link Message} is
-     * posted.
-     */
-    public void connect(final MESSAGE listener) {
-        connect(MESSAGE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.busMessage(bus, msg);
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Add a listener for messages of type {@code signal} posted on the Bus.
-     *
-     * @param signal the signal to connect to.
-     * @param listener The listener to be called when a {@link Message} is
-     * posted.
-     */
-    public void connect(String signal, final MESSAGE listener) {
-        //
-        // Deal with being called as e.g. "message::eos"
-        //
-        if (signal.contains("::")) {
-            signal = signal.substring(signal.lastIndexOf("::") + 2);
+        MessageProxy(MessageType type, Class<T> listenerClass, T listener, BusCallback callback) {
+            this.type = type;
+            this.listenerClass = listenerClass;
+            this.listener = listener;
+            this.callback = callback;
         }
-        connect(signal, MESSAGE.class, listener, new BusCallback() {
-            public boolean callback(Bus bus, Message msg, Pointer user_data) {
-                listener.busMessage(bus, msg);
-                return true;
+
+        void busMessage(final GstBusPtr bus, final GstMessagePtr msg) {
+            if (type == MessageType.ANY || type.intValue() == msg.getMessageType()) {
+                callback.callback(bus, msg, null);
             }
-        });
-    }
-
-    /**
-     * Disconnect the listener for segment-done messages.
-     *
-     * @param listener The listener that was registered to receive the message.
-     */
-    public void disconnect(MESSAGE listener) {
-        disconnect(MESSAGE.class, listener);
-    }
-
-    /**
-     * Posts a {@link Message} on this Bus.
-     *
-     * @param message the message to post.
-     * @return <tt>true</tt> if the message could be posted, <tt>false</tt> if
-     * the bus is flushing.
-     */
-    public boolean post(Message message) {
-        return GSTBUS_API.gst_bus_post(this, message);
-    }
-
-    private BusSyncHandler syncHandler = new BusSyncHandler() {
-        public BusSyncReply syncMessage(Message msg) {
-            return BusSyncReply.PASS;
         }
-    };
-
-    public BusSyncHandler getSyncHandler() {
-        return syncHandler;
     }
 
-    public void setSyncHandler(BusSyncHandler handler) {
-        syncHandler = handler;
-    }
-    
-    private static final org.freedesktop.gstreamer.lowlevel.GstBusAPI.BusSyncHandler syncCallback = new GstBusAPI.BusSyncHandler() {
-        
+    private static class SyncCallback implements GstBusAPI.BusSyncHandler {
+
         {
             Native.setCallbackThreadInitializer(this,
                     new CallbackThreadInitializer(true,
@@ -726,179 +910,24 @@ public class Bus extends GstObject {
                             "GstBus"));
         }
 
-        public BusSyncReply callback(final Bus bus, final Message msg, Pointer userData) {
-            if (bus.syncHandler != null) {
-                BusSyncReply reply = bus.syncHandler.syncMessage(msg);
-
+        @Override
+        public BusSyncReply callback(final GstBusPtr busPtr, final GstMessagePtr msgPtr, Pointer userData) {
+            Bus bus = Natives.objectFor(busPtr, Bus.class, true, true);
+            // volatile - use local reference
+            BusSyncHandler syncHandler = bus.syncHandler;
+            if (syncHandler != null) {
+                Message msg = Natives.objectFor(msgPtr, Message.class, true, true);
+                BusSyncReply reply = syncHandler.syncMessage(msg);
                 if (reply != BusSyncReply.DROP) {
-                    Gst.getExecutor().execute(new Runnable() {
-                        public void run() {
-                            bus.dispatchMessage(msg);
-                        }
-                    });
+                    Gst.getExecutor().execute(() -> bus.dispatchMessage(busPtr, msgPtr));
+                } else {
+                    // not calling dispatch message so unref here
+                    GSTMINIOBJECT_API.gst_mini_object_unref(msgPtr);
                 }
+            } else {
+                Gst.getExecutor().execute(() -> bus.dispatchMessage(busPtr, msgPtr));
             }
-            //
-            // Unref the message, since we are dropping it.
-            // (the normal GC will drop other refs to it)
-            //
-//            GSTMINIOBJECT_API.gst_mini_object_unref(msg);
-            Natives.unref(msg);
             return BusSyncReply.DROP;
-        }
-    };
-
-    /**
-     * Connects to a signal.
-     *
-     * The signal name is deduced from the listenerClass name.
-     *
-     * @param listenerClass the class of the listener.
-     * @param listener the listener to associate with the {@code callback}
-     * @param callback The callback to call when the signal is emitted.
-     */
-    private <T> void connect(Class<T> listenerClass, T listener, BusCallback callback) {
-        final String signal = listenerClass.getSimpleName().toLowerCase(Locale.ROOT).replace('_', '-');
-        connect(signal, listenerClass, listener, callback);
-    }
-
-    /**
-     * Connects a callback to a signal.
-     * <p>
-     * This differs to {@link GObject#connect} in that it hooks up Bus signals
-     * to the sync callback, not the generic GObject signal mechanism.
-     *
-     * @param signal the name of the signal to connect to.
-     * @param listenerClass the class of the {@code listener}
-     * @param listener the listener to associate with the {@code callback}
-     * @param callback the callback to call when the signal is emitted.
-     */
-    @Override
-    public synchronized <T> void connect(String signal, Class<T> listenerClass, T listener,
-            final Callback callback) {
-        if (listenerClass.getEnclosingClass() != Bus.class) {
-            super.connect(signal, listenerClass, listener, callback);
-            return;
-        }
-        MessageType type;
-        if ("message".equals(signal)) {
-            type = MessageType.ANY;
-        } else {
-            //@TODO refactor to stop unnecessary String operations
-            type = MessageType.valueOf(signal.toUpperCase(Locale.ROOT).replace('-', '_'));
-        }
-        final Map<Class<?>, Map<Object, MessageProxy>> signals = getListenerMap();
-        // @TODO this was using type so doubtful ever worked
-        // these maps needs relooking at!
-        Map<Object, MessageProxy> m = signals.get(listenerClass);
-        if (m == null) {
-            m = new HashMap<Object, MessageProxy>();
-            signals.put(listenerClass, m);
-        }
-        MessageProxy proxy = new MessageProxy(type, (BusCallback) callback);
-        m.put(listener, proxy);
-        messageProxies.add(proxy);
-
-        addWatch();
-    }
-
-    @Override
-    public synchronized <T> void disconnect(Class<T> listenerClass, T listener) {
-        if (listenerClass.getEnclosingClass() != Bus.class) {
-            super.disconnect(listenerClass, listener);
-            return;
-        }
-        final Map<Class<?>, Map<Object, MessageProxy>> signals = getListenerMap();
-        Map<Object, MessageProxy> m = signals.get(listenerClass);
-        if (m != null) {
-            MessageProxy proxy = m.remove(listener);
-            if (proxy != null) {
-                messageProxies.remove(proxy);
-            }
-            if (m.isEmpty()) {
-                removeWatch();
-                signals.remove(listenerClass);
-            }
-        }
-    }
-
-    /**
-     * Dispatches a message to all interested listeners.
-     *
-     * <p>
-     * We do this here from a sync callback, because the default gstbus dispatch
-     * uses the default main context to signal that there are messages waiting
-     * on the bus. Since that is used by the GTK L&F under swing, we never get
-     * those notifications, and the messages just queue up.
-     *
-     * @param message
-     */
-    private void dispatchMessage(Message msg) {
-        // Dispatch to listeners
-        messageProxies.forEach((listener) -> {
-            try {
-                ((MessageProxy) listener).busMessage(this, msg);
-            } catch (Throwable t) {
-                LOG.log(Level.SEVERE, "Exception thrown by bus message handler", t);
-            }
-        });
-    }
-
-    private static class MessageProxy implements MESSAGE {
-
-        private final MessageType type;
-        private final BusCallback callback;
-
-        public MessageProxy(MessageType type, BusCallback callback) {
-            this.type = type;
-            this.callback = callback;
-        }
-
-        public void busMessage(final Bus bus, final Message msg) {
-            if (type == MessageType.ANY || type == msg.getType()) {
-                callback.callback(bus, msg, null);
-            }
-        }
-    }
-
-    private final Map<Class<?>, Map<Object, MessageProxy>> getListenerMap() {
-        if (signalListeners == null) {
-            signalListeners = new ConcurrentHashMap<Class<?>, Map<Object, MessageProxy>>();
-        }
-        return signalListeners;
-    }
-
-    @Override
-    public void dispose() {
-        removeWatch();
-        super.dispose();
-    }
-
-    /**
-     * Adds the bus signal watch. This will reference the bus until the signal
-     * watch is removed and so will stop the Bus being GC'd and disposed.
-     */
-    private void addWatch() {
-        synchronized (lock) {
-            if (!watchAdded) {
-                LOG.fine("Add watch");
-                GSTBUS_API.gst_bus_add_signal_watch(this);
-                watchAdded = true;
-            }
-        }
-    }
-
-    /**
-     * Removes the bus signal watch (which will remove the bus reference held by
-     * the signal watch).
-     */
-    private void removeWatch() {
-        synchronized (lock) {
-            if (watchAdded) {
-                LOG.fine("Remove watch");
-                GSTBUS_API.gst_bus_remove_signal_watch(this);
-                watchAdded = false;
-            }
         }
     }
 
