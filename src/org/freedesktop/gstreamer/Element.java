@@ -31,10 +31,11 @@ import org.freedesktop.gstreamer.glib.Natives;
 
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
+import org.freedesktop.gstreamer.lowlevel.GstIteratorPtr;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
-import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
  * Abstract base class for all pipeline elements.
@@ -82,7 +83,7 @@ public class Element extends GstObject {
     protected Element(Initializer init) {
         super(init);
     }
-    
+
     Element(Handle handle, boolean needRef) {
         super(handle, needRef);
     }
@@ -346,7 +347,7 @@ public class Element extends GstObject {
      * @return the List of {@link Pad}s.
      */
     public List<Pad> getPads() {
-        return new GstIterator<Pad>(GSTELEMENT_API.gst_element_iterate_pads(this), Pad.class).asList();
+        return padList(GSTELEMENT_API.gst_element_iterate_pads(this));
     }
 
     /**
@@ -355,7 +356,7 @@ public class Element extends GstObject {
      * @return the List of {@link Pad}s.
      */
     public List<Pad> getSrcPads() {
-        return new GstIterator<Pad>(GSTELEMENT_API.gst_element_iterate_src_pads(this), Pad.class).asList();
+        return padList(GSTELEMENT_API.gst_element_iterate_src_pads(this));
     }
 
     /**
@@ -364,7 +365,11 @@ public class Element extends GstObject {
      * @return the List of {@link Pad}s.
      */
     public List<Pad> getSinkPads() {
-        return new GstIterator<Pad>(GSTELEMENT_API.gst_element_iterate_sink_pads(this), Pad.class).asList();
+        return padList(GSTELEMENT_API.gst_element_iterate_sink_pads(this));
+    }
+    
+    private List<Pad> padList(GstIteratorPtr iter) {
+        return GstIterator.asList(iter, Pad.class);
     }
 
     /**
@@ -770,7 +775,7 @@ public class Element extends GstObject {
 
     /**
      * Gets the context with the context_type set on the element or NULL.
-     * 
+     *
      * @param context_type
      * @return a context or NULL
      */
@@ -780,11 +785,11 @@ public class Element extends GstObject {
     }
 
     static class Handle extends GstObject.Handle {
-        
+
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {
             super(ptr, ownsHandle);
         }
-        
+
     }
 
 }
