@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2008 Wayne Meissner
  * 
  * This file is part of gstreamer-java.
@@ -22,8 +22,8 @@ package org.freedesktop.gstreamer;
  * Describes a GStreamer version.
  * <p>
  * Also upstream documentation at
- * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstVersion.html"
- * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/gstreamer-GstVersion.html</a>
+ * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gst.html#gst_version"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gst.html#gst_version</a>
  * <p>
  */
 public class Version {
@@ -37,9 +37,9 @@ public class Version {
     private final int major, minor, micro, nano;
 
     /**
-     * Constructor for creating a Version with micro and nano set to zero - most
-     * useful for requesting version in {@link Gst#init(org.freedesktop.gstreamer.Version)
-     * }
+     * Constructor for creating a Version with micro and nano set to zero. For
+     * requesting version in {@link Gst#init(org.freedesktop.gstreamer.Version)}
+     * prefer using {@link #of(int, int)}.
      * <p>
      * <b>The library only supports major version 1</b>
      *
@@ -128,6 +128,30 @@ public class Version {
     public boolean checkSatisfies(Version required) {
         return (major == required.major && minor > required.minor)
                 || (major == required.major && minor == required.minor && micro >= required.micro);
+    }
+
+    /**
+     * Create a Version with specified major and minor version, and micro and
+     * nano version set to zero. Useful for specifying a required version in
+     * {@link Gst#init(org.freedesktop.gstreamer.Version)}.
+     * <p>
+     * <b>The library only supports major version 1</b>
+     * <p>
+     * Unlike the constructor this method will throw an exception if the version
+     * is not greater or equal to {@link #BASELINE}, or the major version isn't
+     * 1.
+     *
+     * @param major major version, currently must be 1
+     * @param minor minor version, greater or equal to 8
+     * @return requested version
+     * @throws IllegalArgumentException if the requested version is invalid
+     */
+    public static Version of(int major, int minor) {
+        if (major == BASELINE.getMajor()
+                && minor >= BASELINE.getMinor()) {
+            return new Version(major, minor);
+        }
+        throw new IllegalArgumentException("Invalid version");
     }
 
 }

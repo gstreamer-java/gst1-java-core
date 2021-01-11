@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2008 Wayne Meissner
  * Copyright (C) 2000 Erik Walthinsen <omega@cse.ogi.edu>
  *               2005 Wim Taymans <wim@fluendo.com>
@@ -20,23 +20,21 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.event.SeekType;
-import org.freedesktop.gstreamer.event.SeekFlags;
-import org.freedesktop.gstreamer.query.Query;
-import java.util.concurrent.TimeUnit;
-
 import com.sun.jna.Pointer;
 import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
-
+import org.freedesktop.gstreamer.event.SeekFlags;
+import org.freedesktop.gstreamer.event.SeekType;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+import org.freedesktop.gstreamer.query.Query;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GstPipelineAPI.GSTPIPELINE_API;
 import static org.freedesktop.gstreamer.lowlevel.GstQueryAPI.GSTQUERY_API;
-import org.freedesktop.gstreamer.glib.NativeFlags;
-import org.freedesktop.gstreamer.glib.Natives;
-import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
 
 /**
  * A {@code Pipeline} is a special {@link Bin} used as the top level container
@@ -217,6 +215,9 @@ public class Pipeline extends Bin {
 
     /**
      * Sets the position in the media stream to time in nanoseconds.
+     * <p>
+     * Prefer use of
+     * {@link Element#seekSimple(org.freedesktop.gstreamer.Format, java.util.Set, long)}.
      *
      * @param time The time to change the position to.
      * @return true if seek is successful
@@ -228,6 +229,9 @@ public class Pipeline extends Bin {
 
     /**
      * Sets the current position in the media stream.
+     * <p>
+     * Prefer use of
+     * {@link Element#seekSimple(org.freedesktop.gstreamer.Format, java.util.Set, long)}.
      *
      * @param time the time to change the position to.
      * @param unit the {@code TimeUnit} the time is expressed in.
@@ -253,10 +257,11 @@ public class Pipeline extends Bin {
      * position of 0, a stop position of -1 and a rate of 1.0. The currently
      * configured playback segment can be queried with #GST_QUERY_SEGMENT.
      * <p>
-     * <ttstartType and stopType specify how to adjust the currently configured
+     * startType and stopType specify how to adjust the currently configured
      * start and stop fields in segment. Adjustments can be made relative or
      * absolute to the last configured values. A type of {@link SeekType#NONE}
-     * means that the position should not be updated. <p>
+     * means that the position should not be updated.
+     * <p>
      * When the rate is positive and start has been updated, playback will start
      * from the newly configured start position.
      * <p>
@@ -279,13 +284,18 @@ public class Pipeline extends Bin {
      * @param stop the value of the new stop position
      * @return true if seek is successful
      */
+    // for compatibility
     public boolean seek(double rate, Format format, EnumSet<SeekFlags> seekFlags,
             SeekType startType, long start, SeekType stopType, long stop) {
-
-        return GSTELEMENT_API.gst_element_seek(this, rate, format, NativeFlags.toInt(seekFlags),
-                startType, start, stopType, stop);
+        return super.seek(rate, format, seekFlags, startType, start, stopType, stop);
     }
-
+    
+    @Override
+    public boolean seek(double rate, Format format, Set<SeekFlags> seekFlags,
+            SeekType startType, long start, SeekType stopType, long stop) {
+        return super.seek(rate, format, seekFlags, startType, start, stopType, stop);
+    }
+    
     /**
      * Gets the current position in the media stream.
      *
@@ -296,15 +306,9 @@ public class Pipeline extends Bin {
         return unit.convert(queryPosition(Format.TIME), TimeUnit.NANOSECONDS);
     }
 
-    /**
-     * Gets the current position in terms of the specified {@link Format}.
-     *
-     * @param format The {@link Format} to return the position in.
-     * @return The current position or -1 if the query failed.
-     */
+    @Override
     public long queryPosition(Format format) {
-        long[] pos = {0};
-        return GSTELEMENT_API.gst_element_query_position(this, format, pos) ? pos[0] : -1L;
+        return super.queryPosition(format);
     }
 
     /**
@@ -317,16 +321,9 @@ public class Pipeline extends Bin {
         return unit.convert(queryDuration(Format.TIME), TimeUnit.NANOSECONDS);
     }
 
-    /**
-     * Gets the duration of the current media stream in terms of the specified
-     * {@link Format}.
-     *
-     * @param format the {@code Format} to return the duration in.
-     * @return The total duration of the current media stream.
-     */
+    @Override
     public long queryDuration(Format format) {
-        long[] dur = {0};
-        return GSTELEMENT_API.gst_element_query_duration(this, format, dur) ? dur[0] : -1L;
+        return super.queryDuration(format);
     }
 
     /**

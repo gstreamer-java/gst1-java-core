@@ -1,6 +1,6 @@
 /* 
+ * Copyright (c) 2021 Neil C Smith
  * Copyright (c) 2019 Christophe Lafolet
- * Copyright (c) 2019 Neil C Smith
  * Copyright (c) 2009 Levente Farkas
  * Copyright (C) 2007 Wayne Meissner
  * Copyright (C) 1999,2000 Erik Walthinsen <omega@cse.ogi.edu>
@@ -22,17 +22,21 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.query.Query;
-import org.freedesktop.gstreamer.message.Message;
-import org.freedesktop.gstreamer.event.Event;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.event.SeekEvent;
+import org.freedesktop.gstreamer.event.SeekFlags;
+import org.freedesktop.gstreamer.event.SeekType;
+import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.glib.Natives;
-
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 import org.freedesktop.gstreamer.lowlevel.GstContextPtr;
 import org.freedesktop.gstreamer.lowlevel.GstIteratorPtr;
 import org.freedesktop.gstreamer.lowlevel.GstObjectPtr;
+import org.freedesktop.gstreamer.message.Message;
+import org.freedesktop.gstreamer.query.Query;
 
 import static org.freedesktop.gstreamer.lowlevel.GstElementAPI.GSTELEMENT_API;
 import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
@@ -41,8 +45,8 @@ import static org.freedesktop.gstreamer.lowlevel.GObjectAPI.GOBJECT_API;
  * Abstract base class for all pipeline elements.
  * <p>
  * See upstream documentation at
- * <a href="https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html"
- * >https://gstreamer.freedesktop.org/data/doc/gstreamer/stable/gstreamer/html/GstElement.html</a>
+ * <a href="https://gstreamer.freedesktop.org/documentation/gstreamer/gstelement.html"
+ * >https://gstreamer.freedesktop.org/documentation/gstreamer/gstelement.html</a>
  * <p>
  * Element is the abstract base class needed to construct an element that can be
  * used in a GStreamer pipeline. Please refer to the plugin writers guide for
@@ -185,28 +189,44 @@ public class Element extends GstObject {
     }
 
     /**
-     * Tells the Element to start playing the media stream.
+     * Tells the Element to start playing the media stream. Equivalent to
+     * calling {@link #setState(org.freedesktop.gstreamer.State)} with
+     * {@link State#PLAYING}.
+     *
+     * @return the status of the element's state change.
      */
     public StateChangeReturn play() {
         return setState(State.PLAYING);
     }
 
     /**
-     * Tells the Element to set ready the media stream.
+     * Tells the Element to set ready the media stream. Equivalent to calling
+     * {@link #setState(org.freedesktop.gstreamer.State)} with
+     * {@link State#READY}.
+     *
+     * @return the status of the element's state change.
      */
     public StateChangeReturn ready() {
         return setState(State.READY);
     }
 
     /**
-     * Tells the Element to pause playing the media stream.
+     * Tells the Element to pause playing the media stream. Equivalent to
+     * calling {@link #setState(org.freedesktop.gstreamer.State)} with
+     * {@link State#PAUSED}.
+     *
+     * @return the status of the element's state change.
      */
     public StateChangeReturn pause() {
         return setState(State.PAUSED);
     }
 
     /**
-     * Tells the Element to pause playing the media stream.
+     * Tells the Element to pause playing the media stream. Equivalent to
+     * calling {@link #setState(org.freedesktop.gstreamer.State)} with
+     * {@link State#NULL}.
+     *
+     * @return the status of the element's state change.
      */
     public StateChangeReturn stop() {
         return setState(State.NULL);
@@ -784,6 +804,94 @@ public class Element extends GstObject {
         return gstContextPtr != null ? Natives.callerOwnsReturn(gstContextPtr, Context.class) : null;
     }
 
+    /**
+     * Queries an element (usually top-level pipeline or playbin element) for
+     * the total stream duration in nanoseconds. This query will only work once
+     * the pipeline is prerolled (i.e. reached PAUSED or PLAYING state). The
+     * application will receive an ASYNC_DONE message on the pipeline bus when
+     * that is the case.
+     * <p>
+     * If the duration changes for some reason, you will get a DURATION_CHANGED
+     * message on the pipeline bus, in which case you should re-query the
+     * duration using this function.
+     *
+     * @param format the {@code Format} to return the duration in
+     * @return the total duration of the current media stream, or -1 if the
+     * query failed
+     */
+    public long queryDuration(Format format) {
+        long[] dur = {0};
+        return GSTELEMENT_API.gst_element_query_duration(this, format, dur) ? dur[0] : -1L;
+    }
+    
+    /**
+     * Queries an element (usually top-level pipeline or playbin element) for
+     * the stream position in nanoseconds. This will be a value between 0 and
+     * the stream duration (if the stream duration is known). This query will
+     * usually only work once the pipeline is prerolled (i.e. reached PAUSED or
+     * PLAYING state). The application will receive an ASYNC_DONE message on the
+     * pipeline bus when that is the case.
+     *
+     * @param format The {@link Format} to return the position in
+     * @return the current position or -1 if the query failed.
+     */
+    public long queryPosition(Format format) {
+        long[] pos = {0};
+        return GSTELEMENT_API.gst_element_query_position(this, format, pos) ? pos[0] : -1L;
+    }
+    
+    /**
+     * Sends a seek event to an element. See {@link SeekEvent} for the details
+     * of the parameters. The seek event is sent to the element using the native
+     * equivalent of {@link #sendEvent(org.freedesktop.gstreamer.event.Event)}.
+     *
+     * @param rate the new playback rate
+     * @param format the format of the seek values
+     * @param seekFlags the seek flags
+     * @param startType the type and flags for the new start position
+     * @param start the value of the new start position
+     * @param stopType the type and flags for the new stop position
+     * @param stop the value of the new stop position
+     * @return true if seek operation succeeded. Flushing seeks will trigger a
+     * preroll, which will emit an ASYNC_DONE message
+     */
+    public boolean seek(double rate, Format format, Set<SeekFlags> seekFlags,
+            SeekType startType, long start, SeekType stopType, long stop) {
+
+        return GSTELEMENT_API.gst_element_seek(this, rate, format,
+                NativeFlags.toInt(seekFlags), startType, start, stopType, stop);
+    }
+
+    /**
+     * Simple API to perform a seek on the given element, meaning it just seeks
+     * to the given position relative to the start of the stream. For more
+     * complex operations like segment seeks (e.g. for looping) or changing the
+     * playback rate or seeking relative to the last configured playback segment
+     * you should use
+     * {@link #seek(double, org.freedesktop.gstreamer.Format, java.util.Set, org.freedesktop.gstreamer.event.SeekType, long, org.freedesktop.gstreamer.event.SeekType, long)}.
+     * <p>
+     * In a completely prerolled PAUSED or PLAYING pipeline, seeking is always
+     * guaranteed to return TRUE on a seekable media type or FALSE when the
+     * media type is certainly not seekable (such as a live stream).
+     * <p>
+     * Some elements allow for seeking in the READY state, in this case they
+     * will store the seek event and execute it when they are put to PAUSED. If
+     * the element supports seek in READY, it will always return TRUE when it
+     * receives the event in the READY state.
+     *
+     * @param format a {@link Format} to seek in, such as {@link Format#TIME}
+     * @param seekFlags seek options; playback applications will usually want to
+     * use {@link SeekFlags#FLUSH} and {@link SeekFlags#KEY_UNIT} here
+     * @param seekPosition position to seek to (relative to the start); if you
+     * are doing a seek in format TIME this value is in nanoseconds
+     * @return true if seek operation succeeded. Flushing seeks will trigger a
+     * preroll, which will emit an ASYNC_DONE message
+     */
+    public boolean seekSimple(Format format, Set<SeekFlags> seekFlags, long seekPosition) {
+        return GSTELEMENT_API.gst_element_seek_simple(this, format,
+                NativeFlags.toInt(seekFlags), seekPosition);
+    }
+    
     static class Handle extends GstObject.Handle {
 
         public Handle(GstObjectPtr ptr, boolean ownsHandle) {

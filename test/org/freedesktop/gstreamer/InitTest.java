@@ -39,7 +39,7 @@ public class InitTest {
     @Test
     public void testInit() {
         Version available = Gst.getVersion();
-        Version notAvailable = new Version(available.getMajor(), available.getMinor() + 2);
+        Version notAvailable = Version.of(available.getMajor(), available.getMinor() + 2);
         try {
             Gst.init(notAvailable);
             assertTrue("Version check exception not thrown!", false);
