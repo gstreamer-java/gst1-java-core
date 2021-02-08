@@ -24,7 +24,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.video.VideoTimeCodeFlags;
 
 public interface GstVideoAPI extends Library {
 	public final static GstVideoAPI GSTVIDEO_API = GstNative.load("gstvideo", GstVideoAPI.class);
@@ -58,8 +57,8 @@ public interface GstVideoAPI extends Library {
 
     @Structure.FieldOrder({"meta", "tc"})
     class GstVideoTimeCodeMetaStruct extends Structure {
-        public GstMetaAPI.GstMetaStruct.ByValue meta;
-        public GstVideoTimeCodeStruct.ByValue tc;
+        public GstMetaAPI.GstMetaStruct meta;
+        public GstVideoTimeCodeStruct tc;
 
         public GstVideoTimeCodeMetaStruct(Pointer p) {
             super(p);
@@ -70,10 +69,7 @@ public interface GstVideoAPI extends Library {
     @Structure.FieldOrder({"config", "hours", "minutes", "seconds", "frames", "field_count"})
     @Gst.Since(minor = 10)
     class GstVideoTimeCodeStruct extends Structure {
-        public static class ByValue extends GstVideoTimeCodeStruct implements Structure.ByValue {
-        }
-
-        public GstVideoTimeCodeConfigStruct.ByValue config;
+        public GstVideoTimeCodeConfigStruct config;
         public int hours;
         public int minutes;
         public int seconds;
@@ -92,10 +88,6 @@ public interface GstVideoAPI extends Library {
     @Structure.FieldOrder({"fps_n", "fps_d", "flags", "latest_daily_jam"})
     @Gst.Since(minor = 10)
     class GstVideoTimeCodeConfigStruct extends Structure {
-
-        public static class ByValue extends GstVideoTimeCodeConfigStruct implements Structure.ByValue {
-        }
-
         public int fps_n;
         public int fps_d;
         public int flags;
@@ -108,5 +100,31 @@ public interface GstVideoAPI extends Library {
             super(p);
             read();
         }
+    }
+    
+    @Structure.FieldOrder({
+    	"meta", "buffer", "flags",
+    	"videoFormat", "id", "width", "height", "n_planes", 
+        "offset", "stride", 
+        "map", "unmap",
+        "alignment"})
+    class GstVideoMetaStruct extends Structure {
+    	public GstMetaAPI.GstMetaStruct meta;
+    	public volatile Pointer buffer; // to buffer
+    	public volatile int flags;
+    	public volatile int videoFormat;
+    	public volatile int id;
+    	public volatile int width;
+    	public volatile int height;
+    	public volatile int n_planes;
+    	public volatile long offset[] = new long[4];
+    	public volatile int stride[] = new int[4];
+    	public volatile Pointer map; // to map the video plane
+    	public volatile Pointer unmap; // to unmap
+    	public volatile Pointer alignment;
+
+	    public GstVideoMetaStruct(Pointer p) {
+	    	super(p);
+	    }
     }
 }

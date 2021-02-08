@@ -19,27 +19,26 @@
  */
 package org.freedesktop.gstreamer.video;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.freedesktop.gstreamer.lowlevel.GstVideoAPI;
+import org.junit.Before;
+import org.junit.Test;
 
 
 public class VideoTimeCodeTest {
 
 
     private GstVideoAPI.GstVideoTimeCodeStruct timeCodeStruct;
-    private GstVideoAPI.GstVideoTimeCodeConfigStruct.ByValue configStruct;
+    private GstVideoAPI.GstVideoTimeCodeConfigStruct configStruct;
 
     private VideoTimeCode timeCode;
 
     @Before
     public void setUp() {
         timeCodeStruct = new GstVideoAPI.GstVideoTimeCodeStruct();
-        configStruct = new GstVideoAPI.GstVideoTimeCodeConfigStruct.ByValue();
+        configStruct = new GstVideoAPI.GstVideoTimeCodeConfigStruct();
 
         // 01:02:03:04
         timeCodeStruct.hours = 1;

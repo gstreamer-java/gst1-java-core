@@ -115,6 +115,10 @@ public class Meta extends NativeObject {
             apiType = GType.INVALID;
         }
 
+        public String getAPITypeName() {
+            return this.apiTypeName;
+        }
+
         Class<T> getImplClass() {
             return implClass;
         }

@@ -133,7 +133,7 @@ public abstract class NativeObject implements AutoCloseable {
      * After calling this method this object should not be used.
      */
     public void invalidate() {
-        LOG.log(LIFECYCLE, () -> "Invalidating object " + this + " = " + getRawPointer());
+        LOG.log(LIFECYCLE, () -> "Invalidating object " + getClass().getName() + " = " + getRawPointer());
         handle.invalidate();
     }
 

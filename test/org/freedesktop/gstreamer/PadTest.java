@@ -19,8 +19,6 @@
  */
 package org.freedesktop.gstreamer;
 
-import org.freedesktop.gstreamer.event.Event;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -29,8 +27,9 @@ import static org.junit.Assert.assertTrue;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import org.freedesktop.gstreamer.event.FlushStopEvent;
 
+import org.freedesktop.gstreamer.event.Event;
+import org.freedesktop.gstreamer.event.FlushStopEvent;
 import org.freedesktop.gstreamer.event.TagEvent;
 import org.freedesktop.gstreamer.query.AllocationQuery;
 import org.freedesktop.gstreamer.query.Query;
@@ -263,6 +262,9 @@ public class PadTest {
         // push data
         res = src.push(buf2);
         assertNotSame("data_prober.probeData() should not have been called", buf2, b.get());
+        
+        elem.stop();
+
     }
     
     @Test
@@ -299,6 +301,8 @@ public class PadTest {
         // push data
         res = src.push(buf2);
         assertNotSame("Probe (Data) should not have been called", buf2, b.get());
+        
+        elem.stop();
     }
     
     @Test
