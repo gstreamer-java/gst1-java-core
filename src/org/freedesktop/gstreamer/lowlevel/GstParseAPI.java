@@ -20,7 +20,6 @@
 package org.freedesktop.gstreamer.lowlevel;
 
 import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Pointer;

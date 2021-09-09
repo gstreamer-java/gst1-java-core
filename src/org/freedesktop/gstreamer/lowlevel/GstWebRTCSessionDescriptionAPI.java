@@ -24,7 +24,6 @@ import org.freedesktop.gstreamer.webrtc.WebRTCSessionDescription;
 import org.freedesktop.gstreamer.webrtc.WebRTCSDPType;
 import org.freedesktop.gstreamer.SDPMessage;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
-import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 
 import com.sun.jna.Pointer;
 

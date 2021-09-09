@@ -31,7 +31,6 @@ import org.freedesktop.gstreamer.glib.NativeEnum;
 import org.freedesktop.gstreamer.query.Query;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI.GValueArray;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
-import org.freedesktop.gstreamer.glib.NativeFlags;
 import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GValueAPI;
 
