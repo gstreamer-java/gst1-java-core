@@ -66,8 +66,6 @@ public class PadTest {
     public void tearDown() throws Exception {
     }
 
-    // Does not work yet (<- this comment was here in the 0.10 code)
-//    @Ignore("Didn't work in the 0.10 either by the comment so still ignored")
     @Test
     public void getPad() throws Exception {
         Element src = ElementFactory.make("fakesrc", "src");
@@ -78,8 +76,8 @@ public class PadTest {
         assertNotNull("Could not get sink pad", sinkPad);
         src = null;
         sink = null;
-        WeakReference<Pad> srcRef = new WeakReference<Pad>(srcPad);
-        WeakReference<Pad> sinkRef = new WeakReference<Pad>(sinkPad);
+        WeakReference<Pad> srcRef = new WeakReference<>(srcPad);
+        WeakReference<Pad> sinkRef = new WeakReference<>(sinkPad);
         srcPad = null;
         sinkPad = null;
         assertTrue("Src pad not garbage collected", GCTracker.waitGC(srcRef));
@@ -87,8 +85,7 @@ public class PadTest {
     }
 
     @Test
-    public void padLink()
-            throws Exception {
+    public void padLink() throws Exception {
         Element src = ElementFactory.make("fakesrc", "src");
         Element sink = ElementFactory.make("fakesink", "src");
         Pad srcPad = src.getStaticPad("src");
@@ -96,8 +93,6 @@ public class PadTest {
         srcPad.link(sinkPad);
     }
 
-//    @Ignore("This seems to fail because gst1.0 doesn't actually send the event because pads " +
-//    		"are now created in FLUSHING state")
     @Test
     public void addEventProbe() {
         Element elem = ElementFactory.make("identity", "src");
@@ -263,6 +258,9 @@ public class PadTest {
         // push data
         res = src.push(buf2);
         assertNotSame("data_prober.probeData() should not have been called", buf2, b.get());
+
+        elem.stop();
+
     }
     
     @Test
@@ -278,8 +276,9 @@ public class PadTest {
         Pad.PROBE probe = (Pad pad, PadProbeInfo info) -> {
             assertTrue("Info type does not include buffer",
                     info.getType().contains(PadProbeType.BUFFER));
-            assertTrue(info.getEvent() == null);
-            assertTrue(info.getQuery() == null);
+            // These cause assertion messages to be logged by GStreamer
+            // assertTrue(info.getEvent() == null);
+            // assertTrue(info.getQuery() == null);
             b.set(info.getBuffer());
             return PadProbeReturn.OK;
         };
@@ -299,6 +298,9 @@ public class PadTest {
         // push data
         res = src.push(buf2);
         assertNotSame("Probe (Data) should not have been called", buf2, b.get());
+
+        elem.stop();
+
     }
     
     @Test
@@ -330,7 +332,6 @@ public class PadTest {
     public void addProbe_Query() {
         ProbeTester.test(PadProbeType.QUERY_BOTH, info -> {
             Query q = info.getQuery();
-//            System.out.println(q.getStructure());
             return q instanceof AllocationQuery;
         });
         

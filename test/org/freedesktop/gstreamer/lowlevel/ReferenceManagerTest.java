@@ -70,7 +70,7 @@ public class ReferenceManagerTest {
 
     @Test public void testReference() throws Exception {
         Object ref = new Object();
-        Caps target = new Caps("video/x-raw-rgb");
+        Caps target = new Caps("video/x-raw");
         ReferenceManager.addKeepAliveReference(ref, target);
         WeakReference<Object> targetRef = new WeakReference<Object>(target);
         target = null;
@@ -81,7 +81,7 @@ public class ReferenceManagerTest {
     @Test public void testMultipleReferences() throws Exception {
         Object ref1 = new Object();
         Object ref2 = new Object();
-        Caps target = new Caps("video/x-raw-rgb");
+        Caps target = new Caps("video/x-raw");
         ReferenceManager.addKeepAliveReference(ref1, target);
         ReferenceManager.addKeepAliveReference(ref2, target);
         WeakReference<Object> targetRef = new WeakReference<Object>(target);

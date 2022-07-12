@@ -183,7 +183,7 @@ public class EventTest {
         assertTrue("Event ref not collected after TagList is unreferenced", GCTracker.waitGC(evRef));
     }
     @Test public void Event_testGC() throws Exception {
-        Event ev = new LatencyEvent(ClockTime.NONE);
+        Event ev = new LatencyEvent(100);
         @SuppressWarnings("unused")
         Structure s = ev.getStructure();
         WeakReference<Event> evRef = new WeakReference<Event>(ev);
