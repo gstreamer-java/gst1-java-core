@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import org.freedesktop.gstreamer.lowlevel.GlibAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GErrorStruct;
 import org.freedesktop.gstreamer.message.EOSMessage;
 import org.freedesktop.gstreamer.message.Message;
@@ -136,7 +137,7 @@ public class BusTest {
         };
         pipe.getBus().connect(errorSignal);
 
-        GErrorStruct msg = new GErrorStruct();
+        GErrorStruct msg = GlibAPI.GLIB_API.g_error_new(1, 1, "MSG");
         GSTELEMENT_API.gst_element_post_message(pipe.src,
                 GSTMESSAGE_API.gst_message_new_error(pipe.src, msg, "testing error messages"));
         pipe.play().run();
@@ -144,6 +145,7 @@ public class BusTest {
         pipe.dispose();
         assertTrue("ERROR signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
+        GlibAPI.GLIB_API.g_error_free(msg);
     }
 
     @Test
@@ -160,7 +162,7 @@ public class BusTest {
         };
         pipe.getBus().connect(signal);
 
-        GErrorStruct msg = new GErrorStruct();
+        GErrorStruct msg = GlibAPI.GLIB_API.g_error_new(1, 1, "MSG");
         pipe.play();
         GSTELEMENT_API.gst_element_post_message(pipe.src,
                 GSTMESSAGE_API.gst_message_new_warning(pipe.src, msg, "testing warning messages"));
@@ -169,6 +171,7 @@ public class BusTest {
         pipe.dispose();
         assertTrue("WARNING signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
+        GlibAPI.GLIB_API.g_error_free(msg);
     }
 
     @Test
@@ -185,7 +188,7 @@ public class BusTest {
         };
         pipe.getBus().connect(signal);
 
-        GErrorStruct msg = new GErrorStruct();
+        GErrorStruct msg = GlibAPI.GLIB_API.g_error_new(1, 1, "MSG");
         pipe.play();
         GSTELEMENT_API.gst_element_post_message(pipe.src,
                 GSTMESSAGE_API.gst_message_new_info(pipe.src, msg, "testing info messages"));
@@ -194,6 +197,7 @@ public class BusTest {
         pipe.dispose();
         assertTrue("INFO signal not received", signalFired.get());
         assertEquals("Incorrect source object on signal", pipe.src, signalSource.get());
+        GlibAPI.GLIB_API.g_error_free(msg);
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Neil C Smith
+ * Copyright (c) 2022 Neil C Smith
  * Copyright (c) 2016 Christophe Lafolet
  *
  * This file is part of gstreamer-java.
@@ -25,7 +25,6 @@ import org.freedesktop.gstreamer.lowlevel.GType;
 import org.freedesktop.gstreamer.lowlevel.GstQueryAPI;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.gstreamer.glib.NativeObject;
 import org.freedesktop.gstreamer.glib.Natives;
 
 /**
@@ -45,10 +44,7 @@ public class AllocationQuery extends Query {
      * @param init initialization data.
      */
     AllocationQuery(Initializer init) {
-        // special case : no ref shall be added
-        // the allocationQuery is an in/out parameter during query notification
-        // so, we shall keep query writable for add methods
-        super(Natives.initializer(init.ptr.getPointer(), false, true));
+        super(init);
     }
 
     /**

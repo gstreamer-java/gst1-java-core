@@ -106,6 +106,7 @@ public interface GlibAPI extends Library {
     int g_timeout_add_full(int priority, int interval, GSourceFunc function,
             Pointer data, GDestroyNotify notify);
     int g_timeout_add_seconds(int interval, GSourceFunc function, Pointer data);
+    GstAPI.GErrorStruct g_error_new(int quark, int code, String message);
     void g_error_free(Pointer error);
     void g_error_free(GstAPI.GErrorStruct error);
     
