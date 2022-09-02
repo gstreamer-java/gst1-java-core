@@ -71,7 +71,4 @@ class TestPipe {
         pipe.stop();
     }
 
-    protected void finalize() {
-        dispose();
-    }
 }

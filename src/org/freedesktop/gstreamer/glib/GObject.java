@@ -603,11 +603,6 @@ public abstract class GObject extends RefCountedObject {
 
         abstract protected void disconnect();
 
-//        @Override
-//        protected final void finalize() {
-//            // Ensure the native callback is removed
-//            remove();
-//        }
     }
 
     /**
