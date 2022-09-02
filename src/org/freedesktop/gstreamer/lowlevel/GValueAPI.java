@@ -308,11 +308,6 @@ public interface GValueAPI extends Library {
             return v == null ? null : v.getValue();
         }
         
-        @Override
-        protected void finalize() throws Throwable {
-            free();
-        }
-
         public void free() {
             if (ownsMemory) {
                 GVALUE_API.g_value_array_free(this);  

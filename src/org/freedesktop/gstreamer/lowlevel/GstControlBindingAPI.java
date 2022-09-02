@@ -44,7 +44,7 @@ public interface GstControlBindingAPI extends Library {
             long timestamp,
             long internal,
             int n_values,
-            GValueAPI.GValueArray values);
+            GValueAPI.GValue[] values);
     
     void gst_control_binding_set_disabled(GstControlBindingPtr binding,
             boolean disabled);

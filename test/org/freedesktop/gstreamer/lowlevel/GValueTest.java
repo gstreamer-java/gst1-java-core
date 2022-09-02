@@ -98,6 +98,8 @@ public class GValueTest {
         assertEquals("value mismatch", 5, gva.getValue(0));
         assertEquals("value mismatch", 5.0, gva.getValue(1));
         assertEquals("value mismatch", "omanipadmihoom", gva.getValue(2));
+        
+        gva.free();
     }
     
     @Test public void testInitSet() throws Exception {
