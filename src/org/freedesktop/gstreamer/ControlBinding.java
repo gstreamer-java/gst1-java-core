@@ -74,16 +74,16 @@ public class ControlBinding extends GstObject {
      * @return false if the given array could not be filled
      */
     public boolean getValueArray(long timestamp, long interval, Object[] values) {
-        GValueAPI.GValueArray gValues = new GValueAPI.GValueArray(values.length);
+        GValueAPI.GValue[] gValues = new GValueAPI.GValue[values.length];
         boolean ok = GSTCONTROLBINDING_API.gst_control_binding_get_g_value_array(
                 handle.getPointer(),
                 timestamp,
                 interval,
-                gValues.n_values,
+                gValues.length,
                 gValues);
         if (ok) {
             for (int i = 0; i < values.length; i++) {
-                values[i] = gValues.getValue(i);
+                values[i] = gValues[i].getValue();
             }
         }
         return ok;
