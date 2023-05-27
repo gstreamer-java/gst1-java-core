@@ -621,13 +621,13 @@ public class Structure extends NativeObject {
      */
     public void setObject(String field, String typeName, GObject object) {
         GType type = GType.valueOf(typeName);
-        if (type != GType.INVALID) {
+        if (!GType.INVALID.equals(type)) {
             if (object != null) {
                 GType realType = GType.valueOf(object.getTypeName());
-                while (realType != GType.OBJECT && realType != type) {
+                while (!realType.equals(GType.OBJECT) && !realType.equals(type)) {
                     realType = realType.getParentType();
                 }
-                if (realType != type) {
+                if (!realType.equals(type)) {
                     throw new IllegalArgumentException(
                             "Provided instance of " + object.getTypeName() + " is not a " + typeName);
                 }
