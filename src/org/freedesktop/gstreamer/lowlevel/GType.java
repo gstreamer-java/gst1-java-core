@@ -87,11 +87,7 @@ public class GType extends IntegerType {
     }
 
     public static GType valueOf(long value) {
-    	GType result = gTypeByValues.get(value);
-    	if (result == null) {
-    		gTypeByValues.put(value, result = new GType(value));
-    	}
-    	return result;
+    	return gTypeByValues.computeIfAbsent(value, GType::new);
     }
 
     public static GType valueOf(String typeName) {
