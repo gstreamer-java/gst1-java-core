@@ -140,7 +140,7 @@ public class WebRTCBin extends Bin {
      * @param listener callback that is called when a offer is created
      */
     public void createOffer(final CREATE_OFFER listener) {
-        createOfferPromise = new Promise(new Promise.PROMISE_CHANGE() {
+        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
@@ -149,7 +149,8 @@ public class WebRTCBin extends Bin {
                 promise.dispose();
             }
         });
-        emit("create-offer", null, createOfferPromise);
+        emit("create-offer", null, promise);
+        createOfferPromise = promise;
     }
 
     /**
@@ -164,7 +165,7 @@ public class WebRTCBin extends Bin {
      * @param listener callback that is called when an answer is created.
      */
     public void createAnswer(final CREATE_ANSWER listener) {
-        createAnswerPromise = new Promise(new Promise.PROMISE_CHANGE() {
+        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
@@ -173,7 +174,8 @@ public class WebRTCBin extends Bin {
                 promise.dispose();
             }
         });
-        emit("create-answer", null, createAnswerPromise);
+        emit("create-answer", null, promise);
+        createAnswerPromise = promise;
     }
 
     /**
