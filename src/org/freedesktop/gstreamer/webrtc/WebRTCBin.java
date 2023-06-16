@@ -43,6 +43,8 @@ public class WebRTCBin extends Bin {
 
     public static final String GST_NAME = "webrtcbin";
     public static final String GTYPE_NAME = "GstWebRTCBin";
+    private Promise createOfferPromise;
+    private Promise createAnswerPromise;
 
     WebRTCBin(Initializer init) {
         super(init);
@@ -138,7 +140,7 @@ public class WebRTCBin extends Bin {
      * @param listener callback that is called when a offer is created
      */
     public void createOffer(final CREATE_OFFER listener) {
-        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
+        createOfferPromise = new Promise(new Promise.PROMISE_CHANGE() {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
@@ -147,7 +149,7 @@ public class WebRTCBin extends Bin {
                 promise.dispose();
             }
         });
-        emit("create-offer", null, promise);
+        emit("create-offer", null, createOfferPromise);
     }
 
     /**
@@ -162,7 +164,7 @@ public class WebRTCBin extends Bin {
      * @param listener callback that is called when an answer is created.
      */
     public void createAnswer(final CREATE_ANSWER listener) {
-        Promise promise = new Promise(new Promise.PROMISE_CHANGE() {
+        createAnswerPromise = new Promise(new Promise.PROMISE_CHANGE() {
             @SuppressWarnings("unused")
             public void onChange(Promise promise) {
                 Structure reply = promise.getReply();
@@ -171,7 +173,7 @@ public class WebRTCBin extends Bin {
                 promise.dispose();
             }
         });
-        emit("create-answer", null, promise);
+        emit("create-answer", null, createAnswerPromise);
     }
 
     /**
