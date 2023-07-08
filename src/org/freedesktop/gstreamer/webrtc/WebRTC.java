@@ -35,6 +35,9 @@ public class WebRTC {
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {
             return Stream.of(
+                    registration(WebRTCDataChannel.class,
+                            WebRTCDataChannel.GTYPE_NAME,
+                            WebRTCDataChannel::new),
                     registration(WebRTCSessionDescription.class,
                             WebRTCSessionDescription.GTYPE_NAME,
                             WebRTCSessionDescription::new),

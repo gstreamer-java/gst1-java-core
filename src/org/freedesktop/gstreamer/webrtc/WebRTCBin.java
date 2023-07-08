@@ -18,13 +18,12 @@
  */
 package org.freedesktop.gstreamer.webrtc;
 
-import org.freedesktop.gstreamer.Bin;
-import org.freedesktop.gstreamer.Element;
-import org.freedesktop.gstreamer.Gst;
-import org.freedesktop.gstreamer.Promise;
-import org.freedesktop.gstreamer.Structure;
+import com.sun.jna.ptr.PointerByReference;
+import org.freedesktop.gstreamer.*;
 
 import org.freedesktop.gstreamer.glib.NativeEnum;
+import org.freedesktop.gstreamer.glib.Natives;
+import org.freedesktop.gstreamer.lowlevel.GstAPI;
 import org.freedesktop.gstreamer.lowlevel.GstAPI.GstCallback;
 
 /**
@@ -43,8 +42,8 @@ public class WebRTCBin extends Bin {
 
     public static final String GST_NAME = "webrtcbin";
     public static final String GTYPE_NAME = "GstWebRTCBin";
-    private Promise createOfferPromise;
-    private Promise createAnswerPromise;
+    private Promise promiseCreateOffer;
+    private Promise promiseCreateAnswer;
 
     WebRTCBin(Initializer init) {
         super(init);
@@ -150,7 +149,7 @@ public class WebRTCBin extends Bin {
             }
         });
         emit("create-offer", null, promise);
-        createOfferPromise = promise;
+        promiseCreateOffer = promise;
     }
 
     /**
@@ -175,7 +174,7 @@ public class WebRTCBin extends Bin {
             }
         });
         emit("create-answer", null, promise);
-        createAnswerPromise = promise;
+        promiseCreateAnswer = promise;
     }
 
     /**
@@ -299,5 +298,43 @@ public class WebRTCBin extends Bin {
         WebRTCSessionDescription description = (WebRTCSessionDescription) get("remote-description");
         description.disown();
         return description;
+    }
+
+    /**
+     *  Creates a {@link WebRTCDataChannel} that can be used to send messages to other connected peers
+     *  <p>
+     *  Should be called once this {@link WebRTCBin} is in the READY state. Otherwise an error will be thrown
+     *  <p>
+     *  @return the new {@link WebRTCDataChannel}
+     */
+    public WebRTCDataChannel createDataChannel(String label) {
+        if (getState() != State.READY) {
+            throw new IllegalStateException("WebRTCBin must be in state READY");
+        }
+        PointerByReference channel = new PointerByReference();
+        emit("create-data-channel", label, null, channel);
+        return Natives.objectFor(channel.getValue(), WebRTCDataChannel.class, false, true);
+    }
+
+    /**
+     * Signal emitted when this {@link WebRTCBin} receives a {@link WebRTCDataChannel} from
+     * a remote peer.
+     */
+    public interface ON_DATA_CHANNEL {
+        void onDataChannel(WebRTCDataChannel channel);
+    }
+
+    /**
+     * Adds a listener for the <code>on-data-channel</code> signal.
+     *
+     * @param listener
+     */
+    public void connect(final ON_DATA_CHANNEL listener) {
+        connect(ON_DATA_CHANNEL.class, listener, new GstAPI.GstCallback() {
+            @SuppressWarnings("unused")
+            public void callback(Element elem, WebRTCDataChannel channel) {
+                listener.onDataChannel(channel);
+            }
+        });
     }
 }
