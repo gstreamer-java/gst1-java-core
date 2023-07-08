@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.sun.jna.ptr.IntByReference;
 import org.freedesktop.gstreamer.lowlevel.annotations.CallerOwnsReturn;
 
 import com.sun.jna.Callback;
@@ -121,6 +122,13 @@ public interface GlibAPI extends Library {
     int g_date_get_month(Pointer date);
     int g_date_get_day(Pointer date);
     void g_date_free(Pointer date);
+
+    Pointer g_bytes_new(Pointer source, int size);
+    Pointer g_bytes_get_data(Pointer bytes, IntByReference size);
+    int g_bytes_get_size(Pointer bytes);
+    Pointer g_bytes_ref(Pointer bytes);
+    void g_bytes_unref(Pointer bytes);
+
 
     GList g_list_append(GList list, Pointer data);
 
