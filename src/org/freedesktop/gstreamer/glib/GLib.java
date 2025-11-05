@@ -97,6 +97,7 @@ public class GLib {
         @Override
         public Stream<NativeObject.TypeRegistration<?>> types() {
             return Stream.of(
+                    registration(GBytes.class, GBytes.GTYPE_NAME, GBytes::new),
                     registration(GDate.class, GDate.GTYPE_NAME, GDate::new),
                     registration(GInetAddress.class, GInetAddress.GTYPE_NAME, GInetAddress::new),
                     registration(GSocket.class, GSocket.GTYPE_NAME, GSocket::new),
